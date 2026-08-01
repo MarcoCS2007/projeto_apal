@@ -39,11 +39,9 @@ Se os dois mostrarem um número de versão, está pronto.
 Isso baixa o código do projeto para a sua máquina.
 
 ```bash
-git clone https://github.com/SEU-USUARIO/controle-catraca.git
-cd controle-catraca
+git clone https://github.com/MarcoCS2007/projeto_apal.git
+cd projeto_apal
 ```
-
-Troque `SEU-USUARIO` pelo endereço real do repositório do time.
 
 ### Passo 2 — Criar o arquivo de configuração
 
