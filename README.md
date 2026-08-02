@@ -46,6 +46,13 @@ cd projeto_apal
 
 ```
 
+```bash
+#Támbém pode clonar por SSH
+git clone git@github.com:MarcoCS2007/projeto_apal.git
+cd projeto_apal
+
+```
+
 ### Passo 2 — Criar o arquivo de configuração
 
 O projeto precisa de um arquivo com as configurações. Existe um modelo pronto chamado `.env.example`. Crie a pasta `.envs` e copie o modelo para dentro dela:
