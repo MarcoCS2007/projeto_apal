@@ -196,7 +196,9 @@ Você não precisa instalar nada na máquina para isso funcionar. Não há hook 
 
 ---
 
-## Fluxo de trabalho com Git
+## Fluxo de trabalho com Git (Git Flow)
+
+A branch principal de desenvolvimento agora é a **`develop`**. Todos os desenvolvedores DEVEM criar suas branches de funcionalidade, correção ou documentação a partir da branch `develop`.
 
 O Git roda na sua máquina, não dentro do container. Esse fluxo se repete para **cada card** do Jira, sempre igual. Decore ele.
 
@@ -204,84 +206,70 @@ O Git roda na sua máquina, não dentro do container. Esse fluxo se repete para 
 
 ```
 develop (atualizada) → cria branch → trabalha → commit → push → Pull Request → revisão → merge na develop
-
 ```
 
-### 1. Atualize a develop ANTES de criar qualquer branch
+### 1. Atualize a develop e crie sua branch
 
-Isso é a regra mais importante do fluxo. Sempre que você for começar um card novo, a primeira coisa é garantir que sua develop local está igual à do GitHub. Se você pular esse passo, sua branch parte de uma versão velha e vai dar conflito quando tentar juntar.
+Isso é a regra mais importante do fluxo. Sempre que você for começar um card novo, a primeira coisa é garantir que sua `develop` local está igual à do GitHub. Se você pular esse passo, sua branch parte de uma versão velha e vai dar conflito quando tentar juntar. Atualize a `develop` e crie a nova branch a partir dela:
 
 ```bash
 git checkout develop
 git pull
-
+git checkout -b feature/HU-XXX-descricao-curta
 ```
 
-Se você já estava numa branch de outro card, esse comando te leva para a develop e puxa tudo que o time já juntou. Só depois disso crie a branch nova.
+O nome segue o padrão `feature/HU-XXX-descricao-curta`. Esse padrão ajuda todo mundo a saber de quem é cada branch e a que card pertence. Nunca trabalhe direto na `develop` ou na `main`. Sempre crie uma branch.
 
-### 2. Crie uma branch para a sua tarefa
-
-O nome segue o padrão `feature/HU-XXX-descricao-curta`. Esse padrão ajuda todo mundo a saber de quem é cada branch e a que card pertence.
-
-```bash
-git checkout -b feature/HU-012-configurar-autenticacao
-
-```
-
-Nunca trabalhe direto na develop. Sempre crie uma branch.
-
-### 3. Faça o trabalho
+### 2. Faça o trabalho
 
 Programe, crie arquivos, o que a tarefa pedir. Use os atalhos do container para rodar o servidor, testes e verificações.
 
-### 4. (Opcional, recomendado) Verifique antes de commitar
+### 3. (Opcional, recomendado) Verifique antes de commitar
 
 Rode a verificação no container para já corrigir o que estiver fora do padrão. Isso evita que seu Pull Request fique vermelho no CI.
 
 ```bash
 make precommit
 make test
-
 ```
 
-### 5. Salve com um commit semântico
+### 4. Salve com um commit semântico
 
 ```bash
 git add .
 git commit -m "feat(HU-012): configura autenticacao via Django"
-
 ```
 
 Se precisar fazer vários commits na mesma branch, tudo bem. Cada commit deve ter uma mensagem descritiva do que foi feito nele.
 
-### 6. Envie para o GitHub
+### 5. Envie para o GitHub
 
 ```bash
-git push -u origin feature/HU-012-configurar-autenticacao
-
+git push -u origin feature/HU-XXX-descricao-curta
 ```
 
 O `-u` só é necessário no primeiro push da branch. Nos seguintes, basta `git push`.
 
-### 7. Abra o Pull Request no GitHub
+### 6. Abra o Pull Request no GitHub
 
 1. Vá ao repositório no GitHub. O GitHub geralmente mostra um banner amarelo sugerindo "Compare & pull request" logo após o push. Clique nele.
-2. **Confira a base:** a base deve ser `develop`, não `main`. Se estiver apontando para `main`, troque no dropdown.
+2. **Confira a base (target/base branch):** A branch de destino do PR DEVE ser obrigatoriamente a `develop` e **nunca** a `main`. Se estiver apontando para `main`, troque no dropdown para `develop`.
 3. **Título:** use o mesmo padrão do commit, ex: `feat(HU-012): configura autenticacao via Django`.
 4. **Descrição:** escreva em uma ou duas linhas o que foi feito e cole o link do card no Jira.
 5. Clique em **Create pull request**.
 
 O CI roda automaticamente. Se ficar verde, peça revisão de outra pessoa do time. Se ficar vermelho, corrija o que o CI apontou, commite, dê push e o CI roda de novo sozinho.
 
-### 8. Revisão e merge
+### 7. Revisão e merge
 
-Outra pessoa do time abre o seu Pull Request, olha o código e, se estiver tudo certo, aprova. Depois clica em **Merge pull request** e confirma. Sua branch é juntada à develop e pode ser deletada.
+Outra pessoa do time abre o seu Pull Request, olha o código e, se estiver tudo certo, aprova. Depois clica em **Merge pull request** e confirma. Sua branch é juntada à `develop` e pode ser deletada.
 
 No Jira, mova o card para **Concluído** e escreva um comentário rápido do que foi entregue.
 
-### Regras importantes
+### Regras importantes / Restrições
 
-* **Nunca dê push direto na develop ou na main.** Sempre via Pull Request.
+* **Proibido commits diretos:** Commits diretos nas branches `develop` e `main` são **estritamente proibidos**. As alterações entram apenas via Pull Request aprovado e com CI passando.
+* **A branch de destino do PR DEVE ser a `develop`**, nunca a `main`.
 * **Nunca faça merge com CI vermelho.** Corrija primeiro.
 * **Sempre atualize a develop antes de criar branch.** É o passo 1, não pule.
 * **Um card por vez.** Termine ou trave o atual antes de pegar outro.
