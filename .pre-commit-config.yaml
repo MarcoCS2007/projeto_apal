@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: Ruff Linting (via Docker)
+        entry: docker compose exec -T web ruff check --fix
+        language: system
+        types: [python]
+        pass_filenames: true
+
+      - id: black
+        name: Black Formatting (via Docker)
+        entry: docker compose exec -T web black
+        language: system
+        types: [python]
+        pass_filenames: true

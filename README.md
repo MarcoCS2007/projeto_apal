@@ -311,7 +311,7 @@ Depois disso, novos terminais abrem sem ativar o `.venv`. O ambiente virtual con
 ## Estrutura de pastas
 
 ```
-controle-catraca/
+projeto_apal/
   .github/
     workflows/
       ci.yml         pipeline de CI que valida lint, formatação e testes

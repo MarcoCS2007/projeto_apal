@@ -149,6 +149,8 @@ activemq-data/
 
 # Environments
 .env
+.env.dev
+.env.prod
 .envrc
 .venv
 env/
@@ -156,6 +158,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+# Ignora a pasta de environments da nossa arquitetura Docker
+.envs/
 
 # Spyder project settings
 .spyderproject

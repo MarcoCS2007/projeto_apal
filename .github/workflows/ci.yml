@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Setup do Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Criar arquivo .env de Teste
+        # O Docker Compose precisa do .env.dev para buildar.
+        # Criamos um dummy genérico apenas para o ambiente de testes na nuvem.
+        run: |
+          mkdir -p .envs
+          cat <<EOF > .envs/.env.dev
+          DJANGO_SETTINGS_MODULE=config.settings.dev
+          SECRET_KEY=chave-secreta-ci-pipeline-123
+          POSTGRES_DB=apal_db
+          POSTGRES_USER=apal_user
+          POSTGRES_PASSWORD=apal_password
+          POSTGRES_HOST=db
+          POSTGRES_PORT=5432
+          EOF
+
+      - name: Subir Infraestrutura (Docker Compose)
+        run: |
+          docker compose up -d --build
+          # Aguarda o healthcheck do banco de dados autorizar a subida do web
+          sleep 10 
+
+      - name: Validar Qualidade do Código (Lint e Formatação)
+        # Note que no CI usamos "--check" em vez de "--fix". 
+        # O CI deve falhar se o código estiver fora do padrão, e não tentar consertar.
+        run: |
+          docker compose exec -T web ruff check .
+          docker compose exec -T web black --check .
+
+      - name: Testar Migrações do Banco de Dados
+        run: docker compose exec -T web python manage.py migrate
+
+      - name: Rodar Suíte de Testes (Pytest)
+        run: docker compose exec -T web pytest
