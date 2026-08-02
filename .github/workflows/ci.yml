@@ -43,7 +43,7 @@ jobs:
         # Note que no CI usamos "--check" em vez de "--fix". 
         # O CI deve falhar se o código estiver fora do padrão, e não tentar consertar.
         run: |
-          docker compose exec -T web ruff check .
+          docker compose exec -T web ruff check --no-cache .
           docker compose exec -T web black --check .
 
       - name: Testar Migrações do Banco de Dados

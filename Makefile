@@ -13,7 +13,7 @@ createsuperuser:
 	docker compose exec web python manage.py createsuperuser
 
 precommit:
-		docker compose exec -T web ruff check --no-cache --fix .; \
+		docker compose exec -T web ruff check --fix .; \
 		docker compose exec -T web black .; \
 		
 seed:
