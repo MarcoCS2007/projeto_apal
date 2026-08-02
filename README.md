@@ -1,4 +1,5 @@
 # Sistema APAL - Aqui pode, aqui é legal
+
 Sistema para modernizar o processo de licenciamento e gestão de trabalhadores ambulantes, garantindo organização urbana, controle legal e acesso a oportunidades de forma digna e transparente;
 
 ---
@@ -26,6 +27,7 @@ Para confirmar que Docker e Git estão instalados, abra o terminal e rode:
 ```bash
 docker --version
 git --version
+
 ```
 
 Se os dois mostrarem um número de versão, está pronto.
@@ -41,6 +43,7 @@ Isso baixa o código do projeto para a sua máquina.
 ```bash
 git clone https://github.com/MarcoCS2007/projeto_apal.git
 cd projeto_apal
+
 ```
 
 ### Passo 2 — Criar o arquivo de configuração
@@ -48,13 +51,17 @@ cd projeto_apal
 O projeto precisa de um arquivo com as configurações, chamado `.env`. Existe um modelo pronto chamado `.env.example`. Copie ele:
 
 No Linux, Mac ou Git Bash:
+
 ```bash
 cp .env.example .env
+
 ```
 
 No Windows (Prompt de Comando):
+
 ```cmd
 copy .env.example .env
+
 ```
 
 Pronto, o `.env` está criado com valores que já funcionam para desenvolvimento. Não precisa mudar nada agora.
@@ -64,13 +71,17 @@ Pronto, o `.env` está criado com valores que já funcionam para desenvolvimento
 Esse comando constrói e liga tudo: o Django e o banco de dados PostgreSQL.
 
 Com Makefile:
+
 ```bash
 make up
+
 ```
 
 Com dev.sh:
+
 ```bash
 ./dev.sh up
+
 ```
 
 Na primeira vez demora alguns minutos, porque o Docker baixa e monta tudo. Quando aparecer uma mensagem dizendo que o servidor está rodando, está no ar. Deixe esse terminal aberto.
@@ -80,13 +91,17 @@ Na primeira vez demora alguns minutos, porque o Docker baixa e monta tudo. Quand
 Abra um **segundo terminal**, na mesma pasta do projeto, e rode as migrações. Isso cria as tabelas no banco.
 
 Com Makefile:
+
 ```bash
 make migrate
+
 ```
 
 Com dev.sh:
+
 ```bash
 ./dev.sh migrate
+
 ```
 
 ### Passo 5 — Criar seu usuário administrador
@@ -94,13 +109,17 @@ Com dev.sh:
 Ainda no segundo terminal, crie seu acesso ao sistema. Cada pessoa cria o seu, na própria máquina.
 
 Com Makefile:
+
 ```bash
 make createsuperuser
+
 ```
 
 Com dev.sh:
+
 ```bash
 ./dev.sh createsuperuser
+
 ```
 
 Ele vai pedir um nome de usuário, email e senha. Anote, é com isso que você entra no sistema.
@@ -109,8 +128,8 @@ Ele vai pedir um nome de usuário, email e senha. Anote, é com isso que você e
 
 Abra o navegador e acesse:
 
-- A aplicação: http://localhost:8000
-- A área administrativa: http://localhost:8000/admin
+* A aplicação: http://localhost:8000
+* A área administrativa: http://localhost:8000/admin
 
 Na área administrativa, entre com o usuário e senha que você criou no passo 5.
 
@@ -123,7 +142,7 @@ Pronto, o projeto está rodando.
 Estes são os atalhos que você vai usar com frequência. Existem duas versões, escolha a do seu ambiente: **Makefile** para Linux, Mac ou WSL; **dev.sh** para Git Bash no Windows. As duas fazem exatamente a mesma coisa.
 
 | O que faz | Makefile | dev.sh (Git Bash) |
-|---|---|---|
+| --- | --- | --- |
 | Sobe o projeto | `make up` | `./dev.sh up` |
 | Roda as migrações | `make migrate` | `./dev.sh migrate` |
 | Cria migrações | `make makemigrations` | `./dev.sh makemigrations` |
@@ -137,12 +156,14 @@ Exemplo de comando livre, para criar uma migração nova:
 
 ```bash
 make cmd="python manage.py makemigrations"
+
 ```
 
 ou
 
 ```bash
 ./dev.sh exec python manage.py makemigrations
+
 ```
 
 ---
@@ -158,6 +179,7 @@ A garantia de qualidade acontece em **duas camadas**:
 ```bash
 make precommit      # ou ./dev.sh precommit
 make test           # ou ./dev.sh test
+
 ```
 
 **Camada 2, validação automática no CI (obrigatória, no GitHub).** Quando você abre um Pull Request, o GitHub Actions roda automaticamente o ruff, o black e os testes. Se algo estiver fora do padrão ou algum teste falhar, o Pull Request fica marcado com erro e **não pode ser juntado** até você corrigir. Essa é a rede de segurança: mesmo que alguém esqueça de rodar a verificação manual, o CI barra antes de entrar no projeto.
@@ -180,6 +202,7 @@ O Git roda na sua máquina, não dentro do container. Esse fluxo se repete para 
 
 ```
 develop (atualizada) → cria branch → trabalha → commit → push → Pull Request → revisão → merge na develop
+
 ```
 
 ### 1. Atualize a develop ANTES de criar qualquer branch
@@ -189,6 +212,7 @@ Isso é a regra mais importante do fluxo. Sempre que você for começar um card 
 ```bash
 git checkout develop
 git pull
+
 ```
 
 Se você já estava numa branch de outro card, esse comando te leva para a develop e puxa tudo que o time já juntou. Só depois disso crie a branch nova.
@@ -199,6 +223,7 @@ O nome segue o padrão `feature/HU-XXX-descricao-curta`. Esse padrão ajuda todo
 
 ```bash
 git checkout -b feature/HU-012-configurar-autenticacao
+
 ```
 
 Nunca trabalhe direto na develop. Sempre crie uma branch.
@@ -214,6 +239,7 @@ Rode a verificação no container para já corrigir o que estiver fora do padrã
 ```bash
 make precommit
 make test
+
 ```
 
 ### 5. Salve com um commit semântico
@@ -221,6 +247,7 @@ make test
 ```bash
 git add .
 git commit -m "feat(HU-012): configura autenticacao via Django"
+
 ```
 
 Se precisar fazer vários commits na mesma branch, tudo bem. Cada commit deve ter uma mensagem descritiva do que foi feito nele.
@@ -229,6 +256,7 @@ Se precisar fazer vários commits na mesma branch, tudo bem. Cada commit deve te
 
 ```bash
 git push -u origin feature/HU-012-configurar-autenticacao
+
 ```
 
 O `-u` só é necessário no primeiro push da branch. Nos seguintes, basta `git push`.
@@ -251,10 +279,10 @@ No Jira, mova o card para **Concluído** e escreva um comentário rápido do que
 
 ### Regras importantes
 
-- **Nunca dê push direto na develop ou na main.** Sempre via Pull Request.
-- **Nunca faça merge com CI vermelho.** Corrija primeiro.
-- **Sempre atualize a develop antes de criar branch.** É o passo 1, não pule.
-- **Um card por vez.** Termine ou trave o atual antes de pegar outro.
+* **Nunca dê push direto na develop ou na main.** Sempre via Pull Request.
+* **Nunca faça merge com CI vermelho.** Corrija primeiro.
+* **Sempre atualize a develop antes de criar branch.** É o passo 1, não pule.
+* **Um card por vez.** Termine ou trave o atual antes de pegar outro.
 
 ---
 
@@ -264,10 +292,11 @@ Para manter o histórico organizado, todo commit segue o padrão:
 
 ```
 tipo(HU-XXX): descrição em minúsculas
+
 ```
 
 | Tipo | Quando usar | Exemplo |
-|---|---|---|
+| --- | --- | --- |
 | feat | Nova funcionalidade | feat(HU-018): adiciona parser de CSV |
 | fix | Correção de bug | fix(HU-012): corrige erro de login |
 | docs | Documentação | docs(HU-006): atualiza o README |
@@ -287,6 +316,9 @@ Você pode ter outro PostgreSQL rodando na sua máquina na porta padrão. O proj
 
 **Erro "connection refused" ao rodar migrate.**
 O banco ainda não terminou de subir. Espere alguns segundos depois do `make up` antes de rodar o `make migrate`.
+
+**Erro `service "web" is not running` ao rodar precommit ou testes.**
+Isso acontece porque os comandos de verificação (`make precommit`, `make test`) rodam dentro do container via `docker compose exec`, e ele precisa estar ligado para receber o comando. Certifique-se de ter rodado o `make up` (ou `./dev.sh up`) e que a infraestrutura está no ar antes de tentar rodar as verificações locais.
 
 **Esqueci de criar o arquivo .env.**
 Volte ao Passo 2. Sem o `.env`, o projeto não sabe como conectar no banco.
@@ -310,7 +342,7 @@ Depois disso, novos terminais abrem sem ativar o `.venv`. O ambiente virtual con
 
 ## Estrutura de pastas
 
-```
+```text
 projeto_apal/
   .github/
     workflows/
@@ -330,6 +362,7 @@ projeto_apal/
   dev.sh           atalhos para Windows com Git Bash
   docker-compose.yml
   .env.example     modelo do arquivo de configuração
+
 ```
 
 ---
