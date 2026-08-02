@@ -50,4 +50,4 @@ jobs:
         run: docker compose exec -T web python manage.py migrate
 
       - name: Rodar Suíte de Testes (Pytest)
-        run: docker compose exec -T web pytest
+        run: docker compose exec -T web pytest -p no:cacheprovider
