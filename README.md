@@ -48,23 +48,25 @@ cd projeto_apal
 
 ### Passo 2 — Criar o arquivo de configuração
 
-O projeto precisa de um arquivo com as configurações, chamado `.env`. Existe um modelo pronto chamado `.env.example`. Copie ele:
+O projeto precisa de um arquivo com as configurações. Existe um modelo pronto chamado `.env.example`. Crie a pasta `.envs` e copie o modelo para dentro dela:
 
 No Linux, Mac ou Git Bash:
 
 ```bash
-cp .env.example .env
+mkdir -p .envs
+cp .env.example .envs/.env.dev
 
 ```
 
 No Windows (Prompt de Comando):
 
 ```cmd
-copy .env.example .env
+mkdir .envs
+copy .env.example .envs\.env.dev
 
 ```
 
-Pronto, o `.env` está criado com valores que já funcionam para desenvolvimento. Não precisa mudar nada agora.
+Pronto, o arquivo está criado com valores que já funcionam para desenvolvimento. O Docker Compose agora procura o arquivo `.envs/.env.dev`. Não precisa mudar nada agora.
 
 ### Passo 3 — Subir o projeto
 
@@ -320,8 +322,8 @@ O banco ainda não terminou de subir. Espere alguns segundos depois do `make up`
 **Erro `service "web" is not running` ao rodar precommit ou testes.**
 Isso acontece porque os comandos de verificação (`make precommit`, `make test`) rodam dentro do container via `docker compose exec`, e ele precisa estar ligado para receber o comando. Certifique-se de ter rodado o `make up` (ou `./dev.sh up`) e que a infraestrutura está no ar antes de tentar rodar as verificações locais.
 
-**Esqueci de criar o arquivo .env.**
-Volte ao Passo 2. Sem o `.env`, o projeto não sabe como conectar no banco.
+**Esqueci de criar o arquivo .envs/.env.dev.**
+Volte ao Passo 2. Sem ele, o Docker Compose vai dar erro logo no make up dizendo que não encontrou o arquivo de variáveis, e o projeto não saberá como conectar no banco.
 
 **Meu Pull Request ficou vermelho no GitHub.**
 O CI encontrou algo fora do padrão ou um teste quebrado. Abra a aba do Pull Request, veja qual etapa falhou, rode `make precommit` e `make test` na sua máquina para reproduzir e corrigir, depois commite e dê push. O CI roda de novo sozinho.
@@ -344,6 +346,7 @@ Depois disso, novos terminais abrem sem ativar o `.venv`. O ambiente virtual con
 
 ```text
 projeto_apal/
+  .envs/           arquivos de variáveis de ambiente (.env.dev, .env.prod) - ignorados pelo git
   .github/
     workflows/
       ci.yml         pipeline de CI que valida lint, formatação e testes
