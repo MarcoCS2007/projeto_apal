@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processos em Análise - Ponto Legal VCA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- CAMINHO CORRIGIDO PARA O CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <!-- CAMINHO CORRIGIDO PARA A RAIZ -->
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <!-- Como este arquivo e o dashboard estão na mesma pasta (gestor), o link permanece o mesmo -->
+                <a href="dashboard.html" class="active"><i data-lucide="layout-dashboard"></i> Painel Central</a>
+                <a href="#"><i data-lucide="map"></i> Mapa de Vagas</a>
+                <a href="#"><i data-lucide="wallet"></i> Financeiro</a>
+                <!-- CAMINHO CORRIGIDO PARA A RAIZ (Log-out) -->
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET ACESSIBILIDADE OCULTO -->
+    <div id="access-widget-container" class="access-widget-container"><button id="open-access-float" class="floating-access-btn"><span class="access-text">Acessibilidade</span><i data-lucide="eye-off"></i></button></div>
+    <div id="accessibility-panel" class="access-panel hidden"><div class="access-header"><h3>Acessibilidade</h3><button id="close-access" class="close-btn"><i data-lucide="x"></i></button></div></div>
+
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Fila de Processos em Análise</h1>
+            <p>Analise a documentação, vistorias e emita os pareceres das solicitações pendentes.</p>
+        </div>
+    </section>
+
+    <main class="main-container">
+        <div class="form-card">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #F59E0B;"></div>
+                <h2>Processos Pendentes (142)</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PROTOCOLO</th>
+                            <th>REQUERENTE</th>
+                            <th>TIPO DE PEDIDO</th>
+                            <th>FASE ATUAL</th>
+                            <th>TEMPO NA FILA</th>
+                            <th>AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#8842-2026</td><td>João da Silva</td><td>Nova Licença (Fixo)</td>
+                            <td><span class="badge warning">Análise Documental</span></td>
+                            <td>2 dias</td>
+                            <td><button class="btn-action">Revisar</button></td>
+                        </tr>
+                        <tr>
+                            <td>#8910-2026</td><td>Sonia Regina</td><td>Renovação Anual</td>
+                            <td><span class="badge warning">Aguardando Pagamento</span></td>
+                            <td>5 dias</td>
+                            <td><button class="btn-action">Revisar</button></td>
+                        </tr>
+                        <tr>
+                            <td>#8922-2026</td><td>Carlos Santos</td><td>Nova Licença (Móvel)</td>
+                            <td><span class="badge purple">Vistoria de Local</span></td>
+                            <td>12 dias</td>
+                            <td><button class="btn-action">Parecer</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: left;">
+                <!-- Link na mesma pasta gestor -->
+                <a href="dashboard.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="arrow-left" style="width:16px!important;"></i> Voltar ao Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-pmvc"><p>Prefeitura Municipal de Vitória da Conquista</p></footer>
+    <div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div>
+    <!-- CAMINHO CORRIGIDO PARA O JS -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script><script>new window.VLibras.Widget('https://vlibras.gov.br/app');</script><script src="../js/script.js"></script><script>lucide.createIcons();</script>
+</body>
+</html>

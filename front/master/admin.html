@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de TI - Ponto VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- CAMINHO CORRIGIDO PARA O CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Técnico -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
+        <div class="header-container">
+            <div class="logo-area">
+                <span class="material-icons logo-icon">campaign</span>
+                <span class="logo-text">Ponto <strong>VCA</strong></span>
+            </div>
+            <nav class="header-nav">
+                <a href="#" style="color: var(--texto-escuro); font-weight: 700;"><span class="material-icons">admin_panel_settings</span> Master / TI</a>
+                <!-- CAMINHO CORRIGIDO PARA A RAIZ -->
+                <a href="../index.html"><span class="material-icons">logout</span> Encerrar Sessão</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Faixa (Hero Section) em tom mais escuro para diferenciar a TI -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
+        <div class="hero-container">
+            <h1>Administração do Sistema e Infraestrutura</h1>
+            <p>Monitoramento de banco de dados, logs de segurança e gestão de permissões globais.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+        
+        <!-- Grid de Infraestrutura e Banco de Dados -->
+        <div class="stats-grid">
+            <div class="stat-card" style="border-top-color: #10B981;">
+                <div class="stat-icon" style="background: #D1FAE5; color: #10B981;"><span class="material-icons">dns</span></div>
+                <div class="stat-info">
+                    <label>BANCO DE DADOS (BKP)</label>
+                    <p style="font-size: 1.2rem; color: #10B981;">Sincronizado</p>
+                </div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--azul-vibrante);">
+                <div class="stat-icon" style="background: #E0E7FF; color: var(--azul-vibrante);"><span class="material-icons">shield</span></div>
+                <div class="stat-info">
+                    <label>STATUS DE SEGURANÇA</label>
+                    <p style="font-size: 1.2rem;">Protegido (LGPD)</p>
+                </div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+                <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);"><span class="material-icons">manage_accounts</span></div>
+                <div class="stat-info">
+                    <label>GESTORES ATIVOS</label>
+                    <p>12</p>
+                </div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+                <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);"><span class="material-icons">policy</span></div>
+                <div class="stat-info">
+                    <label>FISCAIS CADASTRADOS</label>
+                    <p>45</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fiscal-grid" style="margin-top: 2rem;">
+            
+            <!-- Card de Ações da TI -->
+            <div class="form-card">
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+                    <h2>Controle de Acessos</h2>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.5rem;">
+                    O Administrador é o único responsável por cadastrar os Fiscais e Gestores iniciais na plataforma.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <span class="material-icons">person_add</span> Cadastrar Novo Gestor (Secretaria)
+                    </button>
+                    <button class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <span class="material-icons">badge</span> Cadastrar Novo Fiscal de Rua
+                    </button>
+                    <button class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <span class="material-icons">key</span> Gerenciar Permissões Globais
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal de Logs de Segurança -->
+            <div class="form-card" style="background-color: #111827; color: #10B981; border: none;">
+                <div class="section-title" style="margin-bottom: 1rem;">
+                    <span class="material-icons" style="color: #10B981; margin-right: 0.5rem;">terminal</span>
+                    <h2 style="color: #fff; font-family: monospace;">Logs Técnicos & Seg.</h2>
+                </div>
+                
+                <div class="terminal-box" style="font-family: monospace; font-size: 0.85rem; line-height: 1.6; height: 200px; overflow-y: auto;">
+                    <p>[10:42:01] AUTH: Sucesso - Login Matrícula #4598 (Fiscal)</p>
+                    <p>[10:45:12] DB_BACKUP: Rotina iniciada automaticamente.</p>
+                    <p>[10:45:15] DB_BACKUP: Sincronização concluída com sucesso (2.4MB).</p>
+                    <p>[11:02:33] AUTH: Falha - Senha incorreta CPF 111.***.***-44.</p>
+                    <p>[11:05:40] SYS_EVENT: Emissão de Alvará VCA-2026-9843 (Gestor ID 12).</p>
+                    <p class="blink">_</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem;">
+                    <button class="btn-submit" style="background-color: #374151; width: 100%;">Exportar Logs (.TXT)</button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- CAMINHO CORRIGIDO PARA O SCRIPT GLOBAL -->
+    <script src="../js/script.js"></script>
+</body>
+</html>
