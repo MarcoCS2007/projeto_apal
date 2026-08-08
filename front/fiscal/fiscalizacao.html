@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo do Fiscal - Ponto Legal VCA</title>
+    
+    <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CAMINHO CORRIGIDO PARA O CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho do Fiscal -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <!-- CAMINHO CORRIGIDO PARA O INDEX NA RAIZ -->
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <!-- Identificação do perfil logado -->
+                <a href="#" style="cursor: default;"><i data-lucide="id-card"></i> Fiscal: Matrícula #4598</a>
+                <!-- CAMINHO CORRIGIDO PARA O INDEX NA RAIZ -->
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Encerrar Turno</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Faixa Azul (Hero Section) adaptada para operação em campo -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Inspeção e Fiscalização</h1>
+            <p>Faça a leitura do QR Code da credencial do ambulante ou realize a busca manual.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+        
+        <!-- Grid de duas colunas: Câmera e Busca Manual -->
+        <div class="fiscal-grid">
+            
+            <!-- Card 1: Leitor de QR Code -->
+            <div class="form-card text-center">
+                <div class="section-title" style="justify-content: center;">
+                    <h2>Validação por QR Code</h2>
+                </div>
+                
+                <!-- Placeholder visual da Câmera -->
+                <div class="qr-scanner-box">
+                    <i data-lucide="scan" class="camera-icon"></i>
+                    <p class="scanner-text" style="font-weight: 500; color: var(--texto-cinza);">Aguardando ativação da câmera...</p>
+                </div>
+
+                <div class="form-actions" style="justify-content: center; margin-top: 1.5rem;">
+                    <button class="btn-submit" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+                        <i data-lucide="camera" style="color: #FFF;"></i>
+                        Ativar Leitor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: Busca Manual e Ocorrências -->
+            <div class="form-card">
+                <div class="section-title">
+                    <div class="title-accent"></div>
+                    <h2>Busca Manual de Licença</h2>
+                </div>
+
+                <form action="#" class="registration-form">
+                    <div class="input-group full-width" style="margin-bottom: 1.5rem;">
+                        <label>CPF DO AMBULANTE OU CÓDIGO DO ALVARÁ</label>
+                        <input type="text" placeholder="Digite os números..." required>
+                    </div>
+                    <button type="submit" class="btn-action" style="width: 100%; padding: 0.8rem; font-size: 1rem;">
+                        Consultar Situação
+                    </button>
+                </form>
+
+                <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
+
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: var(--rosa-detalhe);"></div>
+                    <h2>Módulo de Ocorrências</h2>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1rem;">
+                    Registre infrações, notificações ou apreensões relacionadas a um ponto de ocupação.
+                </p>
+                
+                <button class="btn-submit" style="width: 100%; background-color: var(--rosa-detalhe); display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+                    <i data-lucide="alert-triangle" style="color: #FFF;"></i>
+                    Registrar Nova Ocorrência
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" style="padding: 1rem 0; font-size: 0.95rem; line-height: 1.6; color: var(--texto-escuro); max-height: 350px; overflow-y: auto;">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista</p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- CAMINHO CORRIGIDO PARA O JS GLOBAL -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

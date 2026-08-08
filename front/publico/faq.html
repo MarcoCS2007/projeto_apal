@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dúvidas e Tutoriais (FAQ) - Ponto Legal VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CAMINHO CORRIGIDO PARA O CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Institucional -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <!-- CAMINHO CORRIGIDO PARA O INDEX NA RAIZ -->
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <!-- CAMINHOS CORRIGIDOS DOS MENUS -->
+                <a href="../index.html"><i data-lucide="home"></i> Início</a>
+                <a href="sobre.html"><i data-lucide="info"></i> Sobre o Projeto</a>
+                <a href="faq.html" class="faq-active"><i data-lucide="help-circle"></i> Dúvidas e Tutoriais</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Central de Ajuda e Tutoriais</h1>
+            <p>Passo a passo da regulamentação, documentos necessários e dúvidas frequentes do comércio ambulante.</p>
+        </div>
+    </section>
+
+    <main class="main-container">
+        <div class="form-card">
+            
+            <div class="faq-container">
+                
+                <!-- CATEGORIA 1: TUTORIAL E REGULARIZAÇÃO -->
+                <div class="faq-category">
+                    <h3><i data-lucide="check-square"></i> Como se Regularizar (Passo a Passo)</h3>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">Qual é o passo a passo para conseguir a Licença de Ambulante? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>O processo de licenciamento no <strong>Ponto Legal VCA</strong> é simples e dividido em 5 etapas principais:</p>
+                                <ol>
+                                    <li><strong>Criação da Conta:</strong> Acesse "Cadastre-se" na página inicial e crie seu perfil de Requerente informando seus dados básicos (Nome, CPF e E-mail).</li>
+                                    <li><strong>Preenchimento do Formulário:</strong> Faça login, acesse a aba "Solicitar Licença" e preencha os dados do seu comércio (tipo de mercadoria, estrutura utilizada e o ponto/rua onde deseja atuar).</li>
+                                    <li><strong>Envio de Documentos (Upload):</strong> Anexe as fotos dos documentos exigidos (RG, CPF, Comprovante de Residência, foto 3x4 e foto do seu equipamento).</li>
+                                    <li><strong>Análise e Pagamento:</strong> A Secretaria de Serviços Públicos analisará o pedido em um <strong>prazo médio de 15 a 30 dias úteis</strong>. Sendo deferido, o sistema gerará o boleto (DAM) da taxa municipal.</li>
+                                    <li><strong>Emissão da Credencial:</strong> Após a compensação do pagamento, sua Credencial Digital (com QR Code) será liberada imediatamente no painel para impressão.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Quais são os documentos necessários para o cadastro? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Para evitar atrasos na análise da sua licença, tenha em mãos os seguintes documentos na hora de preencher o cadastro:</p>
+                                <ul>
+                                    <li><strong>Documento de Identificação Oficial com foto</strong> (RG, CNH, Carteira de Trabalho) e <strong>CPF</strong>.</li>
+                                    <li><strong>Comprovante de Residência atualizado</strong> no município de Vitória da Conquista (água, luz ou telefone emitidos nos últimos 90 dias).</li>
+                                    <li><strong>Uma Foto 3x4 recente</strong> do titular (para o crachá/credencial).</li>
+                                    <li><strong>Foto nítida do equipamento de trabalho</strong> (carrinho, barraca, food truck, isopor, etc).</li>
+                                    <li><em>(Apenas para venda de alimentos):</em> <strong>Certificado da Vigilância Sanitária</strong> ou atestado de manipulação de alimentos.</li>
+                                </ul>
+                                <p>Preparamos um checklist em PDF para você imprimir e conferir antes de fazer o seu cadastro:</p>
+                                <a href="documentos_necessarios_pontovca.pdf" class="btn-download-pdf" download>
+                                    <i data-lucide="file-text"></i> Baixar Lista de Documentos (PDF)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Quais são os prazos de validade e regras de renovação? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>A Licença para o Comércio Ambulante ou Eventual possui caráter precário, pessoal e intransferível.</p>
+                                <ul>
+                                    <li><strong>Validade:</strong> O alvará tem validade máxima até o dia <strong>31 de dezembro</strong> do ano em que foi emitido, devendo ser renovado anualmente.</li>
+                                    <li><strong>Prazo de Renovação:</strong> O pedido de renovação deve ser protocolado no sistema Ponto Legal VCA com antecedência mínima de <strong>30 dias</strong> antes do vencimento.</li>
+                                    <li><strong>Transferência:</strong> É expressamente proibido alugar, vender ou transferir o ponto e a licença para terceiros. O descumprimento gera a cassação imediata da credencial.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORIA 2: NORMAS DE POSTURA E LIMPEZA URBANA -->
+                <div class="faq-category">
+                    <h3><i data-lucide="gavel"></i> Normas de Postura, Localização e Limpeza Urbana</h3>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Onde é PROIBIDO posicionar meu carrinho, bancada ou barraca? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>De acordo com o Código de Posturas do Município (Lei Nº 695/1993), é proibido ocupar locais que prejudiquem a circulação de pedestres e o trânsito de veículos. Não é permitido posicionar estruturas em:</p>
+                                <ul>
+                                    <li>Rampas de acessibilidade para PCDs e faixas de pedestres;</li>
+                                    <li>Entradas de hospitais, escolas, órgãos públicos e saídas de emergência;</li>
+                                    <li>Pontos de parada de ônibus e táxis;</li>
+                                    <li>Portas de estabelecimentos comerciais fixos do mesmo ramo de mercadoria.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Qual a responsabilidade do ambulante com a limpeza do local? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>É dever do trabalhador manter a área do seu ponto limpa durante e após o expediente. É <strong>obrigatório</strong> dispor de pelo menos uma lixeira própria com saco plástico para uso dos clientes. Descartar lixo, resíduos ou óleo na calçada e em bueiros gera autuação e multa.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Posso deixar o carrinho montado no local de um dia para o outro? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Não.</strong> Salvo em feiras livres em espaços fixos autorizados, o comércio ambulante exige o recolhimento do equipamento ao final do expediente de trabalho. Estruturas abandonadas na via pública serão recolhidas pela fiscalização de postura.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Posso ter um ajudante ou auxiliar cadastrado no meu ponto? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Sim.</strong> O titular da licença pode cadastrar até 01 (um) auxiliar no sistema para atuar e responder temporariamente pelo ponto em caso de ausência justificada do titular. O auxiliar deve apresentar RG, CPF e Comprovante de Residência para emissão de credencial de apoio.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Se a fiscalização apreender minhas mercadorias, como posso recuperar? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Para produtos <strong>não perecíveis</strong>, o titular tem o prazo de até 30 dias para comparecer à Gerência de Posturas (Ceasa), apresentar o comprovante de origem/Nota Fiscal das mercadorias e efetuar o pagamento da multa e taxa de depósito para liberação.</p>
+                                <p><em>Observação: Produtos perecíveis sem comprovação sanitária não são devolvidos e são doados a instituições de caridade do município.</em></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORIA 3: USO DO SISTEMA -->
+                <div class="faq-category">
+                    <h3><i data-lucide="monitor"></i> Dúvidas sobre o Uso do Sistema</h3>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">O que acontece se minha licença vencer? Como o sistema me avisa? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>O sistema Ponto Legal VCA conta com envio de notificações automáticas. Você receberá um e-mail e um alerta no seu Painel de Ambulante <strong>45 dias antes do vencimento</strong> da licença atual.</p>
+                                <p>Isso permite solicitar a renovação a tempo de não sofrer penalidades da fiscalização. Basta entrar no sistema, clicar na aba "Renovar Licença", anexar comprovantes atualizados (se houver mudança) e gerar a taxa do novo ano.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Como funciona a leitura do QR Code da credencial? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>A Credencial gerada pelo Ponto Legal VCA possui um selo de segurança em formato de QR Code. Ele serve para:</p>
+                                <ul>
+                                    <li><strong>Fiscais:</strong> Leitura do código via dispositivo de fiscalização para verificar no banco de dados se a taxa do ano foi paga e se você está no local correto.</li>
+                                    <li><strong>Cidadãos:</strong> Verificação rápida pela câmera do celular para confirmar que o comerciante é regulamentado e fiscalizado pela Prefeitura.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORIA 4: LEGISLAÇÃO E CONTATOS -->
+                <div class="faq-category">
+                    <h3><i data-lucide="phone-call"></i> Legislação, Multas e Contatos Oficiais</h3>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">Quais são as leis que regulamentam os ambulantes na cidade? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>A atividade é regulamentada pelo <strong>Código de Polícia Administrativa do Município (Código de Posturas) – Lei Municipal Nº 695/1993</strong>. Conforme o Artigo 135 da Lei, o comércio ambulante só pode atuar mediante licença prévia. O trabalhador precisa obrigatoriamente portar o Alvará e, se comercializar alimentos, atestation/licença da Vigilância Sanitária.</p>
+                                <p><a href="https://www.pmvc.ba.gov.br/wp-content/uploads/Lei-695-1993-Codigo_Policia_Administrativa-codigo-de-posturas.pdf" target="_blank" class="faq-link"><i data-lucide="external-link"></i> Ver o Código de Posturas na íntegra no Portal da PMVC</a></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Quais os valores de multas e penalidades? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Trabalhar sem a devida licença ou fora das áreas permitidas acarreta penalidades. A fiscalização atua emitindo advertências, multas ou apreensão.</p>
+                                <p>De acordo com o Artigo 137 do Código de Posturas, as multas variam de <strong>02 a 10 UFMs (Unidades Fiscais do Município)</strong> — o que corresponde em média de <strong>R$ 40 a R$ 593,35</strong>, dependendo da gravidade da infração e reincidência.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">Como entrar em contato com a Gerência de Posturas Municipais? <i data-lucide="chevron-down"></i></button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>A organização do comércio eventual e ambulante é de responsabilidade da Secretaria Municipal de Serviços Públicos (SESEP), por meio da Gerência de Posturas:</p>
+                                <ul>
+                                    <li><i data-lucide="phone"></i> <strong>Atendimento e Dúvidas:</strong> (77) 3229-3745 / (77) 3229-3767</li>
+                                    <li><i data-lucide="message-square"></i> <strong>WhatsApp:</strong> (77) 98856-4737</li>
+                                    <li><i data-lucide="map-pin"></i> <strong>Endereço do Atendimento Presencial:</strong> Praça Catão Ferraz, s/n, Centro (Ceasa).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" style="padding: 1rem 0; font-size: 0.95rem; line-height: 1.6; color: var(--texto-escuro); max-height: 350px; overflow-y: auto;">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista</p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- CAMINHO CORRIGIDO PARA O JS GLOBAL -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
