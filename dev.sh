@@ -14,7 +14,7 @@ case "$1" in
         docker compose exec web python manage.py createsuperuser
         ;;
     seed)
-        docker compose exec web python manage.py seed
+        docker compose exec web python manage.py seed_inicial
         ;;
     precommit)
             docker compose exec -T web ruff check --fix .
