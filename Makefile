@@ -17,7 +17,7 @@ precommit:
 		docker compose exec -T web black .; \
 		
 seed:
-	docker compose exec web python manage.py seed
+	docker compose exec web python manage.py seed_inicial
 
 test:
 	docker compose exec web pytest
