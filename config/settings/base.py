@@ -20,6 +20,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Aplicativos Locais
+    "apps.core",
+    "apps.usuarios",
+    "apps.licenciamento",
+    "apps.espacos",
+    "apps.fiscalizacao",
+    "apps.assistente",
 ]
 
 MIDDLEWARE = [
