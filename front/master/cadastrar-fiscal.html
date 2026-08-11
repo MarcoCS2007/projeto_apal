@@ -3,36 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Conta - APAL</title>
-    
-    <!-- FAVICON -->
-    <link rel="icon" type="image/png" href="img/favicon.png">
+    <title>Cadastrar Fiscal - Ponto Legal VCA</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- LUCIDE ICONS (Biblioteca Oficial) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
-    <!-- Cabeçalho Institucional -->
-    <header class="top-header">
+    <!-- Cabeçalho Técnico da TI -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
         <div class="header-container">
             <div class="logo-area">
-                <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                </a>
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
             </div>
             <nav class="header-nav">
-                <a href="index.html"><i data-lucide="home"></i> Início</a>
-                <a href="publico/sobre.html"><i data-lucide="info"></i> Sobre o Projeto</a>
-                <a href="publico/faq.html"><i data-lucide="help-circle"></i> Dúvidas e Tutoriais</a>
+                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
+                <a href="gerenciar-fiscais.html" class="active"><i data-lucide="id-card"></i> Fiscais</a>
+                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
             </nav>
         </div>
     </header>
@@ -67,83 +63,73 @@
         </div>
     </div>
 
-    <!-- FAIXA SUPERIOR COM GRADIENTE AZUL -->
-    <section class="hero-section">
+    <!-- Hero Section -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
         <div class="hero-container" style="text-align: center;">
-            <h1>Cadastre-se na Plataforma</h1>
-            <p>Crie sua conta para acessar os serviços, solicitar licenças e gerenciar suas atividades.</p>
+            <h1>Cadastro de Fiscal de Rua</h1>
+            <p>Preencha os dados oficiais para emitir as credenciais de acesso do novo agente de fiscalização.</p>
         </div>
     </section>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- Área Principal -->
     <main class="main-container">
-        <div class="form-card login-wrapper" style="max-width: 600px;">
+        <div class="form-card" style="max-width: 800px; margin: 0 auto;">
             
             <div class="section-title">
-                <div class="title-accent"></div>
-                <h2>Criar Nova Conta</h2>
+                <div class="title-accent" style="background-color: #10B981;"></div>
+                <h2>Dados do Novo Agente</h2>
             </div>
 
-            <form id="registro-form" onsubmit="event.preventDefault(); alert('Conta criada com sucesso! Faça login para continuar.'); window.location.href='index.html';">
+            <form onsubmit="event.preventDefault(); alert('Fiscal cadastrado com sucesso! As credenciais de acesso foram enviadas para o e-mail informado.'); window.location.href='gerenciar-fiscais.html';">
                 
                 <div class="form-row">
-                    <div class="input-group full-width">
-                        <label for="reg-nome">Nome Completo</label>
-                        <input type="text" id="reg-nome" placeholder="Digite seu nome completo" required>
+                    <div class="input-group">
+                        <label for="fiscal-nome">Nome Completo do Agente</label>
+                        <input type="text" id="fiscal-nome" placeholder="Ex: Carlos Eduardo Moreira" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="fiscal-matricula">Número da Matrícula</label>
+                        <input type="text" id="fiscal-matricula" placeholder="Ex: #4599" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group">
-                        <label for="reg-email">E-mail de Acesso</label>
-                        <input type="email" id="reg-email" placeholder="seu-email@dominio.com" required>
+                        <label for="fiscal-cpf">CPF do Agente</label>
+                        <input type="text" id="fiscal-cpf" placeholder="000.000.000-00" required>
                     </div>
                     <div class="input-group">
-                        <label for="cpf-cadastro">CPF</label>
-                        <input type="text" id="cpf-cadastro" placeholder="000.000.000-00" required>
+                        <label for="fiscal-email">E-mail Institucional</label>
+                        <input type="email" id="fiscal-email" placeholder="fiscal.nome@pmvc.ba.gov.br" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group">
-                        <label for="reg-password">Senha de Acesso</label>
-                        <div class="input-password-wrapper">
-                            <input type="password" id="reg-password" placeholder="Mínimo de 6 caracteres" required>
-                            <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
-                                <i data-lucide="eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="reg-confirm-password">Confirmar Senha</label>
-                        <div class="input-password-wrapper">
-                            <input type="password" id="reg-confirm-password" placeholder="Repita a senha" required>
-                            <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
-                                <i data-lucide="eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group full-width">
-                        <label for="reg-perfil">Tipo de Perfil Desejado</label>
-                        <select id="reg-perfil" required>
-                            <option value="" disabled selected>Selecione o seu perfil...</option>
-                            <option value="ambulante">Comerciante Ambulante / Requerente</option>
-                            <option value="fiscal">Fiscal de Posturas</option>
-                            <option value="gestor">Gestor Municipal</option>
+                        <label for="fiscal-zona">Zona / Setor de Atuação Principal</label>
+                        <select id="fiscal-zona" required>
+                            <option value="" disabled selected>Selecione a zona...</option>
+                            <option value="centro">Centro Comercial / Praça 9 de Novembro</option>
+                            <option value="bairro_brasil">Feira do Bairro Brasil / Zona Oeste</option>
+                            <option value="terminal">Terminal Lauro de Freitas</option>
+                            <option value="ceasa">Região do Ceasa / Centro Histórico</option>
+                            <option value="itinerante">Fiscalização Itinerante / Eventos</option>
                         </select>
                     </div>
+                    <div class="input-group">
+                        <label for="fiscal-senha">Senha Provisória</label>
+                        <input type="password" id="fiscal-senha" placeholder="Crie uma senha provisória" required>
+                    </div>
                 </div>
 
-                <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="submit" class="btn-submit" style="width: 100%;">
-                        <i data-lucide="user-plus"></i> Finalizar Cadastro
-                    </button>
-                    <a href="index.html" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                        <i data-lucide="arrow-left"></i> Já possui uma conta? Entre aqui
+                <!-- Botões de Ação do Formulário -->
+                <div class="form-actions" style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="gerenciar-fiscais.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="arrow-left"></i> Cancelar e Voltar
                     </a>
+                    <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="user-check"></i> Cadastrar Agente
+                    </button>
                 </div>
 
             </form>
@@ -151,7 +137,7 @@
         </div>
     </main>
 
-    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <!-- FUNDO ESCURECIDO PARA O MODAL DA IA -->
     <div id="modal-backdrop" class="modal-backdrop"></div>
 
     <!-- JANELA MODAL DA IA -->
@@ -183,14 +169,13 @@
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
-    
-    <!-- JS GLOBAL DA APLICAÇÃO -->
-    <script src="js/script.js"></script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
     
     <!-- Inicialização dos ícones do Lucide -->
     <script>
         lucide.createIcons();
     </script>
-
 </body>
 </html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Requerimento - Ponto Legal VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Administrativo (Gestor) -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Painel Central</a>
+                <a href="ambulantes-cadastrados.html"><i data-lucide="users"></i> Ambulantes</a>
+                <a href="analisar-licenca.html" class="active"><i data-lucide="file-check"></i> Análise de Licenças</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Análise de Solicitação de Alvará</h1>
+            <p>Avaliação técnica de documentos, fiscalização de regras e parecer de deferimento da licença municipal.</p>
+        </div>
+    </section>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-container">
+
+        <!-- CARD 1: RESUMO DO REQUERIMENTO E SOLICITANTE -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="section-title" style="margin: 0;">
+                    <div class="title-accent"></div>
+                    <h2>Protocolo nº REQ-2026-0842</h2>
+                </div>
+                <span class="badge warning" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;"><i data-lucide="clock"></i> Em Análise Técnica</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; background: var(--fundo-cinza); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">REQUERENTE</label>
+                    <p style="font-weight: 600; color: var(--texto-escuro);">João da Silva Santos</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">CPF</label>
+                    <p style="font-weight: 600; color: var(--texto-escuro);">111.222.333-44</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">CATEGORIA DA MERCADORIA</label>
+                    <p style="font-weight: 600; color: var(--texto-escuro);">Alimentos (Lanches & Pastel)</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">TIPO DE ESTRUTURA</label>
+                    <p style="font-weight: 600; color: var(--texto-escuro);">Categoria B (Carrinho Tracionado)</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">PONTO PRETENDIDO (1ª OPÇÃO)</label>
+                    <p style="font-weight: 600; color: var(--azul-vibrante);">Praça 9 de Novembro (Ponto #12)</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">ESCALA / HORÁRIO</label>
+                    <p style="font-weight: 600; color: var(--texto-escuro);">Segunda a Sábado (08h às 18h)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: CHECAGEM DE EXIGÊNCIAS LEGAIS -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #F59E0B;"></div>
+                <h2>Conferência de Exigências da Categoria</h2>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.2rem;">
+                Verificação automática baseada na legislação do município para comercialização de alimentos e uso de equipamentos.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 6px;">
+                    <span style="font-size: 0.92rem; font-weight: 600; color: #92400E; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="alert-triangle"></i> Exige Laudo Sanitário (Vigilância Sanitária)?
+                    </span>
+                    <span class="badge warning"><i data-lucide="check"></i> SIM (OBRIGATÓRIO)</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 6px;">
+                    <span style="font-size: 0.92rem; font-weight: 600; color: #92400E; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="flame"></i> Exige Vistoria do Corpo de Bombeiros (Gás/Botijão)?
+                    </span>
+                    <span class="badge warning"><i data-lucide="check"></i> SIM (OBRIGATÓRIO)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: ANÁLISE DOS DOCUMENTOS ANEXADOS -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+                <h2>Documentos e Fotos Anexados</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>DOCUMENTO</th>
+                            <th>ARQUIVO ANEXADO</th>
+                            <th>STATUS DE CONFERÊNCIA</th>
+                            <th>AÇÕES DA ANÁLISE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Foto 3x4 do Titular</strong></td>
+                            <td>foto_joao_3x4.jpg</td>
+                            <td><span class="badge success"><i data-lucide="check-circle"></i> Conforme</span></td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Visualizando Imagem 3x4...')"><i data-lucide="eye"></i> Visualizar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Documento de Identidade (RG)</strong></td>
+                            <td>rg_joao_silva.pdf</td>
+                            <td><span class="badge success"><i data-lucide="check-circle"></i> Conforme</span></td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Visualizando Documento RG...')"><i data-lucide="eye"></i> Visualizar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Foto da Estrutura de Trabalho</strong></td>
+                            <td>carrinho_lanches_foto.jpg</td>
+                            <td><span class="badge success"><i data-lucide="check-circle"></i> Conforme</span></td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Visualizando Foto da Estrutura...')"><i data-lucide="eye"></i> Visualizar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Comprovante de Residência</strong></td>
+                            <td>conta_luz_jan2026.pdf</td>
+                            <td><span class="badge success"><i data-lucide="check-circle"></i> Conforme</span></td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Visualizando Comprovante...')"><i data-lucide="eye"></i> Visualizar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Laudo Sanitário / Manipulador</strong></td>
+                            <td>carteira_sanitaria.pdf</td>
+                            <td><span class="badge danger"><i data-lucide="alert-circle"></i> Vencido / Irregular</span></td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Visualizando Laudo Sanitário...')"><i data-lucide="eye"></i> Visualizar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CARD 4: EMISSÃO DE PARECER FINAL DO GESTOR -->
+        <div class="form-card">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+                <h2>Parecer Final da Secretaria</h2>
+            </div>
+
+            <form onsubmit="event.preventDefault(); alert('Parecer registrado com sucesso! A notificação foi enviada ao requerente.'); window.location.href='dashboard.html';">
+                
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="motivo-rejeicao">Justificativa / Motivo de Indeferimento ou Exigência (Caso não aprovado)</label>
+                        <textarea id="motivo-rejeicao" rows="3" placeholder="Ex: O Laudo Sanitário apresentado está com data de validade expirada. Favor anexar laudo atualizado emitido pela Vigilância Sanitária em até 10 dias úteis." style="width: 100%; padding: 0.8rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-family: inherit;"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="dashboard.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="arrow-left"></i> Voltar ao Painel
+                    </a>
+
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button type="button" onclick="confirm('Confirmar o indeferimento deste requerimento?') && (alert('Requerimento Indeferido com sucesso.'), window.location.href='dashboard.html')" class="btn-action" style="color: #DC2626; border-color: #FCA5A5; padding: 0.8rem 1.4rem;">
+                            <i data-lucide="x-circle"></i> Indeferir Requerimento
+                        </button>
+
+                        <button type="submit" class="btn-submit" style="background-color: #10B981; padding: 0.8rem 1.8rem;">
+                            <i data-lucide="check-circle-2"></i> Deferir e Gerar Licença (Alvará)
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

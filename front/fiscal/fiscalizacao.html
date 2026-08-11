@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo do Fiscal - Ponto Legal VCA</title>
     
-    <!-- Fonte Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +12,7 @@
     <!-- LUCIDE ICONS (Biblioteca Oficial) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- CAMINHO CORRIGIDO PARA O CSS GLOBAL -->
+    <!-- CSS GLOBAL -->
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
@@ -23,13 +22,11 @@
         <div class="header-container">
             <div class="logo-area">
                 <i data-lucide="map-pin" class="logo-icon"></i>
-                <!-- CAMINHO CORRIGIDO PARA O INDEX NA RAIZ -->
                 <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
             </div>
             <nav class="header-nav">
                 <!-- Identificação do perfil logado -->
                 <a href="#" style="cursor: default;"><i data-lucide="id-card"></i> Fiscal: Matrícula #4598</a>
-                <!-- CAMINHO CORRIGIDO PARA O INDEX NA RAIZ -->
                 <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Encerrar Turno</a>
             </nav>
         </div>
@@ -44,7 +41,7 @@
     </div>
 
     <!-- PAINEL DE ACESSIBILIDADE -->
-    <div id="accessibility-panel" class="access-panel hidden">
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
         <div class="access-header">
             <h3>Acessibilidade</h3>
             <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
@@ -65,10 +62,10 @@
         </div>
     </div>
 
-    <!-- Faixa Azul (Hero Section) adaptada para operação em campo -->
+    <!-- Hero Section adaptada para operação em campo -->
     <section class="hero-section">
         <div class="hero-container" style="text-align: center;">
-            <h1>Inspeção e Fiscalização</h1>
+            <h1>Inspeção e Fiscalização de Campo</h1>
             <p>Faça a leitura do QR Code da credencial do ambulante ou realize a busca manual.</p>
         </div>
     </section>
@@ -92,9 +89,9 @@
                 </div>
 
                 <div class="form-actions" style="justify-content: center; margin-top: 1.5rem;">
-                    <button class="btn-submit" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+                    <button class="btn-submit" onclick="alert('Iniciando câmera do dispositivo para leitura do QR Code...')" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
                         <i data-lucide="camera" style="color: #FFF;"></i>
-                        Ativar Leitor
+                        Ativar Câmera e Leitor
                     </button>
                 </div>
             </div>
@@ -106,51 +103,54 @@
                     <h2>Busca Manual de Licença</h2>
                 </div>
 
-                <form action="#" class="registration-form">
+                <form onsubmit="event.preventDefault(); alert('Buscando dados da licença no banco municipal...');" class="registration-form">
                     <div class="input-group full-width" style="margin-bottom: 1.5rem;">
-                        <label>CPF DO AMBULANTE OU CÓDIGO DO ALVARÁ</label>
-                        <input type="text" placeholder="Digite os números..." required>
+                        <label for="busca-fiscal">CPF DO AMBULANTE OU CÓDIGO DO ALVARÁ</label>
+                        <input type="text" id="busca-fiscal" placeholder="Ex: 123.456.789-00 ou ALV-2026/8842" required>
                     </div>
-                    <button type="submit" class="btn-action" style="width: 100%; padding: 0.8rem; font-size: 1rem;">
-                        Consultar Situação
+                    <button type="submit" class="btn-action" style="width: 100%; padding: 0.8rem; font-size: 1rem; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
+                        <i data-lucide="search"></i> Consultar Situação
                     </button>
                 </form>
 
                 <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
 
                 <div class="section-title">
-                    <div class="title-accent" style="background-color: var(--rosa-detalhe);"></div>
+                    <div class="title-accent" style="background-color: #EF4444;"></div>
                     <h2>Módulo de Ocorrências</h2>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1rem;">
-                    Registre infrações, notificações ou apreensões relacionadas a um ponto de ocupação.
+                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.2rem;">
+                    Registre infrações, notificações, advertências ou apreensões de mercadorias no ponto.
                 </p>
                 
-                <button class="btn-submit" style="width: 100%; background-color: var(--rosa-detalhe); display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+                <a href="registrar-ocorrencia.html" class="btn-submit" style="width: 100%; background-color: #EF4444; text-decoration: none; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
                     <i data-lucide="alert-triangle" style="color: #FFF;"></i>
                     Registrar Nova Ocorrência
-                </button>
+                </a>
             </div>
 
         </div>
     </main>
 
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
     <!-- JANELA MODAL DA IA -->
-    <div id="ai-modal" class="access-panel hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
         <div class="access-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">
                 <i data-lucide="sparkles"></i> Assistente de Acessibilidade
             </h3>
             <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
         </div>
-        <div id="ai-response-content" style="padding: 1rem 0; font-size: 0.95rem; line-height: 1.6; color: var(--texto-escuro); max-height: 350px; overflow-y: auto;">
+        <div id="ai-response-content" class="custom-scrollbar">
             Aguardando seleção...
         </div>
     </div>
 
-    <!-- Rodapé -->
+    <!-- RODAPÉ INSTITUCIONAL -->
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista</p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
     </footer>
 
     <!-- VLIBRAS -->
@@ -165,7 +165,7 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
     
-    <!-- CAMINHO CORRIGIDO PARA O JS GLOBAL -->
+    <!-- JS GLOBAL DA APLICAÇÃO -->
     <script src="../js/script.js"></script>
     
     <!-- Inicialização dos ícones do Lucide -->
