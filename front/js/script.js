@@ -1632,78 +1632,81 @@ if (
     window.validarCNPJ = validarCNPJ;
     window.checarCNPJInput = checarCNPJInput;
 
-    // ==========================================
-    // 12. PAÍS DE ORIGEM
+   // ==========================================
+    // 12. PAÍS DE ORIGEM E REGRAS DE NACIONALIDADE
     // ==========================================
 
-    const nacionalidadeSelect = document.getElementById('nacionalidade-select');
+    const paisOrigemSelect = document.getElementById('pais-origem') || document.getElementById('nacionalidade-select');
+    const estadoNascSelect = document.getElementById('estado-nascimento');
+    const cidadeNascSelect = document.getElementById('cidade-nascimento');
 
     function aplicarRegraNacionalidade() {
-        if (
-            !nacionalidadeSelect ||
-            !estadoNascimentoSelect ||
-            !cidadeNascimentoSelect
-        ) {
-            return;
+        if (!paisOrigemSelect) return;
+
+        const ehBrasil = paisOrigemSelect.value === 'Brasil';
+
+        if (estadoNascSelect) {
+            estadoNascSelect.disabled = !ehBrasil;
+            estadoNascSelect.required = ehBrasil;
+
+            if (!ehBrasil) {
+                estadoNascSelect.value = '';
+                estadoNascSelect.replaceChildren(new Option('Não aplicável (Estrangeiro)', '', true, true));
+            } else {
+                carregarEstados();
+            }
         }
 
-        const ehBrasil = nacionalidadeSelect.value === 'Brasil';
+        if (cidadeNascSelect) {
+            cidadeNascSelect.disabled = true; // Habilita somente após escolher a UF
+            cidadeNascSelect.required = ehBrasil;
 
-        if (!ehBrasil) {
-            estadoNascimentoSelect.value = '';
-            estadoNascimentoSelect.disabled = true;
-            estadoNascimentoSelect.required = false;
-            definirPlaceholderSelect(
-                estadoNascimentoSelect,
-                'Não aplicável para país estrangeiro'
-            );
-
-            cidadeNascimentoSelect.value = '';
-            cidadeNascimentoSelect.disabled = true;
-            cidadeNascimentoSelect.required = false;
-            cidadeNascimentoSelect.replaceChildren(
-                new Option('Não aplicável para país estrangeiro', '', true, true)
-            );
-            cidadeNascimentoSelect.options[0].disabled = true;
-
-            sincronizarDropdownPersonalizado(estadoNascimentoSelect);
-            sincronizarDropdownPersonalizado(cidadeNascimentoSelect);
-            return;
+            if (!ehBrasil) {
+                cidadeNascSelect.value = '';
+                cidadeNascSelect.replaceChildren(new Option('Não aplicável (Estrangeiro)', '', true, true));
+            } else {
+                cidadeNascSelect.replaceChildren(new Option('Selecione o Estado primeiro...', '', true, true));
+            }
         }
-
-        estadoNascimentoSelect.disabled = false;
-        estadoNascimentoSelect.required = true;
-        definirPlaceholderSelect(estadoNascimentoSelect, 'Selecione o Estado...');
-
-        cidadeNascimentoSelect.required = true;
-
-        if (!estadoNascimentoSelect.value) {
-            cidadeNascimentoSelect.value = '';
-            cidadeNascimentoSelect.disabled = true;
-            cidadeNascimentoSelect.replaceChildren(
-                new Option('Selecione o Estado primeiro...', '', true, true)
-            );
-            cidadeNascimentoSelect.options[0].disabled = true;
-            sincronizarDropdownPersonalizado(cidadeNascimentoSelect);
-        } else {
-            window.carregarCidades(
-                'estado-nascimento',
-                'cidade-nascimento'
-            );
-        }
-
-        sincronizarDropdownPersonalizado(estadoNascimentoSelect);
     }
 
-    nacionalidadeSelect?.addEventListener('change', aplicarRegraNacionalidade);
+   paisOrigemSelect?.addEventListener('change', aplicarRegraNacionalidade);
 
-    if (estadoNascimentoSelect || estadoAtualSelect || estadoPontoSelect) {
+    // ---> GATILHO: Inicia a busca no IBGE ao carregar a página <---
+    if (estadoNascSelect || document.getElementById('estado-input') || document.getElementById('estado-ponto')) {
         carregarEstados().then(() => {
             aplicarRegraNacionalidade();
         });
     } else {
         aplicarRegraNacionalidade();
     }
+
+    // ==========================================
+    // MÁSCARA E BLOQUEIO DE LETRAS NO TELEFONE
+    // ==========================================
+
+    function mascararTelefone(valor) {
+        // Remove tudo que NÃO for número e limita a 11 dígitos
+        let num = String(valor || '').replace(/\D/g, '').slice(0, 11);
+
+        if (num.length <= 10) {
+            return num.replace(/^(\d{2})(\d)/g, '($1) $2')
+                      .replace(/(\d{4})(\d)/, '$1-$2');
+        }
+        return num.replace(/^(\d{2})(\d)/g, '($1) $2')
+                  .replace(/(\d{5})(\d)/, '$1-$2');
+    }
+
+    const telPrincipal = document.getElementById('req-tel');
+    const telSecundario = document.getElementById('req-tel-2');
+
+    [telPrincipal, telSecundario].forEach(input => {
+        if (input) {
+            input.addEventListener('input', (e) => {
+                e.target.value = mascararTelefone(e.target.value);
+            });
+        }
+    });
 
 
     // ==========================================
@@ -1865,11 +1868,8 @@ if (
         });
     }
 
-    // ==========================================
-    // 14. TELA DE CONFIRMAÇÃO DO REQUERIMENTO
-    // ==========================================
- // ==========================================
-    // 14. TELA DE CONFIRMAÇÃO DO REQUERIMENTO
+// ==========================================
+    // 14. TELA DE CONFIRMAÇÃO E SALVAMENTO DE PROTOCOLO
     // ==========================================
 
     const successScreen = document.getElementById('success-screen');
@@ -1877,7 +1877,6 @@ if (
     const heroTitle = document.getElementById('hero-title');
     const heroSubtitle = document.getElementById('hero-subtitle');
     const protocoloEl = document.getElementById('protocolo-gerado');
-    const protocoloLabel = document.getElementById('protocolo-label');
 
     function gerarIdentificadorTemporario() {
         const ano = new Date().getFullYear();
@@ -1885,102 +1884,121 @@ if (
         return `APAL-${ano}-${sufixo}`;
     }
 
-    function exibirTelaSucessoCadastro(protocoloOficial = '') {
+    function exibirTelaSucessoCadastro(protocoloOficial = '', dadosComprovante = null) {
         if (!cadastroForm || !successScreen) return;
 
-        // Gera o protocolo
-        const protocoloFinal = protocoloOficial || gerarIdentificadorTemporario();
-        if (protocoloEl) {
-            protocoloEl.textContent = protocoloFinal;
+        // 1. Determina ou recupera os dados do protocolo
+        let dadosFinais = dadosComprovante;
+
+        if (!dadosFinais) {
+            const tipoSelect = document.getElementById('tipo-comercio');
+            dadosFinais = {
+                protocolo: protocoloOficial || gerarIdentificadorTemporario(),
+                nome: document.getElementById('req-nome')?.value || 'Não informado',
+                cpf: document.getElementById('cpf-cadastro')?.value || 'Não informado',
+                comercio: (tipoSelect && tipoSelect.selectedIndex >= 0) 
+                    ? tipoSelect.options[tipoSelect.selectedIndex].text 
+                    : 'Comércio Ambulante'
+            };
+            
+            // Grava o comprovante no localStorage para não sumir ao clicar no botão 'Voltar'
+            localStorage.setItem('apal_ultimo_comprovante', JSON.stringify(dadosFinais));
+            localStorage.removeItem('apal_cadastro_rascunho'); // Limpa o rascunho temporário
         }
 
-        // Resgata os dados preenchidos pelo usuário nas etapas anteriores
-        const nomeUsuario = document.getElementById('req-nome')?.value || 'Não informado';
-        const cpfUsuario = document.getElementById('cpf-cadastro')?.value || 'Não informado';
-        const tipoComercioSelect = document.getElementById('tipo-comercio');
-        const tipoComercioTexto = tipoComercioSelect && tipoComercioSelect.selectedOptions[0] 
-            ? tipoComercioSelect.selectedOptions[0].text 
-            : 'Comércio Ambulante';
-
-        // Preenche os campos de resumo na tela de sucesso
+        // 2. Preenche a tela de confirmação com os dados
+        if (protocoloEl) protocoloEl.textContent = dadosFinais.protocolo;
+        
         const resumoNome = document.getElementById('resumo-nome');
         const resumoCpf = document.getElementById('resumo-cpf');
         const resumoComercio = document.getElementById('resumo-comercio');
 
-        if (resumoNome) resumoNome.textContent = nomeUsuario;
-        if (resumoCpf) resumoCpf.textContent = cpfUsuario;
-        if (resumoComercio) resumoComercio.textContent = tipoComercioTexto;
+        if (resumoNome) resumoNome.textContent = dadosFinais.nome;
+        if (resumoCpf) resumoCpf.textContent = dadosFinais.cpf;
+        if (resumoComercio) resumoComercio.textContent = dadosFinais.comercio;
 
+        // 3. Oculta o formulário e exibe o comprovante
         cadastroForm.style.display = 'none';
+        if (stepperContainer) stepperContainer.style.display = 'none';
+        if (typeof ocultarErroEtapa === 'function') ocultarErroEtapa();
 
-        if (stepperContainer) {
-            stepperContainer.style.display = 'none';
-        }
+        if (heroTitle) heroTitle.textContent = 'Requerimento Concluído com Sucesso!';
+        if (heroSubtitle) heroSubtitle.textContent = 'Seu pedido foi protocolado e os dados cadastrais foram vinculados com segurança.';
 
-        ocultarErroEtapa();
+        successScreen.style.setProperty('display', 'block', 'important');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        if (heroTitle) {
-            heroTitle.textContent = 'Requerimento Concluído com Sucesso!';
-        }
+        if (window.lucide) lucide.createIcons();
+    }
 
-        if (heroSubtitle) {
-            heroSubtitle.textContent = 'Seu pedido foi protocolado e os dados cadastrais foram vinculados com segurança.';
-        }
-
-        successScreen.style.display = 'block';
-        successScreen.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-
-        if (window.lucide) {
-            lucide.createIcons();
+    // RESTAURA O COMPROVANTE CASO O USUÁRIO CLIQUE EM VOLTAR NO NAVEGADOR
+    function verificarComprovanteExistente() {
+        const comprovanteSalvo = localStorage.getItem('apal_ultimo_comprovante');
+        if (comprovanteSalvo) {
+            try {
+                const dados = JSON.parse(comprovanteSalvo);
+                exibirTelaSucessoCadastro(dados.protocolo, dados);
+            } catch (e) {
+                console.error('Erro ao restaurar comprovante:', e);
+            }
         }
     }
 
+    // Executa a verificação assim que entra na página
+    verificarComprovanteExistente();
+
+    // Função global para quando o usuário quiser fazer um novo cadastro do zero
+    window.iniciarNovoCadastro = function() {
+        localStorage.removeItem('apal_ultimo_comprovante');
+        localStorage.removeItem('apal_cadastro_rascunho');
+        window.location.reload();
+    };
+
     window.exibirSucessoCadastro = exibirTelaSucessoCadastro;
 
-    // Ações de Impressão de PDF e Compartilhamento
-    const btnImprimirPdf = document.getElementById('btn-imprimir-pdf');
-    btnImprimirPdf?.addEventListener('click', () => {
-        window.print(); // Aciona a janela de impressão nativa do navegador gerando o PDF do comprovante
+    // Ações dos botões de Imprimir e Compartilhar
+  // Ações dos botões de Imprimir e Compartilhar
+    document.getElementById('btn-imprimir-pdf')?.addEventListener('click', () => {
+        // 1. FORÇA O PREENCHIMENTO ANTES DE IMPRIMIR
+        if (typeof preencherDocumentoOficial === 'function') {
+            preencherDocumentoOficial();
+        }
+        // 2. ABRE A TELA DE IMPRESSÃO LOGO EM SEGUIDA
+        setTimeout(() => { window.print(); }, 100);
     });
 
-    const btnCompartilhar = document.getElementById('btn-compartilhar');
-    btnCompartilhar?.addEventListener('click', async () => {
+    document.getElementById('btn-compartilhar')?.addEventListener('click', async () => {
         const protocoloTexto = protocoloEl ? protocoloEl.textContent : 'APAL';
-        const dadosCompartilhamento = {
-            title: 'Comprovante de Protocolo - APAL',
-            text: `Meu requerimento de ambulante foi protocolado com sucesso na Prefeitura de Vitória da Conquista. Protocolo: ${protocoloTexto}`,
+        const dados = {
+            title: 'Comprovante APAL',
+            text: `Requerimento protocolado no APAL. Protocolo: ${protocoloTexto}`,
             url: window.location.href
         };
-
         if (navigator.share) {
-            try {
-                await navigator.share(dadosCompartilhamento);
-            } catch (err) {
-                console.log('Compartilhamento cancelado ou não suportado');
-            }
+            try { await navigator.share(dados); } catch (_) {}
         } else {
-            // Fallback se o navegador não suportar a API nativa
-            navigator.clipboard.writeText(`Protocolo APAL: ${protocoloTexto} - Requerimento enviado com sucesso.`);
-            alert('Número do protocolo copiado para a área de transferência!');
+            navigator.clipboard.writeText(`Protocolo APAL: ${protocoloTexto}`);
+            alert('Número do protocolo copiado!');
         }
     });
 
+    // Envio do Formulário
     cadastroForm?.addEventListener('submit', event => {
         event.preventDefault();
 
         for (let numero = 1; numero <= totalEtapas; numero++) {
-            if (!validarEtapa(numero)) {
-                mostrarEtapa(numero);
+            if (typeof validarEtapa === 'function' && !validarEtapa(numero)) {
+                if (typeof mostrarEtapa === 'function') mostrarEtapa(numero);
                 return;
             }
         }
 
         exibirTelaSucessoCadastro();
     });
-   document.addEventListener('DOMContentLoaded', () => {
+// ==========================================
+    // 15. CREDENCIAL E ANIMAÇÕES EXTRAS
+    // ==========================================
+    
     // Garante que os ícones do Lucide apareçam nos cartões novos
     if (window.lucide) {
         lucide.createIcons();
@@ -1993,8 +2011,8 @@ if (
     });
 
     // Botão de Compartilhar Credencial
-    const btnCompartilhar = document.getElementById('btn-compartilhar-cred');
-    btnCompartilhar?.addEventListener('click', async () => {
+    const btnCompartilharCred = document.getElementById('btn-compartilhar-cred');
+    btnCompartilharCred?.addEventListener('click', async () => {
         const dadosCompartilhamento = {
             title: 'Credencial Digital - APAL',
             text: 'Confira a minha credencial oficial de comerciante ambulante emitida pela Prefeitura de Vitória da Conquista (APAL).',
@@ -2012,12 +2030,226 @@ if (
             alert('Link da credencial copiado para a área de transferência!');
         }
     });
-});
 
-   
+    // Configuração do Observador de Rolagem (Scroll Animation)
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15 
+    };
+
+    const scrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    const elementosAnimados = document.querySelectorAll('.feature-card, .step-card, .cta-banner');
+    
+    elementosAnimados.forEach((elemento, index) => {
+        elemento.style.opacity = '0';
+        elemento.style.transform = 'translateY(40px)';
+        const delay = (index % 4) * 0.15; 
+        elemento.style.transition = `opacity 0.6s ease ${delay}s, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s`;
+        scrollObserver.observe(elemento);
+    });
+
+    // Ativa transições suaves para as requisições assíncronas do HTMX
+    if (typeof htmx !== 'undefined') {
+        htmx.config.globalViewTransitions = true; 
+    }
 
 // ==========================================
-// FIM DO DOMContentLoaded
+// FIM DO DOMContentLoaded (ÚNICO)
 // ==========================================
 
+// ==========================================
+// SALVAR E RESTAURAR PROGRESSO DO FORMULÁRIO
+// ==========================================
+
+const CHAVE_STORAGE = 'apal_cadastro_rascunho';
+
+// 1. Salva os campos do formulário no localStorage
+function salvarProgressoFormulario() {
+    const form = document.getElementById('cadastro-form');
+    if (!form) return;
+
+    const dados = {
+        etapaAtual: typeof etapaAtual !== 'undefined' ? etapaAtual : 1
+    };
+
+    // Salva inputs, selects e textareas
+    const campos = form.querySelectorAll('input, select, textarea');
+    campos.forEach(campo => {
+        if (!campo.id) return;
+
+        if (campo.type === 'checkbox') {
+            dados[campo.id] = campo.checked;
+        } else if (campo.type !== 'file' && campo.type !== 'password') {
+            // Arquivos e senhas não são salvos por questões de segurança do navegador
+            dados[campo.id] = campo.value;
+        }
+    });
+
+    localStorage.setItem(CHAVE_STORAGE, JSON.stringify(dados));
+}
+
+// 2. Restaura o progresso salvo quando o usuário entra na página
+function restaurarProgressoFormulario() {
+    const salvo = localStorage.getItem(CHAVE_STORAGE);
+    if (!salvo) return;
+
+    try {
+        const dados = JSON.parse(salvo);
+
+        // Preenche cada campo salvo
+        Object.keys(dados).forEach(id => {
+            if (id === 'etapaAtual') return;
+
+            const campo = document.getElementById(id);
+            if (campo) {
+                if (campo.type === 'checkbox') {
+                    campo.checked = dados[id];
+                    campo.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                    campo.value = dados[id];
+                    campo.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+
+        // Volta automaticamente para a etapa onde o usuário parou
+        if (dados.etapaAtual && typeof mostrarEtapa === 'function') {
+            mostrarEtapa(dados.etapaAtual, false);
+        }
+    } catch (e) {
+        console.warn('Erro ao restaurar rascunho:', e);
+    }
+}
+
+// 3. Apaga o rascunho quando o formulário for enviado com sucesso
+function limparProgressoSalvo() {
+    localStorage.removeItem(CHAVE_STORAGE);
+}
+
+const form = document.getElementById('cadastro-form');
+if (form) {
+    // Salva automaticamente enquanto o usuário digita ou altera opções
+    form.addEventListener('input', salvarProgressoFormulario);
+    form.addEventListener('change', salvarProgressoFormulario);
+
+    // Restaura o rascunho salvo assim que abre a página
+    restaurarProgressoFormulario();
+}
+
+// ============================================================
+// PREENCHIMENTO AUTOMÁTICO DO FORMULÁRIO OFICIAL (CORRIGIDO)
+// ============================================================
+
+function preencherDocumentoOficial() {
+    let dadosSalvos = {};
+    try {
+        const comprovante = localStorage.getItem('apal_ultimo_comprovante');
+        const rascunho = localStorage.getItem('apal_cadastro_rascunho');
+        dadosSalvos = JSON.parse(comprovante || rascunho || '{}');
+    } catch (e) {
+        console.warn('Erro ao ler rascunho:', e);
+    }
+
+    const getValorCampo = (idsPossiveis) => {
+        for (const id of idsPossiveis) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.tagName === 'SELECT') {
+                    if (el.selectedIndex >= 0 && el.options[el.selectedIndex].value) {
+                        return el.options[el.selectedIndex].text;
+                    }
+                } else if (el.value && el.value.trim() !== '') {
+                    return el.value.trim();
+                }
+            }
+        }
+        
+        for (const id of idsPossiveis) {
+            if (dadosSalvos[id]) return dadosSalvos[id];
+        }
+
+        return '-';
+    };
+
+    const setTxt = (idTarget, valor) => {
+        const el = document.getElementById(idTarget);
+        if (el) {
+            el.textContent = (valor && valor !== '-') ? valor : 'Não informado';
+        }
+    };
+
+    const marcarCheck = (idTarget, condicao) => {
+        const el = document.getElementById(idTarget);
+        if (el) {
+            const textoLimpo = el.textContent.replace(/\([ Xx]\)/, '').trim();
+            el.textContent = `${condicao ? '(X)' : '( )'} ${textoLimpo}`;
+        }
+    };
+
+    // --- MAPEAMENTO COM OS IDs REAIS DO SEU HTML ---
+
+    // 1. Dados Pessoais
+    setTxt('pdf-nome', getValorCampo(['req-nome']));
+    setTxt('pdf-cpf', getValorCampo(['cpf-cadastro']));
+    setTxt('pdf-rg', getValorCampo(['req-rg']));
+    setTxt('pdf-nacionalidade', getValorCampo(['pais-origem']) !== '-' ? getValorCampo(['pais-origem']) : 'Brasileira');
+    setTxt('pdf-estado-civil', getValorCampo(['req-estado-civil']));
+
+    // 2. Endereço Residencial
+    setTxt('pdf-endereco', getValorCampo(['endereco-input']));
+    setTxt('pdf-numero', getValorCampo(['numero-input']));
+    setTxt('pdf-bairro', getValorCampo(['bairro-input']));
+    setTxt('pdf-complemento', getValorCampo(['complemento-input']));
+    setTxt('pdf-cep', getValorCampo(['cep-input']));
+    setTxt('pdf-tel', getValorCampo(['req-tel']));
+    setTxt('pdf-email', getValorCampo(['req-email']));
+
+    // 3. Pessoa Jurídica
+    const cnpjVal = getValorCampo(['pj-cnpj']);
+    setTxt('pdf-pj-cnpj', cnpjVal !== '-' ? cnpjVal : 'Não se aplica');
+    setTxt('pdf-pj-razao', getValorCampo(['pj-razao']));
+    setTxt('pdf-pj-fantasia', getValorCampo(['pj-fantasia']));
+    setTxt('pdf-pj-insc', getValorCampo(['pj-inscricao']));
+
+    // 4. Atuação Pretendida & Categorias
+    const catText = getValorCampo(['categoria-equipamento']).toUpperCase();
+    marcarCheck('pdf-cat-pret-a', catText.includes('A'));
+    marcarCheck('pdf-cat-pret-b', catText.includes('B'));
+    marcarCheck('pdf-cat-pret-c', catText.includes('C'));
+
+    const tipoComercioText = getValorCampo(['especie-mercadoria', 'tipo-comercio']);
+    setTxt('pdf-mercadoria-pretendida', tipoComercioText);
+    setTxt('pdf-ponto-op1', getValorCampo(['endereco-ponto']));
+    setTxt('pdf-ponto-op2', getValorCampo(['opcao-local-2']));
+    setTxt('pdf-ponto-op3', 'N/A');
+    
+    const metragem = getValorCampo(['metragem-utilizada']);
+    setTxt('pdf-area-pretendida', metragem !== '-' ? `${metragem} m²` : '-');
+    
+    setTxt('pdf-horario-pretendida', getValorCampo(['horario-atuacao']) !== '-' ? getValorCampo(['horario-atuacao']) : 'Horário Comercial');
+
+    // 5. Data por extenso
+    const hoje = new Date();
+    const meses = [
+        'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+        'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    ];
+    const dataFormatada = `${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
+    document.querySelectorAll('.pdf-data-extenso').forEach(el => {
+        el.textContent = dataFormatada;
+    });
+}
+
 });
+

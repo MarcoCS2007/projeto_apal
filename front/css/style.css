@@ -372,15 +372,43 @@ svg.lucide {
     color: var(--texto-cinza-suave);
 }
 
-/* --- SELECTS: seta customizada (apenas visual, mesmo elemento nativo) --- */
-.input-group select {
+/* --- SELECTS: Garantia Visual Padrão --- */
+select, .input-group select {
+    width: 100%;
+    height: 46px; /* Altura padronizada com os outros inputs */
+    padding: 0 40px 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.94rem;
+    color: var(--texto-escuro);
+    background-color: var(--branco);
+    border: 1px solid var(--borda-cinza);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    cursor: pointer;
+    
+    /* Remove a seta feia/padrão do navegador */
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    
+    /* Insere uma setinha suave e moderna via ícone SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.85rem center;
-    background-size: 18px;
-    padding-right: 2.5rem;
+    background-position: right 14px center;
+}
+
+/* Estado de Foco (quando o usuário clica no campo) */
+select:focus, .input-group select:focus {
+    border-color: var(--azul-vibrante);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Estado Desabilitado (ex: quando aguarda escolher a UF primeiro) */
+select:disabled, .input-group select:disabled {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    cursor: not-allowed;
+    opacity: 0.8;
 }
 
 /* --- ARQUIVOS: botão nativo estilizado como pill (sem alterar o comportamento do input) --- */
@@ -1954,4 +1982,481 @@ body {
     border-color: #173EA8 !important;
     color: #FFFFFF !important;
     transform: translateY(-1px);
+}
+
+/* =========================================
+   ANIMAÇÕES GLOBAIS DO SISTEMA (UX Sutil)
+========================================= */
+
+/* Animação de entrada rápida e suave para os cards principais */
+.form-card, .access-panel, .modal-backdrop {
+    animation: fadeSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Transição suave para elementos que o HTMX atualiza (Tabelas e Botões) */
+.htmx-swapping {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+/* =========================================
+   FORÇAR ESTILO NOS SELECTS NATIVOS
+========================================= */
+select.styled-select,
+.input-group select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    width: 100% !important;
+    height: 46px !important; /* Altura exata dos outros inputs */
+    padding: 0 40px 0 14px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.94rem !important;
+    color: #172033 !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    /* Setinha moderna convertida em fundo */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+}
+
+select.styled-select:focus,
+.input-group select:focus {
+    border-color: #1D4ED8 !important;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15) !important;
+}
+
+select.styled-select:disabled,
+.input-group select:disabled {
+    background-color: #F1F5F9 !important;
+    color: #94A3B8 !important;
+    cursor: not-allowed !important;
+    opacity: 0.8 !important;
+}
+
+/* =========================================
+   ESTILOS ESPECÍFICOS DO FORMULÁRIO DE CADASTRO
+========================================= */
+.required-marker { color: #EF4444; margin-left: 4px; font-weight: bold; }
+
+.error-card {
+    background-color: #FEF2F2;
+    border-left: 4px solid #EF4444;
+    color: #991B1B;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    display: none;
+    margin-bottom: 2rem;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    animation: shake 0.4s ease-in-out;
+}
+
+.form-step {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+    padding-bottom: 12rem; /* Espaço para a cascata de cidades abrir para baixo */
+}
+
+.form-step.active {
+    display: block;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--texto-cinza, #4B5563);
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.input-group input:disabled, .input-group select:disabled {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* =========================================
+   ESTILOS DA TELA DE SUCESSO / CONFIRMAÇÃO
+========================================= */
+.success-card {
+    display: none;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.success-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background-color: #D1FAE5;
+    color: #059669;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+}
+
+.success-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.success-subtitle {
+    color: #4B5563;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+}
+
+.protocol-box {
+    background-color: #F3F4F6;
+    border: 1px dashed #D1D5DB;
+    border-radius: 8px;
+    padding: 1.25rem;
+    max-width: 480px;
+    margin: 0 auto 2rem auto;
+}
+
+.protocol-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.protocol-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1E3A8A;
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+.next-steps-container {
+    text-align: left;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 650px;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.next-steps-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #2563EB;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.timeline-content h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 2px 0;
+}
+
+.timeline-content p {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+/* =========================================
+   LIMITAR EXIBIÇÃO DE OPÇÕES PARA ~5 ITENS
+========================================= */
+select option {
+    padding: 8px 12px;
+}
+
+/* Limita altura para dropdowns customizados e caixas de seleção */
+.custom-select-options,
+.custom-select-menu {
+    max-height: 200px !important; /* Altura ideal para exibir cerca de 5 opções */
+    overflow-y: auto !important;
+}
+
+/* Garante espaço abaixo do formulário para o menu do navegador sempre abrir para baixo */
+.form-step {
+    padding-bottom: 220px !important;
+}
+
+/* =========================================
+   PADRONIZAÇÃO DO FOCO NOS CAMPOS (SEM DUPLA BORDA)
+========================================= */
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus,
+select.styled-select:focus,
+.input-group input:focus-visible,
+.input-group select:focus-visible,
+.input-group textarea:focus-visible,
+select.styled-select:focus-visible {
+    border-color: var(--azul-vibrante) !important;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.18) !important;
+    outline: none !important; /* Remove o contorno rosa conflitante nos inputs */
+}
+
+/* =========================================
+   REFINAMENTO: TELA DE SUCESSO / REQUERIMENTO
+========================================= */
+
+/* Caixa de Protocolo */
+.protocol-box {
+    background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%) !important;
+    border: 1px solid #BFDBFE !important;
+    border-radius: 14px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.06) !important;
+}
+
+/* Card das Próximas Etapas */
+.next-steps-container {
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Container Principal dos Botões */
+.success-actions {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
+    margin-top: 2rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid #E2E8F0 !important;
+}
+
+/* Botões Secundários (Imprimir, Compartilhar, Início) */
+.success-actions .btn-action {
+    background-color: #FFFFFF !important;
+    color: #334155 !important;
+    border: 1.5px solid #CBD5E1 !important;
+    border-radius: 10px !important;
+    padding: 0.7rem 1.2rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Efeito Hover nos Botões Secundários (Subida Suave + Sombra) */
+.success-actions .btn-action:hover {
+    background-color: #F8FAFC !important;
+    border-color: #94A3B8 !important;
+    color: #0F172A !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Botão "Novo Requerimento" (Estilo Azul Suave) */
+.success-actions .btn-action.btn-novo-req {
+    background-color: #EFF6FF !important;
+    color: #1D4ED8 !important;
+    border-color: #BFDBFE !important;
+}
+
+.success-actions .btn-action.btn-novo-req:hover {
+    background-color: #DBEAFE !important;
+    border-color: #93C5FD !important;
+    color: #1E3A8A !important;
+}
+
+/* Botão Destaque Principal "Meu Painel" */
+.success-actions .btn-submit {
+    background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.75rem 1.4rem !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3) !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.success-actions .btn-submit:hover {
+    background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(29, 78, 216, 0.4) !important;
+}
+
+/* ============================================================
+   ESTILOS DO FORMULÁRIO OFICIAL APAL (PÁGINAS A4 PARA IMPRESSÃO/PDF)
+   ============================================================ */
+
+/* Oculta o formulário oficial durante a navegação normal no site */
+.print-official-container {
+    display: none;
+}
+
+/* ============================================================
+   REGRAS DE IMPRESSÃO BLINDADAS (A4 OFICIAL)
+   ============================================================ */
+
+/* Oculto na visualização normal do site */
+#print-official-form,
+.print-official-container {
+    display: none;
+}
+
+@media print {
+/* 1. Esconde TUDO apenas se o formulário oficial estiver na página */
+    body:has(#print-official-form) > *:not(#print-official-form) {
+        display: none !important;
+    }
+
+    /* 2. Reseta o fundo e margens da página */
+    html, body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* 3. Exibe o formulário oficial */
+    #print-official-form,
+    .print-official-container {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 10mm 15mm;
+    }
+
+    /* Formatação das 3 páginas A4 */
+    .print-page {
+        width: 100% !important;
+        min-height: 265mm !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+    }
+
+    .print-page:last-child {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    /* Estilos internos da folha */
+    .print-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; }
+    .print-header-top { font-size: 9.5pt; line-height: 1.25; text-transform: uppercase; }
+    .print-doc-title { font-size: 11pt; font-weight: 800; margin-top: 8px; text-transform: uppercase; }
+    .print-section { margin-bottom: 10px; }
+    .print-section-title { font-size: 9.5pt; font-weight: 800; background-color: #E5E7EB !important; border: 1px solid #000; padding: 3px 8px; margin-bottom: 4px; text-transform: uppercase; }
+    .print-grid { display: grid !important; gap: 6px; font-size: 9pt; border: 1px solid #000; padding: 6px 8px; margin-bottom: 6px; }
+    .print-grid-2 { grid-template-columns: 1fr 1fr; }
+    .print-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .print-grid-3-wide { grid-template-columns: 2fr 1fr 1fr; }
+    .print-row-line { font-size: 9pt; border-bottom: 1px dotted #666; padding: 4px 0; margin-bottom: 4px; }
+    .pdf-check { margin-right: 14px; font-weight: 600; }
+    .print-legal-box, .print-alert-box { border: 1px solid #000; padding: 8px 10px; font-size: 8.5pt; line-height: 1.35; margin-bottom: 10px; }
+    .print-alert-box h3 { font-size: 10pt; font-weight: 800; text-align: center; margin-bottom: 6px; }
+    .print-doc-list { font-size: 8.8pt; line-height: 1.5; padding-left: 18px; margin-top: 4px; list-style-type: none; }
+    .print-signature-block { text-align: center; margin-top: 20px; margin-bottom: 10px; font-size: 9pt; }
+    .print-signature-line { width: 280px; border-top: 1px solid #000; margin: 35px auto 4px auto; }
+    .print-footer-page { text-align: right; font-size: 8pt; font-weight: 700; border-top: 1px solid #000; padding-top: 4px; margin-top: auto; }
 }
