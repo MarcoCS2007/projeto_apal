@@ -90,16 +90,20 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
 class Ambulante(UsuarioBase):
     apelido_nome_fantasia = models.CharField(max_length=150, blank=True, null=True)
     cnpj = models.CharField(max_length=18, blank=True, null=True)
-    tipo_atuacao = models.CharField(max_length=100)
-    codigo_qr_code = models.CharField(max_length=255, unique=True)
-    data_nasc = models.DateField()
-    escolaridade = models.CharField(max_length=100)
+    tipo_atuacao = models.CharField(max_length=100, blank=True, default="")
+    codigo_qr_code = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    data_nasc = models.DateField(blank=True, null=True)
+    escolaridade = models.CharField(max_length=100, blank=True, default="")
     nis = models.CharField(max_length=20, blank=True, null=True)
     num_funcionarios = models.IntegerField(default=0)
     pontuacao = models.IntegerField(default=100)
 
     def __str__(self):
         return self.apelido_nome_fantasia or self.nome
+
+    @property
+    def cadastro_completo(self):
+        return bool(self.data_nasc and self.escolaridade and self.tipo_atuacao)
 
 
 class Fiscal(UsuarioBase):

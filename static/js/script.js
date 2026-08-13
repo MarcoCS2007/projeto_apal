@@ -479,23 +479,24 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
     });
 
     // ---------------------------------------------------
-    // 6. MOSTRAR / OCULTAR SENHA (LOGIN)
+    // 6. MOSTRAR / OCULTAR SENHA (LOGIN E CADASTRO)
     // ---------------------------------------------------
-    const btnTogglePassword = document.getElementById('btn-toggle-password');
-    const userPasswordInput = document.getElementById('user-password');
+    document.querySelectorAll('.btn-toggle-password').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const wrapper = btn.closest('.input-password-wrapper');
+            const input = wrapper ? wrapper.querySelector('input') : null;
+            if (!input) return;
 
-    if (btnTogglePassword && userPasswordInput) {
-        btnTogglePassword.addEventListener('click', () => {
-            const ehSenha = userPasswordInput.getAttribute('type') === 'password';
-            userPasswordInput.setAttribute('type', ehSenha ? 'text' : 'password');
-            
-            const icone = btnTogglePassword.querySelector('i');
+            const ehSenha = input.getAttribute('type') === 'password';
+            input.setAttribute('type', ehSenha ? 'text' : 'password');
+
+            const icone = btn.querySelector('i');
             if (icone) {
                 icone.setAttribute('data-lucide', ehSenha ? 'eye-off' : 'eye');
                 if (window.lucide) lucide.createIcons();
             }
         });
-    }
+    });
 
     // ==========================================
     // 7. DROPDOWNS PERSONALIZADOS + API DO IBGE

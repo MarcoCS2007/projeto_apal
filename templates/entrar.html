@@ -1,20 +1,16 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}Acesso Backoffice - APAL | Aqui Pode, Aqui é Legal{% endblock %}
+{% block title %}Entrar - APAL | Aqui Pode, Aqui é Legal{% endblock %}
 
 {% block header_nav %}
-<nav class="header-nav">
-    <a href="{% url 'index' %}"><i data-lucide="home"></i> Início</a>
-    <a href="{% url 'login' %}" class="active"><i data-lucide="log-in"></i> Backoffice</a>
-</nav>
+{% include "publico/_nav.html" with active="entrar" %}
 {% endblock %}
 
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Acesso ao Backoffice</h1>
-        <p>Área restrita para Gestores e Administradores da plataforma APAL<br> de Vitória da Conquista.</p>
+        <h1>Acesso do Ambulante</h1>
+        <p>Entre com seu CPF ou e-mail para acompanhar o cadastro e a licença.</p>
     </div>
 </section>
 {% endblock %}
@@ -23,10 +19,10 @@
 <div class="form-card login-wrapper">
     <div class="section-title">
         <div class="title-accent"></div>
-        <h2>Acesso ao Sistema</h2>
+        <h2>Entrar na Plataforma</h2>
     </div>
 
-    <form id="login-form" method="post" action="{% url 'login' %}">
+    <form id="login-form" method="post" action="{% url 'entrar' %}">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -50,7 +46,7 @@
                 <label for="user-password">Senha</label>
                 <div class="input-password-wrapper">
                     {{ form.password }}
-                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -64,10 +60,16 @@
         <input type="hidden" name="next" value="{{ next }}">
         {% endif %}
 
-        <div class="form-actions" style="margin-top: 1.5rem;">
+        <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
             <button type="submit" class="btn-submit" style="width: 100%;">
-                <i data-lucide="log-in"></i> Entrar na Plataforma
+                <i data-lucide="log-in"></i> Entrar
             </button>
+            <a href="{% url 'redefinir_senha' %}" class="forgot-password" style="text-align: center;">
+                Esqueci minha senha
+            </a>
+            <a href="{% url 'registro' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <i data-lucide="user-plus"></i> Ainda não tem conta? Cadastre-se
+            </a>
         </div>
     </form>
 </div>

@@ -28,16 +28,18 @@
             </div>
             <nav class="header-nav home-nav">
                 <a href="{% url 'index' %}" class="active home-nav-link-active"><i data-lucide="home" class="home-nav-icon"></i> Início</a>
-                <a href="#sobre" class="home-nav-link"><i data-lucide="info" class="home-nav-icon"></i> Sobre</a>
-                <a href="#duvidas" class="home-nav-link"><i data-lucide="help-circle" class="home-nav-icon"></i> Dúvidas</a>
+                <a href="{% url 'sobre' %}" class="home-nav-link"><i data-lucide="info" class="home-nav-icon"></i> Sobre</a>
+                <a href="{% url 'faq' %}" class="home-nav-link"><i data-lucide="help-circle" class="home-nav-icon"></i> Dúvidas</a>
                 {% if user.is_authenticated %}
                     {% if user.role == "administrador" %}
                         <a href="{% url 'master_admin' %}" class="home-nav-btn-login"><i data-lucide="layout-dashboard" class="home-nav-icon"></i> Painel</a>
+                    {% elif user.role == "ambulante" %}
+                        <a href="{% url 'ambulante_painel' %}" class="home-nav-btn-login"><i data-lucide="layout-dashboard" class="home-nav-icon"></i> Painel</a>
                     {% else %}
                         <a href="{% url 'backoffice_inicio' %}" class="home-nav-btn-login"><i data-lucide="layout-dashboard" class="home-nav-icon"></i> Painel</a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="home-nav-btn-login"><i data-lucide="log-in" class="home-nav-icon"></i> Entrar</a>
+                    <a href="{% url 'entrar' %}" class="home-nav-btn-login"><i data-lucide="log-in" class="home-nav-icon"></i> Entrar</a>
                 {% endif %}
             </nav>
         </div>
@@ -53,7 +55,7 @@
             </p>
 
             <div class="hero-buttons">
-                <a href="#cadastro" class="btn-modern-primary">
+                <a href="{% url 'registro' %}" class="btn-modern-primary">
                     <i data-lucide="user-plus"></i> Quero me Cadastrar
                 </a>
             </div>
@@ -152,7 +154,7 @@
                 </p>
 
                 <div class="cta-buttons">
-                    <a href="#cadastro" class="btn-download-primary">
+                    <a href="{% url 'registro' %}" class="btn-download-primary">
                         <i data-lucide="user-plus"></i> Iniciar Meu Cadastro
                     </a>
                 </div>

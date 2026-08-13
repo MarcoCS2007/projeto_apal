@@ -1,191 +1,82 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre o Projeto - APAL</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
 
-    <!-- Cabeçalho Institucional -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                </a>
-            </div>
-            <nav class="header-nav">
-                <a href="../index.html"><i data-lucide="home"></i> Início</a>
-                <a href="sobre.html" class="active"><i data-lucide="info"></i> Sobre o Projeto</a>
-                <a href="faq.html"><i data-lucide="help-circle"></i> Dúvidas e Tutoriais</a>
-            </nav>
-        </div>
-    </header>
+{% block title %}Sobre o Projeto - APAL{% endblock %}
 
-    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
-    <div id="access-widget-container" class="access-widget-container">
-        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
-            <span class="access-text">Acessibilidade</span>
-            <i data-lucide="eye-off"></i>
-        </button>
+{% block header_nav %}
+{% include "publico/_nav.html" with active="sobre" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Sobre o Projeto</h1>
+        <p>Conheça a tecnologia por trás da nova Gestão de Trabalhadores Ambulantes.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Nossa Missão e Impacto Social</h2>
     </div>
 
-    <!-- PAINEL DE ACESSIBILIDADE -->
-    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
-        <div class="access-header">
-            <h3>Acessibilidade</h3>
-            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="about-text">
+            <p>O sistema <strong>APAL</strong> nasceu para modernizar o licenciamento e a gestão de trabalhadores ambulantes em Vitória da Conquista. Nosso objetivo é transformar um processo fragmentado em uma solução digital unificada, garantindo organização urbana, controle legal e acesso a oportunidades de forma digna e transparente.</p>
+            <p>A plataforma resolve os desafios da gestão municipal, substituindo cadastros manuais e a falta de rastreabilidade por tecnologia de ponta, beneficiando o comerciante, a prefeitura e o cidadão.</p>
         </div>
-        <div class="access-grid">
-            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
-            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
-            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
-            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
-            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
-            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
-            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
-            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
-            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
-            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
-            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
-            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
-        </div>
-    </div>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-container" style="text-align: center;">
-            <h1>Sobre o Projeto</h1>
-            <p>Conheça a tecnologia por trás da nova Gestão de Trabalhadores Ambulantes.</p>
-        </div>
-    </section>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="main-container">
-        <div class="form-card">
-            
-            <div class="section-title">
-                <div class="title-accent"></div>
-                <h2>Nossa Missão e Impacto Social</h2>
-            </div>
-            
-            <!-- Layout Vertical -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                
-                <!-- TEXTO PRINCIPAL -->
-                <div class="about-text">
-                    <p>O sistema <strong>APAL</strong> nasceu para modernizar o licenciamento e a gestão de trabalhadores ambulantes em Vitória da Conquista. Nosso objetivo é transformar um processo fragmentado em uma solução digital unificada, garantindo organização urbana, controle legal e acesso a oportunidades de forma digna e transparente.</p>
-                    <p>A plataforma resolve os desafios da gestão municipal, substituindo cadastros manuais e a falta de rastreabilidade por tecnologia de ponta, beneficiando o comerciante, a prefeitura e o cidadão.</p>
-                </div>
-
-                <!-- BLOCO 1: PÚBLICO ALVO -->
-                <div class="about-features">
-                    <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; color: var(--azul-vibrante); font-size: 1.2rem;">
-                        <i data-lucide="users"></i> Para quem foi feito?
-                    </h3>
-                    <ul>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="store" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Trabalhadores Ambulantes:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Acesso simplificado a cadastro, licenciamento e emissão de credencial digital com QR Code.</span></div>
-                        </li>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="shield-check" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Prefeitura e Fiscais:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Painel gerencial, controle inteligente de ocupação e aplicativo exclusivo para fiscalização em campo.</span></div>
-                        </li>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="user-search" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Cidadãos:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Consultar ambulantes autorizados, ver localizações e fazer denúncias de forma transparente.</span></div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- BLOCO 2: INOVAÇÕES -->
-                <div class="about-features">
-                    <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; color: var(--azul-vibrante); font-size: 1.2rem;">
-                        <i data-lucide="rocket"></i> Principais Inovações
-                    </h3>
-                    <ul>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="map" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Mapa da Cidade Integrado:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Controle visual de vagas livres, áreas saturadas e zoneamento de ambulantes autorizados.</span></div>
-                        </li>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="cpu" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Inteligência Artificial (IA):</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Validação automática de documentos, triagem de fotos e sugestões inteligentes de novos locais.</span></div>
-                        </li>
-                        <li style="align-items: flex-start;">
-                            <i data-lucide="gavel" style="margin-top: 2px;"></i> 
-                            <div><strong style="color: var(--texto-escuro);">Fiscalização em Tempo Real:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Leitura de QR Code, histórico de infrações e registro de ocorrências georreferenciadas.</span></div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- BLOCO EQUIPE -->
-                <div style="background-color: var(--fundo-cinza); border-radius: 8px; padding: 1.5rem; text-align: center; border: 1px solid var(--borda-cinza); margin-top: 1rem;">
-                    <h4 style="color: var(--texto-escuro); margin-bottom: 0.8rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i data-lucide="code" style="color: var(--azul-vibrante);"></i> Equipe Desenvolvedora
-                    </h4>
-                    <p style="font-size: 0.95rem; color: var(--texto-cinza); margin: 0; line-height: 1.6;">
-                        Henrique Sousa Oliveira &bull; Luan Libarino Santos &bull; Marco Antônio Chaves de Souza<br>Marlon Santos Carvalho &bull; Wendel dos santos Neres
-                    </p>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
-    <div id="modal-backdrop" class="modal-backdrop"></div>
-
-    <!-- JANELA MODAL DA IA -->
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
-        <div class="access-header">
-            <h3 style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+        <div class="about-features">
+            <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; color: var(--azul-vibrante); font-size: 1.2rem;">
+                <i data-lucide="users"></i> Para quem foi feito?
             </h3>
-            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+            <ul>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="store" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Trabalhadores Ambulantes:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Acesso simplificado a cadastro, licenciamento e emissão de credencial digital com QR Code.</span></div>
+                </li>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="shield-check" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Prefeitura e Fiscais:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Painel gerencial, controle inteligente de ocupação e aplicativo exclusivo para fiscalização em campo.</span></div>
+                </li>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="user-search" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Cidadãos:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Consultar ambulantes autorizados, ver localizações e fazer denúncias de forma transparente.</span></div>
+                </li>
+            </ul>
         </div>
-        <div id="ai-response-content" class="custom-scrollbar">
-            Aguardando seleção...
+
+        <div class="about-features">
+            <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; color: var(--azul-vibrante); font-size: 1.2rem;">
+                <i data-lucide="rocket"></i> Principais Inovações
+            </h3>
+            <ul>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="map" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Mapa da Cidade Integrado:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Controle visual de vagas livres, áreas saturadas e zoneamento de ambulantes autorizados.</span></div>
+                </li>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="cpu" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Inteligência Artificial (IA):</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Validação automática de documentos, triagem de fotos e sugestões inteligentes de novos locais.</span></div>
+                </li>
+                <li style="align-items: flex-start;">
+                    <i data-lucide="gavel" style="margin-top: 2px;"></i>
+                    <div><strong style="color: var(--texto-escuro);">Fiscalização em Tempo Real:</strong> <span style="font-weight: 400; color: var(--texto-cinza);">Leitura de QR Code, histórico de infrações e registro de ocorrências georreferenciadas.</span></div>
+                </li>
+            </ul>
+        </div>
+
+        <div style="background-color: var(--fundo-cinza); border-radius: 8px; padding: 1.5rem; text-align: center; border: 1px solid var(--borda-cinza); margin-top: 1rem;">
+            <h4 style="color: var(--texto-escuro); margin-bottom: 0.8rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i data-lucide="code" style="color: var(--azul-vibrante);"></i> Equipe Desenvolvedora
+            </h4>
+            <p style="font-size: 0.95rem; color: var(--texto-cinza); margin: 0; line-height: 1.6;">
+                Henrique Sousa Oliveira &bull; Luan Libarino Santos &bull; Marco Antônio Chaves de Souza<br>Marlon Santos Carvalho &bull; Wendel dos santos Neres
+            </p>
         </div>
     </div>
-
-    <!-- RODAPÉ INSTITUCIONAL -->
-    <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
-    </footer>
-
-    <!-- VLIBRAS -->
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
-        </div>
-    </div>
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-    
-    <!-- JS GLOBAL DA APLICAÇÃO -->
-    <script src="../js/script.js"></script>
-    
-    <!-- Inicialização dos ícones do Lucide -->
-    <script>
-        lucide.createIcons();
-    </script>
-
-</body>
-</html>
+</div>
+{% endblock %}

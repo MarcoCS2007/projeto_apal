@@ -71,4 +71,29 @@ class HomeViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "home.html")
         self.assertContains(response, "comércio ambulante organizado")
-        self.assertContains(response, reverse("login"))
+        self.assertContains(response, reverse("entrar"))
+        self.assertContains(response, reverse("registro"))
+        self.assertContains(response, reverse("sobre"))
+        self.assertContains(response, reverse("faq"))
+
+
+class PaginasPublicasTests(TestCase):
+    def test_sobre_usa_static_e_urls_django(self):
+        response = self.client.get(reverse("sobre"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "publico/sobre.html")
+        self.assertContains(response, reverse("index"))
+        self.assertContains(response, reverse("faq"))
+        self.assertNotContains(response, "../css/style.css")
+        self.assertContains(response, "static/css/style.css")
+
+    def test_faq_usa_static_e_urls_django(self):
+        response = self.client.get(reverse("faq"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "publico/faq.html")
+        self.assertContains(response, reverse("registro"))
+        self.assertContains(response, "static/assets/formulario.pdf")
+        self.assertNotContains(response, "../css/style.css")
+        self.assertNotContains(response, "../js/script.js")

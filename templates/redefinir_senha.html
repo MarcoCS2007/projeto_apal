@@ -1,155 +1,54 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperação de Senha - APAL</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- Cabeçalho Institucional -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                </a>
+{% block title %}Recuperação de Senha - APAL{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Recuperação de Senha</h1>
+        <p>Informe o e-mail ou o CPF cadastrado para receber as instruções de redefinição.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Redefinir Acesso</h2>
+    </div>
+
+    <form id="recovery-form" method="post" action="{% url 'redefinir_senha' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="recovery-email">E-mail ou CPF</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="login-error" role="alert">{{ form.email.errors.0 }}</div>
+                {% endif %}
             </div>
-            <nav class="header-nav">
-                <a href="index.html"><i data-lucide="home"></i> Início</a>
-                <a href="publico/sobre.html"><i data-lucide="info"></i> Sobre o Projeto</a>
-                <a href="publico/faq.html"><i data-lucide="help-circle"></i> Dúvidas e Tutoriais</a>
-            </nav>
         </div>
-    </header>
 
-    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
-    <div id="access-widget-container" class="access-widget-container">
-        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
-            <span class="access-text">Acessibilidade</span>
-            <i data-lucide="eye-off"></i>
-        </button>
-    </div>
-
-    <!-- PAINEL DE ACESSIBILIDADE -->
-    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
-        <div class="access-header">
-            <h3>Acessibilidade</h3>
-            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        <div class="info-callout-box">
+            <p>
+                Enviaremos um link seguro para o e-mail da conta para que você possa cadastrar uma nova senha de acesso ao sistema.
+            </p>
         </div>
-        <div class="access-grid">
-            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
-            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
-            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
-            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
-            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
-            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
-            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
-            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
-            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
-            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
-            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
-            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+
+        <div class="form-actions" style="flex-direction: column; gap: 1rem;">
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                <i data-lucide="send"></i> Enviar Link de Recuperação
+            </button>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.5rem;">
+                <i data-lucide="arrow-left"></i> Voltar para o Login
+            </a>
         </div>
-    </div>
-
-    <!-- FAIXA SUPERIOR COM GRADIENTE AZUL -->
-    <section class="hero-section">
-        <div class="hero-container" style="text-align: center;">
-            <h1>Recuperação de Senha</h1>
-            <p>Informe seu e-mail cadastrado para receber as instruções de redefinição.</p>
-        </div>
-    </section>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="main-container">
-        <div class="form-card login-wrapper">
-            
-            <div class="section-title">
-                <div class="title-accent"></div>
-                <h2>Redefinir Acesso</h2>
-            </div>
-
-            <form id="recovery-form" onsubmit="event.preventDefault(); alert('Instruções enviadas com sucesso! Verifique sua caixa de entrada.'); window.location.href='index.html';">
-                
-                <div class="form-row">
-                    <div class="input-group full-width">
-                        <label for="recovery-email">E-mail Cadastrado</label>
-                        <input type="email" id="recovery-email" placeholder="seu-email@dominio.com" required>
-                    </div>
-                </div>
-
-                <div class="info-callout-box">
-                    <p>
-                        Enviaremos um link seguro para o seu e-mail para que você possa cadastrar uma nova senha de acesso ao sistema.
-                    </p>
-                </div>
-
-                <div class="form-actions" style="flex-direction: column; gap: 1rem;">
-                    <button type="submit" class="btn-submit" style="width: 100%;">
-                        <i data-lucide="send"></i> Enviar Link de Recuperação
-                    </button>
-                    <a href="index.html" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.5rem;">
-                        <i data-lucide="arrow-left"></i> Voltar para o Login
-                    </a>
-                </div>
-
-            </form>
-
-        </div>
-    </main>
-
-    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
-    <div id="modal-backdrop" class="modal-backdrop"></div>
-
-    <!-- JANELA MODAL DA IA -->
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
-        <div class="access-header">
-            <h3 style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
-            </h3>
-            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
-        </div>
-        <div id="ai-response-content" class="custom-scrollbar">
-            Aguardando seleção...
-        </div>
-    </div>
-
-    <!-- RODAPÉ INSTITUCIONAL -->
-    <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
-    </footer>
-
-    <!-- VLIBRAS -->
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
-        </div>
-    </div>
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-    
-    <!-- JS GLOBAL DA APLICAÇÃO -->
-    <script src="js/script.js"></script>
-    
-    <!-- Inicialização dos ícones do Lucide -->
-    <script>
-        lucide.createIcons();
-    </script>
-
-</body>
-</html>
+    </form>
+</div>
+{% endblock %}

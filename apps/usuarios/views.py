@@ -1,7 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetConfirmView,
+    PasswordResetView,
+)
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -14,9 +19,27 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.assistente.models import LogAssistente
 
-from .forms import CadastroFiscalForm, CadastroGestorForm, LoginBackofficeForm
+from .forms import (
+    CadastroAmbulanteForm,
+    CadastroFiscalForm,
+    CadastroGestorForm,
+    LoginAmbulanteForm,
+    LoginBackofficeForm,
+    NovaSenhaForm,
+    RecuperarSenhaForm,
+)
 from .models import Ambulante, Fiscal, Gestor, Perfil, UsuarioBase
 from .serializers import LoginSerializer, UsuarioMeSerializer
+
+
+def destino_pos_login(user):
+    if user.role == Perfil.AMBULANTE:
+        return reverse("ambulante_painel")
+    if user.role == Perfil.ADMINISTRADOR:
+        return reverse("master_admin")
+    if user.role == Perfil.GESTOR:
+        return reverse("backoffice_inicio")
+    return reverse("index")
 
 
 class LoginAPIView(TokenObtainPairView):
@@ -50,7 +73,10 @@ class AcessoBackofficeMixin(UserPassesTestMixin):
         )
 
     def handle_no_permission(self):
-        if self.request.user.is_authenticated:
+        user = self.request.user
+        if user.is_authenticated and user.role == Perfil.AMBULANTE:
+            return redirect("ambulante_painel")
+        if user.is_authenticated:
             logout(self.request)
         return redirect("login")
 
@@ -63,9 +89,32 @@ class AcessoMasterMixin(UserPassesTestMixin):
         return bool(user.is_authenticated and user.role == Perfil.ADMINISTRADOR)
 
     def handle_no_permission(self):
-        if self.request.user.is_authenticated:
+        user = self.request.user
+        if user.is_authenticated and user.role == Perfil.GESTOR:
             return redirect("backoffice_inicio")
+        if user.is_authenticated and user.role == Perfil.AMBULANTE:
+            return redirect("ambulante_painel")
+        if user.is_authenticated:
+            logout(self.request)
         return redirect("login")
+
+
+class AcessoAmbulanteMixin(UserPassesTestMixin):
+    """Restringe views web a comerciantes ambulantes."""
+
+    def test_func(self):
+        user = self.request.user
+        return bool(user.is_authenticated and user.role == Perfil.AMBULANTE)
+
+    def handle_no_permission(self):
+        user = self.request.user
+        if user.is_authenticated and user.role == Perfil.ADMINISTRADOR:
+            return redirect("master_admin")
+        if user.is_authenticated and user.role == Perfil.GESTOR:
+            return redirect("backoffice_inicio")
+        if user.is_authenticated:
+            logout(self.request)
+        return redirect("entrar")
 
 
 class LoginBackofficeView(LoginView):
@@ -83,6 +132,98 @@ class LoginBackofficeView(LoginView):
 
 class LogoutBackofficeView(LogoutView):
     next_page = reverse_lazy("login")
+
+    def dispatch(self, request, *args, **kwargs):
+        role = None
+        if request.user.is_authenticated:
+            role = getattr(request.user, "role", None)
+        self.next_page = (
+            reverse("entrar") if role == Perfil.AMBULANTE else reverse("login")
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class LoginAmbulanteView(LoginView):
+    """Login por sessão para o trabalhador ambulante."""
+
+    template_name = "entrar.html"
+    authentication_form = LoginAmbulanteForm
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse("ambulante_painel")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(destino_pos_login(request.user))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class RegistroAmbulanteView(FormView):
+    template_name = "registro.html"
+    form_class = CadastroAmbulanteForm
+    success_url = reverse_lazy("ambulante_painel")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(destino_pos_login(request.user))
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        usuario = form.save()
+        login(
+            self.request,
+            usuario,
+            backend="apps.usuarios.backends.CPFOuEmailBackend",
+        )
+        messages.success(
+            self.request,
+            "Conta criada com sucesso. Complete seu cadastro para solicitar a licença.",
+        )
+        return super().form_valid(form)
+
+
+class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView):
+    template_name = "ambulante/painel.html"
+    login_url = reverse_lazy("entrar")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ambulante = Ambulante.objects.filter(pk=self.request.user.pk).first()
+        context["ambulante"] = ambulante
+        context["cadastro_completo"] = bool(
+            ambulante and ambulante.cadastro_completo
+        )
+        context["tem_licenca"] = bool(ambulante and ambulante.licencas.exists())
+        return context
+
+
+class RecuperarSenhaView(PasswordResetView):
+    template_name = "redefinir_senha.html"
+    form_class = RecuperarSenhaForm
+    email_template_name = "emails/redefinir_senha.txt"
+    subject_template_name = "emails/redefinir_senha_assunto.txt"
+    success_url = reverse_lazy("redefinir_senha")
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "Se o e-mail ou CPF estiver cadastrado, enviaremos as instruções "
+            "para redefinir a senha.",
+        )
+        return super().form_valid(form)
+
+
+class RedefinirSenhaConfirmView(PasswordResetConfirmView):
+    template_name = "redefinir_senha_nova.html"
+    form_class = NovaSenhaForm
+    success_url = reverse_lazy("entrar")
+
+    def form_valid(self, form):
+        messages.success(
+            self.request, "Senha redefinida com sucesso. Faça login para continuar."
+        )
+        return super().form_valid(form)
 
 
 class BackofficeInicioView(LoginRequiredMixin, AcessoBackofficeMixin, TemplateView):

@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     BackofficeInicioView,
+    LoginAmbulanteView,
     LoginBackofficeView,
     LogoutBackofficeView,
     MasterAdminView,
@@ -11,11 +12,24 @@ from .views import (
     MasterGestoresView,
     MasterLogsIAView,
     MasterTemplateView,
+    PainelAmbulanteView,
+    RecuperarSenhaView,
+    RedefinirSenhaConfirmView,
+    RegistroAmbulanteView,
 )
 
 urlpatterns = [
     path("login/", LoginBackofficeView.as_view(), name="login"),
     path("logout/", LogoutBackofficeView.as_view(), name="logout"),
+    path("entrar/", LoginAmbulanteView.as_view(), name="entrar"),
+    path("registro/", RegistroAmbulanteView.as_view(), name="registro"),
+    path("redefinir-senha/", RecuperarSenhaView.as_view(), name="redefinir_senha"),
+    path(
+        "redefinir-senha/<uidb64>/<token>/",
+        RedefinirSenhaConfirmView.as_view(),
+        name="redefinir_senha_confirmar",
+    ),
+    path("ambulante/", PainelAmbulanteView.as_view(), name="ambulante_painel"),
     path("backoffice/", BackofficeInicioView.as_view(), name="backoffice_inicio"),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/gestores/", MasterGestoresView.as_view(), name="master_gestores"),

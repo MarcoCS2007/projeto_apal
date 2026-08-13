@@ -1,0 +1,22 @@
+<nav class="header-nav">
+    <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
+    <a href="{% url 'sobre' %}"{% if active == "sobre" %} class="active"{% endif %}><i data-lucide="info"></i> Sobre o Projeto</a>
+    <a href="{% url 'faq' %}"{% if active == "faq" %} class="active"{% endif %}><i data-lucide="help-circle"></i> Dúvidas e Tutoriais</a>
+    {% if user.is_authenticated %}
+        {% if user.role == "ambulante" %}
+            <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+        {% elif user.role == "administrador" %}
+            <a href="{% url 'master_admin' %}"><i data-lucide="layout-dashboard"></i> Painel</a>
+        {% elif user.role == "gestor" %}
+            <a href="{% url 'backoffice_inicio' %}"><i data-lucide="layout-dashboard"></i> Painel</a>
+        {% endif %}
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-logout" style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">
+                <i data-lucide="log-out" style="color: #EF4444;"></i> Sair
+            </button>
+        </form>
+    {% else %}
+        <a href="{% url 'entrar' %}"{% if active == "entrar" %} class="active"{% endif %}><i data-lucide="log-in"></i> Entrar</a>
+    {% endif %}
+</nav>

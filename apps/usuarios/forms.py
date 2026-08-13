@@ -1,11 +1,15 @@
 from typing import ClassVar
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+)
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from .models import Fiscal, Gestor, Perfil, UsuarioBase
+from .models import Ambulante, Fiscal, Gestor, Perfil, UsuarioBase
 
 
 def normalizar_cpf(valor):
@@ -115,6 +119,106 @@ class LoginBackofficeForm(AuthenticationForm):
             )
 
 
+class LoginAmbulanteForm(AuthenticationForm):
+    """Login web exclusivo para comerciantes ambulantes."""
+
+    error_messages: ClassVar[dict[str, str]] = {
+        "invalid_login": "CPF/e-mail ou senha inválidos.",
+        "inactive": "Esta conta está inativa.",
+        "sem_acesso_ambulante": (
+            "Este acesso é exclusivo para comerciantes ambulantes. "
+            "Gestores e administradores devem usar o backoffice."
+        ),
+        "usuario_inativo": "Usuário inativo. Entre em contato com a administração.",
+    }
+
+    username = forms.CharField(
+        label="E-mail ou CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "user-login",
+                "placeholder": "Digite seu CPF ou e-mail",
+                "autocomplete": "username",
+                "autofocus": True,
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Senha",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "user-password",
+                "placeholder": "Digite sua senha",
+                "autocomplete": "current-password",
+            }
+        ),
+    )
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.ativo:
+            raise ValidationError(
+                self.error_messages["usuario_inativo"],
+                code="usuario_inativo",
+            )
+        if user.role != Perfil.AMBULANTE:
+            raise ValidationError(
+                self.error_messages["sem_acesso_ambulante"],
+                code="sem_acesso_ambulante",
+            )
+
+
+class RecuperarSenhaForm(PasswordResetForm):
+    email = forms.CharField(
+        label="E-mail ou CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "recovery-email",
+                "placeholder": "seu-email@dominio.com ou CPF",
+                "autocomplete": "username",
+            }
+        ),
+    )
+
+    def get_users(self, email):
+        identificador = (email or "").strip()
+        if not identificador:
+            return []
+        if "@" in identificador:
+            usuarios = UsuarioBase.objects.filter(
+                email__iexact=identificador,
+                is_active=True,
+                ativo=True,
+            )
+        else:
+            usuarios = UsuarioBase.objects.filter(
+                cpf=normalizar_cpf(identificador),
+                is_active=True,
+                ativo=True,
+            )
+        return (usuario for usuario in usuarios if usuario.has_usable_password())
+
+
+class NovaSenhaForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].widget.attrs.update(
+            {
+                "id": "nova-senha",
+                "placeholder": "Digite a nova senha",
+                "autocomplete": "new-password",
+            }
+        )
+        self.fields["new_password2"].widget.attrs.update(
+            {
+                "id": "nova-senha-confirmacao",
+                "placeholder": "Repita a nova senha",
+                "autocomplete": "new-password",
+            }
+        )
+
+
 class CadastroUsuarioMasterMixin:
     def clean_cpf(self):
         cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
@@ -134,6 +238,97 @@ class CadastroUsuarioMasterMixin:
         password = self.cleaned_data["password"]
         validate_password(password)
         return password
+
+
+class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
+    nome_completo = forms.CharField(
+        label="Nome Completo",
+        max_length=300,
+        widget=forms.TextInput(
+            attrs={
+                "id": "reg-nome",
+                "placeholder": "Digite seu nome completo",
+                "autocomplete": "name",
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label="E-mail de Acesso",
+        widget=forms.EmailInput(
+            attrs={
+                "id": "reg-email",
+                "placeholder": "seu-email@dominio.com",
+                "autocomplete": "email",
+            }
+        ),
+    )
+    cpf = forms.CharField(
+        label="CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "cpf-cadastro",
+                "placeholder": "000.000.000-00",
+                "autocomplete": "username",
+            }
+        ),
+    )
+    telefone_whatsapp = forms.CharField(
+        label="Telefone / WhatsApp",
+        max_length=20,
+        widget=forms.TextInput(
+            attrs={
+                "id": "reg-telefone",
+                "placeholder": "(77) 99999-0000",
+                "autocomplete": "tel",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Senha de Acesso",
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "reg-password",
+                "placeholder": "Mínimo de 8 caracteres",
+                "autocomplete": "new-password",
+            }
+        ),
+    )
+    password_confirm = forms.CharField(
+        label="Confirmar Senha",
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "reg-confirm-password",
+                "placeholder": "Repita a senha",
+                "autocomplete": "new-password",
+            }
+        ),
+    )
+    foto = forms.ImageField(
+        label="Foto (opcional)",
+        required=False,
+        widget=forms.ClearableFileInput(attrs={"id": "reg-foto", "accept": "image/*"}),
+    )
+
+    def clean(self):
+        dados = super().clean()
+        senha = dados.get("password")
+        confirmacao = dados.get("password_confirm")
+        if senha and confirmacao and senha != confirmacao:
+            self.add_error("password_confirm", "As senhas não coincidem.")
+        return dados
+
+    def save(self):
+        dados = self.cleaned_data
+        nome, sobrenome = separar_nome(dados["nome_completo"])
+        return Ambulante.objects.create_user(
+            cpf=dados["cpf"],
+            email=dados["email"],
+            password=dados["password"],
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp=dados["telefone_whatsapp"],
+            foto=dados.get("foto") or None,
+        )
 
 
 class CadastroGestorForm(CadastroUsuarioMasterMixin, forms.Form):

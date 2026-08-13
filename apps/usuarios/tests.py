@@ -1,9 +1,17 @@
 import datetime
+import io
+import tempfile
 
-from django.test import TestCase
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from PIL import Image
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import AccessToken
 
 from apps.assistente.models import LogAssistente
@@ -222,6 +230,19 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         response = self.client.post(self.url_logout)
 
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("login"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+        login_page = self.client.get(response.url)
+        self.assertEqual(login_page.status_code, 200)
+        self.assertTemplateUsed(login_page, "login.html")
+
+    def test_fiscal_nao_acessa_backoffice_e_vai_ao_login(self):
+        self.client.force_login(self.fiscal)
+        response = self.client.get(self.url_backoffice)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(self.url_login, response.url)
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_login_administrador_redireciona_ao_painel_master(self):
@@ -443,3 +464,310 @@ class MasterViewsTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("backoffice_inicio"))
         self.assertFalse(Fiscal.objects.filter(cpf="55566677788").exists())
+
+    def test_fiscal_nao_acessa_master_e_vai_ao_login(self):
+        self.client.force_login(self.fiscal)
+        response = self.client.get(reverse("master_admin"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("login"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+
+class AdminPrefeituraTests(UsuariosAuthFixtures, TestCase):
+    def test_formulario_admin_fiscal_tem_matricula_e_zona(self):
+        self.client.force_login(self.administrador)
+        response = self.client.get(reverse("admin:usuarios_fiscal_add"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="matricula_funcional"')
+        self.assertContains(response, 'name="zona_atuacao_primaria"')
+        self.assertContains(response, 'name="password1"')
+
+    def test_formulario_admin_gestor_tem_matricula_e_departamento(self):
+        self.client.force_login(self.administrador)
+        response = self.client.get(reverse("admin:usuarios_gestor_add"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="matricula_funcional"')
+        self.assertContains(response, 'name="departamento"')
+        self.assertContains(response, 'name="password1"')
+
+    def test_admin_cria_fiscal_com_senha_hasheada(self):
+        self.client.force_login(self.administrador)
+        response = self.client.post(
+            reverse("admin:usuarios_fiscal_add"),
+            {
+                "cpf": "77788899900",
+                "nome": "Paulo",
+                "sobrenome": "Lima",
+                "email": "paulo.lima@pmvc.ba.gov.br",
+                "telefone_whatsapp": "77922222222",
+                "matricula_funcional": "FIS-ADM-01",
+                "zona_atuacao_primaria": "Centro Comercial / Praça 9 de Novembro",
+                "password1": self.senha,
+                "password2": self.senha,
+                "ativo": "on",
+                "_save": "Salvar",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        fiscal = Fiscal.objects.get(cpf="77788899900")
+        self.assertNotEqual(fiscal.password, self.senha)
+        self.assertTrue(fiscal.check_password(self.senha))
+        self.assertEqual(fiscal.matricula_funcional, "FIS-ADM-01")
+        self.assertEqual(
+            fiscal.zona_atuacao_primaria,
+            "Centro Comercial / Praça 9 de Novembro",
+        )
+
+    def test_admin_cria_gestor_com_senha_hasheada(self):
+        self.client.force_login(self.administrador)
+        response = self.client.post(
+            reverse("admin:usuarios_gestor_add"),
+            {
+                "cpf": "88899900011",
+                "nome": "Helena",
+                "sobrenome": "Souza",
+                "email": "helena.souza@pmvc.ba.gov.br",
+                "telefone_whatsapp": "77933333333",
+                "matricula_funcional": "GES-ADM-01",
+                "departamento": "SESEP - Serviços Públicos (Posturas)",
+                "cargo": "Coordenadora de Licenciamento",
+                "password1": self.senha,
+                "password2": self.senha,
+                "ativo": "on",
+                "_save": "Salvar",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        gestor = Gestor.objects.get(cpf="88899900011")
+        self.assertNotEqual(gestor.password, self.senha)
+        self.assertTrue(gestor.check_password(self.senha))
+        self.assertEqual(gestor.departamento, "SESEP - Serviços Públicos (Posturas)")
+        self.assertTrue(gestor.is_staff)
+
+
+class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
+    def _payload_registro(self, **overrides):
+        dados = {
+            "nome_completo": "Joana Silva",
+            "cpf": "66677788899",
+            "email": "joana.silva@email.com",
+            "telefone_whatsapp": "77944444444",
+            "password": self.senha,
+            "password_confirm": self.senha,
+        }
+        dados.update(overrides)
+        return dados
+
+    def test_get_registro_renderiza_template(self):
+        response = self.client.get(reverse("registro"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "registro.html")
+        self.assertContains(response, "Criar Nova Conta")
+
+    def test_registro_cria_conta_faz_login_e_abre_painel_vazio(self):
+        response = self.client.post(reverse("registro"), self._payload_registro())
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("ambulante_painel"))
+        ambulante = Ambulante.objects.get(cpf="66677788899")
+        self.assertEqual(ambulante.nome, "Joana")
+        self.assertEqual(ambulante.sobrenome, "Silva")
+        self.assertEqual(ambulante.email, "joana.silva@email.com")
+        self.assertEqual(ambulante.telefone_whatsapp, "77944444444")
+        self.assertEqual(ambulante.role, Perfil.AMBULANTE)
+        self.assertFalse(ambulante.cadastro_completo)
+        self.assertIsNone(ambulante.codigo_qr_code)
+        self.assertTrue(ambulante.check_password(self.senha))
+        self.assertEqual(int(self.client.session["_auth_user_id"]), ambulante.pk)
+
+        painel = self.client.get(response.url)
+        self.assertEqual(painel.status_code, 200)
+        self.assertTemplateUsed(painel, "ambulante/painel.html")
+        self.assertContains(painel, "Complete seu cadastro")
+        self.assertContains(painel, "você ainda não possui licença")
+        self.assertFalse(painel.context["cadastro_completo"])
+        self.assertFalse(painel.context["tem_licenca"])
+
+    def test_registro_cpf_duplicado(self):
+        response = self.client.post(
+            reverse("registro"),
+            self._payload_registro(cpf=self.ambulante.cpf),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Já existe um usuário com este CPF")
+        self.assertFalse(
+            Ambulante.objects.filter(email="joana.silva@email.com").exists()
+        )
+
+    def test_registro_senhas_diferentes(self):
+        response = self.client.post(
+            reverse("registro"),
+            self._payload_registro(password_confirm="outra-senha-123"),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "As senhas não coincidem")
+        self.assertFalse(Ambulante.objects.filter(cpf="66677788899").exists())
+
+    def test_registro_com_foto_opcional(self):
+        buffer = io.BytesIO()
+        Image.new("RGB", (1, 1), color="red").save(buffer, format="PNG")
+        foto = SimpleUploadedFile(
+            "foto.png", buffer.getvalue(), content_type="image/png"
+        )
+        with tempfile.TemporaryDirectory() as tmp, override_settings(MEDIA_ROOT=tmp):
+            response = self.client.post(
+                reverse("registro"),
+                self._payload_registro(foto=foto),
+            )
+
+            self.assertEqual(response.status_code, 302)
+            ambulante = Ambulante.objects.get(cpf="66677788899")
+            self.assertTrue(ambulante.foto)
+
+    def test_login_web_ambulante_abre_painel(self):
+        response = self.client.post(
+            reverse("entrar"),
+            {"username": self.ambulante.cpf, "password": self.senha},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("ambulante_painel"))
+        self.assertEqual(int(self.client.session["_auth_user_id"]), self.ambulante.pk)
+
+        painel = self.client.get(response.url)
+        self.assertEqual(painel.status_code, 200)
+        self.assertContains(painel, self.ambulante.nome)
+        self.assertContains(painel, "você ainda não possui licença")
+
+    def test_login_web_ambulante_com_email(self):
+        response = self.client.post(
+            reverse("entrar"),
+            {"username": self.ambulante.email, "password": self.senha},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("ambulante_painel"))
+
+    def test_gestor_nao_entra_pelo_login_ambulante(self):
+        response = self.client.post(
+            reverse("entrar"),
+            {"username": self.gestor.cpf, "password": self.senha},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "exclusivo para comerciantes ambulantes")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_anonimo_e_redirecionado_ao_entrar(self):
+        response = self.client.get(reverse("ambulante_painel"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("entrar"), response.url)
+
+    def test_gestor_no_painel_ambulante_vai_ao_backoffice(self):
+        self.client.force_login(self.gestor)
+        response = self.client.get(reverse("ambulante_painel"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("backoffice_inicio"))
+
+    def test_logout_ambulante_volta_ao_entrar(self):
+        self.client.force_login(self.ambulante)
+        response = self.client.post(reverse("logout"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("entrar"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_conta_nova_autentica_via_jwt(self):
+        self.client.post(reverse("registro"), self._payload_registro())
+        api = APIClient()
+        response = api.post(
+            "/api/login/",
+            {"cpf": "66677788899", "password": self.senha},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["role"], Perfil.AMBULANTE)
+        self.assertIn("access", response.data)
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class RecuperarSenhaTests(UsuariosAuthFixtures, TestCase):
+    nova_senha = "NovaSenhaForte!456"
+
+    def _uid_token(self, user):
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        return uid, token
+
+    def test_pedido_por_email_envia_token(self):
+        response = self.client.post(
+            reverse("redefinir_senha"),
+            {"email": self.ambulante.email},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(self.ambulante.email, mail.outbox[0].to)
+        self.assertIn("redefinir-senha", mail.outbox[0].body)
+
+    def test_pedido_por_cpf_envia_token(self):
+        response = self.client.post(
+            reverse("redefinir_senha"),
+            {"email": self.ambulante.cpf},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(self.ambulante.email, mail.outbox[0].to)
+
+    def test_pedido_inexistente_nao_revela_cadastro(self):
+        response = self.client.post(
+            reverse("redefinir_senha"),
+            {"email": "naoexiste@apal.com"},
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Se o e-mail ou CPF estiver cadastrado")
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_define_nova_senha_e_faz_login(self):
+        uid, token = self._uid_token(self.ambulante)
+        url = reverse(
+            "redefinir_senha_confirmar",
+            kwargs={"uidb64": uid, "token": token},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        confirm_url = response.url
+        response = self.client.post(
+            confirm_url,
+            {
+                "new_password1": self.nova_senha,
+                "new_password2": self.nova_senha,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("entrar"))
+        self.ambulante.refresh_from_db()
+        self.assertTrue(self.ambulante.check_password(self.nova_senha))
+
+        login = self.client.post(
+            reverse("entrar"),
+            {"username": self.ambulante.cpf, "password": self.nova_senha},
+        )
+        self.assertEqual(login.status_code, 302)
+        self.assertEqual(login.url, reverse("ambulante_painel"))

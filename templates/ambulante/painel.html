@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Painel do Ambulante - APAL{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="painel" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Painel do Ambulante</h1>
+        <p>Acompanhe o cadastro e a situação da sua licença em Vitória da Conquista.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 720px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Olá, {{ user.nome }}</h2>
+    </div>
+
+    <div class="info-callout-box">
+        <p>
+            {% if cadastro_completo %}
+                Seu cadastro está preenchido. Acompanhe aqui o andamento da licença.
+            {% else %}
+                Complete seu cadastro para solicitar a licença. Nesta etapa você já tem uma conta, mas ainda faltam dados socioeconômicos, MEI, estrutura e ponto.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="about-features" style="margin-top: 1.5rem;">
+        <ul>
+            <li style="align-items: flex-start;">
+                <i data-lucide="user-check" style="margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: var(--texto-escuro);">Conta de acesso:</strong>
+                    <span style="font-weight: 400; color: var(--texto-cinza);"> ativa com o CPF {{ user.cpf }} e o e-mail {{ user.email }}.</span>
+                </div>
+            </li>
+            <li style="align-items: flex-start;">
+                <i data-lucide="clipboard-list" style="margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: var(--texto-escuro);">Cadastro completo:</strong>
+                    <span style="font-weight: 400; color: var(--texto-cinza);">
+                        {% if cadastro_completo %}preenchido.{% else %}pendente.{% endif %}
+                    </span>
+                </div>
+            </li>
+            <li style="align-items: flex-start;">
+                <i data-lucide="badge-alert" style="margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: var(--texto-escuro);">Licença / alvará:</strong>
+                    <span style="font-weight: 400; color: var(--texto-cinza);">
+                        {% if tem_licenca %}já existe um registro vinculado.{% else %}você ainda não possui licença.{% endif %}
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

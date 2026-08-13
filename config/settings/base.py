@@ -87,6 +87,13 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "backoffice_inicio"
 LOGOUT_REDIRECT_URL = "login"
 
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "APAL <nao-responda@apal.pmvc.ba.gov.br>"
+)
+
 # Autenticação da API: JWT (stateless, app móvel) + sessão por cookie (backoffice web).
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -143,3 +150,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
