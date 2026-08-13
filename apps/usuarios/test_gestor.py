@@ -139,6 +139,9 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url, reverse("gestor_emitir", args=[self.licenca.pk])
+        )
         self.licenca.refresh_from_db()
         self.assertEqual(self.licenca.status, StatusLicenca.APROVADO)
         self.assertEqual(self.licenca.gestor_responsavel_id, self.gestor.pk)

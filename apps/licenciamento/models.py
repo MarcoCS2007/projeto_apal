@@ -1,8 +1,12 @@
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from apps.core.models import ModeloBase
+
+VALOR_TAXA_DAM = Decimal("120.00")
 
 
 class CategoriaProduto(ModeloBase):
@@ -40,7 +44,10 @@ class StatusLicenca(models.TextChoices):
     PENDENCIA_DOCUMENTAL = "Pendência Documental", "Pendência Documental"
     APROVADO = "Aprovado", "Aprovado"
     INDEFERIDO = "Indeferido", "Indeferido"
-    AGUARDANDO_PAGAMENTO = "Aguardando Pagamento da Taxa", "Aguardando Pagamento da Taxa"
+    AGUARDANDO_PAGAMENTO = (
+        "Aguardando Pagamento da Taxa",
+        "Aguardando Pagamento da Taxa",
+    )
     ATIVO = "Ativo", "Ativo"
     VENCIDO = "Vencido", "Vencido"
     SUSPENSO = "Suspenso", "Suspenso"
@@ -55,6 +62,27 @@ STATUS_FILA = (
     StatusLicenca.EM_ANALISE,
     StatusLicenca.PENDENCIA_DOCUMENTAL,
 )
+
+STATUS_LISTAGEM_GESTOR = (
+    StatusLicenca.APROVADO,
+    StatusLicenca.ATIVO,
+    StatusLicenca.VENCIDO,
+    StatusLicenca.SUSPENSO,
+)
+
+STATUS_ESCALA_AUTORIZADA = "Autorizado"
+
+DIAS_SEMANA = (
+    ("segunda", "Segunda-feira"),
+    ("terca", "Terça-feira"),
+    ("quarta", "Quarta-feira"),
+    ("quinta", "Quinta-feira"),
+    ("sexta", "Sexta-feira"),
+    ("sabado", "Sábado"),
+    ("domingo", "Domingo"),
+)
+
+DIAS_SEMANA_PADRAO = ("segunda", "terca", "quarta", "quinta", "sexta", "sabado")
 
 
 TIPOS_BASICOS_OBRIGATORIOS = (
@@ -117,7 +145,9 @@ class DocumentoAnexo(ModeloBase):
     def aprovar(self):
         self.status_aprovacao = StatusAprovacaoDocumento.APROVADO
         self.motivo_rejeicao = ""
-        self.save(update_fields=["status_aprovacao", "motivo_rejeicao", "atualizado_em"])
+        self.save(
+            update_fields=["status_aprovacao", "motivo_rejeicao", "atualizado_em"]
+        )
         return self
 
     def rejeitar(self, motivo):
@@ -126,7 +156,9 @@ class DocumentoAnexo(ModeloBase):
             raise ValidationError("A justificativa da rejeição é obrigatória.")
         self.status_aprovacao = StatusAprovacaoDocumento.REJEITADO
         self.motivo_rejeicao = justificativa
-        self.save(update_fields=["status_aprovacao", "motivo_rejeicao", "atualizado_em"])
+        self.save(
+            update_fields=["status_aprovacao", "motivo_rejeicao", "atualizado_em"]
+        )
         from apps.licenciamento.services import marcar_pendencia_documental
 
         marcar_pendencia_documental(self.ambulante)
@@ -189,9 +221,7 @@ class LicencaAlvara(ModeloBase):
         related_name="licencas_aprovadas",
     )
     protocolo = models.CharField(max_length=50, unique=True, null=True, blank=True)
-    numero_licenca = models.CharField(
-        max_length=50, unique=True, null=True, blank=True
-    )
+    numero_licenca = models.CharField(max_length=50, unique=True, null=True, blank=True)
     data_emissao = models.DateField(null=True, blank=True)
     data_vencimento = models.DateField(null=True, blank=True)
     status = models.CharField(
@@ -200,6 +230,14 @@ class LicencaAlvara(ModeloBase):
         default=StatusLicenca.EM_ANALISE,
     )
     motivo_parecer = models.TextField(blank=True, default="")
+    taxa_paga = models.BooleanField("Taxa municipal paga", default=False)
+    licenca_origem = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="renovacoes",
+    )
 
     class Meta:
         verbose_name = "Licença Alvará"
@@ -223,7 +261,76 @@ class LicencaAlvara(ModeloBase):
         return self.status in STATUS_FILA
 
     @property
+    def aguardando_taxa(self):
+        return (not self.taxa_paga) and self.status in (
+            StatusLicenca.APROVADO,
+            StatusLicenca.AGUARDANDO_PAGAMENTO,
+        )
+
+    @property
+    def pode_emitir(self):
+        return self.status == StatusLicenca.APROVADO and not self.numero_licenca
+
+    @property
+    def qr_valido(self):
+        from django.utils import timezone
+
+        if self.status != StatusLicenca.ATIVO:
+            return False
+        if self.data_vencimento and self.data_vencimento < timezone.localdate():
+            return False
+        return True
+
+    @property
+    def texto_horario_autorizado(self):
+        escalas = list(self.escalas.all())
+        if not escalas:
+            return "Não informado"
+        ordem = {chave: indice for indice, (chave, _rotulo) in enumerate(DIAS_SEMANA)}
+        escalas = sorted(escalas, key=lambda item: ordem.get(item.dia_semana, 99))
+        horarios = {(item.horario_inicio, item.horario_termino) for item in escalas}
+        dias = ", ".join(item.get_dia_semana_display() for item in escalas)
+        if len(horarios) == 1:
+            inicio, termino = next(iter(horarios))
+            return f"{dias}, {inicio.strftime('%H:%M')} às {termino.strftime('%H:%M')}"
+        return "; ".join(
+            f"{item.get_dia_semana_display()} "
+            f"{item.horario_inicio.strftime('%H:%M')}–"
+            f"{item.horario_termino.strftime('%H:%M')}"
+            for item in escalas
+        )
+
+    @property
+    def pode_renovar(self):
+        return self.status == StatusLicenca.VENCIDO
+
+    @property
+    def valor_taxa(self):
+        return VALOR_TAXA_DAM
+
+    @property
+    def classe_badge(self):
+        if self.aguardando_taxa:
+            return "warning"
+        if self.status in (StatusLicenca.ATIVO, StatusLicenca.APROVADO):
+            return "success"
+        if self.status == StatusLicenca.PENDENCIA_DOCUMENTAL:
+            return "purple"
+        if self.status in (
+            StatusLicenca.INDEFERIDO,
+            StatusLicenca.VENCIDO,
+            StatusLicenca.SUSPENSO,
+            StatusLicenca.CANCELADO,
+        ):
+            return "danger"
+        return "warning"
+
+    @property
     def tipo_pedido(self):
+        if self.licenca_origem_id:
+            if self.numero_licenca:
+                return "Renovação / alvará emitido"
+            return "Renovação"
         if self.numero_licenca:
             return "Renovação / alvará emitido"
         tipo = (self.ambulante.tipo_atuacao or "").lower()
@@ -238,10 +345,10 @@ class EscalaTrabalho(ModeloBase):
     licenca_alvara = models.ForeignKey(
         "LicencaAlvara", on_delete=models.CASCADE, related_name="escalas"
     )
-    dia_semana = models.CharField(max_length=20)
+    dia_semana = models.CharField(max_length=20, choices=DIAS_SEMANA)
     horario_inicio = models.TimeField()
     horario_termino = models.TimeField()
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, default=STATUS_ESCALA_AUTORIZADA)
 
     class Meta:
         verbose_name = "Escala de Trabalho"

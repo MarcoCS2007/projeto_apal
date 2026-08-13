@@ -62,10 +62,13 @@
         </div>
         <h2 class="success-title">Cadastro completo salvo com sucesso</h2>
         <p class="success-subtitle">
-            O gestor municipal já consegue consultar o seu registro. A licença/alvará ainda não foi emitida — o QR Code só será gerado na emissão.
+            O gestor municipal já consegue consultar o seu registro. Acompanhe o protocolo da solicitação em Meu Alvará. A licença oficial e o QR Code só serão gerados na emissão.
         </p>
         <div class="success-actions">
-            <a href="{% url 'ambulante_painel' %}" class="btn-submit">
+            <a href="{% url 'ambulante_alvara' %}" class="btn-submit">
+                <i data-lucide="file-badge"></i> Ver meu protocolo
+            </a>
+            <a href="{% url 'ambulante_painel' %}" class="btn-action">
                 <i data-lucide="layout-dashboard"></i> Meu Painel
             </a>
             <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action">

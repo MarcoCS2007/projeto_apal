@@ -17,6 +17,36 @@
 
 {% block content %}
 <div class="form-card">
+    <form method="get" class="form-row" style="margin-bottom: 1.5rem; align-items: end;">
+        <div class="input-group">
+            <label for="filtro-status">Status</label>
+            <select id="filtro-status" name="status" class="styled-select">
+                <option value="">Todos</option>
+                {% for opcao in status_opcoes %}
+                <option value="{{ opcao }}"{% if filtro_status == opcao %} selected{% endif %}>{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-ponto">Ponto</label>
+            <select id="filtro-ponto" name="ponto" class="styled-select">
+                <option value="">Todos</option>
+                {% for ponto in pontos %}
+                <option value="{{ ponto.pk }}"{% if filtro_ponto == ponto.pk|stringformat:"s" %} selected{% endif %}>{{ ponto.nome_identificacao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group" style="flex: 0 0 auto;">
+            <label class="checkbox-label" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 1.6rem;">
+                <input type="checkbox" name="vencimento_proximo" value="1"{% if filtro_vencimento_proximo %} checked{% endif %}>
+                Vencimento nos próximos 30 dias
+            </label>
+        </div>
+        <div class="input-group" style="flex: 0 0 auto;">
+            <button type="submit" class="btn-action">Filtrar</button>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table class="data-table">
             <thead>
@@ -24,8 +54,9 @@
                     <th>PROTOCOLO / Nº</th>
                     <th>AMBULANTE</th>
                     <th>PONTO</th>
+                    <th>VENCIMENTO</th>
                     <th>STATUS</th>
-                    <th>DOSSIÊ</th>
+                    <th>AÇÃO</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,12 +65,20 @@
                     <td>{{ licenca.numero_licenca|default:licenca.protocolo }}</td>
                     <td>{{ licenca.ambulante.nome_completo }}</td>
                     <td>{% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}—{% endif %}</td>
+                    <td>{% if licenca.data_vencimento %}{{ licenca.data_vencimento|date:"d/m/Y" }}{% else %}—{% endif %}</td>
                     <td>{{ licenca.status }}</td>
-                    <td><a href="{% url 'gestor_dossie' licenca.ambulante_id %}">Abrir</a></td>
+                    <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        {% if licenca.pode_emitir %}
+                        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-submit" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">Emitir</a>
+                        {% elif licenca.numero_licenca %}
+                        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-action" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">Ver alvará</a>
+                        {% endif %}
+                        <a href="{% url 'gestor_dossie' licenca.ambulante_id %}">Dossiê</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">Nenhuma licença deferida ou ativa no momento. A emissão oficial entra na etapa de alvará.</td>
+                    <td colspan="6">Nenhuma licença encontrada com os filtros atuais.</td>
                 </tr>
                 {% endfor %}
             </tbody>

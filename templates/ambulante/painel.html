@@ -70,7 +70,13 @@
                 <div>
                     <strong style="color: var(--texto-escuro);">Licença / alvará:</strong>
                     <span style="font-weight: 400; color: var(--texto-cinza);">
-                        {% if tem_licenca %}já existe um registro vinculado.{% else %}você ainda não possui licença.{% endif %}
+                        {% if licenca %}
+                            protocolo {{ licenca.protocolo }} — {{ licenca.status }}.
+                        {% elif tem_licenca %}
+                            já existe um registro vinculado.
+                        {% else %}
+                            você ainda não possui licença.
+                        {% endif %}
                     </span>
                 </div>
             </li>
@@ -91,6 +97,16 @@
     <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="upload"></i> {% if documentos_rejeitados %}Reenviar documentos{% else %}Enviar documentos{% endif %}
     </a>
+    {% if licenca %}
+    <a href="{% url 'ambulante_alvara' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="file-badge"></i> Acompanhar solicitação
+    </a>
+    {% if licenca.status == "Ativo" %}
+    <a href="{% url 'ambulante_credencial' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="id-card"></i> Ver credencial
+    </a>
+    {% endif %}
+    {% endif %}
 </p>
 {% endif %}
 {% endblock %}

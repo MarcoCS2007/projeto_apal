@@ -186,9 +186,18 @@
 
     {% if not na_fila %}
     <p style="color: var(--texto-cinza);">Este processo já recebeu parecer ({{ licenca.status }}). {% if licenca.motivo_parecer %}<strong>Registro:</strong> {{ licenca.motivo_parecer }}{% endif %}</p>
-    <a href="{% url 'gestor_fila' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
-        <i data-lucide="arrow-left"></i> Voltar à fila
-    </a>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        {% if licenca.pode_emitir %}
+        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-submit" style="display: inline-flex; text-decoration: none; background-color: #10B981;">
+            <i data-lucide="badge-check"></i> Emitir alvará e QR Code
+        </a>
+        {% elif licenca.numero_licenca %}
+        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-action" style="text-decoration: none;">Ver alvará {{ licenca.numero_licenca }}</a>
+        {% endif %}
+        <a href="{% url 'gestor_fila' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar à fila
+        </a>
+    </div>
     {% else %}
     <form method="post">
         {% csrf_token %}

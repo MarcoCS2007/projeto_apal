@@ -93,6 +93,19 @@ class PontoOcupacao(ModeloBase):
             return False
         return not self.tem_licenca_ativa()
 
+    def ocupar(self):
+        self.status_ocupacao = StatusOcupacao.OCUPADO
+        self.save(update_fields=["status_ocupacao", "atualizado_em"])
+
+    def liberar_se_livre(self):
+        if self.tem_licenca_ativa():
+            return False
+        if self.status_ocupacao != StatusOcupacao.OCUPADO:
+            return False
+        self.status_ocupacao = StatusOcupacao.LIVRE
+        self.save(update_fields=["status_ocupacao", "atualizado_em"])
+        return True
+
     def metragem_compativel(self, metragem):
         if metragem is None:
             return True

@@ -1,8 +1,17 @@
+from datetime import time, timedelta
+
 from django import forms
 from django.core.validators import FileExtensionValidator
+from django.db.models import Q
+from django.utils import timezone
 
-from apps.espacos.models import PontoOcupacao
-from apps.licenciamento.models import CategoriaProduto, TipoDocumento
+from apps.espacos.models import PontoOcupacao, StatusOcupacao
+from apps.licenciamento.models import (
+    DIAS_SEMANA,
+    DIAS_SEMANA_PADRAO,
+    CategoriaProduto,
+    TipoDocumento,
+)
 from apps.licenciamento.services import (
     categoria_do_ambulante,
     registrar_documento,
@@ -206,3 +215,102 @@ class ParecerLicencaForm(forms.Form):
         if licenca and not args:
             self.fields["categoria_produto"].initial = licenca.categoria_produto_id
             self.fields["ponto_ocupacao"].initial = licenca.ponto_ocupacao_id
+
+
+class EmitirAlvaraForm(forms.Form):
+    data_emissao = forms.DateField(
+        label="Data de emissão",
+        widget=forms.DateInput(
+            attrs={"id": "data-emissao", "type": "date"},
+            format="%Y-%m-%d",
+        ),
+    )
+    data_vencimento = forms.DateField(
+        label="Data de validade da licença",
+        widget=forms.DateInput(
+            attrs={"id": "validade-licenca", "type": "date"},
+            format="%Y-%m-%d",
+        ),
+    )
+    ponto_ocupacao = forms.ModelChoiceField(
+        label="Ponto de ocupação",
+        queryset=PontoOcupacao.objects.none(),
+    )
+    dias_semana = forms.MultipleChoiceField(
+        label="Dias autorizados",
+        choices=DIAS_SEMANA,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    horario_inicio = forms.TimeField(
+        label="Horário de início",
+        widget=forms.TimeInput(
+            attrs={"id": "horario-inicio", "type": "time"},
+            format="%H:%M",
+        ),
+        input_formats=["%H:%M", "%H:%M:%S"],
+    )
+    horario_termino = forms.TimeField(
+        label="Horário de término",
+        widget=forms.TimeInput(
+            attrs={"id": "horario-termino", "type": "time"},
+            format="%H:%M",
+        ),
+        input_formats=["%H:%M", "%H:%M:%S"],
+    )
+    observacoes = forms.CharField(
+        label="Observações para o alvará",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "id": "obs-alvara",
+                "rows": 3,
+                "placeholder": (
+                    "Insira restrições, recomendações ou observações "
+                    "que constarão no documento do ambulante..."
+                ),
+            }
+        ),
+    )
+
+    def __init__(self, *args, licenca=None, **kwargs):
+        self.licenca = licenca
+        super().__init__(*args, **kwargs)
+        self.fields["data_emissao"].input_formats = ["%Y-%m-%d"]
+        self.fields["data_vencimento"].input_formats = ["%Y-%m-%d"]
+        pontos = PontoOcupacao.objects.filter(
+            ativo=True, status_ocupacao=StatusOcupacao.LIVRE
+        )
+        if licenca and licenca.ponto_ocupacao_id:
+            pontos = PontoOcupacao.objects.filter(
+                Q(pk__in=pontos.values("pk")) | Q(pk=licenca.ponto_ocupacao_id),
+                ativo=True,
+            )
+        self.fields["ponto_ocupacao"].queryset = pontos.order_by("nome_identificacao")
+        self.fields["ponto_ocupacao"].widget.attrs.update({"class": "styled-select"})
+        if not args:
+            hoje = timezone.localdate()
+            self.fields["data_emissao"].initial = hoje
+            self.fields["data_vencimento"].initial = hoje + timedelta(days=365)
+            self.fields["horario_inicio"].initial = time(6, 0)
+            self.fields["horario_termino"].initial = time(18, 0)
+            self.fields["dias_semana"].initial = list(DIAS_SEMANA_PADRAO)
+            if licenca:
+                self.fields["ponto_ocupacao"].initial = licenca.ponto_ocupacao_id
+
+    def clean(self):
+        dados = super().clean()
+        emissao = dados.get("data_emissao")
+        vencimento = dados.get("data_vencimento")
+        if emissao and vencimento and vencimento <= emissao:
+            self.add_error(
+                "data_vencimento",
+                "A validade deve ser posterior à data de emissão.",
+            )
+        inicio = dados.get("horario_inicio")
+        termino = dados.get("horario_termino")
+        if inicio and termino and termino <= inicio:
+            self.add_error(
+                "horario_termino",
+                "O horário de término deve ser posterior ao de início.",
+            )
+        return dados

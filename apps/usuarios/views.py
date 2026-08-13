@@ -21,6 +21,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.assistente.models import LogAssistente
 from apps.licenciamento.services import (
     categoria_do_ambulante,
+    licenca_atual,
     pode_avancar_solicitacao,
     tipos_faltando_aprovacao,
     tipos_faltando_envio,
@@ -251,6 +252,7 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
             ambulante and ambulante.cadastro_completo
         )
         context["tem_licenca"] = bool(ambulante and ambulante.licencas.exists())
+        context["licenca"] = licenca_atual(ambulante) if ambulante else None
         documentos = ambulante.documentos.all() if ambulante else None
         context["documentos_rejeitados"] = (
             list(documentos.filter(status_aprovacao="Rejeitado"))
@@ -369,9 +371,9 @@ class CadastroCompletoAmbulanteView(
                 messages.success(
                     request,
                     "Cadastro concluído. A solicitação entrou na fila de análise "
-                    "da prefeitura.",
+                    "da prefeitura. Acompanhe pelo protocolo em Meu Alvará.",
                 )
-                return redirect(f"{reverse('ambulante_cadastro')}?concluido=1")
+                return redirect("ambulante_alvara")
             messages.error(
                 request,
                 "Ainda faltam dados obrigatórios (pessoais, endereço, "

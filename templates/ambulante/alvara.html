@@ -1,126 +1,153 @@
-<!-- Se estiver usando Django futuramente, descomente a linha abaixo: -->
-<!-- {% extends 'base.html' %} -->
+{% extends "base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emissão de Alvará e Taxas - APAL</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- HTMX CDN (HU-2.3 e HU-3.4) -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% block title %}Meu Alvará - APAL{% endblock %}
 
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+{% block extra_css %}
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+{% endblock %}
 
-    <!-- CABEÇALHO -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                </a>
-            </div>
-            <nav class="header-nav">
-                <a href="../index.html"><i data-lucide="home"></i> Início</a>
-                <a href="alvara.html" class="active"><i data-lucide="file-badge"></i> Meu Alvará</a>
-                <a href="../credencial.html"><i data-lucide="qr-code"></i> Credencial Digital</a>
-            </nav>
+{% block header_nav %}
+{% include "publico/_nav.html" with active="alvara" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Licença e taxas de ocupação</h1>
+        <p>Acompanhe o protocolo, o status da solicitação e o histórico dos seus requerimentos.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{% if not licenca %}
+<div class="form-card" style="max-width: 720px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Nenhuma solicitação ainda</h2>
+    </div>
+    <p style="color: var(--texto-cinza);">
+        {% if ambulante.cadastro_completo %}
+            Conclua o envio dos anexos para abrir o requerimento. O protocolo aparece aqui e na fila da prefeitura.
+        {% else %}
+            Complete o cadastro socioeconômico e envie os documentos para gerar um protocolo de licença.
+        {% endif %}
+    </p>
+    <p style="margin-top: 1.5rem;">
+        {% if ambulante.cadastro_completo %}
+        <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="upload"></i> Enviar documentos
+        </a>
+        {% else %}
+        <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="clipboard-list"></i> Completar cadastro
+        </a>
+        {% endif %}
+    </p>
+</div>
+{% else %}
+<div class="form-card" style="padding: 28px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 20px;">
+        <div>
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Protocolo nº</span>
+            <h2 style="font-size: 1.4rem; font-weight: 700; color: #0F172A; margin: 4px 0 0 0;">{{ licenca.protocolo }}</h2>
+            {% if licenca.numero_licenca %}
+            <p style="margin: 6px 0 0; color: #475569; font-size: 0.9rem;">Alvará {{ licenca.numero_licenca }}</p>
+            {% endif %}
         </div>
-    </header>
+        {% include "ambulante/_status_badge.html" with licenca=licenca %}
+    </div>
 
-    <main class="main-container" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
-        
-        <div style="margin-bottom: 24px;">
-            <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">Licença e Taxas de Ocupação</h1>
-            <p style="color: #475569;">Acompanhe o status do seu alvará, simule o pagamento da taxa municipal e baixe sua credencial.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;">
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Requerente</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">{{ ambulante.nome_completo }}</span>
         </div>
-
-        <!-- CARD DE DETALHES DO ALVARÁ (HU-3.4) -->
-        <div class="form-card" style="padding: 28px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 20px;">
-                <div>
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Protocolo nº</span>
-                    <h2 style="font-size: 1.4rem; font-weight: 700; color: #0F172A; margin: 4px 0 0 0;">2026.VCA-8842</h2>
-                </div>
-                <div id="status-badge-container">
-                    <span style="background: #FEF3C7; color: #D97706; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
-                        <i data-lucide="clock" style="width: 16px;"></i> Aguardando Pagamento da Taxa
-                    </span>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;">
-                <div>
-                    <strong style="display: block; font-size: 0.85rem; color: #64748B;">Requerente:</strong>
-                    <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">João da Silva</span>
-                </div>
-                <div>
-                    <strong style="display: block; font-size: 0.85rem; color: #64748B;">Ponto Solicitado:</strong>
-                    <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">Praça Barão do Rio Branco - Centro</span>
-                </div>
-                <div>
-                    <strong style="display: block; font-size: 0.85rem; color: #64748B;">Categoria:</strong>
-                    <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">Categoria B (Carrinho Tracionado)</span>
-                </div>
-                <div>
-                    <strong style="display: block; font-size: 0.85rem; color: #64748B;">Valor da Taxa (DAM):</strong>
-                    <span style="font-size: 1.25rem; color: #2563EB; font-weight: 800;">R$ 120,00</span>
-                </div>
-            </div>
-
-            <!-- PAINEL DINÂMICO DE AÇÃO HTMX -->
-            <div id="painel-emissao-alvara" style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px; border-radius: 8px; text-align: center;">
-                <p style="color: #475569; font-size: 0.95rem; margin-top: 0;">
-                    Após a confirmação do pagamento do Documento de Arrecadação Municipal (DAM), seu alvará digital será liberado automaticamente.
-                </p>
-                
-                <!-- BOTÃO SIMULAÇÃO DE PAGAMENTO COM HTMX (HU-3.4) -->
-                <button 
-                    hx-post="/api/alvara/20268842/simular-pagamento/" 
-                    hx-target="#painel-emissao-alvara" 
-                    hx-swap="outerHTML"
-                    style="background: #2563EB; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;">
-                    <i data-lucide="credit-card"></i> Simular Pagamento da Taxa (DAM) via HTMX
-                </button>
-            </div>
-
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Ponto solicitado</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">
+                {% if licenca.ponto_ocupacao %}
+                    {{ licenca.ponto_ocupacao.nome_identificacao }}
+                    {% if licenca.ponto_ocupacao.bairro %} — {{ licenca.ponto_ocupacao.bairro }}{% endif %}
+                {% else %}
+                    Não informado
+                {% endif %}
+            </span>
         </div>
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Categoria</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">
+                {% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}Não informada{% endif %}
+            </span>
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Tipo de pedido</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">{{ licenca.tipo_pedido }}</span>
+        </div>
+        {% if licenca.aguardando_taxa or licenca.taxa_paga %}
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Valor da taxa (DAM)</strong>
+            <span style="font-size: 1.25rem; color: #2563EB; font-weight: 800;">R$ {{ licenca.valor_taxa|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+    </div>
 
-    </main>
+    {% include "ambulante/_painel_taxa.html" with licenca=licenca %}
+</div>
 
-    <!-- RODAPÉ -->
-    <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Módulo de Licenciamento</span></p>
-    </footer>
+{% if historico %}
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Histórico de requerimentos</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
+        Solicitações, alterações e renovações vinculadas à sua conta.
+    </p>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>PROTOCOLO</th>
+                    <th>TIPO</th>
+                    <th>PONTO</th>
+                    <th>CATEGORIA</th>
+                    <th>STATUS</th>
+                    <th>DATA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in historico %}
+                <tr>
+                    <td>{{ item.protocolo }}</td>
+                    <td>{{ item.tipo_pedido }}</td>
+                    <td>{% if item.ponto_ocupacao %}{{ item.ponto_ocupacao.nome_identificacao }}{% else %}—{% endif %}</td>
+                    <td>{% if item.categoria_produto %}{{ item.categoria_produto.nome_categoria }}{% else %}—{% endif %}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.criado_em|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
 
-    <script>
-        lucide.createIcons();
-
-        // Listener para simular a troca do Badge no front-end quando o HTMX rodar
-        document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-            const badgeContainer = document.getElementById('status-badge-container');
-            if (badgeContainer) {
-                badgeContainer.innerHTML = `
-                    <span style="background: #D1FAE5; color: #059669; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
-                        <i data-lucide="check-circle-2" style="width: 16px;"></i> Alvará Ativo e Deferido
-                    </span>
-                `;
-                lucide.createIcons();
-            }
-        });
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+        const csrfToken = document.querySelector("meta[name='csrf-token']");
+        if (csrfToken) {
+            event.detail.headers["X-CSRFToken"] = csrfToken.getAttribute("content");
+        }
+    });
+    document.body.addEventListener("htmx:afterSwap", function () {
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

@@ -165,11 +165,18 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         response = self._post_etapa(6, {}, acao="enviar")
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn("concluido=1", response.url)
+        self.assertEqual(response.url, reverse("ambulante_alvara"))
         novo.refresh_from_db()
         self.assertTrue(novo.cadastro_completo)
         self.assertIsNone(novo.codigo_qr_code)
         self.assertEqual(novo.ponto_pretendido_id, self.ponto.pk)
+
+        licenca = LicencaAlvara.objects.get(ambulante=novo)
+        alvara = self.client.get(reverse("ambulante_alvara"))
+        self.assertEqual(alvara.status_code, 200)
+        self.assertContains(alvara, licenca.protocolo)
+        self.assertContains(alvara, "Em Análise")
+        self.assertContains(alvara, "Praça Central")
 
         self.client.logout()
         self.client.force_login(self.gestor)

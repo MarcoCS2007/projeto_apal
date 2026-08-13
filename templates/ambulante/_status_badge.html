@@ -1,0 +1,23 @@
+<div id="status-badge-container"{% if oob_badge %} hx-swap-oob="true"{% endif %}>
+    {% if licenca.aguardando_taxa %}
+    <span class="badge warning" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="clock" style="width: 16px;"></i> Aguardando Pagamento da Taxa
+    </span>
+    {% elif licenca.status == "Pendência Documental" %}
+    <span class="badge purple" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="alert-circle" style="width: 16px;"></i> {{ licenca.status }}
+    </span>
+    {% elif licenca.status == "Indeferido" or licenca.status == "Vencido" or licenca.status == "Suspenso" or licenca.status == "Cancelado" %}
+    <span class="badge danger" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="x-circle" style="width: 16px;"></i> {{ licenca.status }}
+    </span>
+    {% elif licenca.status == "Aprovado" or licenca.status == "Ativo" %}
+    <span class="badge success" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="check-circle-2" style="width: 16px;"></i> {{ licenca.status }}
+    </span>
+    {% else %}
+    <span class="badge warning" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="clock" style="width: 16px;"></i> {{ licenca.status }}
+    </span>
+    {% endif %}
+</div>

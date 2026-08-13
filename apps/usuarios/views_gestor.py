@@ -1,23 +1,32 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView
 
+from apps.espacos.models import PontoOcupacao
 from apps.fiscalizacao.models import OcorrenciaInspecao
-from apps.licenciamento.forms import ParecerLicencaForm
+from apps.licenciamento.forms import EmitirAlvaraForm, ParecerLicencaForm
 from apps.licenciamento.models import (
     STATUS_FILA,
+    STATUS_LISTAGEM_GESTOR,
     DocumentoAnexo,
     LicencaAlvara,
     StatusAprovacaoDocumento,
     StatusLicenca,
     StatusSolicitacao,
 )
-from apps.licenciamento.services import aplicar_parecer
+from apps.licenciamento.services import (
+    aplicar_parecer,
+    emitir_alvara,
+    marcar_licencas_vencidas,
+)
 from apps.usuarios.forms_gestor import EditarAmbulanteGestorForm
 from apps.usuarios.models import Ambulante, Gestor
 from apps.usuarios.views import AcessoBackofficeMixin
@@ -250,7 +259,69 @@ class GestorAnalisarLicencaView(PainelGestorMixin, View):
             "pendencia": "Processo devolvido com pendência documental.",
         }
         messages.success(request, mensagens[form.cleaned_data["acao"]])
+        if form.cleaned_data["acao"] == "deferir":
+            return redirect("gestor_emitir", pk=licenca.pk)
         return redirect("gestor_fila")
+
+
+class GestorEmitirAlvaraView(PainelGestorMixin, View):
+    template_name = "gestor/emitir-alvara.html"
+
+    def _licenca(self, pk):
+        return get_object_or_404(
+            LicencaAlvara.objects.select_related(
+                "ambulante",
+                "categoria_produto",
+                "ponto_ocupacao",
+                "estrutura_trabalho",
+                "gestor_responsavel",
+            ),
+            pk=pk,
+        )
+
+    def _contexto(self, licenca, form):
+        ambulante = licenca.ambulante
+        return {
+            "licenca": licenca,
+            "form": form,
+            "ambulante": ambulante,
+            "estrutura": licenca.estrutura_trabalho
+            or ambulante.estruturas.order_by("id").first(),
+            "escalas": licenca.escalas.order_by("id"),
+            "pode_emitir": licenca.pode_emitir,
+        }
+
+    def get(self, request, pk):
+        licenca = self._licenca(pk)
+        form = EmitirAlvaraForm(licenca=licenca) if licenca.pode_emitir else None
+        return render(request, self.template_name, self._contexto(licenca, form))
+
+    def post(self, request, pk):
+        licenca = self._licenca(pk)
+        form = EmitirAlvaraForm(request.POST, licenca=licenca)
+        if not form.is_valid():
+            return render(request, self.template_name, self._contexto(licenca, form))
+        try:
+            licenca = emitir_alvara(
+                licenca,
+                request.user,
+                data_emissao=form.cleaned_data["data_emissao"],
+                data_vencimento=form.cleaned_data["data_vencimento"],
+                ponto=form.cleaned_data["ponto_ocupacao"],
+                dias_semana=form.cleaned_data["dias_semana"],
+                horario_inicio=form.cleaned_data["horario_inicio"],
+                horario_termino=form.cleaned_data["horario_termino"],
+                observacoes=form.cleaned_data.get("observacoes", ""),
+            )
+        except ValidationError as erro:
+            messages.error(request, erro.messages[0] if erro.messages else str(erro))
+            return render(request, self.template_name, self._contexto(licenca, form))
+        messages.success(
+            request,
+            f"Alvará {licenca.numero_licenca} emitido. O ponto foi ocupado e o QR Code "
+            "já está vinculado ao ambulante.",
+        )
+        return redirect("gestor_licencas")
 
 
 class GestorLicencasAtivasView(PainelGestorMixin, TemplateView):
@@ -258,17 +329,35 @@ class GestorLicencasAtivasView(PainelGestorMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["licencas"] = (
-            LicencaAlvara.objects.filter(
-                status__in=(
-                    StatusLicenca.ATIVO,
-                    StatusLicenca.VENCIDO,
-                    StatusLicenca.SUSPENSO,
-                    StatusSolicitacao.APROVADO,
-                )
+        marcar_licencas_vencidas()
+        status = self.request.GET.get("status", "").strip()
+        ponto_id = self.request.GET.get("ponto", "").strip()
+        vencimento_proximo = self.request.GET.get("vencimento_proximo") == "1"
+        licencas = LicencaAlvara.objects.filter(
+            status__in=STATUS_LISTAGEM_GESTOR
+        ).select_related("ambulante", "ponto_ocupacao", "categoria_produto")
+        if status in STATUS_LISTAGEM_GESTOR:
+            licencas = licencas.filter(status=status)
+        if ponto_id.isdigit():
+            licencas = licencas.filter(ponto_ocupacao_id=int(ponto_id))
+        if vencimento_proximo:
+            hoje = timezone.localdate()
+            licencas = licencas.filter(
+                status=StatusLicenca.ATIVO,
+                data_vencimento__gte=hoje,
+                data_vencimento__lte=hoje + timedelta(days=30),
             )
-            .select_related("ambulante", "ponto_ocupacao", "categoria_produto")
-            .order_by("-atualizado_em")
+        context.update(
+            {
+                "licencas": licencas.order_by("-atualizado_em"),
+                "filtro_status": status,
+                "filtro_ponto": ponto_id,
+                "filtro_vencimento_proximo": vencimento_proximo,
+                "status_opcoes": STATUS_LISTAGEM_GESTOR,
+                "pontos": PontoOcupacao.objects.filter(ativo=True).order_by(
+                    "nome_identificacao"
+                ),
+            }
         )
         return context
 

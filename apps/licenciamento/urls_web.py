@@ -1,14 +1,44 @@
 from django.urls import path
 
 from .views import (
+    AlvaraAmbulanteView,
     AprovarDocumentoView,
+    CredencialAmbulanteView,
+    CredencialQrPngView,
     GestorCategoriaExcluirView,
     GestorCategoriasView,
     GestorTriagemView,
     RejeitarDocumentoView,
+    RenovarLicencaView,
+    SimularPagamentoAlvaraView,
 )
 
 urlpatterns = [
+    path(
+        "ambulante/alvara/",
+        AlvaraAmbulanteView.as_view(),
+        name="ambulante_alvara",
+    ),
+    path(
+        "ambulante/credencial/",
+        CredencialAmbulanteView.as_view(),
+        name="ambulante_credencial",
+    ),
+    path(
+        "ambulante/credencial/qr.png",
+        CredencialQrPngView.as_view(),
+        name="ambulante_credencial_qr",
+    ),
+    path(
+        "ambulante/alvara/<int:pk>/renovar/",
+        RenovarLicencaView.as_view(),
+        name="ambulante_renovar",
+    ),
+    path(
+        "api/alvara/<int:pk>/simular-pagamento/",
+        SimularPagamentoAlvaraView.as_view(),
+        name="alvara_simular_pagamento",
+    ),
     path(
         "gestor/categorias/",
         GestorCategoriasView.as_view(),

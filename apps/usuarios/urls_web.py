@@ -24,6 +24,7 @@ from .views_gestor import (
     GestorAmbulantesView,
     GestorAnalisarLicencaView,
     GestorDossieView,
+    GestorEmitirAlvaraView,
     GestorFilaView,
     GestorLicencasAtivasView,
     GestorOcorrenciasView,
@@ -72,6 +73,11 @@ urlpatterns = [
         "gestor/analisar/<int:pk>/",
         GestorAnalisarLicencaView.as_view(),
         name="gestor_analisar",
+    ),
+    path(
+        "gestor/emitir/<int:pk>/",
+        GestorEmitirAlvaraView.as_view(),
+        name="gestor_emitir",
     ),
     path(
         "gestor/licencas/",
