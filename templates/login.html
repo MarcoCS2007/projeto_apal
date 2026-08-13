@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acesso Backoffice - APAL | Aqui Pode, Aqui é Legal{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Acesso ao Backoffice</h1>
+        <p>Área restrita para Gestores e Administradores da plataforma APAL<br> de Vitória da Conquista.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Acesso ao Sistema</h2>
+    </div>
+
+    <form id="login-form" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">
+            {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="user-login">E-mail ou CPF</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="login-error" role="alert">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 0.5rem;">
+            <div class="input-group full-width">
+                <label for="user-password">Senha</label>
+                <div class="input-password-wrapper">
+                    {{ form.password }}
+                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                <div class="login-error" role="alert">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+
+        <div class="form-actions" style="margin-top: 1.5rem;">
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                <i data-lucide="log-in"></i> Entrar na Plataforma
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

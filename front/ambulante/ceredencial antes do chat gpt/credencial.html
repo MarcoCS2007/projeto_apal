@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Ambulante e Credencial - APAL</title>
-
+    
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="../img/favicon.png">
-
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    
     <!-- LUCIDE ICONS (Biblioteca Oficial) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    
     <!-- CSS GLOBAL -->
     <link rel="stylesheet" href="../css/style.css">
 </head>
-
 <body>
 
     <!-- Cabeçalho Institucional -->
@@ -27,10 +25,8 @@
         <div class="header-container">
             <div class="logo-area">
                 <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin"
-                        style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text"
-                        style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
+                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
                 </a>
             </div>
             <nav class="header-nav">
@@ -60,16 +56,11 @@
             <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
             <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
             <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
-            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o
-                Conteúdo</button>
-            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao
-                Clicar</button>
-            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar
-                Leitura</button>
-            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com
-                IA</button>
-            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de
-                Termos</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
             <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
             <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
             <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
@@ -87,8 +78,19 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-container">
 
-        <div class="form-card">
+        <!-- WIDGET DE GAMIFICAÇÃO / SCORE DO AMBULANTE -->
+        <div class="score-card">
+            <div class="score-info">
+                <h4>Score do Ambulante: 95 Pontos</h4>
+                <p>Você mantém exames e licenças em dia! Seu perfil possui prioridade para novas vagas em eventos municipais.</p>
+            </div>
+            <div class="score-badge-level">
+                <i data-lucide="award"></i> Nível Ouro
+            </div>
+        </div>
 
+        <div class="form-card">
+            
             <!-- NAVEGAÇÃO DE ABAS -->
             <div class="credential-tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('tab-credencial', this)">
@@ -106,160 +108,86 @@
                 <button class="tab-btn" onclick="switchTab('tab-historico', this)">
                     <i data-lucide="history"></i> Histórico
                 </button>
-                <a href="score.html" class="tab-btn" style="text-decoration: none;">
-                    <i data-lucide="award" style="color: #FDB022;"></i> Score do Ambulante
-                </a>
             </div>
 
             <!-- ABA 1: CREDENCIAL / LICENÇA ATUAL (FRENTE E VERSO LADO A LADO) -->
             <div id="tab-credencial" class="tab-pane active">
-                <div class="credential-wrapper"
-                    style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-
+                <div class="credential-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                    
                     <!-- CONTAINER DOS DOIS CARTÕES LADO A LADO -->
-                    <div
-                        style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
+                    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 1.5rem; width: 100%;">
 
                         <!-- FRENTE DO CARTÃO -->
-                        <div class="apal-id-front"
-                            style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; font-family: 'Inter', sans-serif;">
+                        <div class="apal-id-front" style="position: relative; width: 100%; max-width: 420px; height: 230px; border-radius: 16px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10); overflow: hidden; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E2E8F0;">
+                            <!-- Detalhes orgânicos de fundo (Azul e Rosa) -->
+                            <div style="position: absolute; top: -35px; right: -35px; width: 140px; height: 140px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.16) 0%, rgba(255, 0, 127, 0.14) 100%); border-radius: 50%; pointer-events: none; z-index: 1;"></div>
+                            <div style="position: absolute; bottom: -45px; left: -25px; width: 120px; height: 120px; background: linear-gradient(135deg, rgba(255, 0, 127, 0.12) 0%, rgba(37, 99, 235, 0.14) 100%); border-radius: 50%; pointer-events: none; z-index: 1;"></div>
 
-                            <!-- Formas geométricas decorativas -->
-                            <div
-                                style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #1D4ED8 0%, #2563EB 72%, rgba(37,99,235,0.55) 100%); z-index: 1; pointer-events: none;">
+                            <div class="id-front-header" style="padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F1F5F9; z-index: 2;">
+                                <span class="id-brand" style="font-size: 0.95rem; font-weight: 800; color: #000000; display: flex; align-items: center; gap: 6px;">
+                                    <i data-lucide="map-pin" style="width: 15px; height: 15px; color: #EC4899; stroke-width: 3px;"></i> APAL
+                                </span>
+                                <span class="id-type" style="font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: #FF007F; background: #FFF0F5; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(255, 0, 127, 0.2);">Ambulante Autorizado</span>
                             </div>
-                            <div
-                                style="position: absolute; top: -52px; left: 28px; width: 86px; height: 220px; border-radius: 50%; border: 2px solid rgba(37, 99, 235, 0.75); transform: rotate(43deg); z-index: 1; pointer-events: none;">
-                            </div>
-                            <div
-                                style="position: absolute; top: -68px; left: 6px; width: 118px; height: 228px; border-radius: 50%; border: 14px solid rgba(255, 0, 127, 0.07); transform: rotate(43deg); z-index: 1; pointer-events: none;">
-                            </div>
-
-                            <div
-                                style="position: absolute; top: 24px; right: 24px; width: 52px; height: 56px; background-image: radial-gradient(circle, rgba(37,99,235,0.58) 2.2px, transparent 2.6px); background-size: 13px 13px; z-index: 1; pointer-events: none;">
-                            </div>
-                            <div
-                                style="position: absolute; top: 202px; left: 18px; width: 34px; height: 64px; background-image: radial-gradient(circle, rgba(37,99,235,0.46) 2px, transparent 2.4px); background-size: 12px 12px; z-index: 1; pointer-events: none;">
-                            </div>
-
-                            <div
-                                style="position: absolute; right: -72px; top: 250px; width: 142px; height: 178px; border-radius: 48% 0 0 48%; border: 2px solid rgba(255, 0, 127, 0.72); background: rgba(255, 0, 127, 0.06); transform: rotate(8deg); z-index: 1; pointer-events: none;">
-                            </div>
-                            <div
-                                style="position: absolute; right: -88px; top: 286px; width: 138px; height: 146px; border-radius: 48% 0 0 48%; background: linear-gradient(180deg, rgba(255,0,127,0.52), rgba(255,0,127,0.20)); transform: rotate(8deg); z-index: 1; pointer-events: none;">
-                            </div>
-
-                            <!-- Marca APAL -->
-                            <div
-                                style="position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 64px 34px 0 56px;">
-                                <span aria-hidden="true"
-                                    style="width: 64px; height: 64px; flex-shrink: 0; display: block;"></span>
-                                <div style="min-width: 0;">
-                                    <div
-                                        style="font-size: 2rem; line-height: 1; font-weight: 800; color: #FF007F; letter-spacing: -1.2px;">
-                                        APAL</div>
-                                    <p
-                                        style="margin: 8px 0 0 0; max-width: 210px; font-size: 0.68rem; line-height: 1.35; color: #0F172A; font-weight: 500;">
-                                        Plataforma de licenciamento e gestão do comércio ambulante
-                                    </p>
+                            
+                            <div class="id-front-body" style="flex: 1; padding: 12px 16px; display: flex; align-items: center; gap: 15px; z-index: 2;">
+                                <div class="id-photo" style="width: 75px; height: 75px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, #2563EB, #FF007F); flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                                    <img src="../img/foto-ambulante.jpg" alt="Foto do Titular" onerror="this.src='https://ui-avatars.com/api/?name=Joao+Silva&background=E2E8F0&color=0F172A'" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 2px solid #FFFFFF; background: #E2E8F0;">
+                                </div>
+                                <div class="id-info" style="display: flex; flex-direction: column; justify-content: center; gap: 4px;">
+                                    <span class="id-label" style="font-size: 0.58rem; text-transform: uppercase; font-weight: 700; color: #64748B;">Titular da Licença</span>
+                                    <h2 class="id-name" style="font-size: 1rem; font-weight: 800; color: #000000; margin: 0 0 2px 0;">João da Silva Santos</h2>
+                                    <p class="id-cpf" style="font-size: 0.74rem; font-weight: 600; color: #000000; margin: 0;">CPF: 123.456.789-00</p>
                                 </div>
                             </div>
-
-                            <!-- Foto centralizada no centro exato da credencial -->
-                            <div class="id-photo-front"
-                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 100px; border-radius: 15px; overflow: hidden; background: transparent; border: none; box-shadow: none; z-index: 3;">
-                                <img src="../img/foto-ambulante.jpg" alt="Foto do Titular"
-                                    onerror="this.src='https://ui-avatars.com/api/?name=Joao+Silva&background=DBEAFE&color=2563EB'"
-                                    style="display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 15px; background: #DBEAFE; border: 1px solid #BFDBFE;">
-                            </div>
-
-                            <!-- Identificação -->
-                            <div
-                                style="position: absolute; left: 34px; right: 34px; bottom: 66px; z-index: 3; border-left: 4px solid #2563EB; padding-left: 14px;">
-                                <h2 class="id-name"
-                                    style="margin: 0; font-size: 1.1rem; line-height: 1.12; font-weight: 800; color: #0F172A; letter-spacing: -0.5px;">
-                                    João da Silva Santos</h2>
-                                <p class="id-cpf"
-                                    style="margin: 8px 0 0 0; font-size: 0.88rem; line-height: 1.2; font-weight: 600; color: #0F172A;">
-                                    <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> 123.456.789-00
-                                </p>
-                            </div>
-
-                            <!-- Rodapé visual -->
-                            <div
-                                style="position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: #1D4ED8; z-index: 3;">
-                            </div>
-                            <div
-                                style="position: absolute; left: 0; right: 0; bottom: 36px; height: 4px; background: #FF007F; z-index: 3;">
+                            
+                            <div class="id-front-footer" style="padding: 8px 16px; background: #FFFFFF; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; z-index: 2;">
+                                <span class="id-number" style="font-size: 0.66rem; color: #000000;">Licença: <strong style="color: #000000; font-size: 0.76rem;">ALV-2026/8842</strong></span>
                             </div>
                         </div>
-
+                        
                         <!-- VERSO DO CARTÃO -->
-                        <div class="apal-id-back"
-                            style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; font-family: 'Inter', sans-serif; transform: none !important; backface-visibility: visible !important;">
+                        <div class="apal-id-back" style="position: relative; width: 100%; max-width: 420px; height: 230px; border-radius: 16px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10); overflow: hidden; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E2E8F0; transform: none !important; backface-visibility: visible !important;">
+                            <!-- Detalhes orgânicos de fundo (Azul e Rosa invertidos nas pontas) -->
+                            <div style="position: absolute; top: -35px; left: -35px; width: 140px; height: 140px; background: linear-gradient(135deg, rgba(255, 0, 127, 0.14) 0%, rgba(37, 99, 235, 0.16) 100%); border-radius: 50%; pointer-events: none; z-index: 1;"></div>
+                            <div style="position: absolute; bottom: -45px; right: -25px; width: 120px; height: 120px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(255, 0, 127, 0.12) 100%); border-radius: 50%; pointer-events: none; z-index: 1;"></div>
 
-                            <!-- Cabeçalho azul com acabamento rosa -->
-                            <div
-                                style="position: absolute; top: 0; left: 0; right: 0; height: 112px; background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%); z-index: 1;">
+                            <div class="id-back-header" style="background: #FFFFFF; padding: 10px 16px; font-size: 0.68rem; font-weight: 700; color: #000000; text-transform: uppercase; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; gap: 6px; z-index: 2; position: relative;">
+                                <i data-lucide="info" style="width: 14px; height: 14px; color: #2563EB;"></i> Dados de Fiscalização e Ponto
                             </div>
-                            <div
-                                style="position: absolute; top: 86px; left: -18px; right: -18px; height: 46px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; box-sizing: border-box; z-index: 2;">
-                            </div>
-
-
-                            <!-- Dados principais -->
-                            <div
-                                style="position: absolute; top: 118px; left: 24px; right: 24px; z-index: 4; text-align: center;">
-                                <h2 class="id-name"
-                                    style="margin: 0; font-size: 1.22rem; line-height: 1.15; font-weight: 800; color: #0F172A; letter-spacing: -0.45px;">
-                                    João da Silva Santos</h2>
-
-                                <div style="margin-top: 10px;">
-                                    <span
-                                        style="display: block; font-size: 0.64rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">CPF</span>
-                                    <strong
-                                        style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">123.456.789-00</strong>
-                                </div>
-
-                                <div style="margin-top: 10px;">
-                                    <span
-                                        style="display: block; font-size: 0.64rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Nº
-                                        do Alvará</span>
-                                    <strong
-                                        style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">ALV-2026/8842</strong>
-                                </div>
-
-                                <div class="id-qr-box"
-                                    style="display: flex; justify-content: center; margin-top: 10px;">
-                                    <div class="qr-placeholder"
-                                        style="width: 118px; height: 118px; background: #FFFFFF; border: 1.5px solid #93C5FD; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(15,23,42,0.06);">
-                                        <i data-lucide="qr-code"
-                                            style="width: 94px; height: 94px; color: #000000; stroke-width: 1.35px;"></i>
+                            
+                            <div class="id-back-body" style="flex: 1; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 2; position: relative;">
+                                <div class="id-back-info" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                                    <div class="id-data-group">
+                                        <span class="id-label-dark" style="font-size: 0.58rem; text-transform: uppercase; font-weight: 700; color: #64748B;">Atividade Autorizada</span>
+                                        <strong class="id-value-dark" style="font-size: 0.78rem; font-weight: 800; color: #000000;">Cat. B - Cachorro Quente</strong>
+                                    </div>
+                                    <div class="id-data-group">
+                                        <span class="id-label-dark" style="font-size: 0.58rem; text-transform: uppercase; font-weight: 700; color: #64748B;">Local de Atuação</span>
+                                        <strong class="id-value-dark" style="font-size: 0.78rem; font-weight: 800; color: #000000;">Praça 9 de Novembro (Ponto #12)</strong>
+                                    </div>
+                                    <div class="id-data-group">
+                                        <span class="id-label-dark" style="font-size: 0.58rem; text-transform: uppercase; font-weight: 700; color: #64748B;">Validade</span>
+                                        <strong class="id-value-dark" style="font-size: 0.78rem; font-weight: 800; color: #DC2626;">31/12/2026</strong>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Rodapé de demonstração -->
-                            <div
-                                style="position: absolute; left: 0; right: 0; bottom: 0; min-height: 52px; background: #1D4ED8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 9px 18px; text-align: center; font-size: 0.62rem; line-height: 1.35; font-weight: 600; z-index: 4;">
-                                Prefeitura Municipal<br>Vitória da Conquista
-                            </div>
-                            <div
-                                style="position: absolute; left: 0; right: 0; bottom: 52px; height: 4px; background: #FF007F; z-index: 4;">
+                                
+                                <div class="id-qr-box" style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;">
+                                    <div class="qr-placeholder" style="width: 72px; height: 72px; background: #FFFFFF; border: 2px solid #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                        <i data-lucide="qr-code" style="width: 46px; height: 46px; color: #000000; stroke-width: 1.5px;"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Botões de Ação da Credencial -->
-                    <div class="credential-actions"
-                        style="display: flex; gap: 1rem; margin-top: 1rem; width: 100%; max-width: 420px; justify-content: center;">
-                        <button type="button" id="btn-imprimir-cred" class="btn-action-card"
-                            style="flex: 1; background-color: #FFFFFF; color: #1D4ED8; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
+                    <div class="credential-actions" style="display: flex; gap: 1rem; margin-top: 1rem; width: 100%; max-width: 420px; justify-content: center;">
+                        <button type="button" id="btn-imprimir-cred" class="btn-action-card" style="flex: 1; background-color: #FFFFFF; color: #1D4ED8; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
                             <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Imprimir Credencial
                         </button>
-                        <button type="button" id="btn-compartilhar-cred" class="btn-action-card share"
-                            style="flex: 1; background-color: #1D4ED8; color: #FFFFFF; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
+                        <button type="button" id="btn-compartilhar-cred" class="btn-action-card share" style="flex: 1; background-color: #1D4ED8; color: #FFFFFF; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
                             <i data-lucide="share-2" style="width: 16px; height: 16px;"></i> Compartilhar
                         </button>
                     </div>
@@ -273,15 +201,12 @@
                     <div class="title-accent"></div>
                     <h2>Solicitação de Renovação de Licença</h2>
                 </div>
-                <p style="margin-bottom: 1.5rem; color: var(--texto-cinza);">A renovação deve ser solicitada com até 30
-                    dias de antecedência do vencimento da licença atual.</p>
-                <form
-                    onsubmit="event.preventDefault(); alert('Solicitação de renovação enviada com sucesso! Acompanhe o status.');">
+                <p style="margin-bottom: 1.5rem; color: var(--texto-cinza);">A renovação deve ser solicitada com até 30 dias de antecedência do vencimento da licença atual.</p>
+                <form onsubmit="event.preventDefault(); alert('Solicitação de renovação enviada com sucesso! Acompanhe o status.');">
                     <div class="form-row">
                         <div class="input-group">
                             <label for="licenca-num">Número da Licença Atual</label>
-                            <input type="text" id="licenca-num" value="ALV-2026/8842" readonly
-                                style="background: var(--fundo-cinza);">
+                            <input type="text" id="licenca-num" value="ALV-2026/8842" readonly style="background: var(--fundo-cinza);">
                         </div>
                         <div class="input-group">
                             <label for="periodo-renovacao">Período de Renovação Desejado</label>
@@ -311,17 +236,14 @@
                     <div class="title-accent" style="background-color: var(--cor-destaque);"></div>
                     <h2>Solicitação de Cancelamento / Baixa de Licença</h2>
                 </div>
-
-                <div class="info-callout-box"
-                    style="background-color: #FEE2E2; border-left-color: #DC2626; margin-bottom: 2rem;">
+                
+                <div class="info-callout-box" style="background-color: #FEE2E2; border-left-color: #DC2626; margin-bottom: 2rem;">
                     <p style="color: #991B1B;">
-                        <strong>Atenção:</strong> O cancelamento da licença é definitivo e libera o ponto público para
-                        novos requerentes na fila de espera.
+                        <strong>Atenção:</strong> O cancelamento da licença é definitivo e libera o ponto público para novos requerentes na fila de espera.
                     </p>
                 </div>
 
-                <form
-                    onsubmit="event.preventDefault(); alert('Solicitação de cancelamento registrada. A fiscalização entrará em contato.');">
+                <form onsubmit="event.preventDefault(); alert('Solicitação de cancelamento registrada. A fiscalização entrará em contato.');">
                     <div class="form-row">
                         <div class="input-group full-width">
                             <label for="motivo-cancelamento">Motivo do Cancelamento</label>
@@ -337,9 +259,7 @@
                     <div class="form-row">
                         <div class="input-group full-width">
                             <label for="justificativa-text">Justificativa Detalhada</label>
-                            <textarea id="justificativa-text" rows="4"
-                                placeholder="Descreva o motivo do encerramento das atividades no local..."
-                                required></textarea>
+                            <textarea id="justificativa-text" rows="4" placeholder="Descreva o motivo do encerramento das atividades no local..." required></textarea>
                         </div>
                     </div>
                     <div class="form-actions">
@@ -356,16 +276,11 @@
                     <div class="title-accent"></div>
                     <h2>Acompanhamento de Solicitação em Andamento</h2>
                 </div>
-                <div
-                    style="background: var(--fundo-cinza); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="background: var(--fundo-cinza); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                         <div>
-                            <span
-                                style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase; display: block;">Protocolo
-                                #8842-2026</span>
-                            <h3 style="font-size: 1.1rem; color: var(--texto-escuro);">Solicitação de Licença Inicial
-                                (Praça 9 de Novembro)</h3>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase; display: block;">Protocolo #8842-2026</span>
+                            <h3 style="font-size: 1.1rem; color: var(--texto-escuro);">Solicitação de Licença Inicial (Praça 9 de Novembro)</h3>
                         </div>
                         <span class="badge warning"><i data-lucide="clock"></i> EM ANÁLISE PELA FISCALIZAÇÃO</span>
                     </div>
@@ -374,33 +289,28 @@
                             <i data-lucide="check-circle" style="color: #059669;"></i>
                             <div>
                                 <strong style="font-size: 0.9rem;">Requerimento Enviado</strong>
-                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Recebido pelo sistema em
-                                    01/08/2026 às 10:15</p>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Recebido pelo sistema em 01/08/2026 às 10:15</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <i data-lucide="check-circle" style="color: #059669;"></i>
                             <div>
                                 <strong style="font-size: 0.9rem;">Validação Documental</strong>
-                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Documentos conferidos e
-                                    aprovados em 02/08/2026</p>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Documentos conferidos e aprovados em 02/08/2026</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <i data-lucide="circle-dot" style="color: #D97706;"></i>
                             <div>
-                                <strong style="font-size: 0.9rem; color: #D97706;">Vistoria de Local e
-                                    Viabilidade</strong>
-                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Aguardando parecer da
-                                    Secretaria de Urbanismo</p>
+                                <strong style="font-size: 0.9rem; color: #D97706;">Vistoria de Local e Viabilidade</strong>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Aguardando parecer da Secretaria de Urbanismo</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem; opacity: 0.5;">
                             <i data-lucide="circle"></i>
                             <div>
                                 <strong style="font-size: 0.9rem;">Emissão de Credencial</strong>
-                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Disponibilização do QR Code
-                                    oficial</p>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Disponibilização do QR Code oficial</p>
                             </div>
                         </div>
                     </div>
@@ -431,8 +341,7 @@
                                 <td>01/08/2026</td>
                                 <td><span class="badge warning"><i data-lucide="clock"></i> Em Análise</span></td>
                                 <td>
-                                    <button class="btn-action"
-                                        onclick="alert('Visualizando detalhes do protocolo #8842')">
+                                    <button class="btn-action" onclick="alert('Visualizando detalhes do protocolo #8842')">
                                         <i data-lucide="eye"></i> Detalhes
                                     </button>
                                 </td>
@@ -471,8 +380,7 @@
     <div id="modal-backdrop" class="modal-backdrop"></div>
 
     <!-- JANELA MODAL DA IA -->
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden"
-        style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
         <div class="access-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">
                 <i data-lucide="sparkles"></i> Assistente de Acessibilidade
@@ -486,8 +394,7 @@
 
     <!-- RODAPÉ INSTITUCIONAL -->
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é
-                Legal</span></p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
     </footer>
 
     <!-- SCRIPT PARA TROCA DE ABAS E BOTÕES DA CREDENCIAL -->
@@ -549,10 +456,9 @@
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
-
+    
     <!-- JS GLOBAL DA APLICAÇÃO -->
     <script src="../js/script.js"></script>
 
 </body>
-
 </html>

@@ -2460,3 +2460,17 @@ select.styled-select:focus-visible {
     .print-signature-line { width: 280px; border-top: 1px solid #000; margin: 35px auto 4px auto; }
     .print-footer-page { text-align: right; font-size: 8pt; font-weight: 700; border-top: 1px solid #000; padding-top: 4px; margin-top: auto; }
 }
+
+/* =========================================
+   LOGIN BACKOFFICE — FEEDBACK DE ERRO
+========================================= */
+.login-error {
+    background-color: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+}

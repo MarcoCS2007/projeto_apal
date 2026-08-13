@@ -31,6 +31,13 @@ class UsuarioBaseManager(BaseUserManager):
         return self.create_user(cpf, email, password, **extra_fields)
 
 
+class Perfil(models.TextChoices):
+    AMBULANTE = "ambulante", "Ambulante"
+    FISCAL = "fiscal", "Fiscal"
+    GESTOR = "gestor", "Gestor"
+    ADMINISTRADOR = "administrador", "Administrador"
+
+
 class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
     cpf = models.CharField(max_length=14, unique=True)
     nome = models.CharField(max_length=150)
@@ -50,6 +57,17 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
 
     def __str__(self):
         return f"{self.nome} {self.sobrenome} - {self.cpf}"
+
+    @property
+    def role(self):
+        try:
+            return Perfil(self.__class__.__name__.lower())
+        except ValueError:
+            pass
+        for perfil in Perfil:
+            if hasattr(self, perfil.value):
+                return perfil
+        return None
 
 
 class Ambulante(UsuarioBase):
