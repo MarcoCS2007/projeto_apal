@@ -1,0 +1,10 @@
+<nav class="header-nav">
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel Central</a>
+    <a href="{% url 'gestor_ambulantes' %}"{% if active == "ambulantes" %} class="active"{% endif %}><i data-lucide="users"></i> Ambulantes</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" style="background: none; border: none; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">
+            <i data-lucide="log-out"></i> Encerrar expediente
+        </button>
+    </form>
+</nav>

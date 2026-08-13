@@ -70,8 +70,17 @@
     <!-- Área Principal -->
     <main class="main-container">
         
-        <form onsubmit="event.preventDefault(); alert('Permissões e políticas globais de segurança atualizadas com sucesso!'); window.location.href='{% url 'master_admin' %}';">
-            
+        <form method="post" action="{% url 'master_permissoes' %}">
+            {% csrf_token %}
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}form-success{% else %}login-error{% endif %}" role="status" style="margin-bottom: 1.5rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <!-- CARD 1: MATRIZ DE PERMISSÕES POR PERFIL -->
             <div class="form-card" style="margin-bottom: 2rem;">
                 <div class="section-title">
@@ -94,48 +103,20 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for linha in form.linhas_matriz %}
                             <tr>
-                                <td><strong>Consulta do Mapa de Vagas em Tempo Real</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Ambulante ver mapa"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal ver mapa"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor ver mapa"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Cidadão ver mapa"></td>
+                                <td><strong>{{ linha.rotulo }}</strong></td>
+                                {% for celula in linha.celulas %}
+                                <td style="text-align: center;">
+                                    {% if celula.editavel %}
+                                    {{ celula.campo }}
+                                    {% else %}
+                                    <input type="checkbox" disabled title="Não aplicável a este perfil">
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
                             </tr>
-                            <tr>
-                                <td><strong>Solicitação e Renovação de Licença</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Ambulante solicitar licença"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Fiscal"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor solicitar licença"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Emissão Direta e Validação de Alvará</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Ambulante apenas visualiza"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Fiscal apenas valida via QR"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor emitir alvará"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Leitura de QR Code / Validação de Campo</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Ambulante exibe o QR"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal validar via QR"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor validar via QR"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Cidadão consultar QR"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Lavratura de Autos de Ocorrência / Apreensão</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Ambulante"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal registrar ocorrência"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor gerenciar ocorrências"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Cidadão faz denúncias"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Exportação de Relatórios Gerenciais (.CSV / .PDF)</strong></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Ambulante"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Fiscal"></td>
-                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor exportar dados"></td>
-                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -151,42 +132,24 @@
                 <div class="form-row">
                     <div class="input-group">
                         <label for="tempo-sessao">Tempo Limite de Sessão por Inatividade</label>
-                        <select id="tempo-sessao" required>
-                            <option value="15">15 minutos</option>
-                            <option value="30" selected>30 minutos (Recomendado)</option>
-                            <option value="60">60 minutos (1 hora)</option>
-                            <option value="120">120 minutos (2 horas)</option>
-                        </select>
+                        {{ form.tempo_sessao_minutos }}
                     </div>
                     
                     <div class="input-group">
                         <label for="tentativas-login">Tentativas Incorretas para Bloqueio</label>
-                        <select id="tentativas-login" required>
-                            <option value="3">3 tentativas incorretas</option>
-                            <option value="5" selected>5 tentativas incorretas (Padrão)</option>
-                            <option value="10">10 tentativas incorretas</option>
-                        </select>
+                        {{ form.tentativas_bloqueio }}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group">
                         <label for="autenticacao-2fa">Exigência de 2FA (Dois Fatores)</label>
-                        <select id="autenticacao-2fa" required>
-                            <option value="todos">Obrigatório para Todos os Perfis</option>
-                            <option value="internos" selected>Obrigatório apenas para TI, Gestores e Fiscais</option>
-                            <option value="opcional">Opcional para todos os perfis</option>
-                        </select>
+                        {{ form.exigencia_2fa }}
                     </div>
 
                     <div class="input-group">
                         <label for="retencao-logs">Período de Retenção de Logs de Auditoria</label>
-                        <select id="retencao-logs" required>
-                            <option value="6">6 meses</option>
-                            <option value="12" selected>12 meses (Exigência LGPD)</option>
-                            <option value="24">24 meses (2 anos)</option>
-                            <option value="36">36 meses (3 anos)</option>
-                        </select>
+                        {{ form.retencao_logs_meses }}
                     </div>
                 </div>
             </div>

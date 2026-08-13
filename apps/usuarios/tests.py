@@ -2,6 +2,7 @@ import datetime
 import io
 import tempfile
 
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -18,11 +19,13 @@ from apps.assistente.models import LogAssistente
 from apps.usuarios.models import (
     Administrador,
     Ambulante,
+    ConfiguracaoSeguranca,
     Fiscal,
     Gestor,
     Perfil,
     UsuarioBase,
 )
+from apps.usuarios.seguranca import CELULAS_EDITAVEIS, campo_matriz
 
 
 class UsuariosAuthFixtures:
@@ -230,12 +233,62 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         response = self.client.post(self.url_logout)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("login"))
+        self.assertIn(reverse("login"), response.url)
+        self.assertIn("encerrado=1", response.url)
         self.assertNotIn("_auth_user_id", self.client.session)
+
+        cookie = response.cookies.get(settings.SESSION_COOKIE_NAME)
+        self.assertIsNotNone(cookie)
+        self.assertEqual(cookie.value, "")
 
         login_page = self.client.get(response.url)
         self.assertEqual(login_page.status_code, 200)
         self.assertTemplateUsed(login_page, "login.html")
+        self.assertContains(login_page, "Sessão encerrada com segurança")
+
+        protegida = self.client.get(self.url_backoffice)
+        self.assertEqual(protegida.status_code, 302)
+        self.assertIn(reverse("login"), protegida.url)
+
+    def test_logout_administrador_destroi_cookie_e_bloqueia_master(self):
+        self._login_web(self.administrador.cpf)
+        response = self.client.post(self.url_logout)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response.url)
+        self.assertIn("encerrado=1", response.url)
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertEqual(
+            response.cookies[settings.SESSION_COOKIE_NAME].value, ""
+        )
+
+        master = self.client.get(reverse("master_admin"))
+        self.assertEqual(master.status_code, 302)
+        self.assertIn(reverse("login"), master.url)
+
+    def test_logout_nao_aceita_get(self):
+        self._login_web(self.gestor.cpf)
+        response = self.client.get(self.url_logout)
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(int(self.client.session["_auth_user_id"]), self.gestor.pk)
+
+    def test_login_aplica_tempo_de_sessao_salvo(self):
+        config = ConfiguracaoSeguranca.carregar()
+        config.tempo_sessao_minutos = 15
+        config.save(update_fields=["tempo_sessao_minutos"])
+
+        self._login_web(self.gestor.cpf)
+        idade = self.client.session.get_expiry_age()
+        self.assertLessEqual(idade, 15 * 60)
+        self.assertGreater(idade, 14 * 60)
+
+    def test_painel_backoffice_tem_encerrar_expediente(self):
+        self._login_web(self.gestor.cpf)
+        response = self.client.get(self.url_backoffice)
+
+        self.assertContains(response, "Encerrar expediente")
+        self.assertContains(response, reverse("logout"))
 
     def test_fiscal_nao_acessa_backoffice_e_vai_ao_login(self):
         self.client.force_login(self.fiscal)
@@ -382,6 +435,41 @@ class MasterViewsTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "O que é alvará digital?")
         self.assertContains(response, self.ambulante.nome)
         self.assertNotContains(response, "Alvará Precário")
+
+    def test_permissoes_grava_matriz_e_politicas(self):
+        self.client.force_login(self.administrador)
+        payload = {
+            "tempo_sessao_minutos": "15",
+            "tentativas_bloqueio": "3",
+            "exigencia_2fa": "todos",
+            "retencao_logs_meses": "24",
+        }
+        for modulo, perfis in CELULAS_EDITAVEIS.items():
+            for perfil in perfis:
+                if modulo == "mapa_vagas" and perfil == "gestor":
+                    continue
+                payload[campo_matriz(modulo, perfil)] = "on"
+
+        response = self.client.post(reverse("master_permissoes"), payload)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("master_permissoes"))
+
+        config = ConfiguracaoSeguranca.carregar()
+        self.assertEqual(config.tempo_sessao_minutos, 15)
+        self.assertEqual(config.tentativas_bloqueio, 3)
+        self.assertEqual(config.exigencia_2fa, "todos")
+        self.assertEqual(config.retencao_logs_meses, 24)
+        self.assertFalse(config.perfil_pode(Perfil.GESTOR, "mapa_vagas"))
+        self.assertTrue(config.perfil_pode(Perfil.AMBULANTE, "mapa_vagas"))
+        self.assertTrue(config.perfil_pode(Perfil.ADMINISTRADOR, "relatorios"))
+
+        tela = self.client.get(reverse("master_permissoes"))
+        form = tela.context["form"]
+        self.assertContains(tela, "atualizadas com sucesso")
+        self.assertEqual(form.instance.tempo_sessao_minutos, 15)
+        self.assertFalse(form[campo_matriz("mapa_vagas", "gestor")].value())
+        self.assertTrue(form[campo_matriz("mapa_vagas", "ambulante")].value())
 
     def _payload_gestor(self, **overrides):
         dados = {

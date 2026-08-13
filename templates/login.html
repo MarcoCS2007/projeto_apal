@@ -26,6 +26,12 @@
         <h2>Acesso ao Sistema</h2>
     </div>
 
+    {% if request.GET.encerrado %}
+    <div class="form-success" role="status" style="margin-bottom: 1.25rem;">
+        Sessão encerrada com segurança. Faça login para iniciar um novo expediente.
+    </div>
+    {% endif %}
+
     <form id="login-form" method="post" action="{% url 'login' %}">
         {% csrf_token %}
 

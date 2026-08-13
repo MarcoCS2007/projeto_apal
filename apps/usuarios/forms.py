@@ -9,7 +9,21 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from .models import Ambulante, Fiscal, Gestor, Perfil, UsuarioBase
+from .models import (
+    Ambulante,
+    ConfiguracaoSeguranca,
+    Fiscal,
+    Gestor,
+    Perfil,
+    UsuarioBase,
+)
+from .seguranca import (
+    CELULAS_EDITAVEIS,
+    MODULOS_PERMISSAO,
+    PERFIS_MATRIZ,
+    campo_matriz,
+    matriz_padrao,
+)
 
 
 def normalizar_cpf(valor):
@@ -489,3 +503,56 @@ class CadastroFiscalForm(CadastroUsuarioMasterMixin, forms.Form):
             zona_atuacao_primaria=dados["zona_atuacao_primaria"],
             is_staff=True,
         )
+
+
+class ConfiguracaoSegurancaForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracaoSeguranca
+        fields = (
+            "tempo_sessao_minutos",
+            "tentativas_bloqueio",
+            "exigencia_2fa",
+            "retencao_logs_meses",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tempo_sessao_minutos"].widget.attrs["id"] = "tempo-sessao"
+        self.fields["tentativas_bloqueio"].widget.attrs["id"] = "tentativas-login"
+        self.fields["exigencia_2fa"].widget.attrs["id"] = "autenticacao-2fa"
+        self.fields["retencao_logs_meses"].widget.attrs["id"] = "retencao-logs"
+        matriz = self.instance.matriz or matriz_padrao()
+        for modulo, perfis in CELULAS_EDITAVEIS.items():
+            for perfil in perfis:
+                nome = campo_matriz(modulo, perfil)
+                self.fields[nome] = forms.BooleanField(
+                    required=False,
+                    initial=bool(matriz.get(modulo, {}).get(perfil, False)),
+                )
+
+    @property
+    def linhas_matriz(self):
+        linhas = []
+        for modulo, rotulo in MODULOS_PERMISSAO:
+            celulas = []
+            for perfil, _rotulo_perfil in PERFIS_MATRIZ:
+                nome = campo_matriz(modulo, perfil)
+                if nome in self.fields:
+                    celulas.append({"editavel": True, "campo": self[nome]})
+                else:
+                    celulas.append({"editavel": False})
+            linhas.append({"rotulo": rotulo, "celulas": celulas})
+        return linhas
+
+    def save(self, commit=True):
+        instancia = super().save(commit=False)
+        matriz = {}
+        for modulo, perfis in CELULAS_EDITAVEIS.items():
+            matriz[modulo] = {
+                perfil: bool(self.cleaned_data.get(campo_matriz(modulo, perfil)))
+                for perfil in perfis
+            }
+        instancia.matriz = matriz
+        if commit:
+            instancia.save()
+        return instancia

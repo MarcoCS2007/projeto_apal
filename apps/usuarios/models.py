@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 from django.db import models
 
 from apps.core.models import ModeloBase
+from apps.usuarios.seguranca import matriz_padrao
 
 
 class UsuarioBaseManager(BaseUserManager):
@@ -97,13 +98,34 @@ class Ambulante(UsuarioBase):
     nis = models.CharField(max_length=20, blank=True, null=True)
     num_funcionarios = models.IntegerField(default=0)
     pontuacao = models.IntegerField(default=100)
+    ponto_pretendido = models.ForeignKey(
+        "espacos.PontoOcupacao",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ambulantes_interessados",
+    )
+    dados_complementares = models.JSONField(default=dict, blank=True)
 
     def __str__(self):
         return self.apelido_nome_fantasia or self.nome
 
     @property
     def cadastro_completo(self):
-        return bool(self.data_nasc and self.escolaridade and self.tipo_atuacao)
+        estrutura = self.estruturas.order_by("id").first()
+        tem_estrutura = bool(
+            estrutura
+            and estrutura.tipo_estrutura
+            and estrutura.dimensoes_metragem
+            and estrutura.dimensoes_metragem > 0
+        )
+        return bool(
+            self.data_nasc
+            and self.escolaridade
+            and self.tipo_atuacao
+            and self.enderecos.exists()
+            and tem_estrutura
+        )
 
 
 class Fiscal(UsuarioBase):
@@ -129,3 +151,70 @@ class Administrador(UsuarioBase):
 
     def __str__(self):
         return self.nome
+
+
+class ConfiguracaoSeguranca(ModeloBase):
+    """Singleton das políticas globais e da matriz de acessos por perfil."""
+
+    TEMPO_SESSAO_CHOICES = (
+        (15, "15 minutos"),
+        (30, "30 minutos (Recomendado)"),
+        (60, "60 minutos (1 hora)"),
+        (120, "120 minutos (2 horas)"),
+    )
+    TENTATIVAS_CHOICES = (
+        (3, "3 tentativas incorretas"),
+        (5, "5 tentativas incorretas (Padrão)"),
+        (10, "10 tentativas incorretas"),
+    )
+    EXIGENCIA_2FA_CHOICES = (
+        ("todos", "Obrigatório para Todos os Perfis"),
+        ("internos", "Obrigatório apenas para TI, Gestores e Fiscais"),
+        ("opcional", "Opcional para todos os perfis"),
+    )
+    RETENCAO_LOGS_CHOICES = (
+        (6, "6 meses"),
+        (12, "12 meses (Exigência LGPD)"),
+        (24, "24 meses (2 anos)"),
+        (36, "36 meses (3 anos)"),
+    )
+
+    tempo_sessao_minutos = models.PositiveSmallIntegerField(
+        default=30,
+        choices=TEMPO_SESSAO_CHOICES,
+    )
+    tentativas_bloqueio = models.PositiveSmallIntegerField(
+        default=5,
+        choices=TENTATIVAS_CHOICES,
+    )
+    exigencia_2fa = models.CharField(
+        max_length=20,
+        default="internos",
+        choices=EXIGENCIA_2FA_CHOICES,
+    )
+    retencao_logs_meses = models.PositiveSmallIntegerField(
+        default=12,
+        choices=RETENCAO_LOGS_CHOICES,
+    )
+    matriz = models.JSONField(default=matriz_padrao, blank=True)
+
+    class Meta:
+        verbose_name = "Configuração de segurança"
+        verbose_name_plural = "Configurações de segurança"
+
+    def __str__(self):
+        return "Políticas globais de acesso"
+
+    @classmethod
+    def carregar(cls):
+        objeto, _criado = cls.objects.get_or_create(
+            pk=1,
+            defaults={"matriz": matriz_padrao()},
+        )
+        return objeto
+
+    def perfil_pode(self, perfil, modulo):
+        if perfil in (Perfil.ADMINISTRADOR, Perfil.ADMINISTRADOR.value):
+            return True
+        chave = perfil.value if hasattr(perfil, "value") else str(perfil)
+        return bool(self.matriz.get(modulo, {}).get(chave, False))

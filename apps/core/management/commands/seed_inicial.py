@@ -1,153 +1,561 @@
 import datetime
+from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from apps.espacos.models import PontoOcupacao
+from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao
 from apps.licenciamento.models import CategoriaProduto
-from apps.usuarios.models import Administrador, Ambulante, Fiscal, Gestor
+from apps.usuarios.models import (
+    Administrador,
+    Ambulante,
+    ConfiguracaoSeguranca,
+    Fiscal,
+    Gestor,
+)
+
+SENHA_GESTOR = "gestor123"
+SENHA_FISCAL = "fiscal123"
+SENHA_AMBULANTE = "amb123"
+
+CATEGORIAS = (
+    {
+        "nome_categoria": "Alimentos Manipulados",
+        "descricao": "Alimentos preparados na hora.",
+        "exige_laudo_sanitario": True,
+    },
+    {
+        "nome_categoria": "Artesanato",
+        "descricao": "Produtos artesanais e manuais.",
+        "exige_laudo_sanitario": False,
+    },
+    {
+        "nome_categoria": "Lanches e Salgados",
+        "descricao": "Cachorro-quente, tapioca, milho e similares.",
+        "exige_laudo_sanitario": True,
+    },
+    {
+        "nome_categoria": "Vestuário e Acessórios",
+        "descricao": "Roupas, bolsas, bijuterias e calçados.",
+        "exige_laudo_sanitario": False,
+    },
+    {
+        "nome_categoria": "Bebidas e Água de Coco",
+        "descricao": "Bebidas não alcoólicas e água de coco.",
+        "exige_laudo_sanitario": True,
+    },
+    {
+        "nome_categoria": "Frutas e Hortifruti",
+        "descricao": "Frutas, verduras e legumes in natura.",
+        "exige_laudo_sanitario": False,
+    },
+)
+
+PONTOS = (
+    {
+        "nome_identificacao": "Praça Central",
+        "logradouro": "Praça Barão do Rio Branco",
+        "bairro": "Centro",
+        "metragem_maxima": Decimal("10.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8661,-40.8390",
+    },
+    {
+        "nome_identificacao": "Calçadão Comercial",
+        "logradouro": "Rua Coronel Gugé",
+        "bairro": "Centro",
+        "metragem_maxima": Decimal("15.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8654,-40.8378",
+    },
+    {
+        "nome_identificacao": "Praça 9 de Novembro",
+        "logradouro": "Praça 9 de Novembro",
+        "bairro": "Centro",
+        "metragem_maxima": Decimal("8.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8648,-40.8365",
+    },
+    {
+        "nome_identificacao": "Terminal Lauro de Freitas",
+        "logradouro": "Av. Lauro de Freitas",
+        "bairro": "Candeias",
+        "metragem_maxima": Decimal("12.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8612,-40.8441",
+    },
+    {
+        "nome_identificacao": "Feira do Bairro Brasil",
+        "logradouro": "Rua do Comércio Popular",
+        "bairro": "Brasil",
+        "metragem_maxima": Decimal("6.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8702,-40.8520",
+    },
+    {
+        "nome_identificacao": "Região do Ceasa",
+        "logradouro": "Av. Presidente Dutra",
+        "bairro": "Jurema",
+        "metragem_maxima": Decimal("20.00"),
+        "status_ocupacao": "Livre",
+        "coordenadas": "-14.8580,-40.8288",
+    },
+)
+
+GESTORES = (
+    {
+        "cpf": "11111111111",
+        "email": "gestor@apal.com",
+        "password": SENHA_GESTOR,
+        "nome": "Gestor",
+        "sobrenome": "Posturas",
+        "telefone_whatsapp": "77988001001",
+        "matricula_funcional": "GES-001",
+        "cargo": "Gestor de Posturas",
+        "departamento": "SESEP - Serviços Públicos (Posturas)",
+        "is_staff": True,
+    },
+    {
+        "cpf": "44444444444",
+        "email": "mariana.almeida@pmvc.ba.gov.br",
+        "password": SENHA_GESTOR,
+        "nome": "Mariana",
+        "sobrenome": "Almeida",
+        "telefone_whatsapp": "77988001002",
+        "matricula_funcional": "GES-002",
+        "cargo": "Coordenadora de Licenciamento",
+        "departamento": "Vigilância Sanitária Municipal",
+        "is_staff": True,
+    },
+    {
+        "cpf": "55555555555",
+        "email": "roberto.lima@pmvc.ba.gov.br",
+        "password": SENHA_GESTOR,
+        "nome": "Roberto",
+        "sobrenome": "Lima",
+        "telefone_whatsapp": "77988001003",
+        "matricula_funcional": "GES-003",
+        "cargo": "Analista Tributário",
+        "departamento": "SEFIN - Secretaria de Finanças / Tributos",
+        "is_staff": True,
+    },
+)
+
+FISCAIS = (
+    {
+        "cpf": "22222222222",
+        "email": "fiscal@apal.com",
+        "password": SENHA_FISCAL,
+        "nome": "Fiscal",
+        "sobrenome": "Centro",
+        "telefone_whatsapp": "77988002001",
+        "matricula_funcional": "FIS-001",
+        "zona_atuacao_primaria": "Centro Comercial / Praça 9 de Novembro",
+        "is_staff": True,
+    },
+    {
+        "cpf": "66666666666",
+        "email": "carlos.moreira@pmvc.ba.gov.br",
+        "password": SENHA_FISCAL,
+        "nome": "Carlos Eduardo",
+        "sobrenome": "Moreira",
+        "telefone_whatsapp": "77988002002",
+        "matricula_funcional": "FIS-002",
+        "zona_atuacao_primaria": "Feira do Bairro Brasil / Zona Oeste",
+        "is_staff": True,
+    },
+    {
+        "cpf": "77777777777",
+        "email": "ana.souza@pmvc.ba.gov.br",
+        "password": SENHA_FISCAL,
+        "nome": "Ana Paula",
+        "sobrenome": "Souza",
+        "telefone_whatsapp": "77988002003",
+        "matricula_funcional": "FIS-003",
+        "zona_atuacao_primaria": "Terminal Lauro de Freitas",
+        "is_staff": True,
+    },
+    {
+        "cpf": "88888888888",
+        "email": "paulo.itinerante@pmvc.ba.gov.br",
+        "password": SENHA_FISCAL,
+        "nome": "Paulo",
+        "sobrenome": "Nogueira",
+        "telefone_whatsapp": "77988002004",
+        "matricula_funcional": "FIS-004",
+        "zona_atuacao_primaria": "Fiscalização Itinerante / Eventos",
+        "is_staff": True,
+    },
+)
 
 
 class Command(BaseCommand):
-    help = "Carga inicial de dados (seeds) no banco de dados para testes."
+    help = "Carga inicial de dados fictícios para testes locais."
 
     def handle(self, *args, **options):
         self.stdout.write("Iniciando carga inicial de dados...")
-
-        # 1. Administrador Master
-        if not Administrador.objects.filter(cpf="00000000000").exists():
-            Administrador.objects.create_superuser(
-                cpf="00000000000",
-                email="admin@apal.com",
-                password="admin123",
-                nome="Admin",
-                sobrenome="Master",
-                acesso_master=True,
-            )
-            self.stdout.write(
-                self.style.SUCCESS("Administrador Master criado com sucesso.")
-            )
-        else:
-            self.stdout.write("Administrador Master já existe.")
-
-        # 2. Gestor
-        if not Gestor.objects.filter(cpf="11111111111").exists():
-            Gestor.objects.create_user(
-                cpf="11111111111",
-                email="gestor@apal.com",
-                password="gestor123",
-                nome="Gestor",
-                sobrenome="Posturas",
-                matricula_funcional="GES-001",
-                cargo="Gestor de Posturas",
-                departamento="Posturas",
-                is_staff=True,
-            )
-            self.stdout.write(self.style.SUCCESS("Gestor criado com sucesso."))
-        else:
-            self.stdout.write("Gestor já existe.")
-
-        # 3. Fiscal
-        if not Fiscal.objects.filter(cpf="22222222222").exists():
-            Fiscal.objects.create_user(
-                cpf="22222222222",
-                email="fiscal@apal.com",
-                password="fiscal123",
-                nome="Fiscal",
-                sobrenome="Centro",
-                matricula_funcional="FIS-001",
-                zona_atuacao_primaria="Centro",
-                is_staff=True,
-            )
-            self.stdout.write(self.style.SUCCESS("Fiscal criado com sucesso."))
-        else:
-            self.stdout.write("Fiscal já existe.")
-
-        # 4. Ambulante
-        if not Ambulante.objects.filter(cpf="33333333333").exists():
-            Ambulante.objects.create_user(
-                cpf="33333333333",
-                email="ambulante@apal.com",
-                password="amb123",
-                nome="João",
-                sobrenome="Ambulante",
-                tipo_atuacao="Carrinho",
-                codigo_qr_code="QR-001",
-                data_nasc=datetime.date(1990, 1, 1),
-                escolaridade="Ensino Médio",
-                pontuacao=100,
-            )
-            self.stdout.write(self.style.SUCCESS("Ambulante criado com sucesso."))
-        else:
-            self.stdout.write("Ambulante já existe.")
-
-        # 5. Categorias de Produto
-        _categoria_1, created_1 = CategoriaProduto.objects.get_or_create(
-            nome_categoria="Alimentos Manipulados",
-            defaults={
-                "descricao": "Alimentos preparados na hora.",
-                "exige_laudo_sanitario": True,
-            },
-        )
-        if created_1:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    "Categoria 'Alimentos Manipulados' criada com sucesso."
-                )
-            )
-        else:
-            self.stdout.write("Categoria 'Alimentos Manipulados' já existe.")
-
-        _categoria_2, created_2 = CategoriaProduto.objects.get_or_create(
-            nome_categoria="Artesanato",
-            defaults={
-                "descricao": "Produtos artesanais e manuais.",
-                "exige_laudo_sanitario": False,
-            },
-        )
-        if created_2:
-            self.stdout.write(
-                self.style.SUCCESS("Categoria 'Artesanato' criada com sucesso.")
-            )
-        else:
-            self.stdout.write("Categoria 'Artesanato' já existe.")
-
-        # 6. Pontos de Ocupação
-        _ponto_1, created_p1 = PontoOcupacao.objects.get_or_create(
-            nome_identificacao="Praça Central",
-            defaults={
-                "logradouro": "Praça Central",
-                "bairro": "Centro",
-                "metragem_maxima": 10.00,
-                "status_ocupacao": "Livre",
-            },
-        )
-        if created_p1:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    "Ponto de Ocupação 'Praça Central' criado com sucesso."
-                )
-            )
-        else:
-            self.stdout.write("Ponto de Ocupação 'Praça Central' já existe.")
-
-        _ponto_2, created_p2 = PontoOcupacao.objects.get_or_create(
-            nome_identificacao="Calçadão Comercial",
-            defaults={
-                "logradouro": "Rua do Comércio",
-                "bairro": "Centro",
-                "metragem_maxima": 15.00,
-                "status_ocupacao": "Livre",
-            },
-        )
-        if created_p2:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    "Ponto de Ocupação 'Calçadão Comercial' criado com sucesso."
-                )
-            )
-        else:
-            self.stdout.write("Ponto de Ocupação 'Calçadão Comercial' já existe.")
-
+        self._administrador()
+        self._gestores()
+        self._fiscais()
+        pontos = self._pontos()
+        self._categorias()
+        self._ambulantes(pontos)
+        ConfiguracaoSeguranca.carregar()
+        self.stdout.write("Configuração global de segurança disponível.")
+        self._resumo()
         self.stdout.write(
             self.style.SUCCESS("Carga inicial (seeds) finalizada com sucesso!")
         )
+
+    def _criar(self, model, cpf, defaults, senha, criar):
+        existente = model.objects.filter(cpf=cpf).first()
+        if existente:
+            self.stdout.write(f"{model.__name__} {cpf} já existe.")
+            return existente
+        usuario = criar(cpf=cpf, password=senha, **defaults)
+        self.stdout.write(self.style.SUCCESS(f"{model.__name__} {usuario.nome} criado."))
+        return usuario
+
+    def _administrador(self):
+        if Administrador.objects.filter(cpf="00000000000").exists():
+            self.stdout.write("Administrador Master já existe.")
+            return
+        Administrador.objects.create_superuser(
+            cpf="00000000000",
+            email="admin@apal.com",
+            password="admin123",
+            nome="Admin",
+            sobrenome="Master",
+            telefone_whatsapp="77988000000",
+            acesso_master=True,
+            acesso_painel_tecnico=True,
+        )
+        self.stdout.write(self.style.SUCCESS("Administrador Master criado."))
+
+    def _gestores(self):
+        for dados in GESTORES:
+            payload = dict(dados)
+            cpf = payload.pop("cpf")
+            senha = payload.pop("password")
+            self._criar(Gestor, cpf, payload, senha, Gestor.objects.create_user)
+
+    def _fiscais(self):
+        for dados in FISCAIS:
+            payload = dict(dados)
+            cpf = payload.pop("cpf")
+            senha = payload.pop("password")
+            self._criar(Fiscal, cpf, payload, senha, Fiscal.objects.create_user)
+
+    def _categorias(self):
+        for dados in CATEGORIAS:
+            _obj, created = CategoriaProduto.objects.get_or_create(
+                nome_categoria=dados["nome_categoria"],
+                defaults=dados,
+            )
+            nome = dados["nome_categoria"]
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"Categoria '{nome}' criada."))
+            else:
+                self.stdout.write(f"Categoria '{nome}' já existe.")
+
+    def _pontos(self):
+        pontos = {}
+        for dados in PONTOS:
+            obj, created = PontoOcupacao.objects.get_or_create(
+                nome_identificacao=dados["nome_identificacao"],
+                defaults=dados,
+            )
+            pontos[dados["nome_identificacao"]] = obj
+            nome = dados["nome_identificacao"]
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"Ponto '{nome}' criado."))
+            else:
+                self.stdout.write(f"Ponto '{nome}' já existe.")
+        return pontos
+
+    def _ambulantes(self, pontos):
+        self._ambulante_joao()
+        self._ambulante_completo(
+            cpf="39053344705",
+            email="maria.dores@email.com",
+            nome="Maria",
+            sobrenome="das Dores",
+            telefone="77991001001",
+            apelido="Tapioca da Maria",
+            cnpj="12345678000190",
+            tipo_atuacao="fixo",
+            escolaridade="medio_completo",
+            data_nasc=datetime.date(1984, 3, 12),
+            nis="12345678901",
+            ponto=pontos["Praça 9 de Novembro"],
+            endereco={
+                "cep": "45000-000",
+                "logradouro": "Rua da Bandeira",
+                "numero": "120",
+                "bairro": "Centro",
+                "cidade": "Vitória da Conquista",
+                "estado_uf": "BA",
+            },
+            estrutura={
+                "tipo_estrutura": "carrinho",
+                "dimensoes_metragem": Decimal("2.50"),
+                "descricao": "Tapioca, cuscuz e sucos naturais.",
+            },
+            extras={"razao_social": "Maria das Dores MEI", "sem_cnpj": False},
+        )
+        self._ambulante_completo(
+            cpf="28174691000",
+            email="antonio.bispo@email.com",
+            nome="Antônio",
+            sobrenome="Bispo",
+            telefone="77991001002",
+            apelido="Banca do Bispo",
+            cnpj=None,
+            tipo_atuacao="fixo",
+            escolaridade="fundamental_completo",
+            data_nasc=datetime.date(1976, 7, 8),
+            nis=None,
+            ponto=pontos["Calçadão Comercial"],
+            endereco={
+                "cep": "45020-210",
+                "logradouro": "Rua Grande",
+                "numero": "45",
+                "complemento": "Fundos",
+                "bairro": "Alto Maron",
+                "cidade": "Vitória da Conquista",
+                "estado_uf": "BA",
+            },
+            estrutura={
+                "tipo_estrutura": "banca",
+                "dimensoes_metragem": Decimal("4.00"),
+                "descricao": "Roupas e acessórios populares.",
+            },
+            extras={"sem_cnpj": True},
+        )
+        self._ambulante_completo(
+            cpf="83716209433",
+            email="raimunda.alves@email.com",
+            nome="Raimunda",
+            sobrenome="Alves",
+            telefone="77991001003",
+            apelido="Food Truck da Dunda",
+            cnpj="98765432000155",
+            tipo_atuacao="movel",
+            escolaridade="superior",
+            data_nasc=datetime.date(1991, 11, 21),
+            nis="10987654321",
+            ponto=pontos["Terminal Lauro de Freitas"],
+            endereco={
+                "cep": "45028-000",
+                "logradouro": "Av. Presidente Dutra",
+                "numero": "890",
+                "bairro": "Candeias",
+                "cidade": "Vitória da Conquista",
+                "estado_uf": "BA",
+            },
+            estrutura={
+                "tipo_estrutura": "veiculo",
+                "dimensoes_metragem": Decimal("10.00"),
+                "descricao": "Lanches, hambúrguer e milho verde.",
+            },
+            extras={"razao_social": "Raimunda Alves Lanches ME", "sem_cnpj": False},
+        )
+        self._ambulante_completo(
+            cpf="91827364544",
+            email="carlos.feira@email.com",
+            nome="Carlos",
+            sobrenome="Ferreira",
+            telefone="77991001004",
+            apelido="Tabuleiro do Carlos",
+            cnpj=None,
+            tipo_atuacao="eventual",
+            escolaridade="medio_incompleto",
+            data_nasc=datetime.date(1988, 5, 2),
+            nis="11223344556",
+            ponto=pontos["Feira do Bairro Brasil"],
+            endereco={
+                "cep": "45051-000",
+                "logradouro": "Rua São Jorge",
+                "numero": "33",
+                "bairro": "Brasil",
+                "cidade": "Vitória da Conquista",
+                "estado_uf": "BA",
+            },
+            estrutura={
+                "tipo_estrutura": "tabuleiro",
+                "dimensoes_metragem": Decimal("1.50"),
+                "descricao": "Frutas da época e amendoim.",
+            },
+            extras={"sem_cnpj": True},
+        )
+        self._ambulante_completo(
+            cpf="17482956011",
+            email="fatima.inativa@email.com",
+            nome="Fátima",
+            sobrenome="Oliveira",
+            telefone="77991001005",
+            apelido="Água de Coco da Fátima",
+            cnpj=None,
+            tipo_atuacao="fixo",
+            escolaridade="fundamental_incompleto",
+            data_nasc=datetime.date(1972, 9, 30),
+            nis=None,
+            ponto=pontos["Praça Central"],
+            endereco={
+                "cep": "45000-100",
+                "logradouro": "Av. Bartolomeu de Gusmão",
+                "numero": "10",
+                "bairro": "Centro",
+                "cidade": "Vitória da Conquista",
+                "estado_uf": "BA",
+            },
+            estrutura={
+                "tipo_estrutura": "carrinho",
+                "dimensoes_metragem": Decimal("2.00"),
+                "descricao": "Água de coco e sucos.",
+            },
+            extras={"sem_cnpj": True},
+            ativo=False,
+        )
+        self._ambulante_conta(
+            cpf="50293847122",
+            email="luciana.rocha@email.com",
+            nome="Luciana",
+            sobrenome="Rocha",
+            telefone="77991001006",
+        )
+        self._ambulante_parcial(
+            cpf="61504938233",
+            email="pedro.nunes@email.com",
+            nome="Pedro",
+            sobrenome="Nunes",
+            telefone="77991001007",
+            ponto=pontos["Região do Ceasa"],
+        )
+
+    def _ambulante_joao(self):
+        if Ambulante.objects.filter(cpf="33333333333").exists():
+            self.stdout.write("Ambulante 33333333333 já existe.")
+            return
+        Ambulante.objects.create_user(
+            cpf="33333333333",
+            email="ambulante@apal.com",
+            password=SENHA_AMBULANTE,
+            nome="João",
+            sobrenome="Ambulante",
+            telefone_whatsapp="77991000000",
+            tipo_atuacao="Carrinho",
+            codigo_qr_code="QR-001",
+            data_nasc=datetime.date(1990, 1, 1),
+            escolaridade="Ensino Médio",
+            pontuacao=100,
+        )
+        self.stdout.write(self.style.SUCCESS("Ambulante João criado (cadastro pendente)."))
+
+    def _ambulante_conta(self, *, cpf, email, nome, sobrenome, telefone):
+        if Ambulante.objects.filter(cpf=cpf).exists():
+            self.stdout.write(f"Ambulante {cpf} já existe.")
+            return
+        Ambulante.objects.create_user(
+            cpf=cpf,
+            email=email,
+            password=SENHA_AMBULANTE,
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp=telefone,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Ambulante {nome} criado (só a conta).")
+        )
+
+    def _ambulante_parcial(self, *, cpf, email, nome, sobrenome, telefone, ponto):
+        if Ambulante.objects.filter(cpf=cpf).exists():
+            self.stdout.write(f"Ambulante {cpf} já existe.")
+            return
+        ambulante = Ambulante.objects.create_user(
+            cpf=cpf,
+            email=email,
+            password=SENHA_AMBULANTE,
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp=telefone,
+            data_nasc=datetime.date(1995, 4, 18),
+            escolaridade="medio_completo",
+            tipo_atuacao="movel",
+            ponto_pretendido=ponto,
+            pontuacao=80,
+        )
+        Endereco.objects.create(
+            ambulante=ambulante,
+            cep="45000-250",
+            logradouro="Rua Ibitiara",
+            numero="200",
+            bairro="Recreio",
+            cidade="Vitória da Conquista",
+            estado_uf="BA",
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Ambulante {nome} criado (dados + endereço, sem estrutura)."
+            )
+        )
+
+    def _ambulante_completo(
+        self,
+        *,
+        cpf,
+        email,
+        nome,
+        sobrenome,
+        telefone,
+        apelido,
+        cnpj,
+        tipo_atuacao,
+        escolaridade,
+        data_nasc,
+        nis,
+        ponto,
+        endereco,
+        estrutura,
+        extras,
+        ativo=True,
+    ):
+        if Ambulante.objects.filter(cpf=cpf).exists():
+            self.stdout.write(f"Ambulante {cpf} já existe.")
+            return
+        ambulante = Ambulante.objects.create_user(
+            cpf=cpf,
+            email=email,
+            password=SENHA_AMBULANTE,
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp=telefone,
+            apelido_nome_fantasia=apelido,
+            cnpj=cnpj,
+            tipo_atuacao=tipo_atuacao,
+            escolaridade=escolaridade,
+            data_nasc=data_nasc,
+            nis=nis,
+            ponto_pretendido=ponto,
+            dados_complementares=extras,
+            pontuacao=100 if ativo else 40,
+            ativo=ativo,
+            is_active=ativo,
+        )
+        Endereco.objects.create(ambulante=ambulante, **endereco)
+        EstruturaTrabalho.objects.create(ambulante=ambulante, **estrutura)
+        situacao = "completo" if ativo else "completo e inativo"
+        self.stdout.write(self.style.SUCCESS(f"Ambulante {nome} criado ({situacao})."))
+
+    def _resumo(self):
+        self.stdout.write("")
+        self.stdout.write("Contas para teste (todas idempotentes):")
+        self.stdout.write("  Admin     CPF 00000000000  senha admin123")
+        self.stdout.write("  Gestor    CPF 11111111111  senha gestor123")
+        self.stdout.write("  Fiscal    CPF 22222222222  senha fiscal123")
+        self.stdout.write("  Ambulante CPF 33333333333  senha amb123  (cadastro pendente)")
+        self.stdout.write("  Demais gestores/fiscais usam gestor123 / fiscal123.")
+        self.stdout.write("  Demais ambulantes usam amb123.")
+        self.stdout.write(
+            "  Completos: Maria das Dores, Antônio Bispo, Raimunda Alves, Carlos Ferreira."
+        )
+        self.stdout.write("  Só conta: Luciana Rocha. Parcial: Pedro Nunes. Inativa: Fátima Oliveira.")

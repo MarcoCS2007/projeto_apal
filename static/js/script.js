@@ -794,8 +794,19 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
 
                 select.replaceChildren(fragment);
                 select.disabled = false;
+                if (select.dataset.valorInicial) {
+                    select.value = select.dataset.valorInicial;
+                }
                 sincronizarDropdownPersonalizado(select);
             });
+
+            if (estadoAtualSelect?.dataset.valorInicial && cidadeAtualSelect) {
+                window.carregarCidades(
+                    'estado-input',
+                    'cidade-input',
+                    cidadeAtualSelect.dataset.valorInicial || null
+                );
+            }
 
         } catch (error) {
             console.error('Erro ao buscar estados no IBGE:', error);
@@ -1715,6 +1726,7 @@ if (
     // ==========================================
 
     const cadastroForm = document.getElementById('cadastro-form');
+    const stepperServidor = cadastroForm?.dataset.serverStepper === 'true';
     const etapasFormulario = Array.from(document.querySelectorAll('.form-step'));
     const passosStepper = Array.from(document.querySelectorAll('.stepper-step'));
     const stepperProgress = document.getElementById('stepper-progress');
@@ -1723,7 +1735,7 @@ if (
     const checkNoCnpj = document.getElementById('check-no-cnpj');
     const cnpjContainer = document.getElementById('cnpj-container');
 
-    let etapaAtual = 1;
+    let etapaAtual = Number(cadastroForm?.dataset.etapaAtual || 1) || 1;
     const totalEtapas = etapasFormulario.length || 6;
 
     function ocultarErroEtapa() {
@@ -1856,6 +1868,7 @@ if (
         const botaoProximo = document.getElementById(`btn-next-${numero}`);
 
         botaoProximo?.addEventListener('click', () => {
+            if (stepperServidor) return;
             if (!validarEtapa(numero)) return;
             mostrarEtapa(numero + 1);
         });
@@ -1865,6 +1878,7 @@ if (
         const botaoVoltar = document.getElementById(`btn-prev-${numero}`);
 
         botaoVoltar?.addEventListener('click', () => {
+            if (stepperServidor) return;
             mostrarEtapa(numero - 1);
         });
     }
@@ -1946,7 +1960,9 @@ if (
     }
 
     // Executa a verificação assim que entra na página
-    verificarComprovanteExistente();
+    if (!stepperServidor) {
+        verificarComprovanteExistente();
+    }
 
     // Função global para quando o usuário quiser fazer um novo cadastro do zero
     window.iniciarNovoCadastro = function() {
@@ -1985,6 +2001,12 @@ if (
 
     // Envio do Formulário
     cadastroForm?.addEventListener('submit', event => {
+        if (stepperServidor) {
+            if (typeof validarEtapa === 'function' && !validarEtapa(etapaAtual)) {
+                event.preventDefault();
+            }
+            return;
+        }
         event.preventDefault();
 
         for (let numero = 1; numero <= totalEtapas; numero++) {

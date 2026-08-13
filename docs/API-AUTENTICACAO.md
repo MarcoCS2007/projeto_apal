@@ -78,12 +78,22 @@ curl -X POST http://localhost:8000/api/login/ \
 
 Usuários do seed local (`python manage.py seed_inicial`):
 
-| Perfil | CPF | Senha |
-| --- | --- | --- |
-| Administrador | `00000000000` | `admin123` |
-| Gestor | `11111111111` | `gestor123` |
-| Fiscal | `22222222222` | `fiscal123` |
-| Ambulante | `33333333333` | `amb123` |
+| Perfil | CPF | Senha | Observação |
+| --- | --- | --- | --- |
+| Administrador | `00000000000` | `admin123` | Painel Master |
+| Gestor | `11111111111` | `gestor123` | Posturas |
+| Gestor | `44444444444` | `gestor123` | Vigilância Sanitária |
+| Gestor | `55555555555` | `gestor123` | SEFIN |
+| Fiscal | `22222222222` | `fiscal123` | Centro |
+| Fiscal | `66666666666` | `fiscal123` | Feira do Bairro Brasil |
+| Fiscal | `77777777777` | `fiscal123` | Terminal |
+| Fiscal | `88888888888` | `fiscal123` | Itinerante |
+| Ambulante | `33333333333` | `amb123` | Cadastro pendente |
+| Ambulante | `39053344705` | `amb123` | Cadastro completo (MEI) |
+| Ambulante | `50293847122` | `amb123` | Só a conta |
+| Ambulante | `17482956011` | `amb123` | Completo e inativo |
+
+Há outros ambulantes fictícios (Antônio, Raimunda, Carlos, Pedro) com a mesma senha `amb123`, em situações de cadastro completo ou parcial.
 
 ### 2.2 Refresh — `POST /api/token/refresh/`
 
@@ -178,6 +188,8 @@ Elas já exigem usuário autenticado. Combine com `|` do DRF se a rota aceitar m
 ## 5. Relação com o backoffice
 
 O login web (`POST /login/`, template `login.html`) usa sessão Django e cookie `sessionid`. Só **Gestor** e **Administrador** entram. Ambulante e Fiscal recebem erro de formulário e **não** ganham sessão.
+
+O encerramento do expediente é `POST /logout/` (CSRF obrigatório). A view invalida a sessão, apaga o cookie `sessionid` e redireciona Gestor/Administrador para `/login/?encerrado=1`. Ambulante autenticado na web volta para `/entrar/`. `GET /logout/` não encerra a sessão (405).
 
 Não misture os fluxos no cliente:
 

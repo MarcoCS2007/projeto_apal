@@ -62,4 +62,17 @@
         </ul>
     </div>
 </div>
+{% if not cadastro_completo %}
+<p style="margin-top: 1.75rem;">
+    <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="clipboard-list"></i> Completar cadastro
+    </a>
+</p>
+{% else %}
+<p style="margin-top: 1.75rem;">
+    <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="pencil"></i> Revisar cadastro
+    </a>
+</p>
+{% endif %}
 {% endblock %}

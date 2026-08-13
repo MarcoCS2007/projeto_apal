@@ -2,6 +2,8 @@ from django.urls import path
 
 from .views import (
     BackofficeInicioView,
+    CadastroCompletoAmbulanteView,
+    GestorAmbulantesView,
     LoginAmbulanteView,
     LoginBackofficeView,
     LogoutBackofficeView,
@@ -11,7 +13,7 @@ from .views import (
     MasterFiscaisView,
     MasterGestoresView,
     MasterLogsIAView,
-    MasterTemplateView,
+    MasterPermissoesView,
     PainelAmbulanteView,
     RecuperarSenhaView,
     RedefinirSenhaConfirmView,
@@ -30,7 +32,17 @@ urlpatterns = [
         name="redefinir_senha_confirmar",
     ),
     path("ambulante/", PainelAmbulanteView.as_view(), name="ambulante_painel"),
+    path(
+        "ambulante/cadastro/",
+        CadastroCompletoAmbulanteView.as_view(),
+        name="ambulante_cadastro",
+    ),
     path("backoffice/", BackofficeInicioView.as_view(), name="backoffice_inicio"),
+    path(
+        "gestor/ambulantes/",
+        GestorAmbulantesView.as_view(),
+        name="gestor_ambulantes",
+    ),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/gestores/", MasterGestoresView.as_view(), name="master_gestores"),
     path(
@@ -46,7 +58,7 @@ urlpatterns = [
     ),
     path(
         "master/permissoes/",
-        MasterTemplateView.as_view(template_name="master/gerenciar-permissoes.html"),
+        MasterPermissoesView.as_view(),
         name="master_permissoes",
     ),
     path("master/logs-ia/", MasterLogsIAView.as_view(), name="master_logs_ia"),

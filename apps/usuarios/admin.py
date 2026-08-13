@@ -4,7 +4,14 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from .forms import normalizar_cpf
-from .models import Administrador, Ambulante, Fiscal, Gestor, UsuarioBase
+from .models import (
+    Administrador,
+    Ambulante,
+    ConfiguracaoSeguranca,
+    Fiscal,
+    Gestor,
+    UsuarioBase,
+)
 
 admin.site.site_header = "APAL — Administração"
 admin.site.site_title = "APAL Admin"
@@ -287,3 +294,20 @@ class AdministradorAdmin(admin.ModelAdmin):
     list_display = ("cpf", "nome", "acesso_master", "acesso_painel_tecnico", "ativo")
     list_filter = ("acesso_master", "acesso_painel_tecnico")
     readonly_fields = ("password",)
+
+
+@admin.register(ConfiguracaoSeguranca)
+class ConfiguracaoSegurancaAdmin(admin.ModelAdmin):
+    list_display = (
+        "tempo_sessao_minutos",
+        "tentativas_bloqueio",
+        "exigencia_2fa",
+        "retencao_logs_meses",
+        "atualizado_em",
+    )
+
+    def has_add_permission(self, request):
+        return not ConfiguracaoSeguranca.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False

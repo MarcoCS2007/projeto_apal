@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block title %}Painel Backoffice - APAL{% endblock %}
-{% block nav_inicio_class %}active{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="painel" %}
+{% endblock %}
 
 {% block hero %}
 <section class="hero-section">
@@ -24,6 +27,11 @@
     <p style="color: var(--texto-cinza);">
         Perfil: <strong>{{ user.role }}</strong>
     </p>
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'gestor_ambulantes' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            Ver ambulantes cadastrados
+        </a>
+    </p>
     {% if user.role == "administrador" %}
     <p style="margin-top: 1.5rem;">
         <a href="{% url 'master_admin' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
@@ -31,5 +39,11 @@
         </a>
     </p>
     {% endif %}
+    <form action="{% url 'logout' %}" method="post" style="margin-top: 1.5rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn-submit" style="background-color: #DC2626; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="log-out"></i> Encerrar expediente
+        </button>
+    </form>
 </div>
 {% endblock %}
