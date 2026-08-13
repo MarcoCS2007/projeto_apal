@@ -10,6 +10,7 @@ from .views import (
     LoginFiscalView,
     LogoutBackofficeView,
     MasterAdminView,
+    MasterBackupView,
     MasterCadastrarFiscalView,
     MasterCadastrarGestorView,
     MasterFiscaisView,
@@ -20,6 +21,7 @@ from .views import (
     RecuperarSenhaView,
     RedefinirSenhaConfirmView,
     RegistroAmbulanteView,
+    ScoreAmbulanteView,
 )
 from .views_gestor import (
     GestorAmbulanteAcaoView,
@@ -54,6 +56,7 @@ urlpatterns = [
         name="redefinir_senha_confirmar",
     ),
     path("ambulante/", PainelAmbulanteView.as_view(), name="ambulante_painel"),
+    path("ambulante/score/", ScoreAmbulanteView.as_view(), name="ambulante_score"),
     path(
         "ambulante/cadastro/",
         CadastroCompletoAmbulanteView.as_view(),
@@ -108,6 +111,7 @@ urlpatterns = [
     ),
     path("gestor/dashboard/", GestorDashboardView.as_view(), name="gestor_dashboard"),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
+    path("master/backup/", MasterBackupView.as_view(), name="master_backup"),
     path("master/gestores/", MasterGestoresView.as_view(), name="master_gestores"),
     path(
         "master/gestores/cadastrar/",

@@ -155,7 +155,4 @@ Como a variável `COMPOSE_FILE` já está ativa na sessão do seu servidor, os c
 `docker compose restart web`
 * **Derrubar o ambiente completamente:**
 `docker compose down`
-
-```
-
-```
+* **Backup e restauração:** ver `docs/BACKUP.md` (`manage.py backup_banco` e `loaddata` / `pg_restore`).

@@ -27,6 +27,7 @@ urlpatterns = [
     path("", include("apps.usuarios.urls_web")),
     path("", include("apps.licenciamento.urls_web")),
     path("", include("apps.espacos.urls_web")),
+    path("", include("apps.assistente.urls_web")),
 ]
 
 if settings.DEBUG:

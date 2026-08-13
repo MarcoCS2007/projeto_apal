@@ -162,7 +162,7 @@
                     </td>
                     <td>
                         {% if doc.arquivo %}
-                        <a href="{{ doc.arquivo.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a>
+                        <a href="{% url 'documento_arquivo' doc.pk %}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a>
                         {% endif %}
                     </td>
                 </tr>

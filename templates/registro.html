@@ -103,6 +103,21 @@
             </div>
         </div>
 
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="aceite-lgpd" style="display: flex; align-items: flex-start; gap: 0.6rem; text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 500; color: var(--texto-escuro);">
+                    {{ form.aceite_lgpd }}
+                    <span>
+                        Li e aceito o tratamento dos meus dados pessoais para o licenciamento e a fiscalização do comércio ambulante, nos termos da
+                        <a href="{% url 'privacidade' %}" target="_blank" rel="noopener">política de privacidade (LGPD)</a>.
+                    </span>
+                </label>
+                {% if form.aceite_lgpd.errors %}
+                <div class="login-error" role="alert">{{ form.aceite_lgpd.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="info-callout-box">
             <p>
                 Nesta etapa você cria apenas a conta de acesso. Dados socioeconômicos, MEI, estrutura e ponto serão preenchidos depois, no painel.

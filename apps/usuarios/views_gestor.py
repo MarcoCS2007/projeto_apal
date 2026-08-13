@@ -34,16 +34,18 @@ from apps.licenciamento.services import (
     marcar_licencas_vencidas,
 )
 from apps.usuarios.forms_gestor import EditarAmbulanteGestorForm
-from apps.usuarios.models import Ambulante, Gestor
+from apps.usuarios.models import Ambulante, Gestor, LogAcessoDossie
+from apps.usuarios.permissoes import RequerModuloMixin
 from apps.usuarios.views import AcessoBackofficeMixin
 
 
-class PainelGestorMixin(LoginRequiredMixin, AcessoBackofficeMixin):
+class PainelGestorMixin(LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin):
     """Views web do backoffice restritas a Gestor e Administrador."""
 
 
 class GestorAmbulantesView(PainelGestorMixin, TemplateView):
     template_name = "gestor/ambulantes-cadastrados.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -67,6 +69,7 @@ class GestorAmbulantesView(PainelGestorMixin, TemplateView):
 
 class GestorAmbulanteEditarView(PainelGestorMixin, View):
     template_name = "gestor/editar-ambulante.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def _ambulante(self, pk):
         return get_object_or_404(Ambulante, pk=pk)
@@ -96,6 +99,7 @@ class GestorAmbulanteEditarView(PainelGestorMixin, View):
 
 class GestorAmbulanteAcaoView(PainelGestorMixin, View):
     http_method_names = ("post",)
+    modulo_permissao = "solicitacao_licenca"
 
     def post(self, request, pk):
         ambulante = get_object_or_404(Ambulante, pk=pk)
@@ -105,6 +109,9 @@ class GestorAmbulanteAcaoView(PainelGestorMixin, View):
             ambulante.licencas.filter(status=StatusLicenca.ATIVO).update(
                 status=StatusLicenca.SUSPENSO
             )
+            from apps.usuarios.score import pontuar_licenca_suspensa
+
+            pontuar_licenca_suspensa(ambulante)
             messages.success(request, "Conta e licença ativa suspensas.")
         elif acao == "ativar":
             ambulante.aplicar_situacao_conta("ativa")
@@ -117,6 +124,9 @@ class GestorAmbulanteAcaoView(PainelGestorMixin, View):
             ambulante.licencas.exclude(
                 status__in=(StatusLicenca.CANCELADO, StatusSolicitacao.INDEFERIDO)
             ).update(status=StatusLicenca.CANCELADO)
+            from apps.usuarios.score import pontuar_licenca_cancelada
+
+            pontuar_licenca_cancelada(ambulante)
             messages.success(request, "Conta e licenças canceladas.")
         else:
             messages.error(request, "Ação inválida.")
@@ -127,6 +137,12 @@ class GestorAmbulanteAcaoView(PainelGestorMixin, View):
 
 class GestorDossieView(PainelGestorMixin, TemplateView):
     template_name = "gestor/dossie.html"
+    modulo_permissao = "solicitacao_licenca"
+
+    def get(self, request, *args, **kwargs):
+        ambulante = get_object_or_404(Ambulante, pk=self.kwargs["pk"])
+        LogAcessoDossie.objects.create(usuario=request.user, ambulante=ambulante)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,11 +176,15 @@ class GestorDossieView(PainelGestorMixin, TemplateView):
                 ).first(),
             }
         )
+        from apps.usuarios.score import resumo_score
+
+        context.update(resumo_score(ambulante))
         return context
 
 
 class GestorFilaView(PainelGestorMixin, TemplateView):
     template_name = "gestor/em-analise.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -195,6 +215,7 @@ class GestorFilaView(PainelGestorMixin, TemplateView):
 
 class GestorAnalisarLicencaView(PainelGestorMixin, View):
     template_name = "gestor/analisar-licenca.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def _licenca(self, pk):
         return get_object_or_404(
@@ -270,6 +291,7 @@ class GestorAnalisarLicencaView(PainelGestorMixin, View):
 
 class GestorEmitirAlvaraView(PainelGestorMixin, View):
     template_name = "gestor/emitir-alvara.html"
+    modulo_permissao = "emissao_alvara"
 
     def _licenca(self, pk):
         return get_object_or_404(
@@ -330,6 +352,7 @@ class GestorEmitirAlvaraView(PainelGestorMixin, View):
 
 class GestorLicencasAtivasView(PainelGestorMixin, TemplateView):
     template_name = "gestor/licencas-ativas.html"
+    modulo_permissao = "emissao_alvara"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -368,6 +391,7 @@ class GestorLicencasAtivasView(PainelGestorMixin, TemplateView):
 
 class GestorOcorrenciasView(PainelGestorMixin, TemplateView):
     template_name = "gestor/ocorrencias.html"
+    modulo_permissao = "ocorrencias"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -393,6 +417,7 @@ class GestorOcorrenciasView(PainelGestorMixin, TemplateView):
 
 class GestorOcorrenciaDetalheView(PainelGestorMixin, View):
     template_name = "gestor/ocorrencia-detalhe.html"
+    modulo_permissao = "ocorrencias"
 
     def _ocorrencia(self, pk):
         return get_object_or_404(
@@ -457,6 +482,7 @@ class GestorOcorrenciaDetalheView(PainelGestorMixin, View):
 
 class GestorDashboardView(PainelGestorMixin, TemplateView):
     template_name = "gestor/dashboard.html"
+    modulo_permissao = "relatorios"
 
     def get_context_data(self, **kwargs):
         from apps.licenciamento.relatorios import indicadores_gerenciais

@@ -7,6 +7,7 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetView,
 )
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -48,6 +49,7 @@ from .forms_cadastro import (
     PontoCadastroForm,
 )
 from .models import (
+    Administrador,
     Ambulante,
     ConfiguracaoSeguranca,
     Fiscal,
@@ -314,6 +316,24 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
             if documentos is not None
             else []
         )
+        if ambulante:
+            from .score import resumo_score
+
+            context.update(resumo_score(ambulante))
+        return context
+
+
+class ScoreAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView):
+    template_name = "ambulante/score.html"
+    login_url = reverse_lazy("entrar")
+
+    def get_context_data(self, **kwargs):
+        from .score import resumo_score
+
+        context = super().get_context_data(**kwargs)
+        ambulante = Ambulante.objects.filter(pk=self.request.user.pk).first()
+        context["ambulante"] = ambulante
+        context.update(resumo_score(ambulante))
         return context
 
 
@@ -483,6 +503,8 @@ class MasterAdminView(MasterTemplateView):
     template_name = "master/admin.html"
 
     def get_context_data(self, **kwargs):
+        from apps.core.backup import listar_backups
+
         context = super().get_context_data(**kwargs)
         context["total_gestores_ativos"] = Gestor.objects.filter(ativo=True).count()
         context["total_fiscais"] = Fiscal.objects.count()
@@ -490,7 +512,26 @@ class MasterAdminView(MasterTemplateView):
         context["atividade_recente"] = UsuarioBase.objects.filter(
             last_login__isnull=False
         ).order_by("-last_login")[:8]
+        backups = listar_backups()
+        context["backups"] = backups[:5]
+        context["ultimo_backup"] = backups[0] if backups else None
+        admin = Administrador.objects.filter(pk=self.request.user.pk).first()
+        context["pode_backup"] = bool(admin and admin.acesso_painel_tecnico)
         return context
+
+
+class MasterBackupView(LoginRequiredMixin, AcessoMasterMixin, View):
+    http_method_names = ("post", "options")
+
+    def post(self, request, *args, **kwargs):
+        from apps.core.backup import gerar_backup
+
+        admin = Administrador.objects.filter(pk=request.user.pk).first()
+        if not admin or not admin.acesso_painel_tecnico:
+            raise PermissionDenied
+        caminho = gerar_backup()
+        messages.success(request, f"Backup restaurável gravado: {caminho.name}")
+        return redirect("master_admin")
 
 
 class MasterGestoresView(MasterTemplateView):

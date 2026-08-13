@@ -23,7 +23,7 @@
             <h2>Base de Dados ({{ total_ambulantes }} registro{{ total_ambulantes|pluralize }})</h2>
         </div>
         <form method="get" class="input-group" style="flex: 0 1 320px; margin-bottom: 0;">
-            <label for="search-ambulante" class="sr-only" style="display: none;">Buscar ambulante</label>
+            <label for="search-ambulante" class="sr-only">Buscar ambulante</label>
             <input type="text" id="search-ambulante" name="q" value="{{ busca }}" placeholder="Buscar por nome ou CPF..." style="padding: 0.6rem 1rem;">
         </form>
     </div>
@@ -45,7 +45,7 @@
                 <tr>
                     <td>#{{ ambulante.pk }}</td>
                     <td>{{ ambulante.nome_completo }}</td>
-                    <td>{{ ambulante.cpf }}</td>
+                    <td>{{ ambulante.cpf_mascarado }}</td>
                     <td>{{ ambulante.criado_em|date:"d/m/Y" }}</td>
                     <td>
                         {% if ambulante.situacao_conta == "cancelada" %}

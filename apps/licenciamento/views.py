@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import (
+    FileResponse,
     Http404,
     HttpResponse,
     HttpResponseBadRequest,
@@ -14,6 +15,11 @@ from django.views.generic import TemplateView
 from apps.core.qr_imagem import renderizar_qr_png
 from apps.core.qrcode import validar_codigo_qr
 from apps.usuarios.models import Ambulante
+from apps.usuarios.permissoes import (
+    RequerModuloMixin,
+    gestor_recorte_sanitario,
+    pode_ver_documento,
+)
 from apps.usuarios.views import AcessoAmbulanteMixin, AcessoBackofficeMixin
 
 from .forms import CategoriaProdutoForm
@@ -22,6 +28,7 @@ from .models import (
     DocumentoAnexo,
     LicencaAlvara,
     StatusAprovacaoDocumento,
+    TipoDocumento,
 )
 from .services import (
     licenca_ativa,
@@ -32,8 +39,11 @@ from .services import (
 )
 
 
-class GestorCategoriasView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class GestorCategoriasView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     template_name = "gestor/gerenciar-categorias.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def _categoria(self, pk):
         if not pk:
@@ -67,8 +77,11 @@ class GestorCategoriasView(LoginRequiredMixin, AcessoBackofficeMixin, View):
         return redirect("gestor_categorias")
 
 
-class GestorCategoriaExcluirView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class GestorCategoriaExcluirView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     http_method_names = ("post", "options")
+    modulo_permissao = "solicitacao_licenca"
 
     def post(self, request, pk):
         categoria = get_object_or_404(CategoriaProduto, pk=pk, ativo=True)
@@ -84,8 +97,11 @@ class GestorCategoriaExcluirView(LoginRequiredMixin, AcessoBackofficeMixin, View
         return redirect("gestor_categorias")
 
 
-class GestorTriagemView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class GestorTriagemView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     template_name = "gestor/triagem.html"
+    modulo_permissao = "solicitacao_licenca"
 
     def get(self, request):
         documentos = (
@@ -93,6 +109,10 @@ class GestorTriagemView(LoginRequiredMixin, AcessoBackofficeMixin, View):
             .filter(status_aprovacao=StatusAprovacaoDocumento.PENDENTE)
             .order_by("data_upload", "id")
         )
+        if gestor_recorte_sanitario(request.user):
+            documentos = documentos.filter(
+                tipo_documento=TipoDocumento.LAUDO_SANITARIO
+            )
         return render(
             request,
             self.template_name,
@@ -113,23 +133,29 @@ class DocumentoHtmxMixin:
 
 
 class AprovarDocumentoView(
-    LoginRequiredMixin, AcessoBackofficeMixin, DocumentoHtmxMixin, View
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, DocumentoHtmxMixin, View
 ):
     http_method_names = ("post", "options")
+    modulo_permissao = "solicitacao_licenca"
 
     def post(self, request, pk):
         documento = get_object_or_404(DocumentoAnexo, pk=pk)
+        if not pode_ver_documento(request.user, documento):
+            raise PermissionDenied
         documento.aprovar()
         return self._responder(request, documento)
 
 
 class RejeitarDocumentoView(
-    LoginRequiredMixin, AcessoBackofficeMixin, DocumentoHtmxMixin, View
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, DocumentoHtmxMixin, View
 ):
     http_method_names = ("post", "options")
+    modulo_permissao = "solicitacao_licenca"
 
     def post(self, request, pk):
         documento = get_object_or_404(DocumentoAnexo, pk=pk)
+        if not pode_ver_documento(request.user, documento):
+            raise PermissionDenied
         motivo = request.POST.get("justificativa") or request.POST.get(
             "motivo_rejeicao", ""
         )
@@ -192,9 +218,12 @@ class CredencialQrPngView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
         return response
 
 
-class AlvaraAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView):
+class AlvaraAmbulanteView(
+    LoginRequiredMixin, AcessoAmbulanteMixin, RequerModuloMixin, TemplateView
+):
     template_name = "ambulante/alvara.html"
     login_url = "entrar"
+    modulo_permissao = "solicitacao_licenca"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -233,9 +262,12 @@ class SimularPagamentoAlvaraView(LoginRequiredMixin, AcessoAmbulanteMixin, View)
         return redirect("ambulante_alvara")
 
 
-class RenovarLicencaView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
+class RenovarLicencaView(
+    LoginRequiredMixin, AcessoAmbulanteMixin, RequerModuloMixin, View
+):
     http_method_names = ("post", "options")
     login_url = "entrar"
+    modulo_permissao = "solicitacao_licenca"
 
     def post(self, request, pk):
         ambulante = get_object_or_404(Ambulante, pk=request.user.pk)
@@ -259,10 +291,13 @@ class RenovarLicencaView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
         return redirect("ambulante_alvara")
 
 
-class RelatorioOcupacaoView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class RelatorioOcupacaoView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     """HTMX (HTML) e JSON de ocupação/indicadores para o dashboard do gestor."""
 
     template_name = "gestor/_indicadores.html"
+    modulo_permissao = "relatorios"
 
     def get(self, request):
         from .relatorios import indicadores_gerenciais, indicadores_json
@@ -276,3 +311,20 @@ class RelatorioOcupacaoView(LoginRequiredMixin, AcessoBackofficeMixin, View):
         if html:
             return render(request, self.template_name, dados)
         return JsonResponse(indicadores_json(dados))
+
+
+class DocumentoArquivoView(LoginRequiredMixin, View):
+    """Entrega o anexo só para quem tem direito de ver (storage controlado)."""
+
+    def get(self, request, pk):
+        documento = get_object_or_404(DocumentoAnexo, pk=pk)
+        if not pode_ver_documento(request.user, documento):
+            raise PermissionDenied
+        if not documento.arquivo:
+            raise Http404
+        return FileResponse(
+            documento.arquivo.open("rb"),
+            as_attachment=False,
+            filename=documento.arquivo.name.rsplit("/", 1)[-1],
+        )
+

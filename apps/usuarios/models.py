@@ -83,6 +83,13 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
         return self.cpf
 
     @property
+    def cpf_mascarado(self):
+        digits = "".join(ch for ch in (self.cpf or "") if ch.isdigit())
+        if len(digits) == 11:
+            return f"***.***.***-{digits[9:]}"
+        return "***"
+
+    @property
     def role(self):
         try:
             return Perfil(self.__class__.__name__.lower())
@@ -118,6 +125,9 @@ class Ambulante(UsuarioBase):
     nis = models.CharField(max_length=20, blank=True, null=True)
     num_funcionarios = models.IntegerField(default=0)
     pontuacao = models.IntegerField(default=100)
+    aceite_lgpd = models.BooleanField(default=False)
+    aceite_lgpd_em = models.DateTimeField(null=True, blank=True)
+    base_legal_lgpd = models.CharField(max_length=80, blank=True, default="")
     ponto_pretendido = models.ForeignKey(
         "espacos.PontoOcupacao",
         on_delete=models.SET_NULL,
@@ -178,6 +188,42 @@ class Ambulante(UsuarioBase):
         self.save(
             update_fields=["ativo", "is_active", "dados_complementares", "atualizado_em"]
         )
+
+
+class TipoEventoScore(models.TextChoices):
+    LICENCA_ATIVA = "licenca_ativa", "Licença em dia"
+    RENOVACAO = "renovacao", "Renovação no prazo"
+    OCORRENCIA_PROCEDENTE = "ocorrencia_procedente", "Ocorrência procedente"
+    LICENCA_SUSPENSA = "licenca_suspensa", "Licença suspensa"
+    LICENCA_CANCELADA = "licenca_cancelada", "Licença cancelada"
+
+
+class EventoScore(ModeloBase):
+    ambulante = models.ForeignKey(
+        Ambulante,
+        on_delete=models.CASCADE,
+        related_name="eventos_score",
+    )
+    tipo = models.CharField(max_length=40, choices=TipoEventoScore.choices)
+    pontos = models.IntegerField()
+    saldo_apos = models.IntegerField()
+    descricao = models.CharField(max_length=255)
+    chave = models.CharField(max_length=80, blank=True, default="")
+
+    class Meta:
+        verbose_name = "Evento de score"
+        verbose_name_plural = "Eventos de score"
+        constraints = (
+            models.UniqueConstraint(
+                fields=("ambulante", "chave"),
+                condition=~models.Q(chave=""),
+                name="evento_score_chave_unica",
+            ),
+        )
+
+    def __str__(self):
+        sinal = "+" if self.pontos > 0 else ""
+        return f"{self.ambulante} {sinal}{self.pontos} ({self.tipo})"
 
 
 class Fiscal(UsuarioBase):
@@ -270,3 +316,27 @@ class ConfiguracaoSeguranca(ModeloBase):
             return True
         chave = perfil.value if hasattr(perfil, "value") else str(perfil)
         return bool(self.matriz.get(modulo, {}).get(chave, False))
+
+
+class LogAcessoDossie(ModeloBase):
+    """Auditoria de acesso ao dossiê do ambulante (LGPD)."""
+
+    usuario = models.ForeignKey(
+        "usuarios.UsuarioBase",
+        on_delete=models.CASCADE,
+        related_name="acessos_dossie",
+    )
+    ambulante = models.ForeignKey(
+        "usuarios.Ambulante",
+        on_delete=models.CASCADE,
+        related_name="logs_acesso_dossie",
+    )
+
+    class Meta:
+        verbose_name = "Log de acesso ao dossiê"
+        verbose_name_plural = "Logs de acesso ao dossiê"
+        ordering = ("-criado_em",)
+
+    def __str__(self):
+        return f"{self.usuario} → {self.ambulante} ({self.criado_em})"
+

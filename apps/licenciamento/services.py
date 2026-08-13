@@ -316,6 +316,9 @@ def renovar_licenca(licenca, ambulante):
         status=StatusLicenca.EM_ANALISE,
         licenca_origem=licenca,
     )
+    from apps.usuarios.score import pontuar_renovacao
+
+    pontuar_renovacao(ambulante, nova)
     return nova, True
 
 
@@ -431,4 +434,7 @@ def emitir_alvara(
     ambulante = licenca.ambulante
     ambulante.codigo_qr_code = gerar_codigo_qr(licenca)
     ambulante.save(update_fields=["codigo_qr_code", "atualizado_em"])
+    from apps.usuarios.score import pontuar_licenca_ativa
+
+    pontuar_licenca_ativa(ambulante, licenca)
     return licenca

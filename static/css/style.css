@@ -55,6 +55,34 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+.skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -100%;
+    z-index: 10000;
+    padding: 0.75rem 1.25rem;
+    background: var(--texto-escuro);
+    color: var(--branco);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--radius-xs);
+}
+.skip-link:focus {
+    top: 1rem;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* =========================================
    UTILITÁRIO: SCROLLBAR CUSTOMIZADA
 ========================================= */
@@ -108,6 +136,10 @@ svg.lucide {
     background-color: var(--branco);
     border-bottom: 1px solid var(--borda-cinza);
     padding: 1rem 0;
+}
+
+.header-master {
+    border-bottom: 3px solid var(--texto-escuro);
 }
 
 .header-container {
@@ -736,6 +768,22 @@ select:disabled, .input-group select:disabled {
     z-index: 2;
     flex: 1;
     text-align: center;
+}
+
+a.stepper-step {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+a.stepper-step:focus-visible {
+    outline: 2px solid var(--azul-vibrante);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+}
+
+.stepper-step[aria-disabled="true"] {
+    pointer-events: none;
 }
 
 .stepper-circle {
@@ -1448,7 +1496,7 @@ body.leitura-select-mode p:hover, body.leitura-select-mode h1:hover, body.leitur
         -webkit-print-color-adjust: exact !important;
     }
 
-    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .access-panel, [vw], #toast-container, .credential-tabs-nav, .credential-actions, .modal-backdrop {
+    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .assistente-widget-link, .access-panel, [vw], #toast-container, .credential-tabs-nav, .credential-actions, .modal-backdrop {
         display: none !important;
     }
 
@@ -1884,6 +1932,10 @@ body {
     padding: 0;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+}
+
+.top-header.header-master {
+    border-bottom: 3px solid var(--texto-escuro);
 }
 
 .header-container {
@@ -2619,4 +2671,108 @@ select.styled-select:focus-visible {
 
 @media (max-width: 768px) {
     .fiscal-grid { grid-template-columns: 1fr; }
+}
+
+.assistente-card {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.assistente-historico {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.assistente-turno {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.assistente-balao {
+    max-width: 90%;
+    padding: 0.85rem 1.05rem;
+    border-radius: 12px;
+    line-height: 1.5;
+}
+
+.assistente-balao p {
+    margin: 0;
+}
+
+.assistente-rotulo {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 0.35rem;
+    opacity: 0.8;
+}
+
+.assistente-balao.pergunta {
+    align-self: flex-end;
+    background: #2563EB;
+    color: #FFFFFF;
+}
+
+.assistente-balao.resposta {
+    align-self: flex-start;
+    background: #F1F5F9;
+    color: #0F172A;
+}
+
+.assistente-sugestoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.assistente-sugestao {
+    background: #EEF2FF;
+    color: #1D4ED8;
+    border: 1px solid #C7D2FE;
+    border-radius: 999px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.assistente-sugestao:hover {
+    background: #DBEAFE;
+}
+
+.assistente-widget-link {
+    position: fixed;
+    left: 0;
+    top: 48%;
+    z-index: 1000;
+    background: #2563EB;
+    color: #FFFFFF;
+    padding: 0.8rem;
+    border-radius: 0 10px 10px 0;
+    box-shadow: var(--shadow-lg);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.assistente-widget-link:hover {
+    background: #1D4ED8;
+    color: #FFFFFF;
+}
+
+.assistente-widget-text {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.assistente-widget-link .lucide {
+    width: 20px;
+    height: 20px;
 }

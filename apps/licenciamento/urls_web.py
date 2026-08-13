@@ -5,6 +5,7 @@ from .views import (
     AprovarDocumentoView,
     CredencialAmbulanteView,
     CredencialQrPngView,
+    DocumentoArquivoView,
     GestorCategoriaExcluirView,
     GestorCategoriasView,
     GestorTriagemView,
@@ -56,6 +57,11 @@ urlpatterns = [
         name="gestor_categorias_excluir",
     ),
     path("gestor/triagem/", GestorTriagemView.as_view(), name="gestor_triagem"),
+    path(
+        "documentos/<int:pk>/arquivo/",
+        DocumentoArquivoView.as_view(),
+        name="documento_arquivo",
+    ),
     path(
         "api/documentos/<int:pk>/aprovar/",
         AprovarDocumentoView.as_view(),

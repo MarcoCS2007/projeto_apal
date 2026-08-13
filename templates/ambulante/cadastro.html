@@ -25,12 +25,18 @@
 {% block content %}
 <div class="form-card">
     {% if not concluido %}
-    <div class="stepper-container" id="stepper">
+    <nav class="stepper-container" id="stepper" aria-label="Etapas do cadastro">
         <div class="stepper-line">
             <div class="stepper-line-progress" id="stepper-progress" style="width: {{ stepper_percent }}%;"></div>
         </div>
         {% for numero in "123456" %}
-        <div class="stepper-step{% if etapa == forloop.counter %} active{% elif etapa > forloop.counter %} completed{% endif %}" data-step="{{ forloop.counter }}">
+        {% if etapa > forloop.counter %}
+        <a href="?etapa={{ forloop.counter }}" class="stepper-step completed" data-step="{{ forloop.counter }}">
+        {% elif etapa == forloop.counter %}
+        <div class="stepper-step active" data-step="{{ forloop.counter }}" aria-current="step">
+        {% else %}
+        <div class="stepper-step" data-step="{{ forloop.counter }}" aria-disabled="true">
+        {% endif %}
             <div class="stepper-circle">{{ forloop.counter }}</div>
             <span class="stepper-label">
                 {% if forloop.counter == 1 %}Dados Pessoais
@@ -40,13 +46,17 @@
                 {% elif forloop.counter == 5 %}Ponto
                 {% else %}Anexos{% endif %}
             </span>
+        {% if etapa > forloop.counter %}
+        </a>
+        {% else %}
         </div>
+        {% endif %}
         {% endfor %}
-    </div>
+    </nav>
     {% endif %}
 
     {% if form.errors %}
-    <div id="error-card" class="error-card" style="display: flex;">
+    <div id="error-card" class="error-card" style="display: flex;" role="alert">
         <i data-lucide="alert-octagon"></i>
         <div>
             <strong>Atenção! Existem erros no preenchimento.</strong><br>
@@ -390,7 +400,7 @@
                             </td>
                             <td>
                                 {% if documento.arquivo %}
-                                <a href="{{ documento.arquivo.url }}" target="_blank" rel="noopener">Visualizar</a>
+                                <a href="{% url 'documento_arquivo' documento.pk %}" target="_blank" rel="noopener">Visualizar</a>
                                 {% endif %}
                             </td>
                         </tr>

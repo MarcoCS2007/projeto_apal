@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic import FormView
 
 from apps.usuarios.models import Fiscal
+from apps.usuarios.permissoes import RequerModuloMixin
 from apps.usuarios.views import AcessoFiscalMixin
 
 from .forms import BuscaCampoForm, OcorrenciaForm
@@ -18,9 +19,10 @@ from .services import (
 )
 
 
-class FiscalizacaoView(LoginRequiredMixin, AcessoFiscalMixin, View):
+class FiscalizacaoView(LoginRequiredMixin, AcessoFiscalMixin, RequerModuloMixin, View):
     template_name = "fiscal/fiscalizacao.html"
     login_url = reverse_lazy("fiscal_entrar")
+    modulo_permissao = "leitura_qr"
 
     def _contexto(self, request, resultado=None, termo=""):
         fiscal = Fiscal.objects.filter(pk=request.user.pk).first()
@@ -56,10 +58,13 @@ class FiscalizacaoView(LoginRequiredMixin, AcessoFiscalMixin, View):
         return render(request, self.template_name, self._contexto(request))
 
 
-class RegistrarOcorrenciaView(LoginRequiredMixin, AcessoFiscalMixin, FormView):
+class RegistrarOcorrenciaView(
+    LoginRequiredMixin, AcessoFiscalMixin, RequerModuloMixin, FormView
+):
     template_name = "fiscal/registrar-ocorrencia.html"
     form_class = OcorrenciaForm
     login_url = reverse_lazy("fiscal_entrar")
+    modulo_permissao = "ocorrencias"
 
     def get_initial(self):
         initial = super().get_initial()

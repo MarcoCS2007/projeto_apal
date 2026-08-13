@@ -84,15 +84,24 @@
     </div>
 </div>
 {% if not cadastro_completo %}
-<p style="margin-top: 1.75rem;">
+<p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
     <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="clipboard-list"></i> Completar cadastro
+    </a>
+    <a href="{% url 'ambulante_assistente' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="sparkles"></i> Assistente
     </a>
 </p>
 {% else %}
 <p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
     <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="pencil"></i> Revisar cadastro
+    </a>
+    <a href="{% url 'ambulante_score' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="award"></i> Meu score ({{ pontuacao }}/{{ maximo }})
+    </a>
+    <a href="{% url 'ambulante_assistente' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="sparkles"></i> Assistente
     </a>
     <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="upload"></i> {% if documentos_rejeitados %}Reenviar documentos{% else %}Enviar documentos{% endif %}

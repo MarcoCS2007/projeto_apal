@@ -2,9 +2,11 @@ import datetime
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao
 from apps.licenciamento.models import CategoriaProduto
+from apps.usuarios.lgpd import BASE_LEGAL_LGPD
 from apps.usuarios.models import (
     Administrador,
     Ambulante,
@@ -215,6 +217,37 @@ class Command(BaseCommand):
         usuario = criar(cpf=cpf, password=senha, **defaults)
         self.stdout.write(self.style.SUCCESS(f"{model.__name__} {usuario.nome} criado."))
         return usuario
+
+    def _dados_lgpd(self):
+        """Mesmo registro do cadastro web (checkbox + art. 7º, III)."""
+        return {
+            "aceite_lgpd": True,
+            "aceite_lgpd_em": timezone.now(),
+            "base_legal_lgpd": BASE_LEGAL_LGPD,
+        }
+
+    def _garantir_aceite_lgpd(self, ambulante):
+        """Preenche o aceite em contas antigas do seed, sem sobrescrever data já gravada."""
+        if (
+            ambulante.aceite_lgpd
+            and ambulante.aceite_lgpd_em
+            and ambulante.base_legal_lgpd
+        ):
+            return ambulante
+        ambulante.aceite_lgpd = True
+        if not ambulante.aceite_lgpd_em:
+            ambulante.aceite_lgpd_em = timezone.now()
+        if not ambulante.base_legal_lgpd:
+            ambulante.base_legal_lgpd = BASE_LEGAL_LGPD
+        ambulante.save(
+            update_fields=[
+                "aceite_lgpd",
+                "aceite_lgpd_em",
+                "base_legal_lgpd",
+                "atualizado_em",
+            ]
+        )
+        return ambulante
 
     def _administrador(self):
         if Administrador.objects.filter(cpf="00000000000").exists():
@@ -434,7 +467,9 @@ class Command(BaseCommand):
         )
 
     def _ambulante_joao(self):
-        if Ambulante.objects.filter(cpf="33333333333").exists():
+        existente = Ambulante.objects.filter(cpf="33333333333").first()
+        if existente:
+            self._garantir_aceite_lgpd(existente)
             self.stdout.write("Ambulante 33333333333 já existe.")
             return
         Ambulante.objects.create_user(
@@ -449,11 +484,14 @@ class Command(BaseCommand):
             data_nasc=datetime.date(1990, 1, 1),
             escolaridade="Ensino Médio",
             pontuacao=100,
+            **self._dados_lgpd(),
         )
         self.stdout.write(self.style.SUCCESS("Ambulante João criado (cadastro pendente)."))
 
     def _ambulante_conta(self, *, cpf, email, nome, sobrenome, telefone):
-        if Ambulante.objects.filter(cpf=cpf).exists():
+        existente = Ambulante.objects.filter(cpf=cpf).first()
+        if existente:
+            self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {cpf} já existe.")
             return
         Ambulante.objects.create_user(
@@ -463,13 +501,16 @@ class Command(BaseCommand):
             nome=nome,
             sobrenome=sobrenome,
             telefone_whatsapp=telefone,
+            **self._dados_lgpd(),
         )
         self.stdout.write(
             self.style.SUCCESS(f"Ambulante {nome} criado (só a conta).")
         )
 
     def _ambulante_parcial(self, *, cpf, email, nome, sobrenome, telefone, ponto):
-        if Ambulante.objects.filter(cpf=cpf).exists():
+        existente = Ambulante.objects.filter(cpf=cpf).first()
+        if existente:
+            self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {cpf} já existe.")
             return
         ambulante = Ambulante.objects.create_user(
@@ -484,6 +525,7 @@ class Command(BaseCommand):
             tipo_atuacao="movel",
             ponto_pretendido=ponto,
             pontuacao=80,
+            **self._dados_lgpd(),
         )
         Endereco.objects.create(
             ambulante=ambulante,
@@ -520,7 +562,9 @@ class Command(BaseCommand):
         extras,
         ativo=True,
     ):
-        if Ambulante.objects.filter(cpf=cpf).exists():
+        existente = Ambulante.objects.filter(cpf=cpf).first()
+        if existente:
+            self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {cpf} já existe.")
             return
         ambulante = Ambulante.objects.create_user(
@@ -541,6 +585,7 @@ class Command(BaseCommand):
             pontuacao=100 if ativo else 40,
             ativo=ativo,
             is_active=ativo,
+            **self._dados_lgpd(),
         )
         Endereco.objects.create(ambulante=ambulante, **endereco)
         EstruturaTrabalho.objects.create(ambulante=ambulante, **estrutura)

@@ -58,7 +58,8 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
             <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Score de Conformidade</span>
-            <strong style="display: block; font-size: 1.6rem; color: #10B981; margin-top: 4px;">{{ ambulante.pontuacao }} / 100</strong>
+            <strong style="display: block; font-size: 1.6rem; color: {{ faixa.cor }}; margin-top: 4px;">{{ ambulante.pontuacao }} / {{ maximo }}</strong>
+            <small style="color: {{ faixa.cor }}; font-weight: 700;">Nível {{ faixa.nome }}</small>
         </div>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
             <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ponto</span>
@@ -119,7 +120,7 @@
                     <td>{{ doc.data_upload|date:"d/m/Y H:i" }}</td>
                     <td>
                         {% if doc.arquivo %}
-                        <a href="{{ doc.arquivo.url }}" target="_blank">Visualizar</a>
+                        <a href="{% url 'documento_arquivo' doc.pk %}" target="_blank">Visualizar</a>
                         {% else %}
                         —
                         {% endif %}
@@ -205,6 +206,36 @@
                 {% empty %}
                 <tr>
                     <td colspan="5">Nenhuma ocorrência registrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Histórico de score</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>EVENTO</th>
+                    <th>PONTOS</th>
+                    <th>SALDO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{{ evento.descricao }}</td>
+                    <td>{% if evento.pontos > 0 %}+{% endif %}{{ evento.pontos }}</td>
+                    <td>{{ evento.saldo_apos }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Sem eventos ainda. Pontuação inicial: {{ ambulante.pontuacao }}.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -469,6 +469,13 @@ class MasterViewsTests(UsuariosAuthFixtures, TestCase):
         self.assertFalse(form[campo_matriz("mapa_vagas", "gestor")].value())
         self.assertTrue(form[campo_matriz("mapa_vagas", "ambulante")].value())
 
+        self.client.force_login(self.gestor)
+        painel = self.client.get(reverse("backoffice_inicio"))
+        self.assertNotContains(painel, reverse("gestor_pontos"))
+        self.assertContains(painel, reverse("gestor_fila"))
+        bloqueado = self.client.get(reverse("gestor_pontos"))
+        self.assertEqual(bloqueado.status_code, 403)
+
     def _payload_gestor(self, **overrides):
         dados = {
             "nome_completo": "Mariana Almeida",
@@ -647,6 +654,7 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
             "telefone_whatsapp": "77944444444",
             "password": self.senha,
             "password_confirm": self.senha,
+            "aceite_lgpd": True,
         }
         dados.update(overrides)
         return dados
@@ -657,6 +665,8 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registro.html")
         self.assertContains(response, "Criar Nova Conta")
+        self.assertContains(response, "aceite-lgpd")
+        self.assertContains(response, reverse("privacidade"))
 
     def test_registro_cria_conta_faz_login_e_abre_painel_vazio(self):
         response = self.client.post(reverse("registro"), self._payload_registro())
@@ -670,6 +680,9 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(ambulante.telefone_whatsapp, "77944444444")
         self.assertEqual(ambulante.role, Perfil.AMBULANTE)
         self.assertFalse(ambulante.cadastro_completo)
+        self.assertTrue(ambulante.aceite_lgpd)
+        self.assertIsNotNone(ambulante.aceite_lgpd_em)
+        self.assertEqual(ambulante.base_legal_lgpd, "execucao_politicas_publicas")
         self.assertIsNone(ambulante.codigo_qr_code)
         self.assertTrue(ambulante.check_password(self.senha))
         self.assertEqual(int(self.client.session["_auth_user_id"]), ambulante.pk)
@@ -693,6 +706,13 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertFalse(
             Ambulante.objects.filter(email="joana.silva@email.com").exists()
         )
+
+    def test_registro_sem_aceite_lgpd(self):
+        payload = self._payload_registro()
+        payload.pop("aceite_lgpd")
+        response = self.client.post(reverse("registro"), payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Ambulante.objects.filter(cpf="66677788899").exists())
 
     def test_registro_senhas_diferentes(self):
         response = self.client.post(

@@ -3,14 +3,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
+from apps.usuarios.permissoes import RequerModuloMixin
 from apps.usuarios.views import AcessoBackofficeMixin
 
 from .forms import PontoOcupacaoForm
 from .models import PontoOcupacao
 
 
-class GestorPontosView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class GestorPontosView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     template_name = "gestor/gerenciar-pontos.html"
+    modulo_permissao = "mapa_vagas"
 
     def _ponto(self, pk):
         if not pk:
@@ -44,8 +48,11 @@ class GestorPontosView(LoginRequiredMixin, AcessoBackofficeMixin, View):
         return redirect("gestor_pontos")
 
 
-class GestorPontoExcluirView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+class GestorPontoExcluirView(
+    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
+):
     http_method_names = ("post", "options")
+    modulo_permissao = "mapa_vagas"
 
     def post(self, request, pk):
         ponto = get_object_or_404(PontoOcupacao, pk=pk, ativo=True)

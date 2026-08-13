@@ -78,6 +78,13 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "João Ambulante")
         self.assertContains(response, str(self.ambulante.pontuacao))
         self.assertContains(response, self.licenca.protocolo)
+        from apps.usuarios.models import LogAcessoDossie
+
+        self.assertTrue(
+            LogAcessoDossie.objects.filter(
+                usuario=self.gestor, ambulante=self.ambulante
+            ).exists()
+        )
 
     def test_indeferir_com_motivo(self):
         self.client.force_login(self.gestor)

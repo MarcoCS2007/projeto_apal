@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const accessPanel = document.getElementById('accessibility-panel');
     const backdrop = document.getElementById('modal-backdrop');
 
+    function sincronizarPainelAcesso(aberto) {
+        if (!accessPanel || !openBtn) {
+            return;
+        }
+        accessPanel.classList.toggle('hidden', !aberto);
+        openBtn.classList.toggle('expanded', aberto);
+        openBtn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
     if (openBtn && accessPanel) {
         openBtn.addEventListener('mouseenter', () => openBtn.classList.add('expanded'));
         openBtn.addEventListener('mouseleave', () => {
@@ -24,13 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         openBtn.addEventListener('click', () => {
-            accessPanel.classList.toggle('hidden');
-            openBtn.classList.add('expanded');
+            sincronizarPainelAcesso(accessPanel.classList.contains('hidden'));
         });
 
         closeBtn?.addEventListener('click', () => {
-            accessPanel.classList.add('hidden');
-            openBtn.classList.remove('expanded');
+            sincronizarPainelAcesso(false);
         });
     }
 
@@ -47,12 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            sincronizarPainelAcesso(false);
+        }
+    });
+
     // Fechar modais ao clicar no fundo escurecido (Backdrop)
     if (backdrop) {
         backdrop.addEventListener('click', () => {
             fecharModalIA();
-            if (accessPanel) accessPanel.classList.add('hidden');
-            if (openBtn) openBtn.classList.remove('expanded');
+            sincronizarPainelAcesso(false);
         });
     }
 

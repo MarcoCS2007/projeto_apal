@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Assistente educativo - APAL{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="assistente" %}
+{% endblock %}
+
+{% block assistente_widget %}{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Assistente educativo</h1>
+        <p>Pergunte sobre documentos, prazos, zona permitida e a credencial digital.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card assistente-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Tire sua dúvida</h2>
+    </div>
+
+    {% if historico %}
+    <div class="assistente-historico" aria-live="polite">
+        {% for log in historico %}
+        <div class="assistente-turno">
+            <div class="assistente-balao pergunta">
+                <span class="assistente-rotulo">Você</span>
+                <p>{{ log.pergunta }}</p>
+            </div>
+            <div class="assistente-balao resposta">
+                <span class="assistente-rotulo">Assistente APAL</span>
+                <p>{{ log.resposta|linebreaksbr }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="info-callout-box" style="margin-bottom: 1.25rem;">
+        <p>Comece por uma das sugestões ou escreva sua pergunta. Cada consulta fica registrada para auditoria da prefeitura.</p>
+    </div>
+    {% endif %}
+
+    <div class="assistente-sugestoes">
+        {% for sugestao in sugestoes %}
+        <form method="post" action="{% url 'ambulante_assistente' %}">
+            {% csrf_token %}
+            <input type="hidden" name="pergunta" value="{{ sugestao }}">
+            <button type="submit" class="assistente-sugestao">{{ sugestao }}</button>
+        </form>
+        {% endfor %}
+    </div>
+
+    <form method="post" action="{% url 'ambulante_assistente' %}" class="assistente-form">
+        {% csrf_token %}
+        <div class="input-group full-width">
+            <label for="{{ form.pergunta.id_for_label }}">{{ form.pergunta.label }}</label>
+            {{ form.pergunta }}
+            {% if form.pergunta.errors %}
+            <p class="login-error" style="margin-top: 0.4rem;">{{ form.pergunta.errors.0 }}</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top: 1rem;">
+            <i data-lucide="send"></i> Perguntar
+        </button>
+    </form>
+</div>
+{% endblock %}

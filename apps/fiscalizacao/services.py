@@ -325,11 +325,19 @@ def aplicar_efeito_licenca(ambulante, acao):
         afetadas = ambulante.licencas.filter(status=StatusLicenca.ATIVO).update(
             status=StatusLicenca.SUSPENSO
         )
+        if afetadas:
+            from apps.usuarios.score import pontuar_licenca_suspensa
+
+            pontuar_licenca_suspensa(ambulante)
         return "suspenso" if afetadas else None
     if acao == "cancelar":
         afetadas = ambulante.licencas.exclude(
             status__in=(StatusLicenca.CANCELADO, StatusLicenca.INDEFERIDO)
         ).update(status=StatusLicenca.CANCELADO)
+        if afetadas:
+            from apps.usuarios.score import pontuar_licenca_cancelada
+
+            pontuar_licenca_cancelada(ambulante)
         return "cancelado" if afetadas else None
     raise ValueError("Ação sobre a licença inválida.")
 
@@ -346,6 +354,10 @@ def auditar_ocorrencia(ocorrencia, novo_status, acao_licenca=""):
             raise ValueError(f"Não é possível mudar de {atual} para {destino}.")
         ocorrencia.status_ocorrencia = destino
         ocorrencia.save(update_fields=["status_ocorrencia", "atualizado_em"])
+        if destino == StatusOcorrencia.PROCEDENTE:
+            from apps.usuarios.score import pontuar_ocorrencia_procedente
+
+            pontuar_ocorrencia_procedente(ocorrencia.ambulante, ocorrencia)
 
     if acao and acao not in ("suspender", "cancelar"):
         raise ValueError("Ação sobre a licença inválida.")

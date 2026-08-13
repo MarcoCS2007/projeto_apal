@@ -8,7 +8,9 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
+from .lgpd import BASE_LEGAL_LGPD
 from .models import (
     Ambulante,
     ConfiguracaoSeguranca,
@@ -372,6 +374,14 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
         required=False,
         widget=forms.ClearableFileInput(attrs={"id": "reg-foto", "accept": "image/*"}),
     )
+    aceite_lgpd = forms.BooleanField(
+        label=(
+            "Li e aceito o tratamento dos meus dados pessoais para o licenciamento "
+            "e a fiscalização do comércio ambulante, nos termos da LGPD."
+        ),
+        required=True,
+        widget=forms.CheckboxInput(attrs={"id": "aceite-lgpd"}),
+    )
 
     def clean(self):
         dados = super().clean()
@@ -392,6 +402,9 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
             sobrenome=sobrenome,
             telefone_whatsapp=dados["telefone_whatsapp"],
             foto=dados.get("foto") or None,
+            aceite_lgpd=True,
+            aceite_lgpd_em=timezone.now(),
+            base_legal_lgpd=BASE_LEGAL_LGPD,
         )
 
 

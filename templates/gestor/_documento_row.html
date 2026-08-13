@@ -1,11 +1,11 @@
 {% load static %}
 <tr id="doc-row-{{ documento.pk }}" style="border-bottom: 1px solid #E2E8F0;">
     <td style="padding: 16px 12px; font-weight: 600; color: #0F172A;">{{ documento.ambulante.nome }} {{ documento.ambulante.sobrenome }}</td>
-    <td style="padding: 16px 12px; color: #475569;">{{ documento.ambulante.cpf }}</td>
+    <td style="padding: 16px 12px; color: #475569;">{{ documento.ambulante.cpf_mascarado }}</td>
     <td style="padding: 16px 12px; color: #475569;">{{ documento.get_tipo_documento_display }}</td>
     <td style="padding: 16px 12px;">
         {% if documento.arquivo %}
-        <a href="{{ documento.arquivo.url }}" target="_blank" rel="noopener" style="color: #2563EB; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
+        <a href="{% url 'documento_arquivo' documento.pk %}" target="_blank" rel="noopener" style="color: #2563EB; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
             <i data-lucide="eye" style="width: 16px;"></i> Visualizar
         </a>
         {% else %}
@@ -33,14 +33,16 @@
                 hx-target="#doc-row-{{ documento.pk }}"
                 hx-swap="outerHTML"
                 hx-disabled-elt="this"
+                aria-label="Aprovar documento de {{ documento.ambulante.nome }} {{ documento.ambulante.sobrenome }}"
                 style="background: #10B981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <i data-lucide="check" style="width: 16px;"></i> Aprovar
+                <i data-lucide="check" style="width: 16px;" aria-hidden="true"></i> Aprovar
             </button>
             <button
                 type="button"
-                onclick="abrirModalRejeicao({{ documento.pk }}, '{{ documento.ambulante.nome|escapejs }} {{ documento.ambulante.sobrenome|escapejs }}')"
+                onclick="abrirModalRejeicao({{ documento.pk }}, '{{ documento.ambulante.nome|escapejs }} {{ documento.ambulante.sobrenome|escapejs }}', this)"
+                aria-label="Rejeitar documento de {{ documento.ambulante.nome }} {{ documento.ambulante.sobrenome }}"
                 style="background: #EF4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <i data-lucide="x" style="width: 16px;"></i> Rejeitar
+                <i data-lucide="x" style="width: 16px;" aria-hidden="true"></i> Rejeitar
             </button>
         </div>
         {% else %}

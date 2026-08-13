@@ -10,6 +10,7 @@ from .models import (
     ConfiguracaoSeguranca,
     Fiscal,
     Gestor,
+    LogAcessoDossie,
     UsuarioBase,
 )
 
@@ -311,3 +312,10 @@ class ConfiguracaoSegurancaAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(LogAcessoDossie)
+class LogAcessoDossieAdmin(admin.ModelAdmin):
+    list_display = ("usuario", "ambulante", "criado_em")
+    search_fields = ("usuario__nome", "ambulante__nome", "ambulante__cpf")
+    readonly_fields = ("usuario", "ambulante", "criado_em")

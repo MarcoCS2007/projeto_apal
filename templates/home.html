@@ -1,182 +1,162 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APAL - Vitória da Conquista</title>
 
-    <link rel="icon" type="image/png" href="{% static 'img/logo-apal-simbolo.png' %}">
+{% block title %}APAL - Vitória da Conquista{% endblock %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-</head>
-<body>
+{% block header_extra_class %} home-header{% endblock %}
 
-    <header class="top-header home-header">
-        <div class="header-container home-header-container">
-            <div class="logo-area">
-                <a href="{% url 'index' %}" class="home-logo-link">
-                    <i data-lucide="map-pin" class="home-logo-icon"></i>
-                    <span class="logo-text home-logo-text">APAL</span>
-                </a>
-            </div>
-            {% include "publico/_nav.html" with active="inicio" nav_extra_class="home-nav" %}
-        </div>
-    </header>
+{% block header_container_extra %} home-header-container{% endblock %}
 
-    <section class="modern-hero">
-        <div class="hero-content-wrapper">
-            <h1 class="hero-title">
-                O comércio ambulante organizado e <span class="text-highlight-pink">legalizado</span>.
-            </h1>
-            <p class="hero-description">
-                O sistema APAL facilita a solicitação da sua licença, a emissão do seu alvará digital e garante a sua segurança para trabalhar nas ruas de Vitória da Conquista.
-            </p>
+{% block logo %}
+<div class="logo-area">
+    <a href="{% url 'index' %}" class="home-logo-link">
+        <i data-lucide="map-pin" class="home-logo-icon" aria-hidden="true"></i>
+        <span class="logo-text home-logo-text">APAL</span>
+    </a>
+</div>
+{% endblock %}
 
-            <div class="hero-buttons">
-                <a href="{% url 'registro' %}" class="btn-modern-primary">
-                    <i data-lucide="user-plus"></i> Quero me Cadastrar
-                </a>
-                <a href="{% url 'entrar' %}" class="btn-modern-outline">
-                    <i data-lucide="log-in"></i> Já sou ambulante
-                </a>
-            </div>
-        </div>
-    </section>
+{% block header_nav %}
+{% include "publico/_nav.html" with active="inicio" nav_extra_class="home-nav" %}
+{% endblock %}
 
-    <main class="home-main-container">
-
-        <div class="features-grid">
-
-            <div class="feature-card">
-                <div class="feature-icon-wrapper icon-bg-blue">
-                    <i data-lucide="qr-code" class="icon-blue"></i>
-                </div>
-                <h3 class="feature-title">Credencial Digital</h3>
-                <p class="feature-description">
-                    Tenha seu crachá com QR Code oficial direto no celular. Fácil de apresentar para a fiscalização e passa credibilidade aos clientes.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon-wrapper icon-bg-pink">
-                    <i data-lucide="shield-check" class="icon-pink"></i>
-                </div>
-                <h3 class="feature-title">Segurança no Ponto</h3>
-                <p class="feature-description">
-                    Trabalhe com dignidade. Estando regularizado, você garante o seu espaço de atuação sem o risco de ter suas mercadorias apreendidas.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon-wrapper icon-bg-green">
-                    <i data-lucide="smartphone" class="icon-green"></i>
-                </div>
-                <h3 class="feature-title">Processo 100% Online</h3>
-                <p class="feature-description">
-                    Esqueça as filas. Envie seus documentos pelo sistema, acompanhe a análise e receba seu alvará digitalmente.
-                </p>
-            </div>
-
-        </div>
-
-        <div class="steps-header">
-            <h2 class="steps-title">Como funciona a regularização?</h2>
-            <p class="steps-subtitle">Um processo transparente em quatro etapas simples.</p>
-        </div>
-
-        <div class="steps-grid">
-
-            <div class="step-card">
-                <div class="step-number">01</div>
-                <div class="step-icon-wrapper">
-                    <i data-lucide="user" class="step-icon"></i>
-                </div>
-                <h4 class="step-card-title">Seu Cadastro</h4>
-                <p class="step-card-description">Crie sua conta informando seus dados pessoais, endereço e tipo de comércio.</p>
-            </div>
-
-            <div class="step-card">
-                <div class="step-number">02</div>
-                <div class="step-icon-wrapper">
-                    <i data-lucide="file-text" class="step-icon"></i>
-                </div>
-                <h4 class="step-card-title">Envio de Documentos</h4>
-                <p class="step-card-description">Anexe as cópias do seu RG, CPF, Comprovante de Residência e fotos da estrutura.</p>
-            </div>
-
-            <div class="step-card">
-                <div class="step-number">03</div>
-                <div class="step-icon-wrapper">
-                    <i data-lucide="search" class="step-icon"></i>
-                </div>
-                <h4 class="step-card-title">Análise do Município</h4>
-                <p class="step-card-description">A fiscalização avalia os documentos enviados e a viabilidade do ponto solicitado.</p>
-            </div>
-
-            <div class="step-card">
-                <div class="step-number">04</div>
-                <div class="step-icon-wrapper">
-                    <i data-lucide="badge-check" class="step-icon"></i>
-                </div>
-                <h4 class="step-card-title">Credencial Liberada</h4>
-                <p class="step-card-description">Após a aprovação do requerimento, seu alvará digital é emitido direto no seu painel.</p>
-            </div>
-
-        </div>
-
-        <div class="cta-banner" id="cadastro">
-            <div class="cta-content">
-                <div class="cta-alert-badge">
-                    <i data-lucide="sparkles" class="cta-alert-icon"></i> Regularize sua atividade
-                </div>
-                <h3 class="cta-title">Pronto para trabalhar com tranquilidade?</h3>
-                <p class="cta-description">
-                    Faça seu requerimento online agora mesmo e garanta a sua credencial oficial de comerciante ambulante em Vitória da Conquista.
-                </p>
-
-                <div class="cta-buttons">
-                    <a href="{% url 'registro' %}" class="btn-download-primary">
-                        <i data-lucide="user-plus"></i> Iniciar Meu Cadastro
-                    </a>
-                </div>
-            </div>
-
-            <div class="cta-illustration-wrapper">
-                <div class="cta-illustration-circle">
-                    <i data-lucide="shield-check" class="cta-icon-file"></i>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <footer class="home-footer">
-        <p class="home-footer-text">
-            Prefeitura Municipal de Vitória da Conquista &bull; <span class="home-footer-highlight">APAL - Aqui Pode, Aqui é Legal</span>
+{% block hero %}
+<section class="modern-hero">
+    <div class="hero-content-wrapper">
+        <h1 class="hero-title">
+            O comércio ambulante organizado e <span class="text-highlight-pink">legalizado</span>.
+        </h1>
+        <p class="hero-description">
+            O sistema APAL facilita a solicitação da sua licença, a emissão do seu alvará digital e garante a sua segurança para trabalhar nas ruas de Vitória da Conquista.
         </p>
-    </footer>
 
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
+        <div class="hero-buttons">
+            <a href="{% url 'registro' %}" class="btn-modern-primary">
+                <i data-lucide="user-plus" aria-hidden="true"></i> Quero me Cadastrar
+            </a>
+            <a href="{% url 'entrar' %}" class="btn-modern-outline">
+                <i data-lucide="log-in" aria-hidden="true"></i> Já sou ambulante
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block main_class %}home-main-container{% endblock %}
+
+{% block content %}
+<div class="features-grid">
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-blue">
+            <i data-lucide="qr-code" class="icon-blue" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Credencial Digital</h3>
+        <p class="feature-description">
+            Tenha seu crachá com QR Code oficial direto no celular. Fácil de apresentar para a fiscalização e passa credibilidade aos clientes.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-pink">
+            <i data-lucide="shield-check" class="icon-pink" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Segurança no Ponto</h3>
+        <p class="feature-description">
+            Trabalhe com dignidade. Estando regularizado, você garante o seu espaço de atuação sem o risco de ter suas mercadorias apreendidas.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-green">
+            <i data-lucide="smartphone" class="icon-green" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Processo 100% Online</h3>
+        <p class="feature-description">
+            Esqueça as filas. Envie seus documentos pelo sistema, acompanhe a análise e receba seu alvará digitalmente.
+        </p>
+    </div>
+
+</div>
+
+<div class="steps-header">
+    <h2 class="steps-title">Como funciona a regularização?</h2>
+    <p class="steps-subtitle">Um processo transparente em quatro etapas simples.</p>
+</div>
+
+<div class="steps-grid">
+
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="user" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h4 class="step-card-title">Seu Cadastro</h4>
+        <p class="step-card-description">Crie sua conta informando seus dados pessoais, endereço e tipo de comércio.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="file-text" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h4 class="step-card-title">Envio de Documentos</h4>
+        <p class="step-card-description">Anexe as cópias do seu RG, CPF, Comprovante de Residência e fotos da estrutura.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="search" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h4 class="step-card-title">Análise do Município</h4>
+        <p class="step-card-description">A fiscalização avalia os documentos enviados e a viabilidade do ponto solicitado.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="badge-check" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h4 class="step-card-title">Credencial Liberada</h4>
+        <p class="step-card-description">Após a aprovação do requerimento, seu alvará digital é emitido direto no seu painel.</p>
+    </div>
+
+</div>
+
+<div class="cta-banner" id="cadastro">
+    <div class="cta-content">
+        <div class="cta-alert-badge">
+            <i data-lucide="sparkles" class="cta-alert-icon" aria-hidden="true"></i> Regularize sua atividade
+        </div>
+        <h3 class="cta-title">Pronto para trabalhar com tranquilidade?</h3>
+        <p class="cta-description">
+            Faça seu requerimento online agora mesmo e garanta a sua credencial oficial de comerciante ambulante em Vitória da Conquista.
+        </p>
+
+        <div class="cta-buttons">
+            <a href="{% url 'registro' %}" class="btn-download-primary">
+                <i data-lucide="user-plus" aria-hidden="true"></i> Iniciar Meu Cadastro
+            </a>
         </div>
     </div>
 
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-    <script src="{% static 'js/script.js' %}"></script>
-    <script>
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+    <div class="cta-illustration-wrapper">
+        <div class="cta-illustration-circle">
+            <i data-lucide="shield-check" class="cta-icon-file" aria-hidden="true"></i>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="home-footer">
+    <p class="home-footer-text">
+        Prefeitura Municipal de Vitória da Conquista &bull; <span class="home-footer-highlight">APAL - Aqui Pode, Aqui é Legal</span>
+    </p>
+</footer>
+{% endblock %}

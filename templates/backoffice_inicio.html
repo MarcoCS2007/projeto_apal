@@ -21,10 +21,11 @@
         <div class="title-accent"></div>
         <h2>Olá, {{ user.nome }} {{ user.sobrenome }}</h2>
     </div>
-    <p style="color: var(--texto-cinza);">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico. Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.</p>
+    <p style="color: var(--texto-cinza);">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.{% if pode.relatorios %} Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.{% endif %}</p>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    {% if pode.solicitacao_licenca %}
     <a href="{% url 'gestor_fila' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
         <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fila em análise</span>
         <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ fila_analise }}</strong>
@@ -40,11 +41,14 @@
         <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ docs_pendentes }}</strong>
         <small style="color: #475569;">Aguardando triagem</small>
     </a>
+    {% endif %}
+    {% if pode.emissao_alvara %}
     <a href="{% url 'gestor_licencas' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
         <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Prontos para emissão</span>
         <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ licencas_aprovadas }}</strong>
         <small style="color: #059669;">Deferidos nesta etapa</small>
     </a>
+    {% endif %}
 </div>
 
 {% if user.role == "administrador" %}
