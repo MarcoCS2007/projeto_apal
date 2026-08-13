@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Painel Backoffice - APAL{% endblock %}
+{% block nav_inicio_class %}active{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Painel Backoffice</h1>
+        <p>Sessão autenticada por cookie Django para Gestores e Administradores.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Sessão ativa</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
+        Olá, <strong>{{ user.nome }} {{ user.sobrenome }}</strong>.
+    </p>
+    <p style="color: var(--texto-cinza);">
+        Perfil: <strong>{{ user.role }}</strong>
+    </p>
+</div>
+{% endblock %}
