@@ -19,6 +19,9 @@ precommit:
 seed:
 	docker compose exec web python manage.py seed_inicial
 
+seed_massivo:
+	docker compose exec web python manage.py seed_massivo
+
 test:
 	docker compose exec web pytest
 
