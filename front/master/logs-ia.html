@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria de Logs IA - Ponto Legal VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Técnico da TI -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
+                <a href="gerenciar-fiscais.html"><i data-lucide="id-card"></i> Fiscais</a>
+                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
+                <a href="logs-ia.html" class="active"><i data-lucide="bot"></i> Logs IA</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Auditoria do Assistente Virtual de IA</h1>
+            <p>Monitoramento em tempo real das interações, dúvidas dos ambulantes e respostas dos modelos de linguagem.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+
+        <!-- METRICAS DE USO DA IA -->
+        <div class="stats-grid">
+            <div class="stat-card" style="border-top-color: var(--azul-vibrante);">
+                <div class="stat-icon" style="background: #E0E7FF; color: var(--azul-vibrante);"><i data-lucide="sparkles"></i></div>
+                <div class="stat-info">
+                    <label>CONSULTAS HOJE</label>
+                    <p style="font-size: 1.4rem;">1.428</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-top-color: #10B981;">
+                <div class="stat-icon" style="background: #D1FAE5; color: #10B981;"><i data-lucide="check-circle-2"></i></div>
+                <div class="stat-info">
+                    <label>GEMINI FLASH (PRIMARY)</label>
+                    <p style="font-size: 1.4rem; color: #10B981;">98.4% Sucesso</p>
+                </div>
+            </div>
+
+            <div class="stat-card" style="border-top-color: #F59E0B;">
+                <div class="stat-icon" style="background: #FEF3C7; color: #F59E0B;"><i data-lucide="cpu"></i></div>
+                <div class="stat-info">
+                    <label>GROQ LLAMA (FALLBACK)</label>
+                    <p style="font-size: 1.4rem; color: #D97706;">1.6% Chamadas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+                <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);"><i data-lucide="help-circle"></i></div>
+                <div class="stat-info">
+                    <label>TÓPICO MAIS CONSULTADO</label>
+                    <p style="font-size: 1.1rem; color: var(--texto-escuro);">Documentos / Taxas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE AUDITORIA DE REGISTROS LOG_ASSISTENTE -->
+        <div class="form-card" style="margin-top: 2rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div class="section-title" style="margin: 0;">
+                    <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+                    <h2>Histórico do Banco (Tabela `log_assistente`)</h2>
+                </div>
+
+                <button class="btn-submit" onclick="alert('Exportando relatório em formato CSV...')" style="background-color: #374151; font-size: 0.88rem; padding: 0.6rem 1.2rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-lucide="download"></i> Exportar Logs (.CSV)
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>DATA / HORA</th>
+                            <th>AMBULANTE ID</th>
+                            <th>TERMO / PERGUNTA DO USUÁRIO</th>
+                            <th>MODELO DE IA</th>
+                            <th>RESPOSTA GERADA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>05/08/2026 13:42:10</strong></td>
+                            <td>#AMB-9021</td>
+                            <td>"O que significa Alvará Precário?"</td>
+                            <td><span class="badge success">Gemini 1.5</span></td>
+                            <td style="font-size: 0.85rem; color: var(--texto-cinza);">É a licença temporária concedida pela prefeitura para exercer o comércio na rua.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>05/08/2026 13:35:01</strong></td>
+                            <td>#AMB-4412</td>
+                            <td>"Quais documentos preciso para barraca de pastel?"</td>
+                            <td><span class="badge success">Gemini 1.5</span></td>
+                            <td style="font-size: 0.85rem; color: var(--texto-cinza);">RG, CPF, Comprovante de residência, foto da estrutura e Laudo da Vigilância Sanitária.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>05/08/2026 12:10:45</strong></td>
+                            <td>#AMB-1089</td>
+                            <td>"O que acontece se eu não pagar o DAM?"</td>
+                            <td><span class="badge warning">Groq Llama-3.3</span></td>
+                            <td style="font-size: 0.85rem; color: var(--texto-cinza);">A licença pode ser suspensa e haver cobrança de multa de mora conforme o Código de Posturas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: left;">
+                <a href="dashboard-ti.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-lucide="arrow-left"></i> Voltar ao Painel da TI
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
