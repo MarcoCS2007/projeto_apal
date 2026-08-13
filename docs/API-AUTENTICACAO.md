@@ -193,7 +193,7 @@ O encerramento do expediente é `POST /logout/` (CSRF obrigatório). A view inva
 
 Não misture os fluxos no cliente:
 
-- App móvel → `/api/login/` → guardar `access`/`refresh` → header Bearer.
+- App móvel → `/api/login/` → guardar `access`/`refresh` → header Bearer. Casos de uso em [API-MOVEL.md](API-MOVEL.md).
 - Navegador backoffice → `/login/` → cookie gerenciado pelo Django.
 
 ---

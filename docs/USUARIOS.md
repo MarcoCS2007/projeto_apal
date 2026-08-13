@@ -127,7 +127,7 @@ Triagem de documentos, categorias e pontos: ver [licenciamento](LICENCIAMENTO.md
 
 ### API JWT
 
-Prefixo `/api/` (`apps/usuarios/urls.py`): `POST /api/login/`, `POST /api/token/refresh/`, `GET /api/me/`. Ver [API-AUTENTICACAO.md](API-AUTENTICACAO.md).
+Prefixo `/api/` (`apps/usuarios/urls.py`): `POST /api/login/`, `POST /api/token/refresh/`, `GET /api/me/`, cadastro e score do ambulante. Demais rotas do app: [API-MOVEL.md](API-MOVEL.md). Autenticação: [API-AUTENTICACAO.md](API-AUTENTICACAO.md).
 
 ---
 

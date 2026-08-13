@@ -18,6 +18,7 @@ O APAL (Aqui Pode, Aqui é Legal) é o sistema municipal de licenciamento e gest
 | Documento | Conteúdo |
 | --- | --- |
 | [API-AUTENTICACAO.md](API-AUTENTICACAO.md) | Contrato JWT (`/api/login/`, `/api/me/`) |
+| [API-MOVEL.md](API-MOVEL.md) | App ambulante/fiscal (licença, QR, ocorrência) |
 | [DEPLOY.md](DEPLOY.md) | Publicação em produção (Gunicorn, Docker, variáveis) |
 | [../README.md](../README.md) | Como subir o projeto localmente (Docker, Git Flow, CI) |
 

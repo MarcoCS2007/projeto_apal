@@ -63,6 +63,7 @@ Sugestões exibidas na tela:
 | --- | --- | --- |
 | `/ambulante/assistente/` | Ambulante | Formulário + histórico das últimas 20 perguntas |
 | `/master/logs-ia/` | Master | Auditoria (view no módulo usuarios) |
+| `/api/ambulante/assistente/` | Ambulante (JWT) | Histórico `GET` e pergunta `POST` |
 
 Há um atalho no painel do ambulante (`templates/ambulante/_assistente_widget.html`).
 

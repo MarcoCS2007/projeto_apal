@@ -102,6 +102,11 @@ O gestor **não consegue deferir** enquanto algum obrigatório não estiver **Ap
 | `/api/documentos/<id>/aprovar/` | Gestor | `POST` (HTMX) |
 | `/api/documentos/<id>/rejeitar/` | Gestor | `POST` com justificativa |
 | `/api/relatorios/ocupacao/` | Gestor | JSON ou HTML (HTMX) dos indicadores |
+| `/api/ambulante/documentos/` | Ambulante (JWT) | Lista e envio de anexos |
+| `/api/ambulante/solicitacao/` | Ambulante (JWT) | Status da licença |
+| `/api/ambulante/credencial/` | Ambulante (JWT) | Código HMAC e PNG do QR |
+
+App móvel: [API-MOVEL.md](API-MOVEL.md).
 
 Parecer e emissão: `/gestor/analisar/<id>/` e `/gestor/emitir/<id>/` (módulo usuarios, regras aqui).
 

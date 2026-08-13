@@ -63,7 +63,9 @@ from apps.core.permissions import IsAmbulante, IsFiscal, IsGestor, IsAdministrad
 | `IsGestor` | `gestor` |
 | `IsAdministrador` | `administrador` |
 
-Elas já exigem usuário autenticado. Combine com `|` do DRF se a rota aceitar mais de um perfil. Detalhes do JWT: [API-AUTENTICACAO.md](API-AUTENTICACAO.md).
+Elas já exigem usuário autenticado. Combine com `|` do DRF se a rota aceitar mais de um perfil. Detalhes do JWT: [API-AUTENTICACAO.md](API-AUTENTICACAO.md). Rotas do app: [API-MOVEL.md](API-MOVEL.md).
+
+Idioma e fuso: `LANGUAGE_CODE=pt-br` e `TIME_ZONE=America/Bahia` em `config/settings/base.py`.
 
 ---
 
