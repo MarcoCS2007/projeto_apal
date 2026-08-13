@@ -35,6 +35,7 @@ from .forms import (
     ConfiguracaoSegurancaForm,
     LoginAmbulanteForm,
     LoginBackofficeForm,
+    LoginFiscalForm,
     NovaSenhaForm,
     RecuperarSenhaForm,
 )
@@ -64,6 +65,8 @@ def destino_pos_login(user):
         return reverse("master_admin")
     if user.role == Perfil.GESTOR:
         return reverse("backoffice_inicio")
+    if user.role == Perfil.FISCAL:
+        return reverse("fiscal_painel")
     return reverse("index")
 
 
@@ -86,6 +89,8 @@ def apagar_cookie_sessao(response):
 def destino_pos_logout(role):
     if role == Perfil.AMBULANTE:
         return reverse("entrar")
+    if role == Perfil.FISCAL:
+        return reverse("fiscal_entrar")
     return f"{reverse('login')}?encerrado=1"
 
 
@@ -123,6 +128,8 @@ class AcessoBackofficeMixin(UserPassesTestMixin):
         user = self.request.user
         if user.is_authenticated and user.role == Perfil.AMBULANTE:
             return redirect("ambulante_painel")
+        if user.is_authenticated and user.role == Perfil.FISCAL:
+            return redirect("fiscal_painel")
         if user.is_authenticated:
             logout(self.request)
         return redirect("login")
@@ -141,6 +148,8 @@ class AcessoMasterMixin(UserPassesTestMixin):
             return redirect("backoffice_inicio")
         if user.is_authenticated and user.role == Perfil.AMBULANTE:
             return redirect("ambulante_painel")
+        if user.is_authenticated and user.role == Perfil.FISCAL:
+            return redirect("fiscal_painel")
         if user.is_authenticated:
             logout(self.request)
         return redirect("login")
@@ -159,9 +168,31 @@ class AcessoAmbulanteMixin(UserPassesTestMixin):
             return redirect("master_admin")
         if user.is_authenticated and user.role == Perfil.GESTOR:
             return redirect("backoffice_inicio")
+        if user.is_authenticated and user.role == Perfil.FISCAL:
+            return redirect("fiscal_painel")
         if user.is_authenticated:
             logout(self.request)
         return redirect("entrar")
+
+
+class AcessoFiscalMixin(UserPassesTestMixin):
+    """Restringe views web a fiscais de campo."""
+
+    def test_func(self):
+        user = self.request.user
+        return bool(user.is_authenticated and user.role == Perfil.FISCAL)
+
+    def handle_no_permission(self):
+        user = self.request.user
+        if user.is_authenticated and user.role == Perfil.ADMINISTRADOR:
+            return redirect("master_admin")
+        if user.is_authenticated and user.role == Perfil.GESTOR:
+            return redirect("backoffice_inicio")
+        if user.is_authenticated and user.role == Perfil.AMBULANTE:
+            return redirect("ambulante_painel")
+        if user.is_authenticated:
+            logout(self.request)
+        return redirect("fiscal_entrar")
 
 
 class LoginBackofficeView(LoginView):
@@ -216,6 +247,37 @@ class LoginAmbulanteView(LoginView):
         return super().dispatch(request, *args, **kwargs)
 
 
+class LoginFiscalView(LoginView):
+    """Login por sessão para o fiscal de campo."""
+
+    template_name = "fiscal/entrar.html"
+    authentication_form = LoginFiscalForm
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        aplicar_tempo_sessao(self.request)
+        return response
+
+    def get_success_url(self):
+        return reverse("fiscal_painel")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(destino_pos_login(request.user))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class FiscalPainelView(LoginRequiredMixin, AcessoFiscalMixin, TemplateView):
+    template_name = "fiscal/painel.html"
+    login_url = reverse_lazy("fiscal_entrar")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["fiscal"] = Fiscal.objects.filter(pk=self.request.user.pk).first()
+        return context
+
+
 class RegistroAmbulanteView(FormView):
     template_name = "registro.html"
     form_class = CadastroAmbulanteForm
@@ -248,9 +310,7 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
         context = super().get_context_data(**kwargs)
         ambulante = Ambulante.objects.filter(pk=self.request.user.pk).first()
         context["ambulante"] = ambulante
-        context["cadastro_completo"] = bool(
-            ambulante and ambulante.cadastro_completo
-        )
+        context["cadastro_completo"] = bool(ambulante and ambulante.cadastro_completo)
         context["tem_licenca"] = bool(ambulante and ambulante.licencas.exists())
         context["licenca"] = licenca_atual(ambulante) if ambulante else None
         documentos = ambulante.documentos.all() if ambulante else None
@@ -277,9 +337,7 @@ ETAPAS_CADASTRO = {
 }
 
 
-class CadastroCompletoAmbulanteView(
-    LoginRequiredMixin, AcessoAmbulanteMixin, View
-):
+class CadastroCompletoAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
     login_url = reverse_lazy("entrar")
     template_name = "ambulante/cadastro.html"
 
@@ -304,28 +362,28 @@ class CadastroCompletoAmbulanteView(
             "cadastro_completo": ambulante.cadastro_completo,
             "concluido": concluido,
             "stepper_percent": int(((etapa - 1) / 5) * 100),
-            "pontos_catalogo": form.fields["ponto_pretendido"].queryset
-            if etapa == 5
-            else None,
-            "categorias_catalogo": form.fields["categoria_pretendida"].queryset
-            if etapa == 5
-            else None,
-            "documentos": ambulante.documentos.order_by("tipo_documento")
-            if etapa == 6
-            else None,
+            "pontos_catalogo": (
+                form.fields["ponto_pretendido"].queryset if etapa == 5 else None
+            ),
+            "categorias_catalogo": (
+                form.fields["categoria_pretendida"].queryset if etapa == 5 else None
+            ),
+            "documentos": (
+                ambulante.documentos.order_by("tipo_documento") if etapa == 6 else None
+            ),
             "categoria_documentos": categoria,
-            "tipos_obrigatorios": tipos_obrigatorios(ambulante, categoria)
-            if etapa == 6
-            else (),
-            "tipos_faltando_envio": tipos_faltando_envio(ambulante, categoria)
-            if etapa == 6
-            else (),
-            "tipos_faltando_aprovacao": tipos_faltando_aprovacao(ambulante, categoria)
-            if etapa == 6
-            else (),
-            "pode_avancar_solicitacao": pode_avancar_solicitacao(ambulante, categoria)
-            if etapa == 6
-            else False,
+            "tipos_obrigatorios": (
+                tipos_obrigatorios(ambulante, categoria) if etapa == 6 else ()
+            ),
+            "tipos_faltando_envio": (
+                tipos_faltando_envio(ambulante, categoria) if etapa == 6 else ()
+            ),
+            "tipos_faltando_aprovacao": (
+                tipos_faltando_aprovacao(ambulante, categoria) if etapa == 6 else ()
+            ),
+            "pode_avancar_solicitacao": (
+                pode_avancar_solicitacao(ambulante, categoria) if etapa == 6 else False
+            ),
         }
 
     def get(self, request):
@@ -382,7 +440,9 @@ class CadastroCompletoAmbulanteView(
             return redirect(f"{reverse('ambulante_cadastro')}?etapa={etapa}")
 
         proxima = min(etapa + 1, 6)
-        messages.success(request, "Etapa salva. Você pode continuar sem perder os dados.")
+        messages.success(
+            request, "Etapa salva. Você pode continuar sem perder os dados."
+        )
         return redirect(f"{reverse('ambulante_cadastro')}?etapa={proxima}")
 
 

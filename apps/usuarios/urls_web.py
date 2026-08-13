@@ -3,8 +3,10 @@ from django.urls import path
 from .views import (
     BackofficeInicioView,
     CadastroCompletoAmbulanteView,
+    FiscalPainelView,
     LoginAmbulanteView,
     LoginBackofficeView,
+    LoginFiscalView,
     LogoutBackofficeView,
     MasterAdminView,
     MasterCadastrarFiscalView,
@@ -34,6 +36,8 @@ urlpatterns = [
     path("login/", LoginBackofficeView.as_view(), name="login"),
     path("logout/", LogoutBackofficeView.as_view(), name="logout"),
     path("entrar/", LoginAmbulanteView.as_view(), name="entrar"),
+    path("fiscal/entrar/", LoginFiscalView.as_view(), name="fiscal_entrar"),
+    path("fiscal/", FiscalPainelView.as_view(), name="fiscal_painel"),
     path("registro/", RegistroAmbulanteView.as_view(), name="registro"),
     path("redefinir-senha/", RecuperarSenhaView.as_view(), name="redefinir_senha"),
     path(

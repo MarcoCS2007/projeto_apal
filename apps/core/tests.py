@@ -73,6 +73,11 @@ class HomeViewTests(TestCase):
         self.assertContains(response, "comércio ambulante organizado")
         self.assertContains(response, reverse("entrar"))
         self.assertContains(response, reverse("registro"))
+        self.assertContains(response, reverse("login"))
+        self.assertContains(response, reverse("fiscal_entrar"))
+        self.assertContains(response, "Área institucional")
+        self.assertContains(response, "Onde você faz login?")
+        self.assertNotContains(response, "Acesso ao sistema")
         self.assertContains(response, reverse("sobre"))
         self.assertContains(response, reverse("faq"))
 

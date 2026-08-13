@@ -116,7 +116,7 @@ body {
     position: relative;
     background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
     color: white;
-    padding: 100px 20px 80px 20px;
+    padding: 88px 20px 64px 20px;
     text-align: center;
     overflow: hidden;
 }
@@ -230,8 +230,8 @@ body {
 ========================================= */
 .home-main-container {
     max-width: 1200px;
-    margin: -40px auto 60px auto;
-    padding: 0 20px;
+    margin: 0 auto 60px auto;
+    padding: 48px 20px 0 20px;
     position: relative;
     z-index: 20;
 }

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Entrar - APAL | Aqui Pode, Aqui é Legal{% endblock %}
+{% block title %}Acesso do Fiscal - APAL{% endblock %}
 
 {% block header_nav %}
-{% include "publico/_nav.html" with active="entrar" %}
+{% include "publico/_nav.html" with active="fiscal" %}
 {% endblock %}
 
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Acesso do Ambulante</h1>
-        <p>Entre com seu CPF ou e-mail para acompanhar o cadastro e a licença.</p>
+        <h1>Acesso do Fiscal</h1>
+        <p>Entre com CPF ou e-mail para o módulo de fiscalização em campo.</p>
     </div>
 </section>
 {% endblock %}
@@ -19,10 +19,10 @@
 <div class="form-card login-wrapper">
     <div class="section-title">
         <div class="title-accent"></div>
-        <h2>Entrar na Plataforma</h2>
+        <h2>Entrar na Fiscalização</h2>
     </div>
 
-    <form id="login-form" method="post" action="{% url 'entrar' %}">
+    <form id="login-form" method="post" action="{% url 'fiscal_entrar' %}">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -64,13 +64,7 @@
             <button type="submit" class="btn-submit" style="width: 100%;">
                 <i data-lucide="log-in"></i> Entrar
             </button>
-            <a href="{% url 'redefinir_senha' %}" class="forgot-password" style="text-align: center;">
-                Esqueci minha senha
-            </a>
-            <a href="{% url 'registro' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                <i data-lucide="user-plus"></i> Ainda não tem conta? Cadastre-se
-            </a>
-            <a href="{% url 'fiscal_entrar' %}" class="forgot-password" style="text-align: center;">Sou fiscal</a>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center;">Sou ambulante</a>
             <a href="{% url 'login' %}" class="forgot-password" style="text-align: center;">Sou gestor ou administrador</a>
         </div>
     </form>

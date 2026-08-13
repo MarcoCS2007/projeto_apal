@@ -183,6 +183,56 @@ class LoginAmbulanteForm(AuthenticationForm):
             )
 
 
+class LoginFiscalForm(AuthenticationForm):
+    """Login web exclusivo para fiscais de campo."""
+
+    error_messages: ClassVar[dict[str, str]] = {
+        "invalid_login": "CPF/e-mail ou senha inválidos.",
+        "inactive": "Esta conta está inativa.",
+        "sem_acesso_fiscal": (
+            "Este acesso é exclusivo para fiscais. "
+            "Ambulantes usam /entrar/ e a prefeitura usa o backoffice."
+        ),
+        "usuario_inativo": "Usuário inativo. Entre em contato com a administração.",
+    }
+
+    username = forms.CharField(
+        label="E-mail ou CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "user-login",
+                "placeholder": "Digite seu CPF ou e-mail",
+                "autocomplete": "username",
+                "autofocus": True,
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Senha",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "user-password",
+                "placeholder": "Digite sua senha",
+                "autocomplete": "current-password",
+            }
+        ),
+    )
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.ativo:
+            raise ValidationError(
+                self.error_messages["usuario_inativo"],
+                code="usuario_inativo",
+            )
+        if user.role != Perfil.FISCAL:
+            raise ValidationError(
+                self.error_messages["sem_acesso_fiscal"],
+                code="sem_acesso_fiscal",
+            )
+
+
 class RecuperarSenhaForm(PasswordResetForm):
     email = forms.CharField(
         label="E-mail ou CPF",

@@ -34,6 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    document.querySelectorAll('.nav-inst-menu').forEach((menu) => {
+        document.addEventListener('click', (event) => {
+            if (!menu.contains(event.target)) {
+                menu.removeAttribute('open');
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                menu.removeAttribute('open');
+            }
+        });
+    });
+
     // Fechar modais ao clicar no fundo escurecido (Backdrop)
     if (backdrop) {
         backdrop.addEventListener('click', () => {

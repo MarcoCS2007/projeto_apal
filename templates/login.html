@@ -75,6 +75,11 @@
                 <i data-lucide="log-in"></i> Entrar na Plataforma
             </button>
         </div>
+        <p style="text-align: center; margin-top: 1.25rem;">
+            <a href="{% url 'entrar' %}" class="forgot-password">Sou ambulante</a>
+            &nbsp;·&nbsp;
+            <a href="{% url 'fiscal_entrar' %}" class="forgot-password">Sou fiscal</a>
+        </p>
     </form>
 </div>
 {% endblock %}

@@ -179,6 +179,104 @@ svg.lucide {
     color: var(--cor-destaque) !important;
 }
 
+.nav-inst-menu {
+    position: relative;
+}
+
+.nav-inst-toggle {
+    list-style: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--texto-cinza);
+    font-weight: 500;
+    font-size: 0.9rem;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-pill);
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.nav-inst-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.nav-inst-toggle::marker {
+    content: "";
+}
+
+.nav-inst-toggle:hover,
+.nav-inst-menu[open] .nav-inst-toggle {
+    color: var(--azul-vibrante);
+    background-color: var(--fundo-cinza);
+}
+
+.nav-inst-toggle.active {
+    background-color: var(--cor-destaque-suave);
+    color: var(--cor-destaque);
+    font-weight: 600;
+}
+
+.nav-inst-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    z-index: 80;
+    min-width: 280px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+}
+
+.nav-inst-hint {
+    margin: 0 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748B;
+}
+
+.nav-inst-dropdown a {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #0F172A;
+    text-decoration: none;
+}
+
+.nav-inst-dropdown a:hover {
+    background: #EFF6FF;
+    color: #1D4ED8;
+}
+
+.nav-inst-dropdown a i {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    color: #2563EB;
+    flex-shrink: 0;
+}
+
+.nav-inst-dropdown a strong {
+    display: block;
+    font-size: 0.9rem;
+}
+
+.nav-inst-dropdown a small {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748B;
+}
+
 .footer-pmvc {
     text-align: center;
     padding: 1.5rem;

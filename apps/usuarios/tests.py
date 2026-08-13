@@ -258,9 +258,7 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         self.assertIn(reverse("login"), response.url)
         self.assertIn("encerrado=1", response.url)
         self.assertNotIn("_auth_user_id", self.client.session)
-        self.assertEqual(
-            response.cookies[settings.SESSION_COOKIE_NAME].value, ""
-        )
+        self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME].value, "")
 
         master = self.client.get(reverse("master_admin"))
         self.assertEqual(master.status_code, 302)
@@ -290,13 +288,13 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "Encerrar expediente")
         self.assertContains(response, reverse("logout"))
 
-    def test_fiscal_nao_acessa_backoffice_e_vai_ao_login(self):
+    def test_fiscal_nao_acessa_backoffice_e_vai_ao_painel_fiscal(self):
         self.client.force_login(self.fiscal)
         response = self.client.get(self.url_backoffice)
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn(self.url_login, response.url)
-        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertEqual(response.url, reverse("fiscal_painel"))
+        self.assertEqual(int(self.client.session["_auth_user_id"]), self.fiscal.pk)
 
     def test_login_administrador_redireciona_ao_painel_master(self):
         response = self._login_web(self.administrador.cpf)
@@ -522,7 +520,9 @@ class MasterViewsTests(UsuariosAuthFixtures, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Já existe um usuário com este CPF")
-        self.assertEqual(Gestor.objects.filter(email="mariana.almeida@pmvc.ba.gov.br").count(), 0)
+        self.assertEqual(
+            Gestor.objects.filter(email="mariana.almeida@pmvc.ba.gov.br").count(), 0
+        )
 
     def test_cadastrar_fiscal_salva_no_banco(self):
         self.client.force_login(self.administrador)
@@ -553,13 +553,13 @@ class MasterViewsTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.url, reverse("backoffice_inicio"))
         self.assertFalse(Fiscal.objects.filter(cpf="55566677788").exists())
 
-    def test_fiscal_nao_acessa_master_e_vai_ao_login(self):
+    def test_fiscal_nao_acessa_master_e_vai_ao_painel_fiscal(self):
         self.client.force_login(self.fiscal)
         response = self.client.get(reverse("master_admin"))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("login"))
-        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertEqual(response.url, reverse("fiscal_painel"))
+        self.assertEqual(int(self.client.session["_auth_user_id"]), self.fiscal.pk)
 
 
 class AdminPrefeituraTests(UsuariosAuthFixtures, TestCase):
@@ -752,6 +752,29 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "exclusivo para comerciantes ambulantes")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_login_web_fiscal_abre_painel(self):
+        response = self.client.post(
+            reverse("fiscal_entrar"),
+            {"username": self.fiscal.cpf, "password": self.senha},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("fiscal_painel"))
+        painel = self.client.get(response.url)
+        self.assertEqual(painel.status_code, 200)
+        self.assertContains(painel, self.fiscal.nome)
+        self.assertContains(painel, "FIS-TEST-001")
+
+    def test_gestor_nao_entra_pelo_login_fiscal(self):
+        response = self.client.post(
+            reverse("fiscal_entrar"),
+            {"username": self.gestor.cpf, "password": self.senha},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "exclusivo para fiscais")
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_anonimo_e_redirecionado_ao_entrar(self):
