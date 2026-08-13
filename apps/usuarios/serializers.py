@@ -33,3 +33,7 @@ class UsuarioMeSerializer(serializers.ModelSerializer):
         model = UsuarioBase
         fields = ("id", "cpf", "nome", "sobrenome", "email", "role")
         read_only_fields = fields
+
+
+
+
