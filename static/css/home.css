@@ -241,7 +241,7 @@ body {
 ========================================= */
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
     gap: 24px;
     margin-bottom: 80px;
 }
@@ -438,7 +438,7 @@ body {
 
 .cta-content {
     flex: 1;
-    min-width: 280px;
+    min-width: 0;
 }
 
 .cta-alert-badge {
@@ -585,16 +585,73 @@ body {
     font-weight: 700;
 }
 
-/* Responsividade Básica para o Navbar */
+@media (max-width: 1024px) {
+    nav.home-nav {
+        display: none;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+
+    body.nav-open nav.home-nav {
+        display: flex;
+    }
+}
+
 @media (max-width: 768px) {
     .home-header-container {
-        flex-direction: column;
-        gap: 16px;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 1rem;
     }
-    .home-nav {
-        flex-wrap: wrap;
+
+    .modern-hero {
+        padding: 56px 16px 40px 16px;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 28px;
+    }
+
+    .btn-modern-primary,
+    .btn-modern-outline {
+        width: 100%;
         justify-content: center;
-        gap: 16px;
+        padding: 14px 20px;
+    }
+
+    .home-main-container {
+        padding: 32px 16px 0 16px;
+        margin-bottom: 40px;
+    }
+
+    .features-grid,
+    .steps-grid {
+        margin-bottom: 48px;
+    }
+
+    .steps-title {
+        font-size: 1.5rem;
+    }
+
+    .cta-banner {
+        padding: 24px 20px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .btn-download-primary,
+    .btn-download-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cta-illustration-wrapper {
+        display: none;
     }
 }
 

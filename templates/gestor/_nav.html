@@ -1,4 +1,4 @@
-<nav class="header-nav">
+<nav id="header-nav" class="header-nav">
     <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
     {% if pode.relatorios %}
     <a href="{% url 'gestor_dashboard' %}"{% if active == "dashboard" %} class="active"{% endif %}><i data-lucide="bar-chart-3"></i> Relatórios</a>

@@ -1,4 +1,4 @@
-<nav class="header-nav">
+<nav id="header-nav" class="header-nav">
     <a href="{% url 'master_admin' %}"{% if active == "admin" %} class="active"{% endif %}><i data-lucide="shield-alert"></i> Painel TI</a>
     <a href="{% url 'master_fiscais' %}"{% if active == "fiscais" %} class="active"{% endif %}><i data-lucide="id-card"></i> Fiscais</a>
     <a href="{% url 'master_gestores' %}"{% if active == "gestores" %} class="active"{% endif %}><i data-lucide="users"></i> Gestores</a>

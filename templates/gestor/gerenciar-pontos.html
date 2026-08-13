@@ -115,7 +115,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <div style="display: flex; gap: 6px;">
+                        <div class="table-actions">
                             <a class="btn-action" href="{% url 'gestor_pontos_editar' ponto.pk %}" title="Editar"><i data-lucide="edit"></i></a>
                             <form method="post" action="{% url 'gestor_pontos_excluir' ponto.pk %}" onsubmit="return confirm('Excluir este ponto?');">
                                 {% csrf_token %}

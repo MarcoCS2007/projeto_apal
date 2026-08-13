@@ -98,7 +98,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <div style="display: flex; gap: 6px;">
+                        <div class="table-actions">
                             <a href="{% url 'gestor_categorias_editar' categoria.pk %}" class="btn-action" style="text-decoration: none;"><i data-lucide="edit"></i></a>
                             <form action="{% url 'gestor_categorias_excluir' categoria.pk %}" method="post" onsubmit="return confirm('Excluir esta categoria?');">
                                 {% csrf_token %}

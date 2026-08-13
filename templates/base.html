@@ -29,6 +29,10 @@
                 </a>
             </div>
             {% endblock %}
+            <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="header-nav" aria-label="Abrir menu">
+                <i data-lucide="menu" class="nav-toggle-icon nav-toggle-icon-open" aria-hidden="true"></i>
+                <i data-lucide="x" class="nav-toggle-icon nav-toggle-icon-close" aria-hidden="true"></i>
+            </button>
             {% block header_nav %}
             {% include "publico/_nav.html" %}
             {% endblock %}

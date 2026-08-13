@@ -41,6 +41,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ---------------------------------------------------
+    // MENU MOBILE (HAMBURGER)
+    // ---------------------------------------------------
+    const navToggle = document.getElementById('nav-toggle');
+    const headerNav = document.getElementById('header-nav');
+    const topHeader = document.querySelector('.top-header');
+
+    function atualizarRotuloMenu(aberto) {
+        if (!navToggle) return;
+        navToggle.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+        navToggle.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+    }
+
+    function fecharNavMobile() {
+        document.body.classList.remove('nav-open');
+        topHeader?.classList.remove('nav-open');
+        atualizarRotuloMenu(false);
+    }
+
+    function abrirNavMobile() {
+        document.body.classList.add('nav-open');
+        topHeader?.classList.add('nav-open');
+        atualizarRotuloMenu(true);
+    }
+
+    function alternarNavMobile() {
+        if (document.body.classList.contains('nav-open')) {
+            fecharNavMobile();
+        } else {
+            abrirNavMobile();
+        }
+    }
+
+    navToggle?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        alternarNavMobile();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!document.body.classList.contains('nav-open')) return;
+        if (event.target.closest('#header-nav') || event.target.closest('#nav-toggle')) {
+            return;
+        }
+        fecharNavMobile();
+    });
+
+    headerNav?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            fecharNavMobile();
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024) {
+            fecharNavMobile();
+        }
+    });
+
     document.querySelectorAll('.nav-inst-menu').forEach((menu) => {
         document.addEventListener('click', (event) => {
             if (!menu.contains(event.target)) {
@@ -56,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
+            fecharNavMobile();
             sincronizarPainelAcesso(false);
         }
     });
