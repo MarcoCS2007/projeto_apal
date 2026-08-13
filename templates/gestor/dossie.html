@@ -1,146 +1,211 @@
-<!-- Quem for mexer ao conectar com django descomente a linha abaixo: -->
-<!-- {% extends 'base.html' %} -->
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossiê do Trabalhador - APAL Gestor</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- HTMX CDN -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% block title %}Dossiê do Trabalhador - APAL{% endblock %}
 
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ambulantes" %}
+{% endblock %}
 
-    <!-- CABEÇALHO DO GESTOR -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                    <span style="font-size: 0.85rem; background: #EFF6FF; color: #2563EB; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Painel Gestor</span>
-                </a>
-            </div>
-            <nav class="header-nav">
-                <a href="triagem.html"><i data-lucide="file-check"></i> Triagem</a>
-                <a href="dashboard.html"><i data-lucide="bar-chart-3"></i> Relatórios</a>
-                <a href="dossie.html" class="active"><i data-lucide="user-check"></i> Dossiê</a>
-                <a href="../index.html"><i data-lucide="log-out" style="color: #EF4444;"></i> Sair</a>
-            </nav>
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A; margin: 0;">Dossiê do Ambulante</h1>
+        <p style="color: #475569; margin: 4px 0 0 0;">Ficha única: dados, documentos, licenças, ocorrências e score.</p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{% url 'gestor_ambulante_editar' ambulante.pk %}" class="btn-action" style="text-decoration: none;">
+            <i data-lucide="pencil"></i> Editar cadastro
+        </a>
+        {% if requerimento_aberto %}
+        <a href="{% url 'gestor_analisar' requerimento_aberto.pk %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="file-search"></i> Analisar requerimento
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="form-card" style="margin-bottom: 24px;">
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        {% if ambulante.foto %}
+        <img src="{{ ambulante.foto.url }}" alt="Foto de {{ ambulante.nome_completo }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #2563EB;">
+        {% else %}
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid #2563EB;">
+            {{ ambulante.iniciais }}
         </div>
-    </header>
-
-    <main class="main-container" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
-            <div>
-                <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A; margin: 0;">Dossiê do Ambulante</h1>
-                <p style="color: #475569; margin: 4px 0 0 0;">Histórico regulatório, índice de conformidade e exportação de relatório.</p>
+        {% endif %}
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin: 0;">{{ ambulante.nome_completo }}</h2>
+                {% if ambulante.situacao_conta == "cancelada" %}
+                <span class="badge danger">Conta cancelada</span>
+                {% elif ambulante.situacao_conta == "suspensa" %}
+                <span class="badge danger">Conta suspensa</span>
+                {% elif ambulante.situacao_conta == "completa" %}
+                <span class="badge success">Cadastrado</span>
+                {% else %}
+                <span class="badge">Cadastro pendente</span>
+                {% endif %}
             </div>
-            
-            <!-- BOTÃO EXPORTAÇÃO PDF (HU-5.4) -->
-            <a 
-                href="/api/trabalhador/104/dossie/pdf/" 
-                target="_blank" 
-                style="background: #FF007F; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 0, 127, 0.25);">
-                <i data-lucide="file-down"></i> Exportar Dossiê (PDF)
-            </a>
+            <p style="color: #475569; margin: 6px 0 0 0; font-size: 0.95rem;">
+                <strong>CPF:</strong> {{ ambulante.cpf_formatado }}
+                {% if ambulante.apelido_nome_fantasia %} &bull; <strong>Fantasia:</strong> {{ ambulante.apelido_nome_fantasia }}{% endif %}
+            </p>
         </div>
+    </div>
 
-        <!-- CARD PRINCIPAL: PERFIL DO TRABALHADOR -->
-        <div class="form-card" style="padding: 28px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="width: 80px; height: 80px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid #2563EB;">
-                    JS
-                </div>
-                <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h2 style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin: 0;">João da Silva</h2>
-                        <span style="background: #D1FAE5; color: #059669; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">
-                            Cadastrado e Regular
-                        </span>
-                    </div>
-                    <p style="color: #475569; margin: 6px 0 0 0; font-size: 0.95rem;">
-                        <strong>CPF:</strong> 123.456.789-00 &bull; <strong>Inscrição Municipal:</strong> APAL-2026-0104
-                    </p>
-                </div>
-            </div>
+    <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;">
 
-            <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;">
-
-            <!-- ÍNDICE DE CONFORMIDADE / SCORE DO TRABALHADOR -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Score de Conformidade</span>
-                    <strong style="display: block; font-size: 1.6rem; color: #10B981; margin-top: 4px;">98 / 100</strong>
-                    <small style="color: #059669; font-weight: 600;">Excelente Histórico</small>
-                </div>
-
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ponto Autorizado</span>
-                    <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">Praça Barão do Rio Branco</strong>
-                    <small style="color: #475569;">Centro - Vitória da Conquista</small>
-                </div>
-
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Categoria</span>
-                    <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">Categoria B</strong>
-                    <small style="color: #475569;">Carrinho Tracionado Humano</small>
-                </div>
-            </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Score de Conformidade</span>
+            <strong style="display: block; font-size: 1.6rem; color: #10B981; margin-top: 4px;">{{ ambulante.pontuacao }} / 100</strong>
         </div>
-
-        <!-- TABELA DE HISTÓRICO DE MULTAS E INFRAÇÕES -->
-        <div class="form-card" style="padding: 24px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin-top: 0; margin-bottom: 16px;">Histórico de Fiscalização & Notificações</h3>
-
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #E2E8F0; color: #475569;">
-                        <th style="padding: 10px;">Data</th>
-                        <th style="padding: 10px;">Ocorrência</th>
-                        <th style="padding: 10px;">Agente Fiscal</th>
-                        <th style="padding: 10px;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid #E2E8F0;">
-                        <td style="padding: 12px 10px; color: #475569;">15/01/2026</td>
-                        <td style="padding: 12px 10px; font-weight: 600; color: #0F172A;">Vistoria de Rotina (Equipamento)</td>
-                        <td style="padding: 12px 10px; color: #475569;">Fiscal Posturas #402</td>
-                        <td style="padding: 12px 10px;"><span style="color: #059669; font-weight: 600;">Aprovado</span></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #E2E8F0;">
-                        <td style="padding: 12px 10px; color: #475569;">10/11/2025</td>
-                        <td style="padding: 12px 10px; font-weight: 600; color: #0F172A;">Advertência por descarte fora do horário</td>
-                        <td style="padding: 12px 10px; color: #475569;">Fiscal Posturas #108</td>
-                        <td style="padding: 12px 10px;"><span style="color: #D97706; font-weight: 600;">Advertido / Regularizado</span></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ponto</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">
+                {% if licenca_atual and licenca_atual.ponto_ocupacao %}
+                {{ licenca_atual.ponto_ocupacao.nome_identificacao }}
+                {% elif ambulante.ponto_pretendido %}
+                {{ ambulante.ponto_pretendido.nome_identificacao }}
+                {% else %}
+                Não informado
+                {% endif %}
+            </strong>
+            <small style="color: #475569;">
+                {% if licenca_atual and licenca_atual.ponto_ocupacao %}{{ licenca_atual.ponto_ocupacao.bairro }}{% elif ambulante.ponto_pretendido %}{{ ambulante.ponto_pretendido.bairro }}{% endif %}
+            </small>
         </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Categoria / estrutura</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">
+                {% if licenca_atual and licenca_atual.categoria_produto %}
+                {{ licenca_atual.categoria_produto.nome_categoria }}
+                {% else %}
+                Sem categoria definida
+                {% endif %}
+            </strong>
+            <small style="color: #475569;">{% if estrutura %}{{ estrutura.tipo_estrutura }} · {{ estrutura.dimensoes_metragem }} m²{% else %}Estrutura não cadastrada{% endif %}</small>
+        </div>
+    </div>
+</div>
 
-    </main>
+{% if endereco %}
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Endereço</h3>
+    <p style="color: #475569; margin: 0;">
+        {{ endereco.logradouro }}, {{ endereco.numero }}{% if endereco.complemento %} — {{ endereco.complemento }}{% endif %}<br>
+        {{ endereco.bairro }} · {{ endereco.cidade }}/{{ endereco.estado_uf }} · CEP {{ endereco.cep }}
+    </p>
+</div>
+{% endif %}
 
-    <!-- RODAPÉ -->
-    <footer class="footer-pmvc" style="margin-top: 60px;">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Módulo de Gestão</span></p>
-    </footer>
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Documentos</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>TIPO</th>
+                    <th>STATUS</th>
+                    <th>ENVIO</th>
+                    <th>ARQUIVO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documentos %}
+                <tr>
+                    <td>{{ doc.get_tipo_documento_display }}</td>
+                    <td>{{ doc.status_aprovacao }}</td>
+                    <td>{{ doc.data_upload|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if doc.arquivo %}
+                        <a href="{{ doc.arquivo.url }}" target="_blank">Visualizar</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum documento anexado ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-    <script>
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Licenças e requerimentos</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>PROTOCOLO</th>
+                    <th>Nº ALVARÁ</th>
+                    <th>STATUS</th>
+                    <th>CATEGORIA</th>
+                    <th>AÇÃO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for licenca in licencas %}
+                <tr>
+                    <td>{{ licenca.protocolo }}</td>
+                    <td>{{ licenca.numero_licenca|default:"—" }}</td>
+                    <td>{{ licenca.status }}</td>
+                    <td>{% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}—{% endif %}</td>
+                    <td>
+                        {% if licenca.na_fila %}
+                        <a href="{% url 'gestor_analisar' licenca.pk %}">Analisar</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Nenhum requerimento ou alvará para este trabalhador.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Histórico de Fiscalização</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>OCORRÊNCIA</th>
+                    <th>AGENTE FISCAL</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ocorrencia in ocorrencias %}
+                <tr>
+                    <td>{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{{ ocorrencia.tipo_ocorrencia }}</td>
+                    <td>{{ ocorrencia.fiscal.nome_completo }}</td>
+                    <td>{{ ocorrencia.status_ocorrencia }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhuma ocorrência registrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 1.5rem;">
+    <a href="{% url 'gestor_ambulantes' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="arrow-left"></i> Voltar à listagem
+    </a>
+</div>
+{% endblock %}

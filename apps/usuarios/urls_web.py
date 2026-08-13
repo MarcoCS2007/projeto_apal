@@ -3,7 +3,6 @@ from django.urls import path
 from .views import (
     BackofficeInicioView,
     CadastroCompletoAmbulanteView,
-    GestorAmbulantesView,
     LoginAmbulanteView,
     LoginBackofficeView,
     LogoutBackofficeView,
@@ -18,6 +17,16 @@ from .views import (
     RecuperarSenhaView,
     RedefinirSenhaConfirmView,
     RegistroAmbulanteView,
+)
+from .views_gestor import (
+    GestorAmbulanteAcaoView,
+    GestorAmbulanteEditarView,
+    GestorAmbulantesView,
+    GestorAnalisarLicencaView,
+    GestorDossieView,
+    GestorFilaView,
+    GestorLicencasAtivasView,
+    GestorOcorrenciasView,
 )
 
 urlpatterns = [
@@ -38,11 +47,43 @@ urlpatterns = [
         name="ambulante_cadastro",
     ),
     path("backoffice/", BackofficeInicioView.as_view(), name="backoffice_inicio"),
+    path("gestor/fila/", GestorFilaView.as_view(), name="gestor_fila"),
     path(
         "gestor/ambulantes/",
         GestorAmbulantesView.as_view(),
         name="gestor_ambulantes",
     ),
+    path(
+        "gestor/ambulantes/<int:pk>/dossie/",
+        GestorDossieView.as_view(),
+        name="gestor_dossie",
+    ),
+    path(
+        "gestor/ambulantes/<int:pk>/editar/",
+        GestorAmbulanteEditarView.as_view(),
+        name="gestor_ambulante_editar",
+    ),
+    path(
+        "gestor/ambulantes/<int:pk>/acao/",
+        GestorAmbulanteAcaoView.as_view(),
+        name="gestor_ambulante_acao",
+    ),
+    path(
+        "gestor/analisar/<int:pk>/",
+        GestorAnalisarLicencaView.as_view(),
+        name="gestor_analisar",
+    ),
+    path(
+        "gestor/licencas/",
+        GestorLicencasAtivasView.as_view(),
+        name="gestor_licencas",
+    ),
+    path(
+        "gestor/ocorrencias/",
+        GestorOcorrenciasView.as_view(),
+        name="gestor_ocorrencias",
+    ),
+    path("gestor/dashboard/", BackofficeInicioView.as_view(), name="gestor_dashboard"),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/gestores/", MasterGestoresView.as_view(), name="master_gestores"),
     path(

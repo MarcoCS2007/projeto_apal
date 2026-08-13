@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Mapa de Vagas - APAL{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="pontos" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Mapa de Vagas e Pontos de Ocupação</h1>
+        <p>Cadastre vagas legais com metragem máxima, localização e status de ocupação.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+        <h2>{% if ponto_editando %}Editar Ponto de Ocupação{% else %}Cadastrar Novo Ponto{% endif %}</h2>
+    </div>
+
+    <form method="post" action="{% if ponto_editando %}{% url 'gestor_pontos_editar' ponto_editando.pk %}{% else %}{% url 'gestor_pontos' %}{% endif %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="nome-ponto">Nome de identificação</label>
+                {{ form.nome_identificacao }}
+                {% if form.nome_identificacao.errors %}<div class="login-error">{{ form.nome_identificacao.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="status-ponto">Status de ocupação</label>
+                {{ form.status_ocupacao }}
+                {% if form.status_ocupacao.errors %}<div class="login-error">{{ form.status_ocupacao.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="logradouro-ponto">Logradouro</label>
+                {{ form.logradouro }}
+                {% if form.logradouro.errors %}<div class="login-error">{{ form.logradouro.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="bairro-ponto">Bairro</label>
+                {{ form.bairro }}
+                {% if form.bairro.errors %}<div class="login-error">{{ form.bairro.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="coordenadas-ponto">Coordenadas (opcional)</label>
+                {{ form.coordenadas }}
+                {% if form.coordenadas.errors %}<div class="login-error">{{ form.coordenadas.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="metragem-ponto">Metragem máxima (m²)</label>
+                {{ form.metragem_maxima }}
+                {% if form.metragem_maxima.errors %}<div class="login-error">{{ form.metragem_maxima.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
+            {% if ponto_editando %}
+            <a href="{% url 'gestor_pontos' %}" class="forgot-password">Cancelar edição</a>
+            {% endif %}
+            <button type="submit" class="btn-submit" style="display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="plus-circle"></i> {% if ponto_editando %}Salvar Alterações{% else %}Salvar Ponto{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+        <h2>Pontos cadastrados</h2>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>PONTO</th>
+                    <th>ENDEREÇO</th>
+                    <th>METRAGEM MÁX.</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ponto in pontos %}
+                <tr>
+                    <td>
+                        <strong>{{ ponto.nome_identificacao }}</strong>
+                        {% if ponto.coordenadas %}
+                        <div style="font-size: 0.8rem; color: var(--texto-cinza);">{{ ponto.coordenadas }}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ ponto.logradouro }} — {{ ponto.bairro }}</td>
+                    <td>{{ ponto.metragem_maxima }} m²</td>
+                    <td>
+                        {% if ponto.status_ocupacao == "Livre" %}
+                        <span class="badge success">Livre</span>
+                        {% elif ponto.status_ocupacao == "Ocupado" %}
+                        <span class="badge danger">Ocupado</span>
+                        {% elif ponto.status_ocupacao == "Reservado" %}
+                        <span class="badge purple">Reservado</span>
+                        {% else %}
+                        <span class="badge warning">{{ ponto.status_ocupacao }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 6px;">
+                            <a class="btn-action" href="{% url 'gestor_pontos_editar' ponto.pk %}" title="Editar"><i data-lucide="edit"></i></a>
+                            <form method="post" action="{% url 'gestor_pontos_excluir' ponto.pk %}" onsubmit="return confirm('Excluir este ponto?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-action" style="color: #DC2626;" title="Excluir"><i data-lucide="trash-2"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Nenhum ponto cadastrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao Painel Central
+        </a>
+    </div>
+</div>
+{% endblock %}

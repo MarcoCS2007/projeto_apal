@@ -19,6 +19,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.assistente.models import LogAssistente
+from apps.licenciamento.services import (
+    categoria_do_ambulante,
+    pode_avancar_solicitacao,
+    tipos_faltando_aprovacao,
+    tipos_faltando_envio,
+    tipos_obrigatorios,
+)
 
 from .forms import (
     CadastroAmbulanteForm,
@@ -244,6 +251,17 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
             ambulante and ambulante.cadastro_completo
         )
         context["tem_licenca"] = bool(ambulante and ambulante.licencas.exists())
+        documentos = ambulante.documentos.all() if ambulante else None
+        context["documentos_rejeitados"] = (
+            list(documentos.filter(status_aprovacao="Rejeitado"))
+            if documentos is not None
+            else []
+        )
+        context["documentos_pendentes"] = (
+            list(documentos.filter(status_aprovacao="Pendente"))
+            if documentos is not None
+            else []
+        )
         return context
 
 
@@ -276,6 +294,7 @@ class CadastroCompletoAmbulanteView(
         return etapa
 
     def _contexto(self, ambulante, etapa, form, concluido=False):
+        categoria = categoria_do_ambulante(ambulante) if etapa == 6 else None
         return {
             "ambulante": ambulante,
             "etapa": etapa,
@@ -286,6 +305,25 @@ class CadastroCompletoAmbulanteView(
             "pontos_catalogo": form.fields["ponto_pretendido"].queryset
             if etapa == 5
             else None,
+            "categorias_catalogo": form.fields["categoria_pretendida"].queryset
+            if etapa == 5
+            else None,
+            "documentos": ambulante.documentos.order_by("tipo_documento")
+            if etapa == 6
+            else None,
+            "categoria_documentos": categoria,
+            "tipos_obrigatorios": tipos_obrigatorios(ambulante, categoria)
+            if etapa == 6
+            else (),
+            "tipos_faltando_envio": tipos_faltando_envio(ambulante, categoria)
+            if etapa == 6
+            else (),
+            "tipos_faltando_aprovacao": tipos_faltando_aprovacao(ambulante, categoria)
+            if etapa == 6
+            else (),
+            "pode_avancar_solicitacao": pode_avancar_solicitacao(ambulante, categoria)
+            if etapa == 6
+            else False,
         }
 
     def get(self, request):
@@ -303,7 +341,11 @@ class CadastroCompletoAmbulanteView(
         ambulante = self._ambulante()
         etapa = self._etapa(request.POST)
         form_class = ETAPAS_CADASTRO[etapa]
-        form = form_class(request.POST, request.FILES, ambulante=ambulante)
+        acao = request.POST.get("acao", "proxima")
+        form_kwargs = {"ambulante": ambulante}
+        if etapa == 6:
+            form_kwargs["acao"] = acao
+        form = form_class(request.POST, request.FILES, **form_kwargs)
         if not form.is_valid():
             return render(
                 request,
@@ -313,13 +355,21 @@ class CadastroCompletoAmbulanteView(
 
         form.save()
         ambulante.refresh_from_db()
-        acao = request.POST.get("acao", "proxima")
+        if acao == "salvar":
+            messages.success(
+                request,
+                "Documentos salvos. O gestor verá os anexos pendentes na triagem.",
+            )
+            return redirect(f"{reverse('ambulante_cadastro')}?etapa=6")
         if acao == "enviar":
             if ambulante.cadastro_completo:
+                from apps.licenciamento.services import abrir_requerimento
+
+                abrir_requerimento(ambulante)
                 messages.success(
                     request,
-                    "Cadastro concluído. Você ainda não possui licença; "
-                    "o gestor já consegue ver o seu registro.",
+                    "Cadastro concluído. A solicitação entrou na fila de análise "
+                    "da prefeitura.",
                 )
                 return redirect(f"{reverse('ambulante_cadastro')}?concluido=1")
             messages.error(
@@ -332,31 +382,6 @@ class CadastroCompletoAmbulanteView(
         proxima = min(etapa + 1, 6)
         messages.success(request, "Etapa salva. Você pode continuar sem perder os dados.")
         return redirect(f"{reverse('ambulante_cadastro')}?etapa={proxima}")
-
-
-class GestorAmbulantesView(
-    LoginRequiredMixin, AcessoBackofficeMixin, TemplateView
-):
-    template_name = "gestor/ambulantes-cadastrados.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        busca = self.request.GET.get("q", "").strip()
-        ambulantes = Ambulante.objects.prefetch_related(
-            "enderecos", "estruturas"
-        ).order_by("-criado_em", "nome")
-        if busca:
-            ambulantes = ambulantes.filter(
-                Q(nome__icontains=busca)
-                | Q(sobrenome__icontains=busca)
-                | Q(cpf__icontains=busca)
-                | Q(email__icontains=busca)
-                | Q(apelido_nome_fantasia__icontains=busca)
-            )
-        context["busca"] = busca
-        context["ambulantes"] = ambulantes
-        context["total_ambulantes"] = ambulantes.count()
-        return context
 
 
 class RecuperarSenhaView(PasswordResetView):
@@ -389,6 +414,13 @@ class RedefinirSenhaConfirmView(PasswordResetConfirmView):
 
 class BackofficeInicioView(LoginRequiredMixin, AcessoBackofficeMixin, TemplateView):
     template_name = "backoffice_inicio.html"
+
+    def get_context_data(self, **kwargs):
+        from .views_gestor import contexto_inicio_gestor
+
+        context = super().get_context_data(**kwargs)
+        context.update(contexto_inicio_gestor(self.request.user))
+        return context
 
 
 class MasterTemplateView(LoginRequiredMixin, AcessoMasterMixin, TemplateView):

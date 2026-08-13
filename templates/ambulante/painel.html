@@ -51,6 +51,21 @@
                 </div>
             </li>
             <li style="align-items: flex-start;">
+                <i data-lucide="file-check" style="margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: var(--texto-escuro);">Documentos:</strong>
+                    <span style="font-weight: 400; color: var(--texto-cinza);">
+                        {% if documentos_rejeitados %}
+                            há pendência documental. Reenvie os anexos rejeitados.
+                        {% elif documentos_pendentes %}
+                            em análise na triagem da prefeitura.
+                        {% else %}
+                            envie comprovante, RG/CPF e laudos exigidos na etapa de anexos.
+                        {% endif %}
+                    </span>
+                </div>
+            </li>
+            <li style="align-items: flex-start;">
                 <i data-lucide="badge-alert" style="margin-top: 2px;"></i>
                 <div>
                     <strong style="color: var(--texto-escuro);">Licença / alvará:</strong>
@@ -69,9 +84,12 @@
     </a>
 </p>
 {% else %}
-<p style="margin-top: 1.75rem;">
+<p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
     <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="pencil"></i> Revisar cadastro
+    </a>
+    <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="upload"></i> {% if documentos_rejeitados %}Reenviar documentos{% else %}Enviar documentos{% endif %}
     </a>
 </p>
 {% endif %}

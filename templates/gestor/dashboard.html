@@ -1,226 +1,41 @@
-<!-- Se estiver usando Django futuramente, descomente a linha abaixo: -->
-<!-- {% extends 'base.html' %} -->
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard & Relatórios Estatísticos - APAL Gestor</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- HTMX CDN (HU-2.3 e HU-4.4) -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% block title %}Dashboard - APAL Gestor{% endblock %}
 
-    <!-- CHART.JS CDN (HU-4.10: Visualização Dinâmica de Gráficos) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="dashboard" %}
+{% endblock %}
 
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Indicadores do painel</h1>
+        <p>Números operacionais da fila e da base cadastral. Gráficos detalhados entram na etapa de dashboards.</p>
+    </div>
+</section>
+{% endblock %}
 
-    <!-- CABEÇALHO DO GESTOR -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                    <span style="font-size: 0.85rem; background: #EFF6FF; color: #2563EB; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Painel Gestor</span>
-                </a>
-            </div>
-            <nav class="header-nav">
-                <a href="triagem.html"><i data-lucide="file-check"></i> Triagem</a>
-                <a href="dashboard.html" class="active"><i data-lucide="bar-chart-3"></i> Relatórios</a>
-                <a href="../index.html"><i data-lucide="log-out" style="color: #EF4444;"></i> Sair</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="main-container" style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
-        
-        <div style="margin-bottom: 24px;">
-            <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">Indicadores de Ocupação & Relatórios</h1>
-            <p style="color: #475569;">Mapeamento geográfico do comércio ambulante, monitoramento de itinerantes e distribuição por setor em Vitória da Conquista.</p>
-        </div>
-
-        <!-- FILTROS DE CONSULTA (HU-4.5: Filtro Web de Itinerantes) -->
-        <div class="form-card" style="padding: 20px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
-            <form id="filtro-dashboard" hx-get="/api/relatorios/ocupacao/" hx-target="#container-estatisticas" hx-trigger="change, submit" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: end;">
-                <div>
-                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">Bairro / Região:</label>
-                    <select name="bairro" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-family: inherit;">
-                        <option value="">Todos os Bairros</option>
-                        <option value="centro">Centro / Ceasa</option>
-                        <option value="candeias">Candeias</option>
-                        <option value="brasil">Bairro Brasil</option>
-                        <option value="patagônia">Patagônia</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">Origem do Comerciante (HU-4.5):</label>
-                    <select name="origem" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-family: inherit;">
-                        <option value="todos">Todos</option>
-                        <option value="residentes">Residentes de Vitória da Conquista</option>
-                        <option value="itinerantes">Apenas Itinerantes / Outros Municípios</option>
-                    </select>
-                </div>
-
-                <div>
-                    <button type="submit" style="width: 100%; background: #2563EB; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                        <i data-lucide="filter" style="width: 16px;"></i> Aplicar Filtros
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- SEÇÃO DO GRÁFICO INTERATIVO (HU-4.10) -->
-        <div class="form-card" style="padding: 24px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
-                <h2 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin: 0;">Distribuição por Categoria de Comércio</h2>
-                
-                <!-- BOTÕES PARA ALTERNAR GRÁFICO (HU-4.10) -->
-                <div style="display: flex; gap: 8px; background: #F1F5F9; padding: 4px; border-radius: 8px;">
-                    <button type="button" onclick="mudarTipoGrafico('bar')" id="btn-chart-bar" style="background: #2563EB; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                        <i data-lucide="bar-chart-2" style="width: 16px;"></i> Barras
-                    </button>
-                    <button type="button" onclick="mudarTipoGrafico('pie')" id="btn-chart-pie" style="background: transparent; color: #475569; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                        <i data-lucide="pie-chart" style="width: 16px;"></i> Pizza
-                    </button>
-                </div>
-            </div>
-
-            <!-- CANVAS DO CHART.JS -->
-            <div style="position: relative; height: 320px; width: 100%;">
-                <canvas id="graficoOcupacao"></canvas>
-            </div>
-        </div>
-
-        <!-- LISTA ESTATÍSTICA DE OCUPAÇÃO POR BAIRRO (HU-4.4) -->
-        <div id="container-estatisticas" class="form-card" style="padding: 24px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <h2 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin-top: 0; margin-bottom: 16px;">Resumo por Bairro (HU-4.4)</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Centro / Ceasa</span>
-                    <strong style="display: block; font-size: 1.5rem; color: #2563EB; margin-top: 4px;">142 Ambulantes</strong>
-                    <small style="color: #059669; font-weight: 600;">88% Licenciados</small>
-                </div>
-
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Bairro Brasil</span>
-                    <strong style="display: block; font-size: 1.5rem; color: #2563EB; margin-top: 4px;">65 Ambulantes</strong>
-                    <small style="color: #059669; font-weight: 600;">92% Licenciados</small>
-                </div>
-
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Candeias</span>
-                    <strong style="display: block; font-size: 1.5rem; color: #2563EB; margin-top: 4px;">38 Ambulantes</strong>
-                    <small style="color: #D97706; font-weight: 600;">12% Em Análise</small>
-                </div>
-
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Itinerantes (Fora da Cidade)</span>
-                    <strong style="display: block; font-size: 1.5rem; color: #EC4899; margin-top: 4px;">19 Registros</strong>
-                    <small style="color: #64748B; font-weight: 600;">Identificados via filtro</small>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- RODAPÉ -->
-    <footer class="footer-pmvc" style="margin-top: 60px;">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Módulo do Gestor</span></p>
-    </footer>
-
-    <!-- JS DO CHART.JS E LÓGICA DE ALTERNÂNCIA (HU-4.10) -->
-    <script>
-        lucide.createIcons();
-
-        const ctx = document.getElementById('graficoOcupacao').getContext('2d');
-        
-        // Dados estatísticos base
-        const dadosGrafico = {
-            labels: ['Alimentos / Bebidas', 'Vestuário / Calçados', 'Artesanato / Utensílios', 'Serviços / Diversos'],
-            datasets: [{
-                label: 'Quantidade de Ambulantes',
-                data: [120, 75, 45, 24],
-                backgroundColor: [
-                    '#2563EB', // Azul Primário
-                    '#FF007F', // Rosa Magenta APAL
-                    '#10B981', // Verde
-                    '#F59E0B'  // Amarelo
-                ],
-                borderWidth: 1
-            }]
-        };
-
-        // Instância inicial do gráfico (Barras)
-        let meuGrafico = new Chart(ctx, {
-            type: 'bar',
-            data: dadosGrafico,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-
-        // Função para alternar dinamicamente entre Pizza e Barras (HU-4.10)
-        function mudarTipoGrafico(tipo) {
-            meuGrafico.destroy(); // Destrói a instância anterior para recriar
-
-            const btnBar = document.getElementById('btn-chart-bar');
-            const btnPie = document.getElementById('btn-chart-pie');
-
-            if (tipo === 'pie') {
-                btnPie.style.background = '#2563EB';
-                btnPie.style.color = '#FFFFFF';
-                btnBar.style.background = 'transparent';
-                btnBar.style.color = '#475569';
-
-                meuGrafico = new Chart(ctx, {
-                    type: 'pie',
-                    data: dadosGrafico,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
-            } else {
-                btnBar.style.background = '#2563EB';
-                btnBar.style.color = '#FFFFFF';
-                btnPie.style.background = 'transparent';
-                btnPie.style.color = '#475569';
-
-                meuGrafico = new Chart(ctx, {
-                    type: 'bar',
-                    data: dadosGrafico,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        }
-                    }
-                });
-            }
-        }
-    </script>
-</body>
-</html>
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+    <div class="form-card" style="margin: 0;">
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ambulantes</span>
+        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ total_ambulantes }}</strong>
+    </div>
+    <a href="{% url 'gestor_fila' %}" class="form-card" style="margin: 0; text-decoration: none; color: inherit;">
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fila em análise</span>
+        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ fila_analise }}</strong>
+    </a>
+    <div class="form-card" style="margin: 0;">
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Licenças ativas</span>
+        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ licencas_ativas }}</strong>
+    </div>
+    <div class="form-card" style="margin: 0;">
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Docs pendentes</span>
+        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ docs_pendentes }}</strong>
+    </div>
+    <div class="form-card" style="margin: 0;">
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ocorrências</span>
+        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ ocorrencias }}</strong>
+    </div>
+</div>
+{% endblock %}

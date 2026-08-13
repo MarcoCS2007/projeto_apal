@@ -10,7 +10,7 @@
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
         <h1>Ambulantes Cadastrados</h1>
-        <p>Relação completa e gestão do banco de dados de trabalhadores do município.</p>
+        <p>Consultar, editar dados cadastrais, suspender, ativar e cancelar conta ou licença.</p>
     </div>
 </section>
 {% endblock %}
@@ -37,28 +37,59 @@
                     <th>CPF</th>
                     <th>DATA DE CADASTRO</th>
                     <th>SITUAÇÃO</th>
+                    <th>AÇÕES</th>
                 </tr>
             </thead>
             <tbody>
                 {% for ambulante in ambulantes %}
                 <tr>
                     <td>#{{ ambulante.pk }}</td>
-                    <td>{{ ambulante.nome }} {{ ambulante.sobrenome }}</td>
+                    <td>{{ ambulante.nome_completo }}</td>
                     <td>{{ ambulante.cpf }}</td>
                     <td>{{ ambulante.criado_em|date:"d/m/Y" }}</td>
                     <td>
-                        {% if not ambulante.ativo %}
-                        <span class="badge danger"><i data-lucide="lock"></i> Inativo</span>
-                        {% elif ambulante.cadastro_completo %}
+                        {% if ambulante.situacao_conta == "cancelada" %}
+                        <span class="badge danger"><i data-lucide="ban"></i> Cancelado</span>
+                        {% elif ambulante.situacao_conta == "suspensa" %}
+                        <span class="badge danger"><i data-lucide="lock"></i> Suspenso</span>
+                        {% elif ambulante.situacao_conta == "completa" %}
                         <span class="badge success"><i data-lucide="check-circle"></i> Cadastro completo</span>
                         {% else %}
                         <span class="badge"><i data-lucide="clock"></i> Cadastro pendente</span>
                         {% endif %}
                     </td>
+                    <td>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                            <a href="{% url 'gestor_dossie' ambulante.pk %}" class="btn-action" style="text-decoration: none;">
+                                <i data-lucide="folder-open"></i> Dossiê
+                            </a>
+                            <a href="{% url 'gestor_ambulante_editar' ambulante.pk %}" class="btn-action" style="text-decoration: none;">
+                                <i data-lucide="pencil"></i> Editar
+                            </a>
+                            {% if ambulante.situacao_conta == "suspensa" or ambulante.situacao_conta == "cancelada" %}
+                            <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="acao" value="ativar">
+                                <button type="submit" class="btn-action"><i data-lucide="unlock"></i> Ativar</button>
+                            </form>
+                            {% else %}
+                            <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="acao" value="suspender">
+                                <button type="submit" class="btn-action"><i data-lucide="pause-circle"></i> Suspender</button>
+                            </form>
+                            <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Cancelar a conta e as licenças deste ambulante?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="acao" value="cancelar">
+                                <button type="submit" class="btn-action" style="color: #DC2626; border-color: #FCA5A5;"><i data-lucide="ban"></i> Cancelar</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">Nenhum ambulante cadastrado.</td>
+                    <td colspan="6">Nenhum ambulante cadastrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>

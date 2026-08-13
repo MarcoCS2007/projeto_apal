@@ -201,6 +201,7 @@ class Command(BaseCommand):
         self._ambulantes(pontos)
         ConfiguracaoSeguranca.carregar()
         self.stdout.write("Configuração global de segurança disponível.")
+        self._abrir_fila_analise()
         self._resumo()
         self.stdout.write(
             self.style.SUCCESS("Carga inicial (seeds) finalizada com sucesso!")
@@ -544,7 +545,38 @@ class Command(BaseCommand):
         Endereco.objects.create(ambulante=ambulante, **endereco)
         EstruturaTrabalho.objects.create(ambulante=ambulante, **estrutura)
         situacao = "completo" if ativo else "completo e inativo"
-        self.stdout.write(self.style.SUCCESS(f"Ambulante {nome} criado ({situacao})."))
+        self.stdout.write(
+            self.style.SUCCESS(f"Ambulante {nome} criado ({situacao}).")
+        )
+
+    def _abrir_fila_analise(self):
+        from apps.licenciamento.models import CategoriaProduto
+        from apps.licenciamento.services import abrir_requerimento
+
+        mapa = {
+            "39053344705": "Lanches e Salgados",
+            "28174691000": "Vestuário e Acessórios",
+            "83716209433": "Alimentos Manipulados",
+            "91827364544": "Frutas e Hortifruti",
+        }
+        for cpf, nome_categoria in mapa.items():
+            ambulante = Ambulante.objects.filter(cpf=cpf, ativo=True).first()
+            if not ambulante:
+                continue
+            categoria = CategoriaProduto.objects.filter(
+                nome_categoria=nome_categoria
+            ).first()
+            licenca, criado = abrir_requerimento(ambulante, categoria=categoria)
+            if criado:
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Requerimento {licenca.protocolo} na fila ({ambulante.nome})."
+                    )
+                )
+            elif licenca:
+                self.stdout.write(
+                    f"Requerimento {licenca.protocolo} já estava na fila."
+                )
 
     def _resumo(self):
         self.stdout.write("")

@@ -296,21 +296,38 @@
         <div class="form-step active" id="step-5">
             <div class="section-title">
                 <div class="title-accent"></div>
-                <h2>5. Solicitação de Ponto de Ocupação</h2>
+                <h2>5. Ponto e categoria pretendidos</h2>
             </div>
-            {% if pontos_catalogo %}
+            {% if categorias_catalogo %}
             <div class="form-row">
                 <div class="input-group full-width">
-                    <label for="ponto-pretendido">Ponto desejado (catálogo municipal)</label>
-                    {{ form.ponto_pretendido }}
+                    <label for="categoria-pretendida">Categoria de produto (catálogo municipal)</label>
+                    {{ form.categoria_pretendida }}
+                    {% if form.categoria_pretendida.errors %}<div class="login-error">{{ form.categoria_pretendida.errors.0 }}</div>{% endif %}
                     <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.4rem;">
-                        A escolha é uma intenção. O ponto só é ocupado quando o gestor emitir a licença.
+                        Categorias com laudo sanitário ou de bombeiros exigirão esses anexos na etapa de documentos.
                     </p>
                 </div>
             </div>
             {% else %}
             <div class="info-callout-box">
-                <p>O catálogo de pontos ainda não está disponível. Você pode seguir e escolher o ponto depois.</p>
+                <p>O catálogo de categorias ainda não está disponível. O gestor pode cadastrá-las no painel.</p>
+            </div>
+            {% endif %}
+            {% if pontos_catalogo %}
+            <div class="form-row">
+                <div class="input-group full-width">
+                    <label for="ponto-pretendido">Ponto desejado (catálogo municipal)</label>
+                    {{ form.ponto_pretendido }}
+                    {% if form.ponto_pretendido.errors %}<div class="login-error">{{ form.ponto_pretendido.errors.0 }}</div>{% endif %}
+                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.4rem;">
+                        Só aparecem pontos <strong>Livres</strong>. A metragem da sua estrutura não pode ultrapassar a do ponto. A ocupação só ocorre quando o gestor emitir a licença.
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <div class="info-callout-box">
+                <p>Não há pontos livres no catálogo no momento. Você pode seguir e escolher o ponto depois.</p>
             </div>
             {% endif %}
             <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
@@ -324,26 +341,142 @@
         <div class="form-step active" id="step-6">
             <div class="section-title">
                 <div class="title-accent"></div>
-                <h2>6. Fotos e conclusão</h2>
+                <h2>6. Documentos anexos e fotos</h2>
             </div>
+
+            {% if categoria_documentos %}
             <div class="info-callout-box">
-                <p>O envio de RG, CPF, comprovante e laudos entra na etapa de documentos. Aqui você só conclui o cadastro socioeconômico. O QR Code não é gerado agora.</p>
+                <p>
+                    Categoria pretendida: <strong>{{ categoria_documentos.nome_categoria }}</strong>.
+                    {% if categoria_documentos.exige_laudo_sanitario or categoria_documentos.exige_laudo_bombeiros %}
+                    A solicitação só avança quando os laudos exigidos existirem e estiverem <strong>aprovados</strong> na triagem.
+                    {% endif %}
+                </p>
             </div>
+            {% else %}
+            <div class="info-callout-box">
+                <p>Selecione a categoria na etapa 5 para saber se a atividade exige laudo sanitário ou de bombeiros. Comprovante de residência e RG/CPF são sempre necessários para o avanço da solicitação.</p>
+            </div>
+            {% endif %}
+
+            {% if documentos %}
+            <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Status</th>
+                            <th>Arquivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for documento in documentos %}
+                        <tr>
+                            <td>{{ documento.get_tipo_documento_display }}</td>
+                            <td>
+                                {% if documento.aprovado %}
+                                <span class="badge success">Aprovado</span>
+                                {% elif documento.rejeitado %}
+                                <span class="badge danger">Rejeitado</span>
+                                {% else %}
+                                <span class="badge warning">Pendente</span>
+                                {% endif %}
+                                {% if documento.rejeitado and documento.motivo_rejeicao %}
+                                <p style="margin: 6px 0 0; font-size: 0.85rem; color: #B42318;">{{ documento.motivo_rejeicao }} Reenvie o arquivo abaixo.</p>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if documento.arquivo %}
+                                <a href="{{ documento.arquivo.url }}" target="_blank" rel="noopener">Visualizar</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if tipos_faltando_envio %}
+            <div class="error-card" style="display: flex; margin-bottom: 1.25rem;">
+                <i data-lucide="alert-octagon"></i>
+                <div>
+                    <strong>Pendência documental</strong><br>
+                    <span>Ainda faltam (ou foram rejeitados):
+                        {% for tipo in tipos_faltando_envio %}
+                            {% if tipo == "comprovante_residencia" %}Comprovante de Residência{% elif tipo == "rg_cpf" %}RG/CPF{% elif tipo == "mei" %}MEI / CNPJ{% elif tipo == "laudo_sanitario" %}Laudo Sanitário{% elif tipo == "laudo_bombeiros" %}Laudo dos Bombeiros{% else %}{{ tipo }}{% endif %}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}.
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="form-row">
                 <div class="input-group">
                     <label for="doc-foto">Foto 3x4 (opcional)</label>
                     {{ form.foto }}
+                    {% if ambulante.foto %}<p style="font-size: 0.85rem; color: var(--texto-cinza);">Foto atual já enviada.</p>{% endif %}
                 </div>
                 <div class="input-group">
                     <label for="doc-estrutura">Foto da estrutura (opcional)</label>
                     {{ form.foto_estrutura }}
                 </div>
             </div>
-            <div class="form-actions" style="margin-top: 2.5rem; display: flex; justify-content: space-between; gap: 1rem;">
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="doc-rg">Cópia do RG/CPF {% if "rg_cpf" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_rg_cpf }}
+                </div>
+                <div class="input-group">
+                    <label for="doc-comprovante">Comprovante de Residência {% if "comprovante_residencia" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_comprovante_residencia }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="doc-mei">Comprovante de MEI / CNPJ {% if "mei" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_mei }}
+                </div>
+                <div class="input-group">
+                    <label for="doc-saude">Laudo Sanitário {% if "laudo_sanitario" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_laudo_sanitario }}
+                    <label for="validade-saude" style="margin-top: 0.6rem;">Validade (se houver)</label>
+                    {{ form.validade_laudo_sanitario }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="doc-bombeiros">Laudo dos Bombeiros {% if "laudo_bombeiros" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_laudo_bombeiros }}
+                    <label for="validade-bombeiros" style="margin-top: 0.6rem;">Validade (se houver)</label>
+                    {{ form.validade_laudo_bombeiros }}
+                </div>
+            </div>
+
+            {% if not pode_avancar_solicitacao and documentos %}
+            <div class="info-callout-box" style="background-color: #FEF3C7; border-left: 4px solid #D97706; padding: 1.2rem; border-radius: 6px; margin-top: 1.5rem;">
+                <p style="color: #92400E; margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                    A solicitação permanece bloqueada até os documentos obrigatórios existirem e serem aprovados pelo gestor.
+                </p>
+            </div>
+            {% endif %}
+
+            <div class="info-callout-box" style="background-color: #FEF3C7; border-left: 4px solid #D97706; padding: 1.2rem; border-radius: 6px; margin-top: 1.5rem;">
+                <p style="color: #92400E; margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                    <strong>Aviso Importante:</strong> o envio dos anexos <strong>não autoriza o exercício da atividade</strong>. O pedido só avança depois da triagem.
+                </p>
+            </div>
+
+            <div class="form-actions" style="margin-top: 2.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
                 <a href="?etapa=5" class="btn-action" id="btn-prev-6"><i data-lucide="arrow-left"></i> Voltar</a>
-                <button type="submit" name="acao" value="enviar" class="btn-submit" id="btn-enviar-final">
-                    <i data-lucide="send"></i> Concluir cadastro
-                </button>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button type="submit" name="acao" value="salvar" class="btn-action" id="btn-salvar-anexos">
+                        <i data-lucide="upload"></i> Salvar anexos
+                    </button>
+                    <button type="submit" name="acao" value="enviar" class="btn-submit" id="btn-enviar-final">
+                        <i data-lucide="send"></i> Concluir cadastro
+                    </button>
+                </div>
             </div>
         </div>
         {% endif %}

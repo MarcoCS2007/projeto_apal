@@ -2,8 +2,15 @@ from decimal import Decimal
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao
+from apps.licenciamento.forms import AnexosDocumentosForm
+from apps.licenciamento.models import CategoriaProduto
+from apps.licenciamento.services import (
+    categoria_do_ambulante,
+    gravar_categoria_pretendida,
+)
 
 from .forms import separar_nome
 from .models import Ambulante
@@ -429,7 +436,28 @@ class EstruturaCadastroForm(forms.Form):
         return estrutura
 
 
+class CategoriaCatalogoChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        extras = []
+        if obj.exige_laudo_sanitario:
+            extras.append("laudo sanitário")
+        if obj.exige_laudo_bombeiros:
+            extras.append("bombeiros")
+        if extras:
+            return f"{obj.nome_categoria} ({', '.join(extras)})"
+        return obj.nome_categoria
+
+
 class PontoCadastroForm(forms.Form):
+    categoria_pretendida = CategoriaCatalogoChoiceField(
+        label="Categoria de produto",
+        queryset=CategoriaProduto.objects.none(),
+        required=False,
+        empty_label="Selecione a categoria (opcional)",
+        widget=forms.Select(
+            attrs={"id": "categoria-pretendida", "class": "styled-select"}
+        ),
+    )
     ponto_pretendido = forms.ModelChoiceField(
         label="Ponto desejado",
         queryset=PontoOcupacao.objects.none(),
@@ -441,43 +469,53 @@ class PontoCadastroForm(forms.Form):
     def __init__(self, *args, ambulante=None, **kwargs):
         self.ambulante = ambulante
         super().__init__(*args, **kwargs)
-        pontos = PontoOcupacao.objects.filter(ativo=True).order_by("nome_identificacao")
-        livres = pontos.filter(status_ocupacao__iexact="Livre")
-        self.fields["ponto_pretendido"].queryset = livres if livres.exists() else pontos
+        categorias = CategoriaProduto.objects.filter(ativo=True).order_by(
+            "nome_categoria"
+        )
+        self.fields["categoria_pretendida"].queryset = categorias
+        pontos = PontoOcupacao.objects.livres().order_by("nome_identificacao")
+        if ambulante and ambulante.ponto_pretendido_id:
+            pontos = PontoOcupacao.objects.filter(
+                Q(pk__in=pontos.values("pk")) | Q(pk=ambulante.ponto_pretendido_id)
+            ).order_by("nome_identificacao")
+        self.fields["ponto_pretendido"].queryset = pontos
         if ambulante and not args:
             self.fields["ponto_pretendido"].initial = ambulante.ponto_pretendido_id
+            categoria = categoria_do_ambulante(ambulante)
+            if categoria:
+                self.fields["categoria_pretendida"].initial = categoria.pk
+
+    def clean_ponto_pretendido(self):
+        ponto = self.cleaned_data.get("ponto_pretendido")
+        if not ponto:
+            return ponto
+        atual_id = getattr(self.ambulante, "ponto_pretendido_id", None)
+        if ponto.pk != atual_id and not ponto.disponivel_para_nova_atribuicao():
+            raise ValidationError(
+                "Este ponto não está livre para nova ocupação."
+            )
+        estrutura = None
+        if self.ambulante:
+            estrutura = self.ambulante.estruturas.order_by("id").first()
+        if (
+            estrutura
+            and estrutura.dimensoes_metragem
+            and not ponto.metragem_compativel(estrutura.dimensoes_metragem)
+        ):
+            raise ValidationError(
+                "A metragem da sua estrutura "
+                f"({estrutura.dimensoes_metragem} m²) ultrapassa o máximo "
+                f"deste ponto ({ponto.metragem_maxima} m²)."
+            )
+        return ponto
 
     def save(self):
         self.ambulante.ponto_pretendido = self.cleaned_data.get("ponto_pretendido")
         self.ambulante.save(update_fields=["ponto_pretendido", "atualizado_em"])
+        categoria = self.cleaned_data.get("categoria_pretendida")
+        gravar_categoria_pretendida(self.ambulante, categoria)
         return self.ambulante
 
 
-class AnexosCadastroForm(forms.Form):
-    foto = forms.ImageField(
-        label="Foto 3x4 recente",
-        required=False,
-        widget=forms.ClearableFileInput(attrs={"id": "doc-foto", "accept": "image/*"}),
-    )
-    foto_estrutura = forms.ImageField(
-        label="Foto da estrutura",
-        required=False,
-        widget=forms.ClearableFileInput(
-            attrs={"id": "doc-estrutura", "accept": "image/*"}
-        ),
-    )
-
-    def __init__(self, *args, ambulante=None, **kwargs):
-        self.ambulante = ambulante
-        super().__init__(*args, **kwargs)
-
-    def save(self):
-        ambulante = self.ambulante
-        if self.cleaned_data.get("foto"):
-            ambulante.foto = self.cleaned_data["foto"]
-            ambulante.save(update_fields=["foto", "atualizado_em"])
-        estrutura = ambulante.estruturas.order_by("id").first()
-        if estrutura and self.cleaned_data.get("foto_estrutura"):
-            estrutura.foto_estrutura = self.cleaned_data["foto_estrutura"]
-            estrutura.save(update_fields=["foto_estrutura", "atualizado_em"])
-        return ambulante
+class AnexosCadastroForm(AnexosDocumentosForm):
+    """Etapa 6 do cadastro: upload e reenvio de documentos."""

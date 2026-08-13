@@ -1,6 +1,12 @@
 <nav class="header-nav">
-    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel Central</a>
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" or active == "dashboard" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <a href="{% url 'gestor_fila' %}"{% if active == "fila" %} class="active"{% endif %}><i data-lucide="file-search"></i> Fila</a>
     <a href="{% url 'gestor_ambulantes' %}"{% if active == "ambulantes" %} class="active"{% endif %}><i data-lucide="users"></i> Ambulantes</a>
+    <a href="{% url 'gestor_triagem' %}"{% if active == "triagem" %} class="active"{% endif %}><i data-lucide="file-check"></i> Triagem</a>
+    <a href="{% url 'gestor_licencas' %}"{% if active == "licencas" %} class="active"{% endif %}><i data-lucide="badge-check"></i> Licenças</a>
+    <a href="{% url 'gestor_ocorrencias' %}"{% if active == "ocorrencias" %} class="active"{% endif %}><i data-lucide="clipboard-list"></i> Ocorrências</a>
+    <a href="{% url 'gestor_categorias' %}"{% if active == "categorias" %} class="active"{% endif %}><i data-lucide="tags"></i> Categorias</a>
+    <a href="{% url 'gestor_pontos' %}"{% if active == "pontos" %} class="active"{% endif %}><i data-lucide="map"></i> Vagas</a>
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}
         <button type="submit" style="background: none; border: none; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">

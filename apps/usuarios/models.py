@@ -63,6 +63,26 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
         return f"{self.nome} {self.sobrenome} - {self.cpf}"
 
     @property
+    def nome_completo(self):
+        return f"{self.nome} {self.sobrenome}".strip()
+
+    @property
+    def iniciais(self):
+        letras = [
+            parte[0].upper()
+            for parte in (self.nome, self.sobrenome)
+            if parte
+        ]
+        return "".join(letras[:2]) or "?"
+
+    @property
+    def cpf_formatado(self):
+        digits = "".join(ch for ch in (self.cpf or "") if ch.isdigit())
+        if len(digits) == 11:
+            return f"{digits[:3]}.{digits[3:6]}.{digits[6:9]}-{digits[9:]}"
+        return self.cpf
+
+    @property
     def role(self):
         try:
             return Perfil(self.__class__.__name__.lower())
@@ -125,6 +145,38 @@ class Ambulante(UsuarioBase):
             and self.tipo_atuacao
             and self.enderecos.exists()
             and tem_estrutura
+        )
+
+    @property
+    def situacao_conta(self):
+        extras = self.dados_complementares or {}
+        if extras.get("conta_cancelada"):
+            return "cancelada"
+        if not self.ativo or not self.is_active:
+            return "suspensa"
+        if self.cadastro_completo:
+            return "completa"
+        return "pendente"
+
+    def aplicar_situacao_conta(self, situacao):
+        extras = dict(self.dados_complementares or {})
+        if situacao == "cancelada":
+            extras["conta_cancelada"] = True
+            self.ativo = False
+            self.is_active = False
+        elif situacao == "suspensa":
+            extras.pop("conta_cancelada", None)
+            extras["conta_suspensa"] = True
+            self.ativo = False
+            self.is_active = False
+        else:
+            extras.pop("conta_cancelada", None)
+            extras.pop("conta_suspensa", None)
+            self.ativo = True
+            self.is_active = True
+        self.dados_complementares = extras
+        self.save(
+            update_fields=["ativo", "is_active", "dados_complementares", "atualizado_em"]
         )
 
 

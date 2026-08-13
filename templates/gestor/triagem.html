@@ -1,193 +1,126 @@
-<!-- Se estiver usando Django futuramente, descomente a linha abaixo: -->
-<!-- {% extends 'base.html' %} -->
+{% extends "base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triagem de Documentos - APAL Gestor</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- LUCIDE ICONS -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- HTMX CDN (HU-2.3 e HU-3.3) -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% block title %}Triagem de Documentos - APAL Gestor{% endblock %}
 
-    <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+{% block extra_css %}
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+{% endblock %}
 
-    <!-- CABEÇALHO DO GESTOR -->
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                    <span style="font-size: 0.85rem; background: #EFF6FF; color: #2563EB; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Painel Gestor</span>
-                </a>
-            </div>
-            <nav class="header-nav">
-                <a href="triagem.html" class="active"><i data-lucide="file-check"></i> Triagem</a>
-                <a href="dashboard.html"><i data-lucide="bar-chart-3"></i> Relatórios</a>
-                <a href="../index.html"><i data-lucide="log-out" style="color: #EF4444;"></i> Sair</a>
-            </nav>
-        </div>
-    </header>
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="triagem" %}
+{% endblock %}
 
-    <main class="main-container" style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
-        
-        <div style="margin-bottom: 24px;">
-            <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">Triagem de Documentos de Ambulantes</h1>
-            <p style="color: #475569;">Análise e validação dos documentos cadastrados pelos trabalhadores para liberação de credencial.</p>
-        </div>
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Triagem de Documentos de Ambulantes</h1>
+        <p>Análise e validação dos documentos cadastrados pelos trabalhadores para liberação de credencial.</p>
+    </div>
+</section>
+{% endblock %}
 
-        <!-- TABELA DE DOCUMENTOS PENDENTES (HU-3.3) -->
-        <div class="form-card" style="padding: 24px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #E2E8F0; color: #475569;">
-                        <th style="padding: 12px;">Requerente</th>
-                        <th style="padding: 12px;">CPF</th>
-                        <th style="padding: 12px;">Tipo de Documento</th>
-                        <th style="padding: 12px;">Arquivo</th>
-                        <th style="padding: 12px;">Status</th>
-                        <th style="padding: 12px; text-align: center;">Ações (HTMX)</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-triagem">
-                    
-                    <!-- ITEM 1 -->
-                    <tr id="doc-row-1" style="border-bottom: 1px solid #E2E8F0;">
-                        <td style="padding: 16px 12px; font-weight: 600; color: #0F172A;">João da Silva</td>
-                        <td style="padding: 16px 12px; color: #475569;">123.456.789-00</td>
-                        <td style="padding: 16px 12px; color: #475569;">Comprovante de Residência</td>
-                        <td style="padding: 16px 12px;">
-                            <a href="#" style="color: #2563EB; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
-                                <i data-lucide="eye" style="width: 16px;"></i> Visualizar
-                            </a>
-                        </td>
-                        <td style="padding: 16px 12px;">
-                            <span id="badge-1" style="background: #FEF3C7; color: #D97706; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
-                                Em Análise
-                            </span>
-                        </td>
-                        <td style="padding: 16px 12px; text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center;">
-                                <!-- Botão APROVAR com HTMX -->
-                                <button 
-                                    hx-post="/api/documentos/1/aprovar/" 
-                                    hx-target="#doc-row-1" 
-                                    hx-swap="outerHTML"
-                                    style="background: #10B981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i data-lucide="check" style="width: 16px;"></i> Aprovar
-                                </button>
-                                
-                                <!-- Botão REJEITAR que abre Modal -->
-                                <button 
-                                    onclick="abrirModalRejeicao(1, 'João da Silva')" 
-                                    style="background: #EF4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i data-lucide="x" style="width: 16px;"></i> Rejeitar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+{% block content %}
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Documentos pendentes ({{ total_pendentes }})</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1.25rem;">
+        Aprove via HTMX ou rejeite com justificativa obrigatória. A rejeição devolve a solicitação para <strong>Pendência Documental</strong>.
+    </p>
 
-                    <!-- ITEM 2 -->
-                    <tr id="doc-row-2" style="border-bottom: 1px solid #E2E8F0;">
-                        <td style="padding: 16px 12px; font-weight: 600; color: #0F172A;">Maria Oliveira</td>
-                        <td style="padding: 16px 12px; color: #475569;">987.654.321-11</td>
-                        <td style="padding: 16px 12px; color: #475569;">Atestado Sanitário (ASO)</td>
-                        <td style="padding: 16px 12px;">
-                            <a href="#" style="color: #2563EB; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
-                                <i data-lucide="eye" style="width: 16px;"></i> Visualizar
-                            </a>
-                        </td>
-                        <td style="padding: 16px 12px;">
-                            <span id="badge-2" style="background: #FEF3C7; color: #D97706; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
-                                Em Análise
-                            </span>
-                        </td>
-                        <td style="padding: 16px 12px; text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center;">
-                                <button 
-                                    hx-post="/api/documentos/2/aprovar/" 
-                                    hx-target="#doc-row-2" 
-                                    hx-swap="outerHTML"
-                                    style="background: #10B981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i data-lucide="check" style="width: 16px;"></i> Aprovar
-                                </button>
-                                <button 
-                                    onclick="abrirModalRejeicao(2, 'Maria Oliveira')" 
-                                    style="background: #EF4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i data-lucide="x" style="width: 16px;"></i> Rejeitar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-
-        </div>
-    </main>
-
-    <!-- MODAL DE JUSTIFICATIVA DE REJEIÇÃO (HU-3.3) -->
-    <div id="modal-rejeicao" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-        <div style="background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; color: #0F172A; font-size: 1.2rem;">Rejeitar Documento</h3>
-            <p style="color: #475569; font-size: 0.9rem;" id="modal-subtitulo">Informe o motivo da recusa para o requerente:</p>
-            
-            <form id="form-rejeicao" hx-post="" hx-target="" hx-swap="outerHTML" onsubmit="fecharModalRejeicao()">
-                <textarea 
-                    name="justificativa" 
-                    rows="4" 
-                    required 
-                    placeholder="Ex: O comprovante de residência está ilegível ou foi emitido há mais de 90 dias."
-                    style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-family: inherit; font-size: 0.9rem; margin: 12px 0 20px 0; box-sizing: border-box;"></textarea>
-                
-                <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                    <button type="button" onclick="fecharModalRejeicao()" style="background: #F1F5F9; color: #475569; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
-                    <button type="submit" style="background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirmar Rejeição</button>
-                </div>
-            </form>
-        </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Requerente</th>
+                    <th>CPF</th>
+                    <th>Tipo de Documento</th>
+                    <th>Arquivo</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-triagem">
+                {% for documento in documentos %}
+                {% include "gestor/_documento_row.html" %}
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum documento pendente de análise.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <!-- RODAPÉ -->
-    <footer class="footer-pmvc" style="margin-top: 60px;">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Módulo de Gestão</span></p>
-    </footer>
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+</div>
 
-    <script>
-        lucide.createIcons();
+<div id="modal-rejeicao" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 1000;">
+    <div style="background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; color: #0F172A; font-size: 1.2rem;">Rejeitar Documento</h3>
+        <p style="color: #475569; font-size: 0.9rem;" id="modal-subtitulo">Informe o motivo da recusa para o requerente:</p>
+        <form id="form-rejeicao" method="post" hx-post="" hx-target="" hx-swap="outerHTML">
+            {% csrf_token %}
+            <label for="justificativa-rejeicao" class="sr-only" style="display: none;">Justificativa</label>
+            <textarea
+                id="justificativa-rejeicao"
+                name="justificativa"
+                rows="4"
+                required
+                placeholder="Ex: O comprovante de residência está ilegível ou foi emitido há mais de 90 dias."
+                style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-family: inherit; font-size: 0.9rem; margin: 12px 0 20px 0; box-sizing: border-box;"></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" onclick="fecharModalRejeicao()" style="background: #F1F5F9; color: #475569; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button type="submit" style="background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirmar Rejeição</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
 
-        function abrirModalRejeicao(docId, nome) {
-            const modal = document.getElementById('modal-rejeicao');
-            const form = document.getElementById('form-rejeicao');
-            const subtitulo = document.getElementById('modal-subtitulo');
-
-            subtitulo.innerText = `Informe o motivo da recusa do documento de ${nome}:`;
-            form.setAttribute('hx-post', `/api/documentos/${docId}/rejeitar/`);
-            form.setAttribute('hx-target', `#doc-row-${docId}`);
-            htmx.process(form); // Re-inicializa o HTMX no formulário dinâmico
-
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
+{% block extra_js %}
+<script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+        const csrfToken = document.querySelector("meta[name='csrf-token']");
+        if (csrfToken) {
+            event.detail.headers["X-CSRFToken"] = csrfToken.getAttribute("content");
         }
-
-        function fecharModalRejeicao() {
-            const modal = document.getElementById('modal-rejeicao');
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
+    });
+    document.body.addEventListener("htmx:afterSwap", function () {
+        if (window.lucide) {
+            lucide.createIcons();
         }
-    </script>
-</body>
-</html>
+        fecharModalRejeicao();
+    });
+
+    function abrirModalRejeicao(docId, nome) {
+        const modal = document.getElementById("modal-rejeicao");
+        const form = document.getElementById("form-rejeicao");
+        const subtitulo = document.getElementById("modal-subtitulo");
+        subtitulo.innerText = "Informe o motivo da recusa do documento de " + nome + ":";
+        form.setAttribute("hx-post", "/api/documentos/" + docId + "/rejeitar/");
+        form.setAttribute("hx-target", "#doc-row-" + docId);
+        form.querySelector("textarea").value = "";
+        if (window.htmx) {
+            htmx.process(form);
+        }
+        modal.classList.remove("hidden");
+        modal.style.display = "flex";
+    }
+
+    function fecharModalRejeicao() {
+        const modal = document.getElementById("modal-rejeicao");
+        if (!modal) {
+            return;
+        }
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+    }
+</script>
+{% endblock %}

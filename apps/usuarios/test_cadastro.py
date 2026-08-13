@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao
+from apps.licenciamento.models import LicencaAlvara
 from apps.usuarios.models import Ambulante
 from apps.usuarios.tests import UsuariosAuthFixtures
 
@@ -178,6 +179,11 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(lista, novo.cpf)
         self.assertContains(lista, "Cadastro completo")
         self.assertNotContains(lista, "João da Silva Santos")
+
+        fila = self.client.get(reverse("gestor_fila"))
+        self.assertEqual(fila.status_code, 200)
+        self.assertContains(fila, "Joana")
+        self.assertTrue(LicencaAlvara.objects.filter(ambulante=novo).exists())
 
     def test_concluir_sem_etapas_obrigatorias_nao_fecha_cadastro(self):
         self.client.force_login(self.ambulante)
