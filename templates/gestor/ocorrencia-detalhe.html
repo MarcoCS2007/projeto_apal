@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Ocorrência #{{ ocorrencia.pk }} - APAL{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ocorrencias" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Auditoria da ocorrência #{{ ocorrencia.pk }}</h1>
+        <p>Confera a evidência, altere o status e aplique suspensão ou cancelamento da licença.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent" style="background-color: #EF4444;"></div>
+            <h2>{{ ocorrencia.tipo_ocorrencia }}</h2>
+        </div>
+        <span class="badge {{ ocorrencia.classe_badge }}">{{ ocorrencia.status_ocorrencia }}</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; background: var(--fundo-cinza); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">DATA / HORA</label>
+            <p style="font-weight: 600;">{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">FISCAL</label>
+            <p style="font-weight: 600;">{{ ocorrencia.fiscal.nome_completo }}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">INFRATOR</label>
+            <p style="font-weight: 600;">
+                {% if ocorrencia.ambulante %}
+                <a href="{% url 'gestor_dossie' ocorrencia.ambulante_id %}">{{ ocorrencia.ambulante.nome_completo }}</a>
+                <br><small>{{ ocorrencia.ambulante.cpf_formatado }}</small>
+                {% else %}
+                Não identificado
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">LOCAL</label>
+            <p style="font-weight: 600;">{{ ocorrencia.local_ocorrencia|default:"Não informado" }}</p>
+        </div>
+        {% if licenca %}
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">LICENÇA</label>
+            <p style="font-weight: 600;">{{ licenca.numero_licenca|default:licenca.protocolo }} — {{ licenca.status }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">RELATÓRIO DO FISCAL</label>
+        <p style="margin-top: 0.5rem; white-space: pre-wrap;">{{ ocorrencia.descricao }}</p>
+    </div>
+</div>
+
+{% if ocorrencia.evidencia_foto %}
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Evidência fotográfica</h2>
+    </div>
+    <a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">
+        <img src="{{ ocorrencia.evidencia_foto.url }}" alt="Evidência da ocorrência {{ ocorrencia.pk }}" style="max-width: 100%; max-height: 420px; border-radius: 12px; border: 1px solid #E2E8F0;">
+    </a>
+    <p style="margin-top: 0.75rem;">
+        <a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">Abrir foto em tamanho original</a>
+    </p>
+</div>
+{% endif %}
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #2563EB;"></div>
+        <h2>Decisão do gestor</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1.2rem;">
+        Procedente suspende a licença ativa. Use cancelar para cassar o alvará. Improcedente encerra o auto sem efeito na credencial.
+    </p>
+    <form method="post" class="registration-form">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.status_ocorrencia.id_for_label }}">{{ form.status_ocorrencia.label }}</label>
+                {{ form.status_ocorrencia }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.acao_licenca.id_for_label }}">{{ form.acao_licenca.label }}</label>
+                {{ form.acao_licenca }}
+            </div>
+        </div>
+        {% if form.errors %}
+        <p style="color: #B42318;">{{ form.errors }}</p>
+        {% endif %}
+        <div class="form-actions" style="margin-top: 1rem;">
+            <button type="submit" class="btn-submit">Salvar decisão</button>
+            <a href="{% url 'gestor_ocorrencias' %}" class="btn-action" style="text-decoration: none;">Voltar à lista</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -183,19 +183,28 @@
                     <th>OCORRÊNCIA</th>
                     <th>AGENTE FISCAL</th>
                     <th>STATUS</th>
+                    <th>AÇÕES</th>
                 </tr>
             </thead>
             <tbody>
                 {% for ocorrencia in ocorrencias %}
                 <tr>
                     <td>{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
-                    <td>{{ ocorrencia.tipo_ocorrencia }}</td>
+                    <td>
+                        {{ ocorrencia.tipo_ocorrencia }}
+                        {% if ocorrencia.evidencia_foto %}
+                        <br><a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">Ver evidência</a>
+                        {% endif %}
+                    </td>
                     <td>{{ ocorrencia.fiscal.nome_completo }}</td>
-                    <td>{{ ocorrencia.status_ocorrencia }}</td>
+                    <td><span class="badge {{ ocorrencia.classe_badge }}">{{ ocorrencia.status_ocorrencia }}</span></td>
+                    <td>
+                        <a href="{% url 'gestor_ocorrencia_detalhe' ocorrencia.pk %}">Auditar</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4">Nenhuma ocorrência registrada.</td>
+                    <td colspan="5">Nenhuma ocorrência registrada.</td>
                 </tr>
                 {% endfor %}
             </tbody>

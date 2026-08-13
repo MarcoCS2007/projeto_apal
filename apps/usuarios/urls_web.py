@@ -1,9 +1,10 @@
 from django.urls import path
 
+from apps.fiscalizacao.views import FiscalizacaoView, RegistrarOcorrenciaView
+
 from .views import (
     BackofficeInicioView,
     CadastroCompletoAmbulanteView,
-    FiscalPainelView,
     LoginAmbulanteView,
     LoginBackofficeView,
     LoginFiscalView,
@@ -25,10 +26,12 @@ from .views_gestor import (
     GestorAmbulanteEditarView,
     GestorAmbulantesView,
     GestorAnalisarLicencaView,
+    GestorDashboardView,
     GestorDossieView,
     GestorEmitirAlvaraView,
     GestorFilaView,
     GestorLicencasAtivasView,
+    GestorOcorrenciaDetalheView,
     GestorOcorrenciasView,
 )
 
@@ -37,7 +40,12 @@ urlpatterns = [
     path("logout/", LogoutBackofficeView.as_view(), name="logout"),
     path("entrar/", LoginAmbulanteView.as_view(), name="entrar"),
     path("fiscal/entrar/", LoginFiscalView.as_view(), name="fiscal_entrar"),
-    path("fiscal/", FiscalPainelView.as_view(), name="fiscal_painel"),
+    path("fiscal/", FiscalizacaoView.as_view(), name="fiscal_painel"),
+    path(
+        "fiscal/ocorrencia/",
+        RegistrarOcorrenciaView.as_view(),
+        name="fiscal_ocorrencia",
+    ),
     path("registro/", RegistroAmbulanteView.as_view(), name="registro"),
     path("redefinir-senha/", RecuperarSenhaView.as_view(), name="redefinir_senha"),
     path(
@@ -93,7 +101,12 @@ urlpatterns = [
         GestorOcorrenciasView.as_view(),
         name="gestor_ocorrencias",
     ),
-    path("gestor/dashboard/", BackofficeInicioView.as_view(), name="gestor_dashboard"),
+    path(
+        "gestor/ocorrencias/<int:pk>/",
+        GestorOcorrenciaDetalheView.as_view(),
+        name="gestor_ocorrencia_detalhe",
+    ),
+    path("gestor/dashboard/", GestorDashboardView.as_view(), name="gestor_dashboard"),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/gestores/", MasterGestoresView.as_view(), name="master_gestores"),
     path(

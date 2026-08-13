@@ -1,7 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import TemplateView
@@ -252,3 +257,22 @@ class RenovarLicencaView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
                 f"Já existe um requerimento em aberto ({nova.protocolo}).",
             )
         return redirect("ambulante_alvara")
+
+
+class RelatorioOcupacaoView(LoginRequiredMixin, AcessoBackofficeMixin, View):
+    """HTMX (HTML) e JSON de ocupação/indicadores para o dashboard do gestor."""
+
+    template_name = "gestor/_indicadores.html"
+
+    def get(self, request):
+        from .relatorios import indicadores_gerenciais, indicadores_json
+
+        dados = indicadores_gerenciais(
+            bairro=request.GET.get("bairro", ""),
+            origem=request.GET.get("origem", ""),
+            periodo_dias=request.GET.get("periodo", 30),
+        )
+        html = request.headers.get("HX-Request") or request.GET.get("formato") == "html"
+        if html:
+            return render(request, self.template_name, dados)
+        return JsonResponse(indicadores_json(dados))

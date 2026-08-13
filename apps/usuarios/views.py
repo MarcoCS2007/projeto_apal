@@ -268,16 +268,6 @@ class LoginFiscalView(LoginView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class FiscalPainelView(LoginRequiredMixin, AcessoFiscalMixin, TemplateView):
-    template_name = "fiscal/painel.html"
-    login_url = reverse_lazy("fiscal_entrar")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["fiscal"] = Fiscal.objects.filter(pk=self.request.user.pk).first()
-        return context
-
-
 class RegistroAmbulanteView(FormView):
     template_name = "registro.html"
     form_class = CadastroAmbulanteForm

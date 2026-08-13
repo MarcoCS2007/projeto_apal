@@ -1,5 +1,6 @@
 <nav class="header-nav">
-    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" or active == "dashboard" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <a href="{% url 'gestor_dashboard' %}"{% if active == "dashboard" %} class="active"{% endif %}><i data-lucide="bar-chart-3"></i> Relatórios</a>
     <a href="{% url 'gestor_fila' %}"{% if active == "fila" %} class="active"{% endif %}><i data-lucide="file-search"></i> Fila</a>
     <a href="{% url 'gestor_ambulantes' %}"{% if active == "ambulantes" %} class="active"{% endif %}><i data-lucide="users"></i> Ambulantes</a>
     <a href="{% url 'gestor_triagem' %}"{% if active == "triagem" %} class="active"{% endif %}><i data-lucide="file-check"></i> Triagem</a>

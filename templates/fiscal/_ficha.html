@@ -1,0 +1,95 @@
+{% if resultado.ambulante %}
+<div class="form-card" id="ficha-inspecao" style="margin-top: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+            {% if resultado.ambulante.foto %}
+            <img src="{{ resultado.ambulante.foto.url }}" alt="Foto de {{ resultado.ambulante.nome_completo }}" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 1px solid #BFDBFE;">
+            {% else %}
+            <div style="width: 72px; height: 72px; border-radius: 12px; background: #DBEAFE; color: #2563EB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">{{ resultado.ambulante.iniciais }}</div>
+            {% endif %}
+            <div>
+                <h2 style="margin: 0; font-size: 1.25rem;">{{ resultado.ambulante.nome_completo }}</h2>
+                {% if resultado.ambulante.apelido_nome_fantasia %}
+                <p style="margin: 4px 0 0; color: #475569;">{{ resultado.ambulante.apelido_nome_fantasia }}</p>
+                {% endif %}
+                <p style="margin: 4px 0 0; color: #475569;">CPF {{ resultado.ambulante.cpf_formatado }}</p>
+            </div>
+        </div>
+        {% if resultado.valido %}
+        <span class="badge success"><i data-lucide="check-circle-2"></i> Credencial válida</span>
+        {% else %}
+        <span class="badge danger"><i data-lucide="alert-triangle"></i> {{ resultado.licenca.status|default:"Irregular" }}</span>
+        {% endif %}
+    </div>
+
+    <p style="margin: 0 0 16px; color: {% if resultado.valido %}#027A48{% else %}#B42318{% endif %};">{{ resultado.mensagem }}</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Alvará</strong>
+            {{ resultado.licenca.numero_licenca|default:"Não emitido" }}
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Status</strong>
+            {{ resultado.licenca.status|default:"—" }}
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Ponto autorizado</strong>
+            {% if resultado.licenca.ponto_ocupacao %}
+                {{ resultado.licenca.ponto_ocupacao.nome_identificacao }}
+                {% if resultado.licenca.ponto_ocupacao.bairro %} — {{ resultado.licenca.ponto_ocupacao.bairro }}{% endif %}
+            {% else %}
+                Não informado
+            {% endif %}
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Horário autorizado</strong>
+            {{ resultado.licenca.texto_horario_autorizado|default:"Não informado" }}
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Metragem</strong>
+            {% if resultado.licenca.estrutura_trabalho %}
+                {{ resultado.licenca.estrutura_trabalho.dimensoes_metragem }} m²
+            {% else %}
+                Não informada
+            {% endif %}
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.8rem; color: #64748B;">Categoria</strong>
+            {% if resultado.licenca.categoria_produto %}{{ resultado.licenca.categoria_produto.nome_categoria }}{% else %}—{% endif %}
+        </div>
+    </div>
+
+    {% if not resultado.valido %}
+    <p style="margin-top: 1.25rem;">
+        <a href="{% url 'fiscal_ocorrencia' %}?ambulante={{ resultado.ambulante.pk }}&motivo={{ resultado.motivo }}" class="btn-submit" style="display: inline-flex; text-decoration: none; background-color: #EF4444;">
+            <i data-lucide="alert-triangle"></i> Registrar ocorrência
+        </a>
+    </p>
+    {% else %}
+    <p style="margin-top: 1.25rem;">
+        <a href="{% url 'fiscal_ocorrencia' %}?ambulante={{ resultado.ambulante.pk }}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="file-warning"></i> Registrar ocorrência mesmo assim
+        </a>
+    </p>
+    {% endif %}
+</div>
+{% elif resultado.candidatos %}
+<div class="form-card" style="margin-top: 24px;">
+    <p>{{ resultado.mensagem }}</p>
+    <ul style="list-style: none; padding: 0; margin: 1rem 0 0;">
+        {% for candidato in resultado.candidatos %}
+        <li style="margin-bottom: 0.5rem;">
+            <a href="{% url 'fiscal_painel' %}?q={{ candidato.cpf }}">{{ candidato.nome_completo }} — CPF {{ candidato.cpf_formatado }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% elif resultado %}
+<div class="form-card" style="margin-top: 24px;">
+    <p style="color: #B42318; margin: 0 0 1rem;">{{ resultado.mensagem }}</p>
+    <a href="{% url 'fiscal_ocorrencia' %}?motivo={{ resultado.motivo }}" class="btn-submit" style="display: inline-flex; text-decoration: none; background-color: #EF4444;">
+        <i data-lucide="alert-triangle"></i> Registrar ocorrência
+    </a>
+</div>
+{% endif %}

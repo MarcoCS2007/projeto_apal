@@ -2583,3 +2583,40 @@ select.styled-select:focus-visible {
     font-size: 0.88rem;
     font-weight: 600;
 }
+
+.fiscal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.text-center { text-align: center; }
+
+.qr-scanner-box {
+    border: 2px dashed var(--borda-cinza);
+    border-radius: 8px;
+    padding: 2rem 1rem;
+    margin: 1.5rem 0;
+    background-color: #FAFAFA;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 180px;
+}
+
+.qr-scanner-box .lucide {
+    width: 48px !important;
+    height: 48px !important;
+    color: var(--texto-cinza);
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 280px;
+}
+
+@media (max-width: 768px) {
+    .fiscal-grid { grid-template-columns: 1fr; }
+}

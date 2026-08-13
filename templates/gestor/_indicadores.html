@@ -1,0 +1,96 @@
+{% if alerta_lotacao or licencas_vencendo %}
+<div class="info-callout-box" style="background-color: #FEF3C7; border-left-color: #D97706; margin-bottom: 1.5rem;">
+    <p style="color: #92400E; display: flex; align-items: center; gap: 0.6rem; margin: 0;">
+        <i data-lucide="alert-triangle" style="width: 20px; height: 20px; color: #D97706;"></i>
+        <span>
+            {% if alerta_lotacao %}
+            <strong>{{ alerta_lotacao.bairro }}</strong> está com {{ alerta_lotacao.percentual }}% das vagas ocupadas.
+            {% endif %}
+            {% if licencas_vencendo %}
+            {{ licencas_vencendo }} licença{{ licencas_vencendo|pluralize }} vence{{ licencas_vencendo|pluralize:"m" }} nos próximos 30 dias.
+            {% endif %}
+        </span>
+    </p>
+</div>
+{% endif %}
+
+<div class="stats-grid" style="margin-bottom: 1.5rem;">
+    <a href="{% url 'gestor_licencas' %}?status=Ativo" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-icon" style="color: #10B981; background: #D1FAE5;"><i data-lucide="check-circle"></i></div>
+        <div class="stat-info">
+            <label>Licenças ativas</label>
+            <p>{{ licencas_ativas }}</p>
+        </div>
+    </a>
+    <a href="{% url 'gestor_licencas' %}?status=Vencido" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="badge-alert"></i></div>
+        <div class="stat-info">
+            <label>Licenças vencidas</label>
+            <p>{{ licencas_vencidas }}</p>
+        </div>
+    </a>
+    <a href="{% url 'gestor_fila' %}" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-icon" style="color: #F59E0B; background: #FEF3C7;"><i data-lucide="clock"></i></div>
+        <div class="stat-info">
+            <label>Pendentes na fila</label>
+            <p>{{ licencas_pendentes }}</p>
+        </div>
+    </a>
+    <a href="{% url 'gestor_ocorrencias' %}" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="gavel"></i></div>
+        <div class="stat-info">
+            <label>Infrações ({{ periodo_dias }} dias)</label>
+            <p>{{ ocorrencias_periodo }}</p>
+        </div>
+    </a>
+</div>
+
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent"></div>
+            <h2>Distribuição por categoria</h2>
+        </div>
+        <div style="display: flex; gap: 8px; background: #F1F5F9; padding: 4px; border-radius: 8px;">
+            <button type="button" onclick="mudarTipoGrafico('bar')" id="btn-chart-bar" style="background: #2563EB; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                Barras
+            </button>
+            <button type="button" onclick="mudarTipoGrafico('pie')" id="btn-chart-pie" style="background: transparent; color: #475569; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                Pizza
+            </button>
+        </div>
+    </div>
+    {{ categorias|json_script:"dados-categorias" }}
+    {% if categorias %}
+    <div style="position: relative; height: 320px; width: 100%;">
+        <canvas id="graficoOcupacao" data-tipo="bar"></canvas>
+    </div>
+    {% else %}
+    <p style="color: #64748B; margin: 0;">Nenhuma licença ativa neste recorte para montar o gráfico.</p>
+    {% endif %}
+</div>
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #2563EB;"></div>
+        <h2>Ocupação de vagas por bairro</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        {% for item in ocupacao %}
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">{{ item.bairro }}</span>
+            <strong style="display: block; font-size: 1.5rem; color: #2563EB; margin-top: 4px;">{{ item.ocupados }}/{{ item.total }} ocupadas</strong>
+            <small style="color: {% if item.percentual >= 90 %}#B42318{% elif item.percentual >= 70 %}#D97706{% else %}#059669{% endif %}; font-weight: 600;">
+                {{ item.percentual }}% de lotação · {{ item.licencas_ativas }} alvará{{ item.licencas_ativas|pluralize }} ativo{{ item.licencas_ativas|pluralize }}
+            </small>
+        </div>
+        {% empty %}
+        <p style="color: #64748B; margin: 0;">Nenhum ponto de ocupação neste recorte.</p>
+        {% endfor %}
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fixos / itinerantes</span>
+            <strong style="display: block; font-size: 1.5rem; color: #EC4899; margin-top: 4px;">{{ residentes }} / {{ itinerantes }}</strong>
+            <small style="color: #64748B; font-weight: 600;">Identificados pelo tipo de atuação</small>
+        </div>
+    </div>
+</div>

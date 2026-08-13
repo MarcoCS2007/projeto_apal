@@ -3,7 +3,7 @@
 {% block title %}Painel do Gestor - APAL{% endblock %}
 
 {% block header_nav %}
-{% include "gestor/_nav.html" with active="dashboard" %}
+{% include "gestor/_nav.html" with active="painel" %}
 {% endblock %}
 
 {% block hero %}
@@ -21,7 +21,7 @@
         <div class="title-accent"></div>
         <h2>Olá, {{ user.nome }} {{ user.sobrenome }}</h2>
     </div>
-    <p style="color: var(--texto-cinza);">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.</p>
+    <p style="color: var(--texto-cinza);">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico. Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.</p>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">

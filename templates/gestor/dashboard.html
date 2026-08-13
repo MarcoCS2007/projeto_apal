@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - APAL Gestor{% endblock %}
+{% block title %}Relatórios - APAL Gestor{% endblock %}
+
+{% block extra_css %}
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block header_nav %}
 {% include "gestor/_nav.html" with active="dashboard" %}
@@ -9,33 +14,126 @@
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Indicadores do painel</h1>
-        <p>Números operacionais da fila e da base cadastral. Gráficos detalhados entram na etapa de dashboards.</p>
+        <h1>Indicadores de ocupação e relatórios</h1>
+        <p>Licenças, lotação por bairro, infrações no período e distribuição por categoria — números do banco, não mock.</p>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-    <div class="form-card" style="margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ambulantes</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ total_ambulantes }}</strong>
-    </div>
-    <a href="{% url 'gestor_fila' %}" class="form-card" style="margin: 0; text-decoration: none; color: inherit;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fila em análise</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ fila_analise }}</strong>
-    </a>
-    <div class="form-card" style="margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Licenças ativas</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ licencas_ativas }}</strong>
-    </div>
-    <div class="form-card" style="margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Docs pendentes</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ docs_pendentes }}</strong>
-    </div>
-    <div class="form-card" style="margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ocorrências</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ ocorrencias }}</strong>
-    </div>
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <form
+        id="filtro-dashboard"
+        method="get"
+        action="{% url 'gestor_dashboard' %}"
+        hx-get="{% url 'api_relatorios_ocupacao' %}"
+        hx-target="#container-indicadores"
+        hx-trigger="change, submit"
+        class="form-row"
+        style="align-items: end;"
+    >
+        <input type="hidden" name="formato" value="html">
+        <div class="input-group">
+            <label for="filtro-bairro">Bairro / região</label>
+            <select id="filtro-bairro" name="bairro" class="styled-select">
+                <option value="">Todos os bairros</option>
+                {% for bairro in bairros %}
+                <option value="{{ bairro }}"{% if filtro_bairro == bairro %} selected{% endif %}>{{ bairro }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-origem">Origem do comerciante</label>
+            <select id="filtro-origem" name="origem" class="styled-select">
+                <option value="">Todos</option>
+                <option value="residentes"{% if filtro_origem == "residentes" %} selected{% endif %}>Residentes (ambulante fixo)</option>
+                <option value="itinerantes"{% if filtro_origem == "itinerantes" %} selected{% endif %}>Itinerantes (ambulante móvel)</option>
+            </select>
+        </div>
+        <div class="input-group" style="flex: 0 0 auto;">
+            <button type="submit" class="btn-action">
+                <i data-lucide="filter"></i> Aplicar filtros
+            </button>
+        </div>
+    </form>
 </div>
+
+<div id="container-indicadores">
+    {% include "gestor/_indicadores.html" %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function iniciarGraficoCategorias() {
+        const fonte = document.getElementById("dados-categorias");
+        const canvas = document.getElementById("graficoOcupacao");
+        if (!fonte || !canvas || !window.Chart) {
+            return;
+        }
+        const categorias = JSON.parse(fonte.textContent);
+        const labels = categorias.map(function (item) { return item.nome; });
+        const valores = categorias.map(function (item) { return item.total; });
+        if (window.graficoCategoriasApal) {
+            window.graficoCategoriasApal.destroy();
+        }
+        if (!labels.length) {
+            return;
+        }
+        window.graficoCategoriasApal = new Chart(canvas.getContext("2d"), {
+            type: canvas.dataset.tipo || "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Licenças ativas",
+                    data: valores,
+                    backgroundColor: ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9"],
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: (canvas.dataset.tipo || "bar") === "pie" },
+                },
+            },
+        });
+    }
+
+    function mudarTipoGrafico(tipo) {
+        const canvas = document.getElementById("graficoOcupacao");
+        const btnBar = document.getElementById("btn-chart-bar");
+        const btnPie = document.getElementById("btn-chart-pie");
+        if (!canvas) {
+            return;
+        }
+        canvas.dataset.tipo = tipo;
+        if (btnBar && btnPie) {
+            const ativo = tipo === "pie" ? btnPie : btnBar;
+            const inativo = tipo === "pie" ? btnBar : btnPie;
+            ativo.style.background = "#2563EB";
+            ativo.style.color = "#FFFFFF";
+            inativo.style.background = "transparent";
+            inativo.style.color = "#475569";
+        }
+        iniciarGraficoCategorias();
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", iniciarGraficoCategorias);
+    document.body.addEventListener("htmx:afterSwap", function () {
+        iniciarGraficoCategorias();
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    });
+    document.body.addEventListener("htmx:configRequest", function (event) {
+        const token = document.querySelector("[name=csrfmiddlewaretoken]");
+        if (token) {
+            event.detail.headers["X-CSRFToken"] = token.value;
+        }
+    });
+</script>
 {% endblock %}

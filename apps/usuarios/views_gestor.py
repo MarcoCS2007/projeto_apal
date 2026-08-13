@@ -11,7 +11,13 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from apps.espacos.models import PontoOcupacao
-from apps.fiscalizacao.models import OcorrenciaInspecao
+from apps.fiscalizacao.forms import AuditoriaOcorrenciaForm, FiltroOcorrenciaForm
+from apps.fiscalizacao.models import (
+    OcorrenciaInspecao,
+    StatusOcorrencia,
+    TipoOcorrencia,
+)
+from apps.fiscalizacao.services import auditar_ocorrencia, filtrar_ocorrencias
 from apps.licenciamento.forms import EmitirAlvaraForm, ParecerLicencaForm
 from apps.licenciamento.models import (
     STATUS_FILA,
@@ -204,9 +210,9 @@ class GestorAnalisarLicencaView(PainelGestorMixin, View):
 
     def _contexto(self, licenca, form):
         ambulante = licenca.ambulante
-        estrutura = licenca.estrutura_trabalho or ambulante.estruturas.order_by(
-            "id"
-        ).first()
+        estrutura = (
+            licenca.estrutura_trabalho or ambulante.estruturas.order_by("id").first()
+        )
         ponto = licenca.ponto_ocupacao or ambulante.ponto_pretendido
         alerta_metragem = None
         if estrutura and ponto and estrutura.dimensoes_metragem > ponto.metragem_maxima:
@@ -223,9 +229,7 @@ class GestorAnalisarLicencaView(PainelGestorMixin, View):
             "ponto": ponto,
             "documentos": ambulante.documentos.order_by("-data_upload"),
             "alerta_metragem": alerta_metragem,
-            "ponto_disponivel": bool(
-                ponto and ponto.disponivel_para_nova_atribuicao()
-            ),
+            "ponto_disponivel": bool(ponto and ponto.disponivel_para_nova_atribuicao()),
             "escalas": escalas,
             "na_fila": licenca.na_fila,
         }
@@ -367,21 +371,104 @@ class GestorOcorrenciasView(PainelGestorMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ocorrencias"] = OcorrenciaInspecao.objects.select_related(
-            "fiscal", "ambulante"
-        ).order_by("-criado_em")
+        form = FiltroOcorrenciaForm(self.request.GET)
+        busca = self.request.GET.get("q", "").strip()
+        status = self.request.GET.get("status", "").strip()
+        tipo = self.request.GET.get("tipo", "").strip()
+        ocorrencias = filtrar_ocorrencias(q=busca, status=status, tipo=tipo)
+        context.update(
+            {
+                "form": form,
+                "ocorrencias": ocorrencias,
+                "total_ocorrencias": ocorrencias.count(),
+                "filtro_q": busca,
+                "filtro_status": status,
+                "filtro_tipo": tipo,
+                "status_opcoes": StatusOcorrencia.values,
+                "tipo_opcoes": TipoOcorrencia.values,
+            }
+        )
         return context
+
+
+class GestorOcorrenciaDetalheView(PainelGestorMixin, View):
+    template_name = "gestor/ocorrencia-detalhe.html"
+
+    def _ocorrencia(self, pk):
+        return get_object_or_404(
+            OcorrenciaInspecao.objects.select_related("fiscal", "ambulante"),
+            pk=pk,
+        )
+
+    def _licenca(self, ocorrencia):
+        if ocorrencia.ambulante is None:
+            return None
+        return (
+            ocorrencia.ambulante.licencas.exclude(
+                status__in=(StatusLicenca.INDEFERIDO,)
+            )
+            .order_by("-data_emissao", "-pk")
+            .first()
+        )
+
+    def _contexto(self, ocorrencia, form):
+        return {
+            "ocorrencia": ocorrencia,
+            "form": form,
+            "licenca": self._licenca(ocorrencia),
+        }
+
+    def get(self, request, pk):
+        ocorrencia = self._ocorrencia(pk)
+        form = AuditoriaOcorrenciaForm(
+            ocorrencia=ocorrencia,
+            initial={"status_ocorrencia": ocorrencia.status_ocorrencia},
+        )
+        return render(request, self.template_name, self._contexto(ocorrencia, form))
+
+    def post(self, request, pk):
+        ocorrencia = self._ocorrencia(pk)
+        form = AuditoriaOcorrenciaForm(request.POST, ocorrencia=ocorrencia)
+        if not form.is_valid():
+            return render(request, self.template_name, self._contexto(ocorrencia, form))
+        try:
+            ocorrencia, efeito = auditar_ocorrencia(
+                ocorrencia,
+                form.cleaned_data["status_ocorrencia"],
+                form.cleaned_data.get("acao_licenca") or "",
+            )
+        except ValueError as erro:
+            messages.error(request, str(erro))
+            return render(request, self.template_name, self._contexto(ocorrencia, form))
+        mensagem = f"Ocorrência #{ocorrencia.pk} atualizada para {ocorrencia.status_ocorrencia}."
+        if efeito == "suspenso":
+            mensagem = (
+                f"Ocorrência #{ocorrencia.pk} marcada como {ocorrencia.status_ocorrencia}. "
+                "A licença do ambulante passou a Suspenso."
+            )
+        elif efeito == "cancelado":
+            mensagem = (
+                f"Ocorrência #{ocorrencia.pk} atualizada. "
+                "A licença do ambulante foi cancelada."
+            )
+        messages.success(request, mensagem)
+        return redirect("gestor_ocorrencia_detalhe", pk=ocorrencia.pk)
 
 
 class GestorDashboardView(PainelGestorMixin, TemplateView):
     template_name = "gestor/dashboard.html"
 
     def get_context_data(self, **kwargs):
+        from apps.licenciamento.relatorios import indicadores_gerenciais
+
         context = super().get_context_data(**kwargs)
-        stats = contexto_inicio_gestor(self.request.user)
-        context.update(stats)
-        context["licencas_ativas"] = stats.get("licencas_aprovadas", 0)
-        context["ocorrencias"] = OcorrenciaInspecao.objects.count()
+        context.update(
+            indicadores_gerenciais(
+                bairro=self.request.GET.get("bairro", ""),
+                origem=self.request.GET.get("origem", ""),
+                periodo_dias=self.request.GET.get("periodo", 30),
+            )
+        )
         return context
 
 

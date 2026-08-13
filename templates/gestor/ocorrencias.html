@@ -9,37 +9,87 @@
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Ocorrências da fiscalização</h1>
-        <p>Autos registrados em campo. A auditoria completa entra em etapa posterior.</p>
+        <h1>Registro de Ocorrências</h1>
+        <p>Audite os autos da fiscalização, abra a evidência e decida sobre a licença.</p>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
 <div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #EF4444;"></div>
+        <h2>Ocorrências registradas ({{ total_ocorrencias }})</h2>
+    </div>
+
+    <form method="get" class="form-row" style="margin-bottom: 1.5rem; align-items: end;">
+        <div class="input-group" style="flex: 2;">
+            <label for="search-ocorrencias">Pesquisar ocorrência</label>
+            <input type="text" id="search-ocorrencias" name="q" placeholder="Fiscal, infrator, local ou tipo de infração..." value="{{ filtro_q }}">
+        </div>
+        <div class="input-group">
+            <label for="filtro-status">Status</label>
+            <select id="filtro-status" name="status" class="styled-select">
+                <option value="">Todos</option>
+                {% for opcao in status_opcoes %}
+                <option value="{{ opcao }}"{% if filtro_status == opcao %} selected{% endif %}>{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-tipo">Tipo</label>
+            <select id="filtro-tipo" name="tipo" class="styled-select">
+                <option value="">Todos</option>
+                {% for opcao in tipo_opcoes %}
+                <option value="{{ opcao }}"{% if filtro_tipo == opcao %} selected{% endif %}>{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group" style="flex: 0 0 auto;">
+            <button type="submit" class="btn-action">Filtrar</button>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>DATA</th>
-                    <th>AMBULANTE</th>
+                    <th>DATA / HORA</th>
                     <th>FISCAL</th>
+                    <th>INFRATOR / LOCAL</th>
                     <th>TIPO</th>
                     <th>STATUS</th>
+                    <th>AÇÕES</th>
                 </tr>
             </thead>
             <tbody>
                 {% for ocorrencia in ocorrencias %}
                 <tr>
                     <td>{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
-                    <td><a href="{% url 'gestor_dossie' ocorrencia.ambulante_id %}">{{ ocorrencia.ambulante.nome_completo }}</a></td>
                     <td>{{ ocorrencia.fiscal.nome_completo }}</td>
+                    <td>
+                        {% if ocorrencia.ambulante %}
+                        <a href="{% url 'gestor_dossie' ocorrencia.ambulante_id %}">{{ ocorrencia.ambulante.nome_completo }}</a>
+                        {% else %}
+                        Não identificado
+                        {% endif %}
+                        {% if ocorrencia.local_ocorrencia %}
+                        <br><small style="color: #64748B;">{{ ocorrencia.local_ocorrencia }}</small>
+                        {% endif %}
+                    </td>
                     <td>{{ ocorrencia.tipo_ocorrencia }}</td>
-                    <td>{{ ocorrencia.status_ocorrencia }}</td>
+                    <td>
+                        <span class="badge {{ ocorrencia.classe_badge }}">{{ ocorrencia.status_ocorrencia }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'gestor_ocorrencia_detalhe' ocorrencia.pk %}" class="btn-action" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            <i data-lucide="eye"></i> Detalhes
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">Nenhuma ocorrência lançada ainda.</td>
+                    <td colspan="6">Nenhuma ocorrência lançada ainda.</td>
                 </tr>
                 {% endfor %}
             </tbody>

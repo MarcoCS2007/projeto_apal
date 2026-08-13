@@ -12,7 +12,8 @@
         {% elif user.role == "gestor" %}
             <a href="{% url 'backoffice_inicio' %}"><i data-lucide="layout-dashboard"></i> Painel</a>
         {% elif user.role == "fiscal" %}
-            <a href="{% url 'fiscal_painel' %}"><i data-lucide="scan-line"></i> Fiscalização</a>
+            <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="scan-line"></i> Fiscalização</a>
+            <a href="{% url 'fiscal_ocorrencia' %}"{% if active == "ocorrencia" %} class="active"{% endif %}><i data-lucide="alert-triangle"></i> Ocorrência</a>
         {% endif %}
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
             {% csrf_token %}

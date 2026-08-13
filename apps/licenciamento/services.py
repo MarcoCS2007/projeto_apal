@@ -321,7 +321,6 @@ def renovar_licenca(licenca, ambulante):
 
 def marcar_licencas_vencidas():
     """Marca Ativo → Vencido após a data de vencimento e libera o ponto."""
-    from apps.espacos.models import PontoOcupacao
     from apps.licenciamento.models import LicencaAlvara
 
     hoje = timezone.localdate()
