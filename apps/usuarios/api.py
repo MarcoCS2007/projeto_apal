@@ -13,7 +13,9 @@ def ambulante_autenticado(user):
 
 
 def _erros(form):
-    return {campo: [str(erro) for erro in erros] for campo, erros in form.errors.items()}
+    return {
+        campo: [str(erro) for erro in erros] for campo, erros in form.errors.items()
+    }
 
 
 def snapshot_cadastro(ambulante):

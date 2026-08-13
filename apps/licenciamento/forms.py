@@ -178,9 +178,7 @@ class AnexosDocumentosForm(forms.Form):
             if not arquivo:
                 continue
             validade_campo = CAMPOS_VALIDADE.get(tipo)
-            validade = (
-                self.cleaned_data.get(validade_campo) if validade_campo else None
-            )
+            validade = self.cleaned_data.get(validade_campo) if validade_campo else None
             registrar_documento(ambulante, tipo, arquivo, data_validade=validade)
         return ambulante
 

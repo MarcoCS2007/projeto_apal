@@ -115,7 +115,9 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(EstruturaTrabalho.objects.filter(ambulante=self.ambulante).exists())
+        self.assertFalse(
+            EstruturaTrabalho.objects.filter(ambulante=self.ambulante).exists()
+        )
 
     def test_fluxo_completo_aparece_na_listagem_do_gestor(self):
         novo = Ambulante.objects.create_user(
@@ -183,7 +185,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         lista = self.client.get(reverse("gestor_ambulantes"))
         self.assertEqual(lista.status_code, 200)
         self.assertContains(lista, "Joana")
-        self.assertContains(lista, novo.cpf)
+        self.assertContains(lista, novo.cpf_mascarado)
         self.assertContains(lista, "Cadastro completo")
         self.assertNotContains(lista, "João da Silva Santos")
 

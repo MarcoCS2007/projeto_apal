@@ -110,9 +110,7 @@ class GestorTriagemView(
             .order_by("data_upload", "id")
         )
         if gestor_recorte_sanitario(request.user):
-            documentos = documentos.filter(
-                tipo_documento=TipoDocumento.LAUDO_SANITARIO
-            )
+            documentos = documentos.filter(tipo_documento=TipoDocumento.LAUDO_SANITARIO)
         return render(
             request,
             self.template_name,
@@ -133,7 +131,11 @@ class DocumentoHtmxMixin:
 
 
 class AprovarDocumentoView(
-    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, DocumentoHtmxMixin, View
+    LoginRequiredMixin,
+    AcessoBackofficeMixin,
+    RequerModuloMixin,
+    DocumentoHtmxMixin,
+    View,
 ):
     http_method_names = ("post", "options")
     modulo_permissao = "solicitacao_licenca"
@@ -147,7 +149,11 @@ class AprovarDocumentoView(
 
 
 class RejeitarDocumentoView(
-    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, DocumentoHtmxMixin, View
+    LoginRequiredMixin,
+    AcessoBackofficeMixin,
+    RequerModuloMixin,
+    DocumentoHtmxMixin,
+    View,
 ):
     http_method_names = ("post", "options")
     modulo_permissao = "solicitacao_licenca"
@@ -327,4 +333,3 @@ class DocumentoArquivoView(LoginRequiredMixin, View):
             as_attachment=False,
             filename=documento.arquivo.name.rsplit("/", 1)[-1],
         )
-

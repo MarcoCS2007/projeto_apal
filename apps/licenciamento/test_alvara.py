@@ -3,7 +3,12 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao, StatusOcupacao
+from apps.espacos.models import (
+    Endereco,
+    EstruturaTrabalho,
+    PontoOcupacao,
+    StatusOcupacao,
+)
 from apps.licenciamento.models import CategoriaProduto, LicencaAlvara, StatusLicenca
 from apps.licenciamento.services import abrir_requerimento, renovar_licenca
 from apps.usuarios.models import Ambulante
@@ -173,7 +178,9 @@ class AlvaraAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, self.url)
 
-        nova = LicencaAlvara.objects.exclude(pk=licenca.pk).get(ambulante=self.ambulante)
+        nova = LicencaAlvara.objects.exclude(pk=licenca.pk).get(
+            ambulante=self.ambulante
+        )
         self.assertEqual(nova.status, StatusLicenca.EM_ANALISE)
         self.assertEqual(nova.licenca_origem_id, licenca.pk)
         self.assertEqual(nova.tipo_pedido, "Renovação")

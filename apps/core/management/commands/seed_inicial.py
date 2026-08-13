@@ -215,7 +215,9 @@ class Command(BaseCommand):
             self.stdout.write(f"{model.__name__} {cpf} já existe.")
             return existente
         usuario = criar(cpf=cpf, password=senha, **defaults)
-        self.stdout.write(self.style.SUCCESS(f"{model.__name__} {usuario.nome} criado."))
+        self.stdout.write(
+            self.style.SUCCESS(f"{model.__name__} {usuario.nome} criado.")
+        )
         return usuario
 
     def _dados_lgpd(self):
@@ -486,7 +488,9 @@ class Command(BaseCommand):
             pontuacao=100,
             **self._dados_lgpd(),
         )
-        self.stdout.write(self.style.SUCCESS("Ambulante João criado (cadastro pendente)."))
+        self.stdout.write(
+            self.style.SUCCESS("Ambulante João criado (cadastro pendente).")
+        )
 
     def _ambulante_conta(self, *, cpf, email, nome, sobrenome, telefone):
         existente = Ambulante.objects.filter(cpf=cpf).first()
@@ -503,9 +507,7 @@ class Command(BaseCommand):
             telefone_whatsapp=telefone,
             **self._dados_lgpd(),
         )
-        self.stdout.write(
-            self.style.SUCCESS(f"Ambulante {nome} criado (só a conta).")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Ambulante {nome} criado (só a conta)."))
 
     def _ambulante_parcial(self, *, cpf, email, nome, sobrenome, telefone, ponto):
         existente = Ambulante.objects.filter(cpf=cpf).first()
@@ -590,9 +592,7 @@ class Command(BaseCommand):
         Endereco.objects.create(ambulante=ambulante, **endereco)
         EstruturaTrabalho.objects.create(ambulante=ambulante, **estrutura)
         situacao = "completo" if ativo else "completo e inativo"
-        self.stdout.write(
-            self.style.SUCCESS(f"Ambulante {nome} criado ({situacao}).")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Ambulante {nome} criado ({situacao})."))
 
     def _abrir_fila_analise(self):
         from apps.licenciamento.models import CategoriaProduto
@@ -629,10 +629,14 @@ class Command(BaseCommand):
         self.stdout.write("  Admin     CPF 00000000000  senha admin123")
         self.stdout.write("  Gestor    CPF 11111111111  senha gestor123")
         self.stdout.write("  Fiscal    CPF 22222222222  senha fiscal123")
-        self.stdout.write("  Ambulante CPF 33333333333  senha amb123  (cadastro pendente)")
+        self.stdout.write(
+            "  Ambulante CPF 33333333333  senha amb123  (cadastro pendente)"
+        )
         self.stdout.write("  Demais gestores/fiscais usam gestor123 / fiscal123.")
         self.stdout.write("  Demais ambulantes usam amb123.")
         self.stdout.write(
             "  Completos: Maria das Dores, Antônio Bispo, Raimunda Alves, Carlos Ferreira."
         )
-        self.stdout.write("  Só conta: Luciana Rocha. Parcial: Pedro Nunes. Inativa: Fátima Oliveira.")
+        self.stdout.write(
+            "  Só conta: Luciana Rocha. Parcial: Pedro Nunes. Inativa: Fátima Oliveira."
+        )

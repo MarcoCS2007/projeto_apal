@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('espacos', '0004_alter_endereco_id_alter_estruturatrabalho_id_and_more'),
+        ("espacos", "0004_alter_endereco_id_alter_estruturatrabalho_id_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='pontoocupacao',
-            name='status_ocupacao',
-            field=models.CharField(choices=[('Livre', 'Livre'), ('Ocupado', 'Ocupado'), ('Bloqueado', 'Bloqueado'), ('Reservado', 'Reservado')], default='Livre', max_length=50, verbose_name='Status de Ocupação'),
+            model_name="pontoocupacao",
+            name="status_ocupacao",
+            field=models.CharField(
+                choices=[
+                    ("Livre", "Livre"),
+                    ("Ocupado", "Ocupado"),
+                    ("Bloqueado", "Bloqueado"),
+                    ("Reservado", "Reservado"),
+                ],
+                default="Livre",
+                max_length=50,
+                verbose_name="Status de Ocupação",
+            ),
         ),
     ]

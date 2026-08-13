@@ -25,7 +25,9 @@ class AssistenteAmbulanteAPIView(APIView):
     def get(self, request):
         ambulante = ambulante_autenticado(request.user)
         historico = list(
-            LogAssistente.objects.filter(ambulante=ambulante).order_by("-criado_em")[:20]
+            LogAssistente.objects.filter(ambulante=ambulante).order_by("-criado_em")[
+                :20
+            ]
         )
         historico.reverse()
         return Response(

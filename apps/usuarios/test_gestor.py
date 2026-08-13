@@ -4,7 +4,12 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao, StatusOcupacao
+from apps.espacos.models import (
+    Endereco,
+    EstruturaTrabalho,
+    PontoOcupacao,
+    StatusOcupacao,
+)
 from apps.licenciamento.models import (
     CategoriaProduto,
     StatusLicenca,
@@ -69,7 +74,9 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.licenca.protocolo)
         self.assertContains(response, "João Ambulante")
-        self.assertContains(response, reverse("gestor_analisar", args=[self.licenca.pk]))
+        self.assertContains(
+            response, reverse("gestor_analisar", args=[self.licenca.pk])
+        )
 
     def test_dossie_mostra_dados_e_score(self):
         self.client.force_login(self.gestor)
@@ -146,9 +153,7 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.url, reverse("gestor_emitir", args=[self.licenca.pk])
-        )
+        self.assertEqual(response.url, reverse("gestor_emitir", args=[self.licenca.pk]))
         self.licenca.refresh_from_db()
         self.assertEqual(self.licenca.status, StatusLicenca.APROVADO)
         self.assertEqual(self.licenca.gestor_responsavel_id, self.gestor.pk)

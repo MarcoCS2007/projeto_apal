@@ -96,7 +96,9 @@ class DocumentosAmbulanteAPIView(APIView):
                     {"detail": "data_validade deve estar no formato AAAA-MM-DD."},
                     status=400,
                 )
-        documento = registrar_documento(ambulante, tipo, arquivo, data_validade=validade)
+        documento = registrar_documento(
+            ambulante, tipo, arquivo, data_validade=validade
+        )
         return Response(serializar_documento(documento), status=201)
 
 

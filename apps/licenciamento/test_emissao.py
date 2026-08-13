@@ -6,7 +6,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.core.qrcode import gerar_codigo_qr, validar_codigo_qr
-from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao, StatusOcupacao
+from apps.espacos.models import (
+    Endereco,
+    EstruturaTrabalho,
+    PontoOcupacao,
+    StatusOcupacao,
+)
 from apps.licenciamento.models import (
     CategoriaProduto,
     EscalaTrabalho,
@@ -120,7 +125,9 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
 
     def test_qr_invalido_se_suspenso_ou_adulterado(self):
         self.client.force_login(self.gestor)
-        self.client.post(reverse("gestor_emitir", args=[self.licenca.pk]), self._payload())
+        self.client.post(
+            reverse("gestor_emitir", args=[self.licenca.pk]), self._payload()
+        )
         self.ambulante.refresh_from_db()
         codigo = self.ambulante.codigo_qr_code
 
@@ -131,7 +138,9 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
 
     def test_consulta_marca_licenca_vencida_e_libera_ponto(self):
         self.client.force_login(self.gestor)
-        self.client.post(reverse("gestor_emitir", args=[self.licenca.pk]), self._payload())
+        self.client.post(
+            reverse("gestor_emitir", args=[self.licenca.pk]), self._payload()
+        )
         self.licenca.refresh_from_db()
         self.licenca.data_vencimento = timezone.localdate() - timedelta(days=1)
         self.licenca.save(update_fields=["data_vencimento"])
@@ -162,7 +171,9 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
 
     def test_filtro_por_status_e_vencimento_proximo(self):
         self.client.force_login(self.gestor)
-        self.client.post(reverse("gestor_emitir", args=[self.licenca.pk]), self._payload())
+        self.client.post(
+            reverse("gestor_emitir", args=[self.licenca.pk]), self._payload()
+        )
         self.licenca.refresh_from_db()
 
         ativas = self.client.get(reverse("gestor_licencas"), {"status": "Ativo"})

@@ -161,9 +161,13 @@ def dicas_regularizacao(ambulante):
     elif licenca.status == StatusLicenca.VENCIDO:
         dicas.append("Renove o alvará no prazo para recuperar pontos de renovação.")
     elif licenca.status == StatusLicenca.CANCELADO:
-        dicas.append("A licença foi cancelada. Abra um novo requerimento após a orientação da gestão.")
+        dicas.append(
+            "A licença foi cancelada. Abra um novo requerimento após a orientação da gestão."
+        )
     elif licenca.status == StatusLicenca.ATIVO:
-        dicas.append("Mantenha a credencial visível e evite infrações de ponto e horário.")
+        dicas.append(
+            "Mantenha a credencial visível e evite infrações de ponto e horário."
+        )
     if ambulante and ambulante.pontuacao < 75:
         dicas.append("Evite novas autuações: ocorrência procedente reduz o score.")
     return dicas
@@ -181,13 +185,25 @@ def resumo_score(ambulante):
         ),
         "dicas": dicas_regularizacao(ambulante),
         "regras": [
-            {"rotulo": "Licença ativa / alvará emitido", "pontos": PONTOS[TipoEventoScore.LICENCA_ATIVA]},
-            {"rotulo": "Renovação no prazo", "pontos": PONTOS[TipoEventoScore.RENOVACAO]},
+            {
+                "rotulo": "Licença ativa / alvará emitido",
+                "pontos": PONTOS[TipoEventoScore.LICENCA_ATIVA],
+            },
+            {
+                "rotulo": "Renovação no prazo",
+                "pontos": PONTOS[TipoEventoScore.RENOVACAO],
+            },
             {
                 "rotulo": "Ocorrência procedente",
                 "pontos": PONTOS[TipoEventoScore.OCORRENCIA_PROCEDENTE],
             },
-            {"rotulo": "Licença suspensa", "pontos": PONTOS[TipoEventoScore.LICENCA_SUSPENSA]},
-            {"rotulo": "Licença cancelada", "pontos": PONTOS[TipoEventoScore.LICENCA_CANCELADA]},
+            {
+                "rotulo": "Licença suspensa",
+                "pontos": PONTOS[TipoEventoScore.LICENCA_SUSPENSA],
+            },
+            {
+                "rotulo": "Licença cancelada",
+                "pontos": PONTOS[TipoEventoScore.LICENCA_CANCELADA],
+            },
         ],
     }

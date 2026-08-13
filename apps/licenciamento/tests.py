@@ -82,7 +82,9 @@ class CatalogoGestorTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Já existe uma categoria com este nome")
         self.assertEqual(
-            CategoriaProduto.objects.filter(nome_categoria__iexact="artesanato").count(),
+            CategoriaProduto.objects.filter(
+                nome_categoria__iexact="artesanato"
+            ).count(),
             1,
         )
 
@@ -283,14 +285,14 @@ class WorkflowDocumentosTests(UsuariosAuthFixtures, TestCase):
             tempfile.TemporaryDirectory() as tmp,
             override_settings(MEDIA_ROOT=tmp),
         ):
-                response = self.client.post(
-                    reverse("ambulante_cadastro"),
-                    {
-                        "etapa": "6",
-                        "acao": "salvar",
-                        "arquivo_comprovante_residencia": _pdf("comprovante.pdf"),
-                    },
-                )
+            response = self.client.post(
+                reverse("ambulante_cadastro"),
+                {
+                    "etapa": "6",
+                    "acao": "salvar",
+                    "arquivo_comprovante_residencia": _pdf("comprovante.pdf"),
+                },
+            )
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("etapa=6", response.url)
@@ -303,89 +305,85 @@ class WorkflowDocumentosTests(UsuariosAuthFixtures, TestCase):
             tempfile.TemporaryDirectory() as tmp,
             override_settings(MEDIA_ROOT=tmp),
         ):
-                comprovante = self._criar_documento(
-                    TipoDocumento.COMPROVANTE_RESIDENCIA, "comprovante.pdf"
-                )
-                rg = self._criar_documento(TipoDocumento.RG_CPF, "rg.pdf")
-                licenca, _criado = abrir_requerimento(
-                    self.ambulante, categoria=self.categoria
-                )
+            comprovante = self._criar_documento(
+                TipoDocumento.COMPROVANTE_RESIDENCIA, "comprovante.pdf"
+            )
+            rg = self._criar_documento(TipoDocumento.RG_CPF, "rg.pdf")
+            licenca, _criado = abrir_requerimento(
+                self.ambulante, categoria=self.categoria
+            )
 
-                self.client.force_login(self.gestor)
-                triagem = self.client.get(reverse("gestor_triagem"))
-                self.assertEqual(triagem.status_code, 200)
-                self.assertContains(triagem, "Comprovante de Residência")
-                self.assertContains(triagem, "RG/CPF")
+            self.client.force_login(self.gestor)
+            triagem = self.client.get(reverse("gestor_triagem"))
+            self.assertEqual(triagem.status_code, 200)
+            self.assertContains(triagem, "Comprovante de Residência")
+            self.assertContains(triagem, "RG/CPF")
 
-                aprovar = self.client.post(
-                    reverse("documento_aprovar", args=[comprovante.pk])
-                )
-                self.assertEqual(aprovar.status_code, 302)
-                comprovante.refresh_from_db()
-                self.assertEqual(
-                    comprovante.status_aprovacao, StatusAprovacaoDocumento.APROVADO
-                )
+            aprovar = self.client.post(
+                reverse("documento_aprovar", args=[comprovante.pk])
+            )
+            self.assertEqual(aprovar.status_code, 302)
+            comprovante.refresh_from_db()
+            self.assertEqual(
+                comprovante.status_aprovacao, StatusAprovacaoDocumento.APROVADO
+            )
 
-                rejeitar_sem_motivo = self.client.post(
-                    reverse("documento_rejeitar", args=[rg.pk]),
-                    {"justificativa": ""},
-                )
-                self.assertEqual(rejeitar_sem_motivo.status_code, 302)
-                rg.refresh_from_db()
-                self.assertEqual(rg.status_aprovacao, StatusAprovacaoDocumento.PENDENTE)
+            rejeitar_sem_motivo = self.client.post(
+                reverse("documento_rejeitar", args=[rg.pk]),
+                {"justificativa": ""},
+            )
+            self.assertEqual(rejeitar_sem_motivo.status_code, 302)
+            rg.refresh_from_db()
+            self.assertEqual(rg.status_aprovacao, StatusAprovacaoDocumento.PENDENTE)
 
-                rejeitar = self.client.post(
-                    reverse("documento_rejeitar", args=[rg.pk]),
-                    {"justificativa": "Documento ilegível."},
-                )
-                self.assertEqual(rejeitar.status_code, 302)
-                rg.refresh_from_db()
-                self.assertEqual(
-                    rg.status_aprovacao, StatusAprovacaoDocumento.REJEITADO
-                )
-                self.assertEqual(rg.motivo_rejeicao, "Documento ilegível.")
-                licenca.refresh_from_db()
-                self.assertEqual(
-                    licenca.status, StatusLicenca.PENDENCIA_DOCUMENTAL
-                )
+            rejeitar = self.client.post(
+                reverse("documento_rejeitar", args=[rg.pk]),
+                {"justificativa": "Documento ilegível."},
+            )
+            self.assertEqual(rejeitar.status_code, 302)
+            rg.refresh_from_db()
+            self.assertEqual(rg.status_aprovacao, StatusAprovacaoDocumento.REJEITADO)
+            self.assertEqual(rg.motivo_rejeicao, "Documento ilegível.")
+            licenca.refresh_from_db()
+            self.assertEqual(licenca.status, StatusLicenca.PENDENCIA_DOCUMENTAL)
 
     def test_ambulante_ve_pendencia_e_reenvia(self):
         with (
             tempfile.TemporaryDirectory() as tmp,
             override_settings(MEDIA_ROOT=tmp),
         ):
-                rg = self._criar_documento(TipoDocumento.RG_CPF, "rg.pdf")
-                rg.rejeitar("Frente do RG cortada.")
-                licenca, _criado = abrir_requerimento(
-                    self.ambulante, categoria=self.categoria
-                )
-                licenca.status = StatusLicenca.PENDENCIA_DOCUMENTAL
-                licenca.save(update_fields=["status"])
+            rg = self._criar_documento(TipoDocumento.RG_CPF, "rg.pdf")
+            rg.rejeitar("Frente do RG cortada.")
+            licenca, _criado = abrir_requerimento(
+                self.ambulante, categoria=self.categoria
+            )
+            licenca.status = StatusLicenca.PENDENCIA_DOCUMENTAL
+            licenca.save(update_fields=["status"])
 
-                self.client.force_login(self.ambulante)
-                pagina = self.client.get(reverse("ambulante_cadastro"), {"etapa": 6})
-                self.assertContains(pagina, "Frente do RG cortada.")
-                self.assertContains(pagina, "Rejeitado")
-                self.assertContains(pagina, "Pendência documental")
+            self.client.force_login(self.ambulante)
+            pagina = self.client.get(reverse("ambulante_cadastro"), {"etapa": 6})
+            self.assertContains(pagina, "Frente do RG cortada.")
+            self.assertContains(pagina, "Rejeitado")
+            self.assertContains(pagina, "Pendência documental")
 
-                painel = self.client.get(reverse("ambulante_painel"))
-                self.assertContains(painel, "há pendência documental")
-                self.assertContains(painel, "Reenviar documentos")
+            painel = self.client.get(reverse("ambulante_painel"))
+            self.assertContains(painel, "há pendência documental")
+            self.assertContains(painel, "Reenviar documentos")
 
-                reenvio = self.client.post(
-                    reverse("ambulante_cadastro"),
-                    {
-                        "etapa": "6",
-                        "acao": "salvar",
-                        "arquivo_rg_cpf": _pdf("rg-novo.pdf"),
-                    },
-                )
-                self.assertEqual(reenvio.status_code, 302)
-                rg.refresh_from_db()
-                self.assertEqual(rg.status_aprovacao, StatusAprovacaoDocumento.PENDENTE)
-                self.assertEqual(rg.motivo_rejeicao, "")
-                licenca.refresh_from_db()
-                self.assertEqual(licenca.status, StatusLicenca.EM_ANALISE)
+            reenvio = self.client.post(
+                reverse("ambulante_cadastro"),
+                {
+                    "etapa": "6",
+                    "acao": "salvar",
+                    "arquivo_rg_cpf": _pdf("rg-novo.pdf"),
+                },
+            )
+            self.assertEqual(reenvio.status_code, 302)
+            rg.refresh_from_db()
+            self.assertEqual(rg.status_aprovacao, StatusAprovacaoDocumento.PENDENTE)
+            self.assertEqual(rg.motivo_rejeicao, "")
+            licenca.refresh_from_db()
+            self.assertEqual(licenca.status, StatusLicenca.EM_ANALISE)
 
     def test_laudo_obrigatorio_bloqueia_avanco(self):
         self.assertFalse(pode_avancar_solicitacao(self.ambulante, self.categoria))
@@ -402,24 +400,21 @@ class WorkflowDocumentosTests(UsuariosAuthFixtures, TestCase):
             tempfile.TemporaryDirectory() as tmp,
             override_settings(MEDIA_ROOT=tmp),
         ):
-                for tipo, nome in (
-                    (TipoDocumento.COMPROVANTE_RESIDENCIA, "comp.pdf"),
-                    (TipoDocumento.RG_CPF, "rg.pdf"),
-                    (TipoDocumento.LAUDO_SANITARIO, "sanitario.pdf"),
-                    (TipoDocumento.LAUDO_BOMBEIROS, "bombeiros.pdf"),
-                ):
-                    doc = self._criar_documento(tipo, nome)
-                    doc.aprovar()
+            for tipo, nome in (
+                (TipoDocumento.COMPROVANTE_RESIDENCIA, "comp.pdf"),
+                (TipoDocumento.RG_CPF, "rg.pdf"),
+                (TipoDocumento.LAUDO_SANITARIO, "sanitario.pdf"),
+                (TipoDocumento.LAUDO_BOMBEIROS, "bombeiros.pdf"),
+            ):
+                doc = self._criar_documento(tipo, nome)
+                doc.aprovar()
 
         self.assertTrue(pode_avancar_solicitacao(self.ambulante, self.categoria))
 
-        licenca, _criado = abrir_requerimento(
-            self.ambulante, categoria=self.categoria
-        )
+        licenca, _criado = abrir_requerimento(self.ambulante, categoria=self.categoria)
         DocumentoAnexo.objects.filter(
             tipo_documento=TipoDocumento.LAUDO_SANITARIO
         ).update(status_aprovacao=StatusAprovacaoDocumento.PENDENTE)
 
         with self.assertRaises(ValidationError):
             aplicar_parecer(licenca, self.gestor, "deferir")
-

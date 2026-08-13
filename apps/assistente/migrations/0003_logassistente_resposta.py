@@ -6,22 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assistente', '0002_alter_logassistente_id'),
+        ("assistente", "0002_alter_logassistente_id"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='logassistente',
-            options={'ordering': ['-criado_em'], 'verbose_name': 'Log do Assistente', 'verbose_name_plural': 'Logs do Assistente'},
+            name="logassistente",
+            options={
+                "ordering": ["-criado_em"],
+                "verbose_name": "Log do Assistente",
+                "verbose_name_plural": "Logs do Assistente",
+            },
         ),
         migrations.AddField(
-            model_name='logassistente',
-            name='fonte',
+            model_name="logassistente",
+            name="fonte",
             field=models.CharField(blank=True, max_length=120),
         ),
         migrations.AddField(
-            model_name='logassistente',
-            name='resposta',
+            model_name="logassistente",
+            name="resposta",
             field=models.TextField(blank=True),
         ),
     ]

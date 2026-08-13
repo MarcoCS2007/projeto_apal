@@ -20,7 +20,9 @@ def listar_backups():
     pasta = Path(settings.BACKUP_ROOT)
     if not pasta.exists():
         return []
-    arquivos = sorted(pasta.glob("apal_backup_*"), key=lambda p: p.stat().st_mtime, reverse=True)
+    arquivos = sorted(
+        pasta.glob("apal_backup_*"), key=lambda p: p.stat().st_mtime, reverse=True
+    )
     itens = []
     for arquivo in arquivos:
         itens.append(

@@ -8,39 +8,61 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('usuarios', '0006_evento_score'),
+        ("usuarios", "0006_evento_score"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ambulante',
-            name='aceite_lgpd',
+            model_name="ambulante",
+            name="aceite_lgpd",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='ambulante',
-            name='aceite_lgpd_em',
+            model_name="ambulante",
+            name="aceite_lgpd_em",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='ambulante',
-            name='base_legal_lgpd',
-            field=models.CharField(blank=True, default='', max_length=80),
+            model_name="ambulante",
+            name="base_legal_lgpd",
+            field=models.CharField(blank=True, default="", max_length=80),
         ),
         migrations.CreateModel(
-            name='LogAcessoDossie',
+            name="LogAcessoDossie",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('criado_em', models.DateTimeField(auto_now_add=True)),
-                ('atualizado_em', models.DateTimeField(auto_now=True)),
-                ('ativo', models.BooleanField(default=True)),
-                ('ambulante', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='logs_acesso_dossie', to='usuarios.ambulante')),
-                ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='acessos_dossie', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("criado_em", models.DateTimeField(auto_now_add=True)),
+                ("atualizado_em", models.DateTimeField(auto_now=True)),
+                ("ativo", models.BooleanField(default=True)),
+                (
+                    "ambulante",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="logs_acesso_dossie",
+                        to="usuarios.ambulante",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="acessos_dossie",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Log de acesso ao dossiê',
-                'verbose_name_plural': 'Logs de acesso ao dossiê',
-                'ordering': ('-criado_em',),
+                "verbose_name": "Log de acesso ao dossiê",
+                "verbose_name_plural": "Logs de acesso ao dossiê",
+                "ordering": ("-criado_em",),
             },
         ),
     ]

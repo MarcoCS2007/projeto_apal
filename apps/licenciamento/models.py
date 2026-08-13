@@ -277,9 +277,9 @@ class LicencaAlvara(ModeloBase):
 
         if self.status != StatusLicenca.ATIVO:
             return False
-        if self.data_vencimento and self.data_vencimento < timezone.localdate():
-            return False
-        return True
+        return not (
+            self.data_vencimento and self.data_vencimento < timezone.localdate()
+        )
 
     @property
     def texto_horario_autorizado(self):

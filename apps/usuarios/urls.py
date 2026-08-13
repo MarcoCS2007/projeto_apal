@@ -12,5 +12,7 @@ urlpatterns = [
         CadastroAmbulanteAPIView.as_view(),
         name="api_ambulante_cadastro",
     ),
-    path("ambulante/score/", ScoreAmbulanteAPIView.as_view(), name="api_ambulante_score"),
+    path(
+        "ambulante/score/", ScoreAmbulanteAPIView.as_view(), name="api_ambulante_score"
+    ),
 ]

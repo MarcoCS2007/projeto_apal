@@ -68,11 +68,7 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
 
     @property
     def iniciais(self):
-        letras = [
-            parte[0].upper()
-            for parte in (self.nome, self.sobrenome)
-            if parte
-        ]
+        letras = [parte[0].upper() for parte in (self.nome, self.sobrenome) if parte]
         return "".join(letras[:2]) or "?"
 
     @property
@@ -119,7 +115,9 @@ class Ambulante(UsuarioBase):
     apelido_nome_fantasia = models.CharField(max_length=150, blank=True, null=True)
     cnpj = models.CharField(max_length=18, blank=True, null=True)
     tipo_atuacao = models.CharField(max_length=100, blank=True, default="")
-    codigo_qr_code = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    codigo_qr_code = models.CharField(
+        max_length=255, unique=True, blank=True, null=True
+    )
     data_nasc = models.DateField(blank=True, null=True)
     escolaridade = models.CharField(max_length=100, blank=True, default="")
     nis = models.CharField(max_length=20, blank=True, null=True)
@@ -186,7 +184,12 @@ class Ambulante(UsuarioBase):
             self.is_active = True
         self.dados_complementares = extras
         self.save(
-            update_fields=["ativo", "is_active", "dados_complementares", "atualizado_em"]
+            update_fields=[
+                "ativo",
+                "is_active",
+                "dados_complementares",
+                "atualizado_em",
+            ]
         )
 
 
@@ -339,4 +342,3 @@ class LogAcessoDossie(ModeloBase):
 
     def __str__(self):
         return f"{self.usuario} → {self.ambulante} ({self.criado_em})"
-

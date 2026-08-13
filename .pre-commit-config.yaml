@@ -3,9 +3,10 @@ repos:
     hooks:
       - id: ruff
         name: Ruff Linting (via Docker)
-        entry: docker compose exec -T web ruff check --fix
+        entry: docker compose exec -T web ruff check --fix --force-exclude
         language: system
         types: [python]
+        exclude: ^.*/migrations/
         pass_filenames: true
 
       - id: black

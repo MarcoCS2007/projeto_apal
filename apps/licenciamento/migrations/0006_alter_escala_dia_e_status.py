@@ -6,18 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('licenciamento', '0005_licencaalvara_taxa_e_renovacao'),
+        ("licenciamento", "0005_licencaalvara_taxa_e_renovacao"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='escalatrabalho',
-            name='dia_semana',
-            field=models.CharField(choices=[('segunda', 'Segunda-feira'), ('terca', 'Terça-feira'), ('quarta', 'Quarta-feira'), ('quinta', 'Quinta-feira'), ('sexta', 'Sexta-feira'), ('sabado', 'Sábado'), ('domingo', 'Domingo')], max_length=20),
+            model_name="escalatrabalho",
+            name="dia_semana",
+            field=models.CharField(
+                choices=[
+                    ("segunda", "Segunda-feira"),
+                    ("terca", "Terça-feira"),
+                    ("quarta", "Quarta-feira"),
+                    ("quinta", "Quinta-feira"),
+                    ("sexta", "Sexta-feira"),
+                    ("sabado", "Sábado"),
+                    ("domingo", "Domingo"),
+                ],
+                max_length=20,
+            ),
         ),
         migrations.AlterField(
-            model_name='escalatrabalho',
-            name='status',
-            field=models.CharField(default='Autorizado', max_length=50),
+            model_name="escalatrabalho",
+            name="status",
+            field=models.CharField(default="Autorizado", max_length=50),
         ),
     ]

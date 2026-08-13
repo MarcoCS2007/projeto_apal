@@ -491,9 +491,7 @@ class PontoCadastroForm(forms.Form):
             return ponto
         atual_id = getattr(self.ambulante, "ponto_pretendido_id", None)
         if ponto.pk != atual_id and not ponto.disponivel_para_nova_atribuicao():
-            raise ValidationError(
-                "Este ponto não está livre para nova ocupação."
-            )
+            raise ValidationError("Este ponto não está livre para nova ocupação.")
         estrutura = None
         if self.ambulante:
             estrutura = self.ambulante.estruturas.order_by("id").first()

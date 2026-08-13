@@ -7,28 +7,61 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('usuarios', '0005_configuracao_seguranca'),
+        ("usuarios", "0005_configuracao_seguranca"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EventoScore',
+            name="EventoScore",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('criado_em', models.DateTimeField(auto_now_add=True)),
-                ('atualizado_em', models.DateTimeField(auto_now=True)),
-                ('ativo', models.BooleanField(default=True)),
-                ('tipo', models.CharField(choices=[('licenca_ativa', 'Licença em dia'), ('renovacao', 'Renovação no prazo'), ('ocorrencia_procedente', 'Ocorrência procedente'), ('licenca_suspensa', 'Licença suspensa'), ('licenca_cancelada', 'Licença cancelada')], max_length=40)),
-                ('pontos', models.IntegerField()),
-                ('saldo_apos', models.IntegerField()),
-                ('descricao', models.CharField(max_length=255)),
-                ('chave', models.CharField(blank=True, default='', max_length=80)),
-                ('ambulante', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eventos_score', to='usuarios.ambulante')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("criado_em", models.DateTimeField(auto_now_add=True)),
+                ("atualizado_em", models.DateTimeField(auto_now=True)),
+                ("ativo", models.BooleanField(default=True)),
+                (
+                    "tipo",
+                    models.CharField(
+                        choices=[
+                            ("licenca_ativa", "Licença em dia"),
+                            ("renovacao", "Renovação no prazo"),
+                            ("ocorrencia_procedente", "Ocorrência procedente"),
+                            ("licenca_suspensa", "Licença suspensa"),
+                            ("licenca_cancelada", "Licença cancelada"),
+                        ],
+                        max_length=40,
+                    ),
+                ),
+                ("pontos", models.IntegerField()),
+                ("saldo_apos", models.IntegerField()),
+                ("descricao", models.CharField(max_length=255)),
+                ("chave", models.CharField(blank=True, default="", max_length=80)),
+                (
+                    "ambulante",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eventos_score",
+                        to="usuarios.ambulante",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Evento de score',
-                'verbose_name_plural': 'Eventos de score',
-                'constraints': [models.UniqueConstraint(condition=models.Q(('chave', ''), _negated=True), fields=('ambulante', 'chave'), name='evento_score_chave_unica')],
+                "verbose_name": "Evento de score",
+                "verbose_name_plural": "Eventos de score",
+                "constraints": [
+                    models.UniqueConstraint(
+                        condition=models.Q(("chave", ""), _negated=True),
+                        fields=("ambulante", "chave"),
+                        name="evento_score_chave_unica",
+                    )
+                ],
             },
         ),
     ]
