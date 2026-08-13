@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de TI - Ponto Legal VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Técnico da TI -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="#" style="color: var(--texto-escuro); font-weight: 700; cursor: default;">
+                    <i data-lucide="shield-alert"></i> Perfil: Master / TI
+                </a>
+                <a href="../index.html" style="color: #DC2626;">
+                    <i data-lucide="log-out"></i> Encerrar Sessão
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Faixa Hero Section (Infraestrutura) -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Administração do Sistema e Infraestrutura</h1>
+            <p>Monitoramento de banco de dados, logs de segurança e gestão de permissões globais.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+        
+        <!-- Grid de Infraestrutura e Banco de Dados -->
+        <div class="stats-grid">
+            <div class="stat-card" style="border-top-color: #10B981;">
+                <div class="stat-icon" style="background: #D1FAE5; color: #10B981;">
+                    <i data-lucide="hard-drive"></i>
+                </div>
+                <div class="stat-info">
+                    <label>BANCO DE DADOS (BKP)</label>
+                    <p style="font-size: 1.2rem; color: #10B981;">Sincronizado</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-top-color: var(--azul-vibrante);">
+                <div class="stat-icon" style="background: #E0E7FF; color: var(--azul-vibrante);">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <div class="stat-info">
+                    <label>STATUS DE SEGURANÇA</label>
+                    <p style="font-size: 1.2rem;">Protegido (LGPD)</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+                <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);">
+                    <i data-lucide="user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <label>GESTORES ATIVOS</label>
+                    <p>12</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+                <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);">
+                    <i data-lucide="badge"></i>
+                </div>
+                <div class="stat-info">
+                    <label>FISCAIS CADASTRADOS</label>
+                    <p>45</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fiscal-grid" style="margin-top: 2rem;">
+            
+            <!-- Card de Ações da TI -->
+            <div class="form-card">
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+                    <h2>Controle de Acessos</h2>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.5rem;">
+                    O Administrador Master é responsável pela criação dos perfis institucionais de Fiscais e Gestores da Secretaria.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn-action" onclick="alert('Abrindo formulário de cadastro de novo Gestor da Secretaria...')" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <i data-lucide="user-plus" style="color: var(--azul-vibrante);"></i> Cadastrar Novo Gestor (Secretaria)
+                    </button>
+                    
+                    <button class="btn-action" onclick="alert('Abrindo formulário de cadastro de novo Fiscal de Rua...')" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <i data-lucide="id-card" style="color: #10B981;"></i> Cadastrar Novo Fiscal de Rua
+                    </button>
+                    
+                    <button class="btn-action" onclick="alert('Acessando painel de permissões do sistema...')" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro);">
+                        <i data-lucide="key" style="color: #F59E0B;"></i> Gerenciar Permissões Globais
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal de Logs de Segurança -->
+            <div class="form-card" style="background-color: #111827; color: #10B981; border: none;">
+                <div class="section-title" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="terminal" style="color: #10B981;"></i>
+                    <h2 style="color: #fff; font-family: monospace;">Logs Técnicos & Segurança</h2>
+                </div>
+                
+                <div class="terminal-box custom-scrollbar" style="font-family: monospace; font-size: 0.85rem; line-height: 1.6; height: 200px; overflow-y: auto; background: #000; padding: 1rem; border-radius: 6px; border: 1px solid #374151;">
+                    <p>[10:42:01] AUTH: Sucesso - Login Matrícula #4598 (Fiscal)</p>
+                    <p>[10:45:12] DB_BACKUP: Rotina iniciada automaticamente.</p>
+                    <p>[10:45:15] DB_BACKUP: Sincronização concluída com sucesso (2.4MB).</p>
+                    <p>[11:02:33] AUTH: Falha - Senha incorreta CPF 111.***.***-44.</p>
+                    <p>[11:05:40] SYS_EVENT: Emissão de Alvará VCA-2026-9843 (Gestor ID 12).</p>
+                    <p>[11:30:12] SECURITY: Varredura de integridade realizada - 0 ameaças.</p>
+                    <p class="blink" style="color: #10B981;">_</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem;">
+                    <button class="btn-submit" onclick="alert('Exportando arquivo de logs (.TXT) para o dispositivo...')" style="background-color: #374151; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <i data-lucide="download"></i> Exportar Logs (.TXT)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

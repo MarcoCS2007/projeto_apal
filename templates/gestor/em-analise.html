@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processos em Análise - Ponto Legal VCA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Administrativo -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard.html" class="active"><i data-lucide="layout-dashboard"></i> Painel Central</a>
+                <a href="#"><i data-lucide="map"></i> Mapa de Vagas</a>
+                <a href="#"><i data-lucide="wallet"></i> Financeiro</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Fila de Processos em Análise</h1>
+            <p>Analise a documentação, vistorias e emita os pareceres das solicitações pendentes.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+
+        <div class="form-card">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #F59E0B;"></div>
+                <h2>Processos Pendentes (142)</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PROTOCOLO</th>
+                            <th>REQUERENTE</th>
+                            <th>TIPO DE PEDIDO</th>
+                            <th>FASE ATUAL</th>
+                            <th>TEMPO NA FILA</th>
+                            <th>AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#8842-2026</td>
+                            <td>João da Silva</td>
+                            <td>Nova Licença (Fixo)</td>
+                            <td><span class="badge warning"><i data-lucide="file-search"></i> Análise Documental</span></td>
+                            <td>2 dias</td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Iniciando revisão do processo #8842-2026')">
+                                    <i data-lucide="eye"></i> Revisar
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#8910-2026</td>
+                            <td>Sonia Regina</td>
+                            <td>Renovação Anual</td>
+                            <td><span class="badge warning"><i data-lucide="clock"></i> Aguardando Pagamento</span></td>
+                            <td>5 dias</td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Iniciando revisão do processo #8910-2026')">
+                                    <i data-lucide="eye"></i> Revisar
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#8922-2026</td>
+                            <td>Carlos Santos</td>
+                            <td>Nova Licença (Móvel)</td>
+                            <td><span class="badge purple"><i data-lucide="map-pin"></i> Vistoria de Local</span></td>
+                            <td>12 dias</td>
+                            <td>
+                                <button class="btn-action" onclick="alert('Abrindo emissão de parecer do processo #8922-2026')">
+                                    <i data-lucide="file-text"></i> Parecer
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BOTÃO VOLTAR AO DASHBOARD POSICIONADO NO RODAPÉ DO CARD -->
+            <div style="margin-top: 1.5rem; text-align: left;">
+                <a href="dashboard.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-lucide="arrow-left"></i> Voltar ao Dashboard
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- JS GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
