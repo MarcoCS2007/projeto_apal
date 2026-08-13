@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Gestor - Ponto Legal VCA</title>
+    <title>Cadastrar Gestor - APAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
@@ -22,15 +23,9 @@
         <div class="header-container">
             <div class="logo-area">
                 <i data-lucide="map-pin" class="logo-icon"></i>
-                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+                <span class="logo-text"><a href="{% url 'master_admin' %}" style="text-decoration: none; color: inherit;">APAL</a></span>
             </div>
-            <nav class="header-nav">
-                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
-                <a href="gerenciar-fiscais.html"><i data-lucide="id-card"></i> Fiscais</a>
-                <a href="gerenciar-gestores.html" class="active"><i data-lucide="users"></i> Gestores</a>
-                <a href="gerenciar-permissoes.html"><i data-lucide="key"></i> Permissões</a>
-                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
-            </nav>
+            {% include "master/_nav.html" with active="gestores" %}
         </div>
     </header>
 
@@ -81,58 +76,77 @@
                 <h2>Dados do Gestor / Servidor</h2>
             </div>
 
-            <form onsubmit="event.preventDefault(); alert('Gestor cadastrado com sucesso! As credenciais de acesso foram enviadas para o e-mail institucional informado.'); window.location.href='gerenciar-gestores.html';">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+                {% endif %}
                 
                 <div class="form-row">
                     <div class="input-group">
                         <label for="gestor-nome">Nome Completo do Gestor</label>
-                        <input type="text" id="gestor-nome" placeholder="Ex: Dra. Mariana Almeida" required>
+                        {{ form.nome_completo }}
+                        {% if form.nome_completo.errors %}
+                        <div class="login-error" role="alert">{{ form.nome_completo.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="input-group">
                         <label for="gestor-cpf">CPF do Servidor</label>
-                        <input type="text" id="gestor-cpf" placeholder="000.000.000-00" required>
+                        {{ form.cpf }}
+                        {% if form.cpf.errors %}
+                        <div class="login-error" role="alert">{{ form.cpf.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group">
                         <label for="gestor-email">E-mail Institucional</label>
-                        <input type="email" id="gestor-email" placeholder="gestor.nome@pmvc.ba.gov.br" required>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="login-error" role="alert">{{ form.email.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="input-group">
                         <label for="gestor-telefone">Telefone / Ramal de Contato</label>
-                        <input type="tel" id="gestor-telefone" placeholder="(77) 3229-0000" required>
+                        {{ form.telefone_whatsapp }}
+                        {% if form.telefone_whatsapp.errors %}
+                        <div class="login-error" role="alert">{{ form.telefone_whatsapp.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group">
                         <label for="gestor-secretaria">Secretaria / Órgão Vinculado</label>
-                        <select id="gestor-secretaria" required>
-                            <option value="" disabled selected>Selecione a secretaria...</option>
-                            <option value="sesep">SESEP - Serviços Públicos (Posturas)</option>
-                            <option value="visa">Vigilância Sanitária Municipal</option>
-                            <option value="financas">SEFIN - Secretaria de Finanças / Tributos</option>
-                            <option value="seinfra">SEINFRA - Infraestrutura Urbana</option>
-                            <option value="gabinete">Gabinete da Prefeita / Governo</option>
-                        </select>
+                        {{ form.departamento }}
+                        {% if form.departamento.errors %}
+                        <div class="login-error" role="alert">{{ form.departamento.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="input-group">
                         <label for="gestor-cargo">Cargo / Função Institucional</label>
-                        <input type="text" id="gestor-cargo" placeholder="Ex: Coordenadora de Licenciamento" required>
+                        {{ form.cargo }}
+                        {% if form.cargo.errors %}
+                        <div class="login-error" role="alert">{{ form.cargo.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="input-group full-width">
                         <label for="gestor-senha">Senha Provisória de Acesso</label>
-                        <input type="password" id="gestor-senha" placeholder="Crie uma senha provisória de acesso" required>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="login-error" role="alert">{{ form.password.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Botões de Ação do Formulário -->
                 <div class="form-actions" style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <a href="gerenciar-gestores.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <a href="{% url 'master_gestores' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
                         <i data-lucide="arrow-left"></i> Cancelar e Voltar
                     </a>
                     <button type="submit" class="btn-submit" style="background-color: var(--azul-vibrante); display: inline-flex; align-items: center; gap: 8px;">
@@ -179,7 +193,7 @@
     </script>
 
     <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
-    <script src="../js/script.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     
     <!-- Inicialização dos ícones do Lucide -->
     <script>

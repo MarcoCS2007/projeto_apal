@@ -22,13 +22,16 @@ class UsuarioBaseManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("acesso_master", True)
+        extra_fields.setdefault("acesso_painel_tecnico", True)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superusuário deve ter is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superusuário deve ter is_superuser=True.")
 
-        return self.create_user(cpf, email, password, **extra_fields)
+        administrador = self.model._meta.apps.get_model("usuarios", "Administrador")
+        return administrador.objects.create_user(cpf, email, password, **extra_fields)
 
 
 class Perfil(models.TextChoices):
@@ -67,7 +70,21 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
         for perfil in Perfil:
             if hasattr(self, perfil.value):
                 return perfil
+        if self.is_superuser:
+            return Perfil.ADMINISTRADOR
         return None
+
+    def garantir_perfil_administrador(self):
+        administrador = Administrador.objects.filter(pk=self.pk).first()
+        if administrador:
+            return administrador
+        administrador = Administrador(
+            usuariobase_ptr_id=self.pk,
+            acesso_master=True,
+            acesso_painel_tecnico=True,
+        )
+        administrador.save_base(raw=True)
+        return Administrador.objects.get(pk=self.pk)
 
 
 class Ambulante(UsuarioBase):

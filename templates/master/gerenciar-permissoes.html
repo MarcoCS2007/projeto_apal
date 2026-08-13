@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permissões Globais - Ponto Legal VCA</title>
+    <title>Permissões Globais - APAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
@@ -22,15 +23,9 @@
         <div class="header-container">
             <div class="logo-area">
                 <i data-lucide="map-pin" class="logo-icon"></i>
-                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+                <span class="logo-text"><a href="{% url 'master_admin' %}" style="text-decoration: none; color: inherit;">APAL</a></span>
             </div>
-            <nav class="header-nav">
-                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
-                <a href="gerenciar-fiscais.html"><i data-lucide="id-card"></i> Fiscais</a>
-                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
-                <a href="gerenciar-permissoes.html" class="active"><i data-lucide="key"></i> Permissões</a>
-                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
-            </nav>
+            {% include "master/_nav.html" with active="permissoes" %}
         </div>
     </header>
 
@@ -75,7 +70,7 @@
     <!-- Área Principal -->
     <main class="main-container">
         
-        <form onsubmit="event.preventDefault(); alert('Permissões e políticas globais de segurança atualizadas com sucesso!'); window.location.href='dashboard-ti.html';">
+        <form onsubmit="event.preventDefault(); alert('Permissões e políticas globais de segurança atualizadas com sucesso!'); window.location.href='{% url 'master_admin' %}';">
             
             <!-- CARD 1: MATRIZ DE PERMISSÕES POR PERFIL -->
             <div class="form-card" style="margin-bottom: 2rem;">
@@ -199,7 +194,7 @@
             <!-- AÇÕES DO FORMULÁRIO -->
             <div class="form-card">
                 <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <a href="dashboard-ti.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <a href="{% url 'master_admin' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
                         <i data-lucide="arrow-left"></i> Voltar ao Painel da TI
                     </a>
                     
@@ -247,7 +242,7 @@
     </script>
 
     <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
-    <script src="../js/script.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     
     <!-- Inicialização dos ícones do Lucide -->
     <script>

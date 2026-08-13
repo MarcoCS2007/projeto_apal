@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Fiscais - Ponto Legal VCA</title>
+    <title>Gerenciar Fiscais - APAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- CSS GLOBAL -->
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
@@ -22,14 +23,9 @@
         <div class="header-container">
             <div class="logo-area">
                 <i data-lucide="map-pin" class="logo-icon"></i>
-                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+                <span class="logo-text"><a href="{% url 'master_admin' %}" style="text-decoration: none; color: inherit;">APAL</a></span>
             </div>
-            <nav class="header-nav">
-                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
-                <a href="gerenciar-fiscais.html" class="active"><i data-lucide="id-card"></i> Fiscais</a>
-                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
-                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
-            </nav>
+            {% include "master/_nav.html" with active="fiscais" %}
         </div>
     </header>
 
@@ -81,22 +77,30 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                 <div class="section-title" style="margin: 0;">
                     <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
-                    <h2>Fiscais Cadastrados (45)</h2>
+                    <h2>Fiscais Cadastrados ({{ total_fiscais }})</h2>
                 </div>
 
                 <!-- Atalho para a rota de cadastro -->
-                <a href="cadastrar-fiscal.html" class="btn-submit" style="background-color: #10B981; text-decoration: none; padding: 0.7rem 1.2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+                <a href="{% url 'master_cadastrar_fiscal' %}" class="btn-submit" style="background-color: #10B981; text-decoration: none; padding: 0.7rem 1.2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
                     <i data-lucide="user-plus"></i> Cadastrar Novo Fiscal
                 </a>
             </div>
 
+            {% if messages %}
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}form-success{% else %}login-error{% endif %}" role="status">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <!-- BUSCA RÁPIDA DE FISCAIS -->
-            <div class="form-row" style="margin-bottom: 1.5rem;">
+            <form method="get" class="form-row" style="margin-bottom: 1.5rem;">
                 <div class="input-group full-width">
                     <label for="search-fiscal">Pesquisar Fiscal Cadastrado</label>
-                    <input type="text" id="search-fiscal" placeholder="Digite o nome, matrícula ou CPF do agente...">
+                    <input type="search" id="search-fiscal" name="q" value="{{ busca }}" placeholder="Digite o nome, matrícula ou CPF do agente...">
                 </div>
-            </div>
+            </form>
 
             <!-- TABELA DE FISCAIS -->
             <div class="table-responsive">
@@ -112,70 +116,42 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for fiscal in fiscais %}
                         <tr>
-                            <td><strong>#4598</strong></td>
-                            <td>Carlos Eduardo Moreira</td>
-                            <td>111.222.333-44</td>
-                            <td>Centro Comercial</td>
-                            <td><span class="badge success"><i data-lucide="check-circle"></i> Ativo</span></td>
+                            <td><strong>{{ fiscal.matricula_funcional }}</strong></td>
+                            <td>{{ fiscal.nome }} {{ fiscal.sobrenome }}</td>
+                            <td>{{ fiscal.cpf }}</td>
+                            <td>{{ fiscal.zona_atuacao_primaria }}</td>
+                            <td>
+                                {% if fiscal.ativo %}
+                                <span class="badge success"><i data-lucide="check-circle"></i> Ativo</span>
+                                {% else %}
+                                <span class="badge danger"><i data-lucide="lock"></i> Inativo</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 <div style="display: flex; gap: 6px;">
-                                    <button class="btn-action" onclick="alert('Editando dados do fiscal #4598')" title="Editar Cadastro">
+                                    <button type="button" class="btn-action" title="Editar cadastro (em breve)">
                                         <i data-lucide="edit"></i>
                                     </button>
-                                    <button class="btn-action" onclick="alert('Enviando link para redefinição de senha do fiscal #4598')" title="Resetar Senha">
+                                    <button type="button" class="btn-action" title="Resetar senha (em breve)">
                                         <i data-lucide="key"></i>
                                     </button>
-                                    <button class="btn-action" onclick="confirm('Deseja desativar o acesso deste fiscal?') && alert('Acesso bloqueado com sucesso.')" style="color: #DC2626; border-color: #FCA5A5;" title="Bloquear Acesso">
-                                        <i data-lucide="user-x"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td><strong>#3321</strong></td>
-                            <td>Juliana Santana Rocha</td>
-                            <td>555.666.777-88</td>
-                            <td>Feira do Bairro Brasil</td>
-                            <td><span class="badge success"><i data-lucide="check-circle"></i> Ativo</span></td>
-                            <td>
-                                <div style="display: flex; gap: 6px;">
-                                    <button class="btn-action" onclick="alert('Editando dados da fiscal #3321')" title="Editar Cadastro">
-                                        <i data-lucide="edit"></i>
-                                    </button>
-                                    <button class="btn-action" onclick="alert('Enviando link para redefinição de senha da fiscal #3321')" title="Resetar Senha">
-                                        <i data-lucide="key"></i>
-                                    </button>
-                                    <button class="btn-action" onclick="confirm('Deseja desativar o acesso desta fiscal?') && alert('Acesso bloqueado com sucesso.')" style="color: #DC2626; border-color: #FCA5A5;" title="Bloquear Acesso">
-                                        <i data-lucide="user-x"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            <td colspan="6">Nenhum fiscal cadastrado.</td>
                         </tr>
-                        <tr>
-                            <td><strong>#2109</strong></td>
-                            <td>Roberto Alves Pires</td>
-                            <td>999.888.777-66</td>
-                            <td>Terminal Lauro de Freitas</td>
-                            <td><span class="badge danger"><i data-lucide="lock"></i> Inativo</span></td>
-                            <td>
-                                <div style="display: flex; gap: 6px;">
-                                    <button class="btn-action" onclick="alert('Editando dados do fiscal #2109')" title="Editar Cadastro">
-                                        <i data-lucide="edit"></i>
-                                    </button>
-                                    <button class="btn-action" onclick="alert('Reativando acesso do fiscal #2109...')" style="color: #10B981; border-color: #6EE7B7;" title="Reativar Acesso">
-                                        <i data-lucide="user-check"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
 
             <!-- BOTÃO VOLTAR AO PAINEL DA TI POSICIONADO NO RODAPÉ DO CARD -->
             <div style="margin-top: 1.5rem; text-align: left;">
-                <a href="dashboard-ti.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <a href="{% url 'master_admin' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
                     <i data-lucide="arrow-left"></i> Voltar ao Painel da TI
                 </a>
             </div>
@@ -217,7 +193,7 @@
     </script>
 
     <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
-    <script src="../js/script.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     
     <!-- Inicialização dos ícones do Lucide -->
     <script>

@@ -2,9 +2,67 @@ from typing import ClassVar
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from .models import Perfil
+from .models import Fiscal, Gestor, Perfil, UsuarioBase
+
+
+def normalizar_cpf(valor):
+    return "".join(ch for ch in valor if ch.isdigit())
+
+
+def separar_nome(nome_completo):
+    partes = nome_completo.strip().split()
+    if not partes:
+        return "", ""
+    if len(partes) == 1:
+        return partes[0], partes[0]
+    return partes[0], " ".join(partes[1:])
+
+
+SECRETARIA_CHOICES = (
+    (
+        "SESEP - Serviços Públicos (Posturas)",
+        "SESEP - Serviços Públicos (Posturas)",
+    ),
+    (
+        "Vigilância Sanitária Municipal",
+        "Vigilância Sanitária Municipal",
+    ),
+    (
+        "SEFIN - Secretaria de Finanças / Tributos",
+        "SEFIN - Secretaria de Finanças / Tributos",
+    ),
+    (
+        "SEINFRA - Infraestrutura Urbana",
+        "SEINFRA - Infraestrutura Urbana",
+    ),
+    (
+        "Gabinete da Prefeita / Governo",
+        "Gabinete da Prefeita / Governo",
+    ),
+)
+
+ZONA_CHOICES = (
+    (
+        "Centro Comercial / Praça 9 de Novembro",
+        "Centro Comercial / Praça 9 de Novembro",
+    ),
+    (
+        "Feira do Bairro Brasil / Zona Oeste",
+        "Feira do Bairro Brasil / Zona Oeste",
+    ),
+    ("Terminal Lauro de Freitas", "Terminal Lauro de Freitas"),
+    (
+        "Região do Ceasa / Centro Histórico",
+        "Região do Ceasa / Centro Histórico",
+    ),
+    (
+        "Fiscalização Itinerante / Eventos",
+        "Fiscalização Itinerante / Eventos",
+    ),
+)
 
 
 class LoginBackofficeForm(AuthenticationForm):
@@ -55,3 +113,184 @@ class LoginBackofficeForm(AuthenticationForm):
                 self.error_messages["sem_acesso_backoffice"],
                 code="sem_acesso_backoffice",
             )
+
+
+class CadastroUsuarioMasterMixin:
+    def clean_cpf(self):
+        cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
+        if len(cpf) != 11:
+            raise ValidationError("Informe um CPF com 11 dígitos.")
+        if UsuarioBase.objects.filter(cpf=cpf).exists():
+            raise ValidationError("Já existe um usuário com este CPF.")
+        return cpf
+
+    def clean_email(self):
+        email = UsuarioBase.objects.normalize_email(self.cleaned_data["email"])
+        if UsuarioBase.objects.filter(email__iexact=email).exists():
+            raise ValidationError("Já existe um usuário com este e-mail.")
+        return email
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        validate_password(password)
+        return password
+
+
+class CadastroGestorForm(CadastroUsuarioMasterMixin, forms.Form):
+    nome_completo = forms.CharField(
+        label="Nome Completo do Gestor",
+        max_length=300,
+        widget=forms.TextInput(
+            attrs={
+                "id": "gestor-nome",
+                "placeholder": "Ex: Dra. Mariana Almeida",
+            }
+        ),
+    )
+    cpf = forms.CharField(
+        label="CPF do Servidor",
+        widget=forms.TextInput(
+            attrs={
+                "id": "gestor-cpf",
+                "placeholder": "000.000.000-00",
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label="E-mail Institucional",
+        widget=forms.EmailInput(
+            attrs={
+                "id": "gestor-email",
+                "placeholder": "gestor.nome@pmvc.ba.gov.br",
+            }
+        ),
+    )
+    telefone_whatsapp = forms.CharField(
+        label="Telefone / Ramal de Contato",
+        max_length=20,
+        widget=forms.TextInput(
+            attrs={
+                "id": "gestor-telefone",
+                "placeholder": "(77) 3229-0000",
+            }
+        ),
+    )
+    departamento = forms.ChoiceField(
+        label="Secretaria / Órgão Vinculado",
+        choices=(("", "Selecione a secretaria..."),) + SECRETARIA_CHOICES,
+        widget=forms.Select(attrs={"id": "gestor-secretaria"}),
+    )
+    cargo = forms.CharField(
+        label="Cargo / Função Institucional",
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "id": "gestor-cargo",
+                "placeholder": "Ex: Coordenadora de Licenciamento",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Senha Provisória de Acesso",
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "gestor-senha",
+                "placeholder": "Crie uma senha provisória de acesso",
+                "autocomplete": "new-password",
+            }
+        ),
+    )
+
+    def save(self):
+        dados = self.cleaned_data
+        nome, sobrenome = separar_nome(dados["nome_completo"])
+        cpf = dados["cpf"]
+        return Gestor.objects.create_user(
+            cpf=cpf,
+            email=dados["email"],
+            password=dados["password"],
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp=dados["telefone_whatsapp"],
+            matricula_funcional=f"GES-{cpf}",
+            cargo=dados["cargo"],
+            departamento=dados["departamento"],
+            is_staff=True,
+        )
+
+
+class CadastroFiscalForm(CadastroUsuarioMasterMixin, forms.Form):
+    nome_completo = forms.CharField(
+        label="Nome Completo do Agente",
+        max_length=300,
+        widget=forms.TextInput(
+            attrs={
+                "id": "fiscal-nome",
+                "placeholder": "Ex: Carlos Eduardo Moreira",
+            }
+        ),
+    )
+    matricula_funcional = forms.CharField(
+        label="Número da Matrícula",
+        max_length=50,
+        widget=forms.TextInput(
+            attrs={
+                "id": "fiscal-matricula",
+                "placeholder": "Ex: #4599",
+            }
+        ),
+    )
+    cpf = forms.CharField(
+        label="CPF do Agente",
+        widget=forms.TextInput(
+            attrs={
+                "id": "fiscal-cpf",
+                "placeholder": "000.000.000-00",
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label="E-mail Institucional",
+        widget=forms.EmailInput(
+            attrs={
+                "id": "fiscal-email",
+                "placeholder": "fiscal.nome@pmvc.ba.gov.br",
+            }
+        ),
+    )
+    zona_atuacao_primaria = forms.ChoiceField(
+        label="Zona / Setor de Atuação Principal",
+        choices=(("", "Selecione a zona..."),) + ZONA_CHOICES,
+        widget=forms.Select(attrs={"id": "fiscal-zona"}),
+    )
+    password = forms.CharField(
+        label="Senha Provisória",
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "fiscal-senha",
+                "placeholder": "Crie uma senha provisória",
+                "autocomplete": "new-password",
+            }
+        ),
+    )
+
+    def clean_matricula_funcional(self):
+        matricula = self.cleaned_data["matricula_funcional"].strip()
+        if Fiscal.objects.filter(matricula_funcional=matricula).exists():
+            raise ValidationError("Já existe um fiscal com esta matrícula.")
+        return matricula
+
+    def save(self):
+        dados = self.cleaned_data
+        nome, sobrenome = separar_nome(dados["nome_completo"])
+        return Fiscal.objects.create_user(
+            cpf=dados["cpf"],
+            email=dados["email"],
+            password=dados["password"],
+            nome=nome,
+            sobrenome=sobrenome,
+            telefone_whatsapp="",
+            matricula_funcional=dados["matricula_funcional"],
+            zona_atuacao_primaria=dados["zona_atuacao_primaria"],
+            is_staff=True,
+        )

@@ -24,5 +24,12 @@
     <p style="color: var(--texto-cinza);">
         Perfil: <strong>{{ user.role }}</strong>
     </p>
+    {% if user.role == "administrador" %}
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'master_admin' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            Abrir painel Master
+        </a>
+    </p>
+    {% endif %}
 </div>
 {% endblock %}
