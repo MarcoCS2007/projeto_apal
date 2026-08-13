@@ -1,6 +1,11 @@
 # Documentação do APAL
 
-O APAL (Aqui Pode, Aqui é Legal) é o sistema municipal de licenciamento e gestão de comércio ambulante. A documentação está **separada por módulo** (`apps/`), com o propósito do domínio, as telas, as regras e o passo a passo de uso.
+O APAL (Aqui Pode, Aqui é Legal) é o sistema municipal de licenciamento e gestão de comércio ambulante.
+
+Há dois jeitos de ler a docs:
+
+1. **[Documentação técnica](tecnica/README.md)** — capítulos sobre back-end, front-end, banco e funções reutilizadas. Comece por aqui se você é desenvolvedor novo no repositório.
+2. **Módulos abaixo** — como usar cada painel no dia a dia (URLs, perfis, regras de tela).
 
 ## Módulos
 
@@ -17,8 +22,10 @@ O APAL (Aqui Pode, Aqui é Legal) é o sistema municipal de licenciamento e gest
 
 | Documento | Conteúdo |
 | --- | --- |
+| [tecnica/README.md](tecnica/README.md) | Documentação técnica em 8 capítulos |
 | [API-AUTENTICACAO.md](API-AUTENTICACAO.md) | Contrato JWT (`/api/login/`, `/api/me/`) |
 | [API-MOVEL.md](API-MOVEL.md) | App ambulante/fiscal (licença, QR, ocorrência) |
+| [BACKUP.md](BACKUP.md) | Dump JSON, restauração e retenção LGPD |
 | [DEPLOY.md](DEPLOY.md) | Publicação em produção (Gunicorn, Docker, variáveis) |
 | [../README.md](../README.md) | Como subir o projeto localmente (Docker, Git Flow, CI) |
 

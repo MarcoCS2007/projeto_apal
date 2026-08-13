@@ -81,7 +81,7 @@
         <h2>Pontos cadastrados</h2>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -95,15 +95,15 @@
             <tbody>
                 {% for ponto in pontos %}
                 <tr>
-                    <td>
+                    <td data-label="Ponto">
                         <strong>{{ ponto.nome_identificacao }}</strong>
                         {% if ponto.coordenadas %}
                         <div style="font-size: 0.8rem; color: var(--texto-cinza);">{{ ponto.coordenadas }}</div>
                         {% endif %}
                     </td>
-                    <td>{{ ponto.logradouro }} — {{ ponto.bairro }}</td>
-                    <td>{{ ponto.metragem_maxima }} m²</td>
-                    <td>
+                    <td data-label="Endereço">{{ ponto.logradouro }} — {{ ponto.bairro }}</td>
+                    <td data-label="Metragem máx.">{{ ponto.metragem_maxima }} m²</td>
+                    <td data-label="Status">
                         {% if ponto.status_ocupacao == "Livre" %}
                         <span class="badge success">Livre</span>
                         {% elif ponto.status_ocupacao == "Ocupado" %}
@@ -114,9 +114,7 @@
                         <span class="badge warning">{{ ponto.status_ocupacao }}</span>
                         {% endif %}
                     </td>
-                    <td>
-                        <div class="table-actions">
-                            <a class="btn-action" href="{% url 'gestor_pontos_editar' ponto.pk %}" title="Editar"><i data-lucide="edit"></i></a>
+                    <td data-label="Ações">
                             <form method="post" action="{% url 'gestor_pontos_excluir' ponto.pk %}" onsubmit="return confirm('Excluir este ponto?');">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-action" style="color: #DC2626;" title="Excluir"><i data-lucide="trash-2"></i></button>

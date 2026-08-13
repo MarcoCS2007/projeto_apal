@@ -1,9 +1,9 @@
 {% load static %}
 <tr id="doc-row-{{ documento.pk }}" style="border-bottom: 1px solid #E2E8F0;">
-    <td style="padding: 16px 12px; font-weight: 600; color: #0F172A;">{{ documento.ambulante.nome }} {{ documento.ambulante.sobrenome }}</td>
-    <td style="padding: 16px 12px; color: #475569;">{{ documento.ambulante.cpf_mascarado }}</td>
-    <td style="padding: 16px 12px; color: #475569;">{{ documento.get_tipo_documento_display }}</td>
-    <td style="padding: 16px 12px;">
+    <td data-label="Requerente" style="padding: 16px 12px; font-weight: 600; color: #0F172A;">{{ documento.ambulante.nome }} {{ documento.ambulante.sobrenome }}</td>
+    <td data-label="CPF" style="padding: 16px 12px; color: #475569;">{{ documento.ambulante.cpf_mascarado }}</td>
+    <td data-label="Tipo de documento" style="padding: 16px 12px; color: #475569;">{{ documento.get_tipo_documento_display }}</td>
+    <td data-label="Arquivo" style="padding: 16px 12px;">
         {% if documento.arquivo %}
         <a href="{% url 'documento_arquivo' documento.pk %}" target="_blank" rel="noopener" style="color: #2563EB; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
             <i data-lucide="eye" style="width: 16px;"></i> Visualizar
@@ -12,7 +12,7 @@
         —
         {% endif %}
     </td>
-    <td style="padding: 16px 12px;">
+    <td data-label="Status" style="padding: 16px 12px;">
         {% if documento.aprovado %}
         <span class="badge success">Aprovado</span>
         {% elif documento.rejeitado %}
@@ -24,7 +24,7 @@
         <p style="margin: 6px 0 0; font-size: 0.8rem; color: #B42318;">{{ documento.motivo_rejeicao }}</p>
         {% endif %}
     </td>
-    <td style="padding: 16px 12px; text-align: center;">
+    <td data-label="Ações" style="padding: 16px 12px; text-align: center;">
         {% if documento.pendente %}
         <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
             <button

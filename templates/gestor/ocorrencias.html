@@ -50,7 +50,7 @@
         </div>
     </form>
 
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -65,9 +65,9 @@
             <tbody>
                 {% for ocorrencia in ocorrencias %}
                 <tr>
-                    <td>{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
-                    <td>{{ ocorrencia.fiscal.nome_completo }}</td>
-                    <td>
+                    <td data-label="Data / hora">{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td data-label="Fiscal">{{ ocorrencia.fiscal.nome_completo }}</td>
+                    <td data-label="Infrator / local">
                         {% if ocorrencia.ambulante %}
                         <a href="{% url 'gestor_dossie' ocorrencia.ambulante_id %}">{{ ocorrencia.ambulante.nome_completo }}</a>
                         {% else %}
@@ -77,11 +77,11 @@
                         <br><small style="color: #64748B;">{{ ocorrencia.local_ocorrencia }}</small>
                         {% endif %}
                     </td>
-                    <td>{{ ocorrencia.tipo_ocorrencia }}</td>
-                    <td>
+                    <td data-label="Tipo">{{ ocorrencia.tipo_ocorrencia }}</td>
+                    <td data-label="Status">
                         <span class="badge {{ ocorrencia.classe_badge }}">{{ ocorrencia.status_ocorrencia }}</span>
                     </td>
-                    <td>
+                    <td data-label="Ações">
                         <a href="{% url 'gestor_ocorrencia_detalhe' ocorrencia.pk %}" class="btn-action" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
                             <i data-lucide="eye"></i> Detalhes
                         </a>

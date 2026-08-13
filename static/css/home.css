@@ -2,13 +2,13 @@
    VARIÁVEIS DE CORES E ESTILOS GLOBAIS
 ========================================= */
 :root {
-    --brand-blue: #2563EB;
-    --brand-blue-hover: #1D4ED8;
-    --brand-pink: #EC4899;
-    --brand-dark: #0F172A;
-    --brand-slate: #475569;
-    --bg-light: #F8FAFC;
-    --border-color: #E2E8F0;
+    --brand-blue: var(--azul-vibrante);
+    --brand-blue-hover: var(--azul-escuro);
+    --brand-pink: var(--cor-destaque);
+    --brand-dark: var(--texto-escuro);
+    --brand-slate: var(--texto-cinza);
+    --bg-light: var(--fundo-cinza);
+    --border-color: var(--borda-cinza);
 }
 
 body {
@@ -128,8 +128,19 @@ body {
     left: -10%;
     width: 50%;
     height: 150%;
-    background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--blob-rosa) 0%, transparent 70%);
     transform: rotate(-45deg);
+    pointer-events: none;
+}
+
+.modern-hero::after {
+    content: '';
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    right: -130px;
+    bottom: -160px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.11) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -193,15 +204,20 @@ body {
     align-items: center;
     gap: 10px;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--cor-destaque) 40%, transparent);
     border: 2px solid var(--brand-pink);
 }
 
 .btn-modern-primary:hover {
-    background: #DB2777;
-    border-color: #DB2777;
+    background: var(--cor-destaque-escuro);
+    border-color: var(--cor-destaque-escuro);
     transform: translateY(-3px);
-    box-shadow: 0 15px 30px -5px rgba(236, 72, 153, 0.5);
+    box-shadow: 0 15px 30px -5px color-mix(in srgb, var(--cor-destaque) 50%, transparent);
+}
+
+.btn-modern-primary:active,
+.btn-modern-outline:active {
+    scale: 0.98;
 }
 
 .btn-modern-outline {
@@ -247,21 +263,23 @@ body {
 }
 
 .feature-card {
-    background: white;
+    background: var(--branco);
     padding: 32px 24px;
     border-radius: 16px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
     text-align: left;
-    transition: all 0.3s ease;
+    transition: translate 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s ease, border-color 0.2s ease;
     position: relative;
     overflow: hidden;
 }
 
-.feature-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-    border-color: #CBD5E1;
+@media (hover: hover) and (pointer: fine) {
+    .feature-card:hover {
+        translate: 0 -2px;
+        box-shadow: var(--shadow-md);
+        border-color: color-mix(in srgb, var(--azul-vibrante) 28%, var(--borda-cinza));
+    }
 }
 
 .feature-icon-wrapper {
@@ -280,13 +298,13 @@ body {
 }
 
 /* Cores dos Ícones de Benefícios */
-.icon-bg-blue { background: #EFF6FF; }
+.icon-bg-blue { background: var(--azul-suave); }
 .icon-blue { color: var(--brand-blue); width: 28px; height: 28px; }
 
-.icon-bg-pink { background: #FDF2F8; }
+.icon-bg-pink { background: var(--cor-destaque-suave); }
 .icon-pink { color: var(--brand-pink); width: 28px; height: 28px; }
 
-.icon-bg-green { background: #ECFDF5; }
+.icon-bg-green { background: var(--sucesso-bg); }
 .icon-green { color: #059669; width: 28px; height: 28px; }
 
 .feature-title {
@@ -661,7 +679,7 @@ body {
 .home-nav-btn-login {
     background: transparent !important;
     border: none !important;
-    color: #475467 !important;
+    color: var(--texto-cinza) !important;
     font-size: 0.88rem !important;
     font-weight: 600 !important;
     padding: 0.55rem 0.85rem !important;
@@ -674,14 +692,18 @@ body {
 }
 
 .home-nav-btn-login:hover {
-    color: #1D4ED8 !important;
-    background: #EFF6FF !important;
+    color: var(--azul-vibrante) !important;
+    background: var(--hover-azul) !important;
+}
+
+.home-nav-btn-login:active {
+    scale: 0.98;
 }
 
 .home-nav-btn-login .home-nav-icon {
-    color: #98A2B3 !important;
+    color: var(--texto-cinza-suave) !important;
 }
 
 .home-nav-btn-login:hover .home-nav-icon {
-    color: #1D4ED8 !important;
+    color: var(--azul-vibrante) !important;
 }

@@ -17,18 +17,18 @@
 
 {% block content %}
 <div class="form-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div class="table-toolbar">
         <div class="section-title" style="margin: 0;">
             <div class="title-accent"></div>
             <h2>Base de Dados ({{ total_ambulantes }} registro{{ total_ambulantes|pluralize }})</h2>
         </div>
-        <form method="get" class="input-group" style="flex: 0 1 320px; margin-bottom: 0;">
+        <form method="get" class="input-group" style="flex: 1 1 280px; margin-bottom: 0;">
             <label for="search-ambulante" class="sr-only">Buscar ambulante</label>
             <input type="text" id="search-ambulante" name="q" value="{{ busca }}" placeholder="Buscar por nome ou CPF..." style="padding: 0.6rem 1rem;">
         </form>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -43,11 +43,11 @@
             <tbody>
                 {% for ambulante in ambulantes %}
                 <tr>
-                    <td>#{{ ambulante.pk }}</td>
-                    <td>{{ ambulante.nome_completo }}</td>
-                    <td>{{ ambulante.cpf_mascarado }}</td>
-                    <td>{{ ambulante.criado_em|date:"d/m/Y" }}</td>
-                    <td>
+                    <td data-label="ID">#{{ ambulante.pk }}</td>
+                    <td data-label="Nome completo">{{ ambulante.nome_completo }}</td>
+                    <td data-label="CPF">{{ ambulante.cpf_mascarado }}</td>
+                    <td data-label="Data de cadastro">{{ ambulante.criado_em|date:"d/m/Y" }}</td>
+                    <td data-label="Situação">
                         {% if ambulante.situacao_conta == "cancelada" %}
                         <span class="badge danger"><i data-lucide="ban"></i> Cancelado</span>
                         {% elif ambulante.situacao_conta == "suspensa" %}
@@ -58,7 +58,7 @@
                         <span class="badge"><i data-lucide="clock"></i> Cadastro pendente</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Ações">
                         <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
                             <a href="{% url 'gestor_dossie' ambulante.pk %}" class="btn-action" style="text-decoration: none;">
                                 <i data-lucide="folder-open"></i> Dossiê
