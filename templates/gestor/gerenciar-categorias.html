@@ -67,7 +67,7 @@
         <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
         <h2>Categorias Registradas no Sistema</h2>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -81,23 +81,23 @@
             <tbody>
                 {% for categoria in categorias %}
                 <tr>
-                    <td><strong>{{ categoria.nome_categoria }}</strong></td>
-                    <td>{{ categoria.descricao }}</td>
-                    <td style="text-align: center;">
+                    <td data-label="Categoria"><strong>{{ categoria.nome_categoria }}</strong></td>
+                    <td data-label="Descrição">{{ categoria.descricao }}</td>
+                    <td data-label="Laudo sanitário" style="text-align: center;">
                         {% if categoria.exige_laudo_sanitario %}
                         <span class="badge warning"><i data-lucide="check"></i> Obrigatório</span>
                         {% else %}
                         <span class="badge success">Isento</span>
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td data-label="Bombeiros" style="text-align: center;">
                         {% if categoria.exige_laudo_bombeiros %}
                         <span class="badge warning"><i data-lucide="check"></i> Obrigatório</span>
                         {% else %}
                         <span class="badge success">Isento</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Ações">
                         <div class="table-actions">
                             <a href="{% url 'gestor_categorias_editar' categoria.pk %}" class="btn-action" style="text-decoration: none;"><i data-lucide="edit"></i></a>
                             <form action="{% url 'gestor_categorias_excluir' categoria.pk %}" method="post" onsubmit="return confirm('Excluir esta categoria?');">

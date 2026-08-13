@@ -17,18 +17,18 @@
 
 {% block content %}
 <div class="form-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div class="table-toolbar">
         <div class="section-title" style="margin: 0;">
             <div class="title-accent" style="background-color: #F59E0B;"></div>
             <h2>Processos na fila ({{ total_processos }})</h2>
         </div>
-        <form method="get" class="input-group" style="flex: 0 1 320px; margin-bottom: 0;">
+        <form method="get" class="input-group" style="flex: 1 1 280px; margin-bottom: 0;">
             <label for="search-fila" class="sr-only">Buscar processo</label>
             <input type="text" id="search-fila" name="q" value="{{ busca }}" placeholder="Buscar por protocolo, nome ou CPF...">
         </form>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -43,18 +43,18 @@
             <tbody>
                 {% for processo in processos %}
                 <tr>
-                    <td>{{ processo.protocolo }}</td>
-                    <td>{{ processo.ambulante.nome_completo }}</td>
-                    <td>{{ processo.tipo_pedido }}</td>
-                    <td>
+                    <td data-label="Protocolo">{{ processo.protocolo }}</td>
+                    <td data-label="Requerente">{{ processo.ambulante.nome_completo }}</td>
+                    <td data-label="Tipo de pedido">{{ processo.tipo_pedido }}</td>
+                    <td data-label="Fase atual">
                         {% if processo.status == "Pendência Documental" %}
                         <span class="badge purple"><i data-lucide="alert-circle"></i> {{ processo.status }}</span>
                         {% else %}
                         <span class="badge warning"><i data-lucide="file-search"></i> {{ processo.status }}</span>
                         {% endif %}
                     </td>
-                    <td>{{ processo.criado_em|timesince }}</td>
-                    <td>
+                    <td data-label="Tempo na fila">{{ processo.criado_em|timesince }}</td>
+                    <td data-label="Ação">
                         <a href="{% url 'gestor_analisar' processo.pk %}" class="btn-action" style="text-decoration: none;">
                             <i data-lucide="eye"></i> Revisar
                         </a>

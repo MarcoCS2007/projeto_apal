@@ -120,7 +120,7 @@
         <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
         <h2>Documentos e fotos anexados</h2>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -133,25 +133,25 @@
             <tbody>
                 {% if ambulante.foto %}
                 <tr>
-                    <td><strong>Foto 3x4 do titular</strong></td>
-                    <td>{{ ambulante.foto.name }}</td>
-                    <td><span class="badge success">Anexado</span></td>
-                    <td><a href="{{ ambulante.foto.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
+                    <td data-label="Documento"><strong>Foto 3x4 do titular</strong></td>
+                    <td data-label="Arquivo">{{ ambulante.foto.name }}</td>
+                    <td data-label="Status"><span class="badge success">Anexado</span></td>
+                    <td data-label="Ações"><a href="{{ ambulante.foto.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
                 </tr>
                 {% endif %}
                 {% if estrutura and estrutura.foto_estrutura %}
                 <tr>
-                    <td><strong>Foto da estrutura</strong></td>
-                    <td>{{ estrutura.foto_estrutura.name }}</td>
-                    <td><span class="badge success">Anexado</span></td>
-                    <td><a href="{{ estrutura.foto_estrutura.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
+                    <td data-label="Documento"><strong>Foto da estrutura</strong></td>
+                    <td data-label="Arquivo">{{ estrutura.foto_estrutura.name }}</td>
+                    <td data-label="Status"><span class="badge success">Anexado</span></td>
+                    <td data-label="Ações"><a href="{{ estrutura.foto_estrutura.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
                 </tr>
                 {% endif %}
                 {% for doc in documentos %}
                 <tr>
-                    <td><strong>{{ doc.get_tipo_documento_display }}</strong></td>
-                    <td>{% if doc.arquivo %}{{ doc.arquivo.name }}{% else %}—{% endif %}</td>
-                    <td>
+                    <td data-label="Documento"><strong>{{ doc.get_tipo_documento_display }}</strong></td>
+                    <td data-label="Arquivo">{% if doc.arquivo %}{{ doc.arquivo.name }}{% else %}—{% endif %}</td>
+                    <td data-label="Status">
                         {% if doc.status_aprovacao == "Aprovado" %}
                         <span class="badge success">{{ doc.status_aprovacao }}</span>
                         {% elif doc.status_aprovacao == "Rejeitado" %}
@@ -160,7 +160,7 @@
                         <span class="badge warning">{{ doc.status_aprovacao }}</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Ações">
                         {% if doc.arquivo %}
                         <a href="{% url 'documento_arquivo' doc.pk %}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a>
                         {% endif %}

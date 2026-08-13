@@ -47,7 +47,7 @@
         </div>
     </form>
 
-    <div class="table-responsive">
+    <div class="table-responsive table-stack">
         <table class="data-table">
             <thead>
                 <tr>
@@ -62,18 +62,20 @@
             <tbody>
                 {% for licenca in licencas %}
                 <tr>
-                    <td>{{ licenca.numero_licenca|default:licenca.protocolo }}</td>
-                    <td>{{ licenca.ambulante.nome_completo }}</td>
-                    <td>{% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}—{% endif %}</td>
-                    <td>{% if licenca.data_vencimento %}{{ licenca.data_vencimento|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-                    <td>{{ licenca.status }}</td>
-                    <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <td data-label="Protocolo">{{ licenca.numero_licenca|default:licenca.protocolo }}</td>
+                    <td data-label="Ambulante">{{ licenca.ambulante.nome_completo }}</td>
+                    <td data-label="Ponto">{% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}—{% endif %}</td>
+                    <td data-label="Vencimento">{% if licenca.data_vencimento %}{{ licenca.data_vencimento|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                    <td data-label="Status">{{ licenca.status }}</td>
+                    <td data-label="Ação">
+                        <div class="table-actions">
                         {% if licenca.pode_emitir %}
                         <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-submit" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">Emitir</a>
                         {% elif licenca.numero_licenca %}
                         <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-action" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;">Ver alvará</a>
                         {% endif %}
-                        <a href="{% url 'gestor_dossie' licenca.ambulante_id %}">Dossiê</a>
+                        <a href="{% url 'gestor_dossie' licenca.ambulante_id %}" class="btn-action" style="text-decoration: none;">Dossiê</a>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}

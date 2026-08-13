@@ -59,37 +59,38 @@
                 <div style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%); z-index: 1;"></div>
                 <div style="position: absolute; top: 56px; left: -18px; right: -18px; height: 36px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; z-index: 2;"></div>
 
-                <div style="position: absolute; top: 88px; left: 20px; right: 20px; bottom: 60px; z-index: 4; text-align: center; overflow: hidden;">
-                    <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
-                    <p style="margin: 4px 0 0; font-size: 0.78rem; font-weight: 600; color: #475569;">
-                        {{ ambulante.apelido_nome_fantasia|default:"Sem nome fantasia" }}
-                    </p>
+                <div class="id-back-content" style="text-align: center;">
+                    <div class="id-back-meta">
+                        <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
+                        <p style="margin: 4px 0 0; font-size: 0.78rem; font-weight: 600; color: #475569;">
+                            {{ ambulante.apelido_nome_fantasia|default:"Sem nome fantasia" }}
+                        </p>
 
-                    <div style="margin-top: 8px;">
-                        <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Nº do alvará</span>
-                        <strong style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">{{ licenca.numero_licenca }}</strong>
+                        <div style="margin-top: 8px;">
+                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Nº do alvará</span>
+                            <strong style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">{{ licenca.numero_licenca }}</strong>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Ponto</span>
+                            <strong style="display: block; margin-top: 2px; font-size: 0.8rem; font-weight: 700; color: #0F172A;">
+                                {% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}Não informado{% endif %}
+                            </strong>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Horário autorizado</span>
+                            <strong style="display: block; margin-top: 2px; font-size: 0.72rem; line-height: 1.3; font-weight: 700; color: #0F172A;">{{ licenca.texto_horario_autorizado }}</strong>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            {% include "ambulante/_status_badge.html" with licenca=licenca %}
+                        </div>
                     </div>
-                    <div style="margin-top: 8px;">
-                        <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Ponto</span>
-                        <strong style="display: block; margin-top: 2px; font-size: 0.8rem; font-weight: 700; color: #0F172A;">
-                            {% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}Não informado{% endif %}
-                        </strong>
-                    </div>
-                    <div style="margin-top: 8px;">
-                        <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Horário autorizado</span>
-                        <strong style="display: block; margin-top: 2px; font-size: 0.72rem; line-height: 1.3; font-weight: 700; color: #0F172A;">{{ licenca.texto_horario_autorizado }}</strong>
-                    </div>
-                    <div style="margin-top: 8px;">
-                        {% include "ambulante/_status_badge.html" with licenca=licenca %}
-                    </div>
-                    <div class="id-qr-box" style="display: flex; justify-content: center; margin-top: 8px;">
+                    <div class="id-qr-box">
                         <img
                             src="{% url 'ambulante_credencial_qr' %}"
                             alt="QR Code da licença {{ licenca.numero_licenca }}"
                             data-qr-codigo="{{ ambulante.codigo_qr_code }}"
                             width="118"
-                            height="118"
-                            style="width: 118px; height: 118px; background: #FFFFFF; border: 1.5px solid #93C5FD; border-radius: 12px; padding: 4px; box-sizing: border-box;">
+                            height="118">
                     </div>
                 </div>
 
