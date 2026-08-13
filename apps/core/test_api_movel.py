@@ -81,9 +81,17 @@ class ApiMovelTests(UsuariosAuthFixtures, APITestCase):
             data_emissao=hoje,
             data_vencimento=hoje + timedelta(days=365),
             ponto=self.ponto,
-            dias_semana=["segunda", "terca", "quarta", "quinta", "sexta"],
-            horario_inicio=time(6, 0),
-            horario_termino=time(18, 0),
+            dias_semana=[
+                "segunda",
+                "terca",
+                "quarta",
+                "quinta",
+                "sexta",
+                "sabado",
+                "domingo",
+            ],
+            horario_inicio=time(0, 0),
+            horario_termino=time(23, 59),
         )
 
     def _token(self, user):

@@ -1,14 +1,18 @@
 from datetime import timedelta
+from io import BytesIO
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView
+from xhtml2pdf import pisa
 
 from apps.espacos.models import PontoOcupacao
 from apps.fiscalizacao.forms import AuditoriaOcorrenciaForm, FiltroOcorrenciaForm
@@ -510,3 +514,49 @@ def contexto_inicio_gestor(user):
         ).count(),
         "eh_gestor": Gestor.objects.filter(pk=user.pk).exists(),
     }
+
+
+class GestorDossieExportPDFView(PainelGestorMixin, View):
+    modulo_permissao = "solicitacao_licenca"
+
+    def get(self, request, pk):
+        ambulante = get_object_or_404(
+            Ambulante.objects.select_related("ponto_pretendido").prefetch_related(
+                "licencas", "estruturas", "ocorrencias_recebidas"
+            ),
+            pk=pk,
+        )
+
+        LogAcessoDossie.objects.create(usuario=request.user, ambulante=ambulante)
+
+        html_string = render_to_string(
+            "gestor/dossie_export.html", {"ambulante": ambulante}
+        )
+        buffer = BytesIO()
+        pisa.pisaDocument(BytesIO(html_string.encode("UTF-8")), buffer)
+        pdf_file = buffer.getvalue()
+
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="dossie_{ambulante.cpf}.pdf"'
+        )
+        return response
+
+
+class GestorDashboardChartDataView(PainelGestorMixin, View):
+    modulo_permissao = "relatorios"
+
+    def get(self, request):
+        dados = (
+            LicencaAlvara.objects.filter(status=StatusLicenca.ATIVO)
+            .values("categoria_produto__nome_categoria")
+            .annotate(total=Count("id"))
+            .order_by("-total")
+        )
+
+        labels = [
+            d["categoria_produto__nome_categoria"] or "Sem Categoria" for d in dados
+        ]
+        data = [d["total"] for d in dados]
+
+        return JsonResponse({"labels": labels, "data": data})

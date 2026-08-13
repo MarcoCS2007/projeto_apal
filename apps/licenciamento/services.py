@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
@@ -224,6 +226,16 @@ def aplicar_parecer(licenca, gestor, acao, motivo="", categoria=None, ponto=None
         raise ValidationError("Selecione a categoria do produto antes de deferir.")
 
     licenca.status = StatusLicenca.APROVADO
+
+    # Motor Financeiro: Cálculo da Taxa Baseado no Uso do Solo
+    if estrutura and licenca.categoria_produto:
+        metragem = estrutura.dimensoes_metragem
+        fator = licenca.categoria_produto.fator_financeiro
+        licenca.valor_taxa = round(metragem * fator, 2)
+    else:
+        # Fallback caso não haja estrutura/categoria definida corretamente
+        licenca.valor_taxa = Decimal("0.00")
+
     if not licenca.motivo_parecer:
         licenca.motivo_parecer = (
             f"Deferido em {timezone.localdate().strftime('%d/%m/%Y')} "

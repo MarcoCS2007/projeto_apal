@@ -66,38 +66,42 @@
 {% block extra_js %}
 <script>
     function iniciarGraficoCategorias() {
-        const fonte = document.getElementById("dados-categorias");
         const canvas = document.getElementById("graficoOcupacao");
-        if (!fonte || !canvas || !window.Chart) {
+        if (!canvas || !window.Chart) {
             return;
         }
-        const categorias = JSON.parse(fonte.textContent);
-        const labels = categorias.map(function (item) { return item.nome; });
-        const valores = categorias.map(function (item) { return item.total; });
-        if (window.graficoCategoriasApal) {
-            window.graficoCategoriasApal.destroy();
-        }
-        if (!labels.length) {
-            return;
-        }
-        window.graficoCategoriasApal = new Chart(canvas.getContext("2d"), {
-            type: canvas.dataset.tipo || "bar",
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: "Licenças ativas",
-                    data: valores,
-                    backgroundColor: ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9"],
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: (canvas.dataset.tipo || "bar") === "pie" },
-                },
-            },
-        });
+
+        fetch("{% url 'gestor_dashboard_chart_data' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (window.graficoCategoriasApal) {
+                    window.graficoCategoriasApal.destroy();
+                }
+                
+                if (!data.labels || !data.labels.length) {
+                    return;
+                }
+
+                window.graficoCategoriasApal = new Chart(canvas.getContext("2d"), {
+                    type: canvas.dataset.tipo || "bar",
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: "Licenças ativas",
+                            data: data.data,
+                            backgroundColor: ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9"],
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: (canvas.dataset.tipo || "bar") === "pie" },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error("Erro ao carregar dados do gráfico:", error));
     }
 
     function mudarTipoGrafico(tipo) {

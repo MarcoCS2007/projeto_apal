@@ -16,6 +16,12 @@ class CategoriaProduto(ModeloBase):
     exige_laudo_bombeiros = models.BooleanField(
         "Exige Laudo dos Bombeiros", default=False
     )
+    fator_financeiro = models.DecimalField(
+        "Fator Financeiro (R$ por m²)",
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("1.00"),
+    )
 
     class Meta:
         verbose_name = "Categoria de Produto"
@@ -231,6 +237,14 @@ class LicencaAlvara(ModeloBase):
     )
     motivo_parecer = models.TextField(blank=True, default="")
     taxa_paga = models.BooleanField("Taxa municipal paga", default=False)
+    valor_taxa = models.DecimalField(
+        "Valor da Taxa",
+        max_digits=10,
+        decimal_places=2,
+        default=VALOR_TAXA_DAM,
+        null=True,
+        blank=True,
+    )
     licenca_origem = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
@@ -303,10 +317,6 @@ class LicencaAlvara(ModeloBase):
     @property
     def pode_renovar(self):
         return self.status == StatusLicenca.VENCIDO
-
-    @property
-    def valor_taxa(self):
-        return VALOR_TAXA_DAM
 
     @property
     def classe_badge(self):

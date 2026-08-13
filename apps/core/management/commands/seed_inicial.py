@@ -24,31 +24,37 @@ CATEGORIAS = (
         "nome_categoria": "Alimentos Manipulados",
         "descricao": "Alimentos preparados na hora.",
         "exige_laudo_sanitario": True,
+        "fator_financeiro": Decimal("15.00"),
     },
     {
         "nome_categoria": "Artesanato",
         "descricao": "Produtos artesanais e manuais.",
         "exige_laudo_sanitario": False,
+        "fator_financeiro": Decimal("10.00"),
     },
     {
         "nome_categoria": "Lanches e Salgados",
         "descricao": "Cachorro-quente, tapioca, milho e similares.",
         "exige_laudo_sanitario": True,
+        "fator_financeiro": Decimal("12.50"),
     },
     {
         "nome_categoria": "Vestuário e Acessórios",
         "descricao": "Roupas, bolsas, bijuterias e calçados.",
         "exige_laudo_sanitario": False,
+        "fator_financeiro": Decimal("20.00"),
     },
     {
         "nome_categoria": "Bebidas e Água de Coco",
         "descricao": "Bebidas não alcoólicas e água de coco.",
         "exige_laudo_sanitario": True,
+        "fator_financeiro": Decimal("8.00"),
     },
     {
         "nome_categoria": "Frutas e Hortifruti",
         "descricao": "Frutas, verduras e legumes in natura.",
         "exige_laudo_sanitario": False,
+        "fator_financeiro": Decimal("5.00"),
     },
 )
 
@@ -283,15 +289,17 @@ class Command(BaseCommand):
 
     def _categorias(self):
         for dados in CATEGORIAS:
-            _obj, created = CategoriaProduto.objects.get_or_create(
-                nome_categoria=dados["nome_categoria"],
-                defaults=dados,
+            defaults = dict(dados)
+            nome_categoria = defaults.pop("nome_categoria")
+            _obj, created = CategoriaProduto.objects.update_or_create(
+                nome_categoria=nome_categoria,
+                defaults=defaults,
             )
-            nome = dados["nome_categoria"]
+            nome = nome_categoria
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Categoria '{nome}' criada."))
             else:
-                self.stdout.write(f"Categoria '{nome}' já existe.")
+                self.stdout.write(f"Categoria '{nome}' já existe e foi atualizada.")
 
     def _pontos(self):
         pontos = {}
