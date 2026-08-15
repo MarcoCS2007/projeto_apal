@@ -14,7 +14,7 @@ from apps.usuarios.models import (
     Fiscal,
     Gestor,
 )
-
+SENHA_ADMIN = "admin123"
 SENHA_GESTOR = "gestor123"
 SENHA_FISCAL = "fiscal123"
 SENHA_AMBULANTE = "amb123"
