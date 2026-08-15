@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Inteligência Governamental - APAL Gestor{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="dashboard" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Inteligência Governamental</h1>
+        <p>Indicadores Avançados e Cruzamentos Estratégicos</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card relatorio-filtros">
+    <form id="formFiltros" class="relatorio-filtros-grid">
+        <div class="input-group">
+            <label for="bairro">Bairro de atuação</label>
+            <select id="bairro" name="bairro" class="styled-select">
+                <option value="">Todos os bairros</option>
+                {% for bairro in bairros_disponiveis %}
+                <option value="{{ bairro }}" {% if bairro_atual|lower == bairro|lower %}selected{% endif %}>{{ bairro }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="origem">Tipo de atuação</label>
+            <select id="origem" name="origem" class="styled-select">
+                <option value="">Todos</option>
+                <option value="residentes">Fixo (ponto autorizado)</option>
+                <option value="itinerantes">Itinerante (móvel)</option>
+            </select>
+        </div>
+        <div class="input-group relatorio-filtros-acao" style="display: flex; gap: 10px;">
+            <button type="submit" class="btn-action">
+                <i data-lucide="filter"></i> Aplicar Filtros
+            </button>
+            <a href="{% url 'relatorios:exportacao' %}" id="btnExportar" class="btn-action" style="background-color: #10B981; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                <i data-lucide="download" style="margin-right: 5px;"></i> Exportar CSV
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+    <div class="form-card">
+        <h3>Distribuição Etária</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartEtaria"></canvas>
+        </div>
+    </div>
+    
+    <div class="form-card">
+        <h3>Distribuição de Gênero</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartGenero"></canvas>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <h3>Vulnerabilidade Social</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartVulnerabilidade"></canvas>
+        </div>
+    </div>
+    
+    <div class="form-card" style="grid-column: 1 / -1;">
+        <h3>Grau de Instrução</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartInstrucao"></canvas>
+        </div>
+    </div>
+
+    <div class="form-card" style="grid-column: 1 / -1;">
+        <h3>Estimativa de Renda Média por Categoria</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartRenda"></canvas>
+        </div>
+    </div>
+
+    <div class="form-card" style="grid-column: 1 / -1;">
+        <h3>Evolução da Regularização</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="chartEvolucao"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let charts = {};
+
+    function destroyChart(id) {
+        if (charts[id]) {
+            charts[id].destroy();
+        }
+    }
+
+    const CORES_RELATORIO = ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9", "#64748B", "#DC2626"];
+
+    function createChart(id, type, data, options = {}) {
+        destroyChart(id);
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
+        
+        if (data && data.datasets) {
+            data.datasets.forEach(ds => {
+                if (!ds.backgroundColor) {
+                    ds.backgroundColor = CORES_RELATORIO;
+                }
+            });
+        }
+
+        const ctx = canvas.getContext('2d');
+        charts[id] = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                ...options
+            }
+        });
+    }
+
+    const dataEtaria = {{ chart_etaria_json|safe }};
+    const dataGenero = {{ chart_genero_json|safe }};
+    const dataVulnerabilidade = {{ chart_vulnerabilidade_json|safe }};
+    const dataInstrucao = {{ chart_instrucao_json|safe }};
+    const dataRenda = {{ chart_renda_json|safe }};
+    const dataEvolucao = {{ chart_evolucao_json|safe }};
+
+    const percentageTooltip = {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        let value = context.raw;
+                        let total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                        let percentage = total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                        
+                        if (label) {
+                            label += ': ';
+                        }
+                        return label + value + ' (' + percentage + ')';
+                    }
+                }
+            }
+        }
+    };
+
+    const currencyTooltip = {
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        let value = context.raw;
+                        if (label) {
+                            label += ': ';
+                        }
+                        return label + 'R$ ' + parseFloat(value).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    }
+                }
+            }
+        }
+    };
+
+    createChart('chartEtaria', 'pie', dataEtaria, percentageTooltip);
+    createChart('chartGenero', 'doughnut', dataGenero, percentageTooltip);
+    createChart('chartVulnerabilidade', 'pie', dataVulnerabilidade, percentageTooltip);
+    createChart('chartInstrucao', 'bar', dataInstrucao, {
+        plugins: {
+            legend: { display: false },
+            tooltip: percentageTooltip.plugins.tooltip
+        }
+    });
+    createChart('chartRenda', 'bar', dataRenda, currencyTooltip);
+    createChart('chartEvolucao', 'line', dataEvolucao);
+
+    const btnExportar = document.getElementById('btnExportar');
+    if (btnExportar) {
+        btnExportar.href = `{% url 'relatorios:exportacao' %}?{{ query_string|safe }}`;
+    }
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

@@ -53,6 +53,8 @@ class AcessibilidadeTransversalTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, 'id="ai-modal"')
         self.assertContains(response, 'id="ai-response-content"')
         self.assertContains(response, "Simplificar com IA")
-        self.assertContains(response, 'aria-label="APAL — página inicial de Vitória da Conquista"')
+        self.assertContains(
+            response, 'aria-label="APAL — página inicial de Vitória da Conquista"'
+        )
         self.assertContains(response, "Recursos da plataforma")
         self.assertNotContains(response, "max-width: 500px")

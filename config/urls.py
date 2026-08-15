@@ -31,6 +31,7 @@ urlpatterns = [
     path("", include("apps.licenciamento.urls_web")),
     path("", include("apps.espacos.urls_web")),
     path("", include("apps.assistente.urls_web")),
+    path("relatorios/", include("apps.relatorios.urls")),
 ]
 
 handler404 = "apps.core.views.pagina_nao_encontrada"

@@ -37,7 +37,7 @@ class EditarAmbulanteGestorForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "styled-select"}),
     )
-    renda_estimada = forms.DecimalField(
+    renda_mensal_estimada = forms.DecimalField(
         label="Renda mensal estimada (R$)",
         required=False,
         min_value=0,
@@ -68,7 +68,9 @@ class EditarAmbulanteGestorForm(forms.Form):
                 self.fields["nis"].initial = ambulante.nis or ""
                 self.fields["escolaridade"].initial = ambulante.escolaridade
                 self.fields["genero"].initial = ambulante.genero or Genero.NAO_INFORMADO
-                self.fields["renda_estimada"].initial = ambulante.renda_estimada
+                self.fields["renda_mensal_estimada"].initial = (
+                    ambulante.renda_mensal_estimada
+                )
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
@@ -96,6 +98,6 @@ class EditarAmbulanteGestorForm(forms.Form):
         ambulante.nis = self.cleaned_data.get("nis") or None
         ambulante.escolaridade = self.cleaned_data.get("escolaridade") or ""
         ambulante.genero = self.cleaned_data.get("genero") or Genero.NAO_INFORMADO
-        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
+        ambulante.renda_mensal_estimada = self.cleaned_data.get("renda_mensal_estimada")
         ambulante.save()
         return ambulante

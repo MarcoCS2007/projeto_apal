@@ -14,6 +14,7 @@ from apps.usuarios.models import (
     Fiscal,
     Gestor,
 )
+
 SENHA_ADMIN = "admin123"
 SENHA_GESTOR = "gestor123"
 SENHA_FISCAL = "fiscal123"
@@ -234,10 +235,15 @@ class Command(BaseCommand):
         )
 
     def _criar(self, model, cpf, defaults, senha, criar):
-        existente = model.objects.filter(cpf=cpf).first()
+        email = defaults.get("email")
+        from django.db.models import Q
+
+        from apps.usuarios.models import UsuarioBase
+
+        existente = UsuarioBase.objects.filter(Q(cpf=cpf) | Q(email=email)).first()
         if existente:
-            self.stdout.write(f"{model.__name__} {cpf} já existe.")
-            return existente
+            self.stdout.write(f"Usuário com CPF {cpf} ou email {email} já existe.")
+            return model.objects.filter(pk=existente.pk).first() or existente
         usuario = criar(cpf=cpf, password=senha, **defaults)
         self.stdout.write(
             self.style.SUCCESS(f"{model.__name__} {usuario.nome} criado.")
@@ -276,7 +282,12 @@ class Command(BaseCommand):
         return ambulante
 
     def _administrador(self):
-        if Administrador.objects.filter(cpf=CPF_ADMIN).exists():
+        from apps.usuarios.models import UsuarioBase
+
+        if (
+            UsuarioBase.objects.filter(cpf=CPF_ADMIN).exists()
+            or UsuarioBase.objects.filter(email="admin@apal.com").exists()
+        ):
             self.stdout.write("Administrador Master já existe.")
             return
         Administrador.objects.create_superuser(
@@ -364,7 +375,7 @@ class Command(BaseCommand):
             },
             extras={"razao_social": "Maria das Dores MEI", "sem_cnpj": False},
             genero="feminino",
-            renda_estimada=Decimal("2200.00"),
+            renda_mensal_estimada=Decimal("2200.00"),
             num_funcionarios=1,
         )
         self._ambulante_completo(
@@ -396,7 +407,7 @@ class Command(BaseCommand):
             },
             extras={"sem_cnpj": True},
             genero="masculino",
-            renda_estimada=Decimal("1800.00"),
+            renda_mensal_estimada=Decimal("1800.00"),
             num_funcionarios=0,
         )
         self._ambulante_completo(
@@ -427,7 +438,7 @@ class Command(BaseCommand):
             },
             extras={"razao_social": "Raimunda Alves Lanches ME", "sem_cnpj": False},
             genero="feminino",
-            renda_estimada=Decimal("3500.00"),
+            renda_mensal_estimada=Decimal("3500.00"),
             num_funcionarios=2,
         )
         self._ambulante_completo(
@@ -458,7 +469,7 @@ class Command(BaseCommand):
             },
             extras={"sem_cnpj": True},
             genero="masculino",
-            renda_estimada=Decimal("1200.00"),
+            renda_mensal_estimada=Decimal("1200.00"),
             num_funcionarios=1,
         )
         self._ambulante_completo(
@@ -490,7 +501,7 @@ class Command(BaseCommand):
             extras={"sem_cnpj": True},
             ativo=False,
             genero="feminino",
-            renda_estimada=Decimal("900.00"),
+            renda_mensal_estimada=Decimal("900.00"),
             num_funcionarios=0,
         )
         self._ambulante_conta(
@@ -510,7 +521,23 @@ class Command(BaseCommand):
         )
 
     def _ambulante_joao(self):
-        existente = Ambulante.objects.filter(cpf=CPF_AMBULANTE).first()
+        from django.db.models import Q
+
+        from apps.usuarios.models import UsuarioBase
+
+        existente = Ambulante.objects.filter(
+            Q(cpf=CPF_AMBULANTE) | Q(email="ambulante@apal.com")
+        ).first()
+        if (
+            not existente
+            and UsuarioBase.objects.filter(
+                Q(cpf=CPF_AMBULANTE) | Q(email="ambulante@apal.com")
+            ).exists()
+        ):
+            self.stdout.write(
+                "Usuário com email ambulante@apal.com ou CPF já existe mas não é ambulante."
+            )
+            return
         if existente:
             self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {CPF_AMBULANTE} já existe.")
@@ -535,7 +562,19 @@ class Command(BaseCommand):
         )
 
     def _ambulante_conta(self, *, cpf, email, nome, sobrenome, telefone):
-        existente = Ambulante.objects.filter(cpf=cpf).first()
+        from django.db.models import Q
+
+        from apps.usuarios.models import UsuarioBase
+
+        existente = Ambulante.objects.filter(Q(cpf=cpf) | Q(email=email)).first()
+        if (
+            not existente
+            and UsuarioBase.objects.filter(Q(cpf=cpf) | Q(email=email)).exists()
+        ):
+            self.stdout.write(
+                f"Usuário com email {email} ou CPF já existe mas não é ambulante."
+            )
+            return
         if existente:
             self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {cpf} já existe.")
@@ -552,7 +591,19 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Ambulante {nome} criado (só a conta)."))
 
     def _ambulante_parcial(self, *, cpf, email, nome, sobrenome, telefone, ponto):
-        existente = Ambulante.objects.filter(cpf=cpf).first()
+        from django.db.models import Q
+
+        from apps.usuarios.models import UsuarioBase
+
+        existente = Ambulante.objects.filter(Q(cpf=cpf) | Q(email=email)).first()
+        if (
+            not existente
+            and UsuarioBase.objects.filter(Q(cpf=cpf) | Q(email=email)).exists()
+        ):
+            self.stdout.write(
+                f"Usuário com email {email} ou CPF já existe mas não é ambulante."
+            )
+            return
         if existente:
             self._garantir_aceite_lgpd(existente)
             self.stdout.write(f"Ambulante {cpf} já existe.")
@@ -606,19 +657,34 @@ class Command(BaseCommand):
         extras,
         ativo=True,
         genero="nao_informado",
-        renda_estimada=None,
+        renda_mensal_estimada=None,
         num_funcionarios=0,
     ):
-        existente = Ambulante.objects.filter(cpf=cpf).first()
+        from django.db.models import Q
+
+        from apps.usuarios.models import UsuarioBase
+
+        existente = Ambulante.objects.filter(Q(cpf=cpf) | Q(email=email)).first()
+        if (
+            not existente
+            and UsuarioBase.objects.filter(Q(cpf=cpf) | Q(email=email)).exists()
+        ):
+            self.stdout.write(
+                f"Usuário com email {email} ou CPF já existe mas não é ambulante."
+            )
+            return
         if existente:
             self._garantir_aceite_lgpd(existente)
             campos = []
             if genero and existente.genero in ("", "nao_informado"):
                 existente.genero = genero
                 campos.append("genero")
-            if renda_estimada is not None and existente.renda_estimada is None:
-                existente.renda_estimada = renda_estimada
-                campos.append("renda_estimada")
+            if (
+                renda_mensal_estimada is not None
+                and existente.renda_mensal_estimada is None
+            ):
+                existente.renda_mensal_estimada = renda_mensal_estimada
+                campos.append("renda_mensal_estimada")
             if num_funcionarios and not existente.num_funcionarios:
                 existente.num_funcionarios = num_funcionarios
                 campos.append("num_funcionarios")
@@ -640,7 +706,7 @@ class Command(BaseCommand):
             data_nasc=data_nasc,
             nis=nis,
             genero=genero,
-            renda_estimada=renda_estimada,
+            renda_mensal_estimada=renda_mensal_estimada,
             num_funcionarios=num_funcionarios,
             ponto_pretendido=ponto,
             dados_complementares=extras,

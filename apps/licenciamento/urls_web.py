@@ -10,7 +10,6 @@ from .views import (
     GestorCategoriasView,
     GestorTriagemView,
     RejeitarDocumentoView,
-    RelatorioOcupacaoView,
     RenovarLicencaView,
     SimularPagamentoAlvaraView,
 )
@@ -71,10 +70,5 @@ urlpatterns = [
         "api/documentos/<int:pk>/rejeitar/",
         RejeitarDocumentoView.as_view(),
         name="documento_rejeitar",
-    ),
-    path(
-        "api/relatorios/ocupacao/",
-        RelatorioOcupacaoView.as_view(),
-        name="api_relatorios_ocupacao",
     ),
 ]

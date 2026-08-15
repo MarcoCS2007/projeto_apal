@@ -149,10 +149,10 @@
                     <label for="req-tel-2">Telefone Secundário / Recado</label>
                     {{ form.telefone_2 }}
                 </div>
-                <div class="input-group">
-                    <label for="req-renda">Renda mensal estimada (R$) <span class="required-marker">*</span></label>
-                    {{ form.renda_estimada }}
-                    {% if form.renda_estimada.errors %}<div class="login-error">{{ form.renda_estimada.errors.0 }}</div>{% endif %}
+                <div class="form-group">
+                    <label for="{{ form.renda_mensal_estimada.id_for_label }}">{{ form.renda_mensal_estimada.label }}</label>
+                    {{ form.renda_mensal_estimada }}
+                    {% if form.renda_mensal_estimada.errors %}<div class="login-error">{{ form.renda_mensal_estimada.errors.0 }}</div>{% endif %}
                 </div>
             </div>
             <div class="form-row">

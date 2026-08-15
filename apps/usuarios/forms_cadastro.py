@@ -123,7 +123,7 @@ class DadosPessoaisCadastroForm(forms.Form):
         error_messages={"required": "Selecione o gênero."},
         widget=forms.Select(attrs={"id": "req-genero", "class": "styled-select"}),
     )
-    renda_estimada = forms.DecimalField(
+    renda_mensal_estimada = forms.DecimalField(
         label="Renda mensal estimada (R$)",
         min_value=0,
         max_digits=10,
@@ -252,12 +252,9 @@ class DadosPessoaisCadastroForm(forms.Form):
                 self.fields["email"].initial = ambulante.email
                 self.fields["cpf"].initial = ambulante.cpf_formatado
                 self.fields["data_nasc"].initial = ambulante.data_nasc
-                self.fields["genero"].initial = ambulante.genero or ""
-                self.fields["renda_estimada"].initial = ambulante.renda_estimada
-                self.fields["pais_origem"].initial = extras.get("pais_origem", "Brasil")
-                self.fields["uf_nascimento"].initial = extras.get("uf_nascimento", "")
-                self.fields["cidade_nascimento"].initial = extras.get(
-                    "cidade_nascimento", ""
+                self.fields["genero"].initial = ambulante.genero or Genero.NAO_INFORMADO
+                self.fields["renda_mensal_estimada"].initial = (
+                    ambulante.renda_mensal_estimada
                 )
                 self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
                 self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
@@ -334,8 +331,8 @@ class DadosPessoaisCadastroForm(forms.Form):
         ambulante.email = self.cleaned_data["email"]
         ambulante.cpf = self.cleaned_data["cpf"]
         ambulante.data_nasc = self.cleaned_data["data_nasc"]
-        ambulante.genero = self.cleaned_data["genero"]
-        ambulante.renda_estimada = self.cleaned_data["renda_estimada"]
+        ambulante.genero = self.cleaned_data.get("genero") or Genero.NAO_INFORMADO
+        ambulante.renda_mensal_estimada = self.cleaned_data.get("renda_mensal_estimada")
         ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
         ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
         ambulante.nis = self.cleaned_data.get("nis") or None
@@ -358,7 +355,13 @@ class EnderecoCadastroForm(forms.Form):
         label="CEP",
         max_length=9,
         widget=forms.TextInput(
-            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9", "inputmode": "numeric", "data-hint": "Digite o cep, o endereço é preenchido automaticamente"}
+            attrs={
+                "id": "cep-input",
+                "placeholder": "00000-000",
+                "maxlength": "9",
+                "inputmode": "numeric",
+                "data-hint": "8 dígitos. O endereço é preenchido automaticamente.",
+            }
         ),
     )
     logradouro = forms.CharField(

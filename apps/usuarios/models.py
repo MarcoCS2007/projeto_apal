@@ -134,7 +134,7 @@ class Ambulante(UsuarioBase):
     )
     escolaridade = models.CharField(max_length=100, blank=True, default="")
     nis = models.CharField(max_length=20, blank=True, null=True)
-    renda_estimada = models.DecimalField(
+    renda_mensal_estimada = models.DecimalField(
         "Renda mensal estimada (R$)",
         max_digits=10,
         decimal_places=2,
