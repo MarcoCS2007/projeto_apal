@@ -2852,8 +2852,8 @@ if (
     const btnCompartilharCred = document.getElementById('btn-compartilhar-cred');
     btnCompartilharCred?.addEventListener('click', async () => {
         const dadosCompartilhamento = {
-            title: 'Credencial Digital - APAL',
-            text: 'Confira a minha credencial oficial de comerciante ambulante emitida pela Prefeitura de Vitória da Conquista (APAL).',
+            title: 'Credencial Digital - Ponto Certo Conquista',
+            text: 'Confira a minha credencial oficial de comerciante ambulante emitida pela Prefeitura de Vitória da Conquista (Ponto Certo Conquista).',
             url: window.location.href
         };
 

@@ -1,19 +1,17 @@
 {% load static %}
 {% if qr_liberado and licenca %}
 <div class="credential-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
+    <div class="credential-print-stack" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
 
         <div class="apal-id-front" style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0;">
             <div style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #1D4ED8 0%, #2563EB 72%, rgba(37,99,235,0.55) 100%); z-index: 1; pointer-events: none;"></div>
-            <div style="position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 64px 34px 0 32px;">
-                <div style="min-width: 0;">
-                    <div style="font-size: 1.2rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px;">
-                        <span style="color: #FF007F;">Ponto Certo</span> <span style="color: #1E3A8A;">Conquista</span>
-                    </div>
-                    <p style="margin: 8px 0 0 0; max-width: 240px; font-size: 0.68rem; line-height: 1.35; color: #0F172A; font-weight: 500;">
-                        Plataforma de licenciamento e gestão do comércio ambulante
-                    </p>
+            <div style="position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 64px 28px 0 28px;">
+                <div style="font-size: 1.2rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px;">
+                    <span style="color: #FF007F;">Ponto Certo</span> <span style="color: #1E3A8A;">Conquista</span>
                 </div>
+                <p style="margin: 8px 0 0 0; max-width: 240px; font-size: 0.68rem; line-height: 1.35; color: #0F172A; font-weight: 500;">
+                    Plataforma de licenciamento e gestão do comércio ambulante
+                </p>
             </div>
 
             <div class="id-photo-front" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 100px; border-radius: 15px; overflow: hidden; z-index: 3; background: #DBEAFE; border: 1px solid #BFDBFE;">
@@ -42,7 +40,12 @@
             <div style="position: absolute; top: 56px; left: -18px; right: -18px; height: 36px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; z-index: 2;"></div>
 
             <div class="id-back-content id-back-content--qr">
-                <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
+                <div>
+                    <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
+                    <p class="id-cpf" style="margin: 8px 0 0 0; font-size: 0.88rem; font-weight: 600; color: #0F172A;">
+                        <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_mascarado }}
+                    </p>
+                </div>
                 <div class="id-qr-box id-qr-box--large">
                     <img
                         src="{% url 'ambulante_credencial_qr' %}"
@@ -60,13 +63,16 @@
         </div>
     </div>
 
-    <div class="credential-actions" style="display: flex; gap: 1rem; margin-top: 1.25rem; width: 100%; max-width: 420px; justify-content: center; flex-wrap: wrap;">
+    <div class="credential-actions" style="display: flex; gap: 1rem; margin-top: 1.25rem; width: 100%; max-width: 560px; justify-content: center; flex-wrap: wrap;">
         <button type="button" id="btn-imprimir-cred" class="btn-action-card" style="flex: 1; min-width: 140px; background-color: #FFFFFF; color: #1D4ED8; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
             <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Imprimir
         </button>
         <a href="{% url 'ambulante_credencial_qr' %}?download=1" class="btn-action-card" style="flex: 1; min-width: 140px; background-color: #1D4ED8; color: #FFFFFF; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
             <i data-lucide="download" style="width: 16px; height: 16px;"></i> Baixar QR
         </a>
+        <button type="button" id="btn-compartilhar-cred" class="btn-action-card share" style="flex: 1; min-width: 140px; background-color: #FFFFFF; color: #FF007F; border: 1.5px solid #FF007F; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+            <i data-lucide="share-2" style="width: 16px; height: 16px;"></i> Compartilhar
+        </button>
     </div>
 </div>
 {% else %}

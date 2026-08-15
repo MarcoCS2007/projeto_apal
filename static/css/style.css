@@ -2105,7 +2105,12 @@ form[novalidate] textarea:invalid {
         -webkit-print-color-adjust: exact !important;
     }
 
-    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .assistente-widget-link, .access-panel, [vw], #toast-container, .credential-tabs-nav, .credential-actions, .modal-backdrop {
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+
+    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .assistente-widget-link, .access-panel, [vw], #toast-container, .credential-tabs-nav, .credential-actions, .modal-backdrop, .site-top, .nav-backdrop {
         display: none !important;
     }
 
@@ -2115,6 +2120,37 @@ form[novalidate] textarea:invalid {
         padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
+    }
+
+    .credential-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .credential-wrapper > div,
+    .credential-wrapper .credential-print-stack {
+        display: flex !important;
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 12mm !important;
+        width: 100% !important;
+    }
+
+    .credential-wrapper .apal-id-front,
+    .credential-wrapper .apal-id-back {
+        display: block !important;
+        position: relative !important;
+        width: 330px !important;
+        max-width: 100% !important;
+        height: 500px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        transform: none !important;
+        margin: 0 auto !important;
     }
 
     .credential-card-vca {
@@ -2465,7 +2501,7 @@ form[novalidate] textarea:invalid {
     align-items: center;
     justify-content: space-between;
     text-align: center;
-    gap: 1rem;
+    gap: 0.75rem;
     padding-top: 0.35rem;
 }
 
