@@ -84,9 +84,9 @@
 
     <div id="modal-backdrop" class="modal-backdrop"></div>
 
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
         <div class="access-header">
-            <h3 style="display: flex; align-items: center; gap: 8px;">
+            <h3 id="ai-modal-title">
                 <i data-lucide="sparkles"></i> Assistente de Acessibilidade
             </h3>
             <button type="button" id="close-ai-modal" class="close-btn" aria-label="Fechar assistente de acessibilidade"><i data-lucide="x" aria-hidden="true"></i></button>

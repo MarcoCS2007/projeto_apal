@@ -176,6 +176,8 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "login.html")
         self.assertContains(response, "Acesso ao Backoffice")
+        self.assertNotContains(response, "Entrar como fiscal")
+        self.assertNotContains(response, "Entrar como ambulante")
 
     def test_login_gestor_cria_cookie_de_sessao(self):
         response = self._login_web(self.gestor.cpf)
@@ -747,6 +749,18 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
             self.assertEqual(response.status_code, 302)
             ambulante = Ambulante.objects.get(cpf="66677788899")
             self.assertFalse(ambulante.foto)
+
+    def test_get_entrar_nao_exibe_atalhos_de_outros_perfis(self):
+        response = self.client.get(reverse("entrar"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "entrar.html")
+        self.assertContains(response, "Acesso do Ambulante")
+        self.assertContains(response, "Área institucional")
+        self.assertNotContains(response, "Entrar como fiscal")
+        self.assertNotContains(response, "Entrar como gestor")
+        self.assertNotContains(response, "Sou Fiscal")
+        self.assertNotContains(response, "Sou Gestor")
 
     def test_login_web_ambulante_abre_painel(self):
         response = self.client.post(

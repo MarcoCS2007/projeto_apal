@@ -48,3 +48,7 @@ class AcessibilidadeTransversalTests(UsuariosAuthFixtures, TestCase):
         response = self.client.get(reverse("index"))
         self._assert_widget_unico(response)
         self.assertTemplateUsed(response, "home.html")
+        self.assertContains(response, 'id="ai-modal"')
+        self.assertContains(response, 'id="ai-response-content"')
+        self.assertContains(response, "Simplificar com IA")
+        self.assertNotContains(response, "max-width: 500px")

@@ -1435,7 +1435,7 @@ div[vw].enabled {
     transition: opacity 0.3s, visibility 0.3s;
 }
 
-.access-panel.hidden { opacity: 0; visibility: hidden; }
+.access-panel.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .access-header {
     display: flex;
@@ -1679,7 +1679,7 @@ form[novalidate] textarea:invalid {
 
 @media (max-width: 768px) {
     .form-row { flex-direction: column; }
-    .access-panel { right: 10px; left: 10px; width: auto; max-height: 70vh; }
+    .access-panel:not(#ai-modal):not(#confirm-dialog) { right: 10px; left: 10px; width: auto; max-height: 70vh; }
 }
 
 /* =========================================
@@ -3488,7 +3488,7 @@ body.nav-compact .nav-inst-dropdown {
         transform: none;
     }
 
-    .access-panel {
+    .access-panel:not(#ai-modal):not(#confirm-dialog) {
         top: auto;
         bottom: 7.5rem;
         max-height: 55vh;
@@ -4141,7 +4141,7 @@ a.feature-card:focus-visible {
         flex-direction: column; 
     }
     
-    .access-panel { 
+    .access-panel:not(#ai-modal):not(#confirm-dialog) { 
         right: 10px; 
         left: 10px; 
         width: auto; 
@@ -4332,19 +4332,46 @@ a.feature-card:focus-visible {
 
 /* =========================================
    MELHORIAS VISUAIS NO MODAL DA IA
+   (reusa .access-panel / .access-header / tokens)
 ========================================= */
 #ai-modal {
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
     transform: translate(-50%, -50%) !important;
-    width: 92% !important;
-    max-width: 680px !important; /* Aumentado de 500px para 680px */
-    padding: 2rem !important; /* Maior espaçamento interno */
+    width: min(92vw, 680px) !important;
+    max-width: 680px !important;
+    max-height: min(88vh, calc(100dvh - 1.5rem)) !important;
     margin: 0 !important;
-    border-radius: 18px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22) !important;
+    padding: 1.5rem 1.75rem !important;
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
     z-index: 2147483647 !important;
+}
+
+#ai-modal .access-header {
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+}
+
+#ai-modal .access-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#ai-modal .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 #ai-response-content {
@@ -4352,10 +4379,29 @@ a.feature-card:focus-visible {
     color: var(--texto-escuro);
     font-size: 0.98rem;
     line-height: 1.75;
-    max-height: 60vh !important; /* Mais espaço vertical para leitura */
+    flex: 1 1 auto;
+    min-height: 14rem;
+    max-height: none !important;
     overflow-y: auto;
-    padding: 0.5rem 0.5rem 0.5rem 0;
-    margin-top: 1rem;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.25rem 0.35rem 0.25rem 0;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 768px) {
+    #ai-modal {
+        width: calc(100vw - 1.5rem) !important;
+        max-width: calc(100vw - 1.5rem) !important;
+        max-height: calc(100dvh - 1.5rem) !important;
+        padding: 1.15rem 1.2rem !important;
+    }
+
+    #ai-response-content {
+        min-height: 12rem;
+        font-size: 1rem;
+    }
 }
 
 .ai-card-body {

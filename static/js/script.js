@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\n\n/g, '</p><p>')
             .replace(/\n/g, '<br>');
 
-        return `<div class="ai-card-body" style="padding: 0.5rem 0;"><p style="line-height: 1.6; color: var(--texto-escuro);">${html}</p></div>`;
+        return `<div class="ai-card-body"><p>${html}</p></div>`;
     }
 
 async function chamarGemini(promptInstrucao, textoSelecionado) {
