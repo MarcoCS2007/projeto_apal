@@ -89,7 +89,7 @@ class DadosPessoaisCadastroForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"id": "req-genero", "class": "styled-select"}),
     )
-    renda_estimada = forms.DecimalField(
+    renda_mensal_estimada = forms.DecimalField(
         label="Renda mensal estimada (R$)",
         required=False,
         min_value=0,
@@ -180,7 +180,9 @@ class DadosPessoaisCadastroForm(forms.Form):
                 )
                 self.fields["data_nasc"].initial = ambulante.data_nasc
                 self.fields["genero"].initial = ambulante.genero or Genero.NAO_INFORMADO
-                self.fields["renda_estimada"].initial = ambulante.renda_estimada
+                self.fields["renda_mensal_estimada"].initial = (
+                    ambulante.renda_mensal_estimada
+                )
                 self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
                 self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
                 self.fields["nis"].initial = ambulante.nis or ""
@@ -211,7 +213,7 @@ class DadosPessoaisCadastroForm(forms.Form):
         ambulante.sobrenome = sobrenome
         ambulante.data_nasc = self.cleaned_data["data_nasc"]
         ambulante.genero = self.cleaned_data.get("genero") or Genero.NAO_INFORMADO
-        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
+        ambulante.renda_mensal_estimada = self.cleaned_data.get("renda_mensal_estimada")
         ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
         ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
         ambulante.nis = self.cleaned_data.get("nis") or None
@@ -231,7 +233,13 @@ class EnderecoCadastroForm(forms.Form):
         label="CEP",
         max_length=9,
         widget=forms.TextInput(
-            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9", "inputmode": "numeric", "data-hint": "8 dígitos. O endereço é preenchido automaticamente."}
+            attrs={
+                "id": "cep-input",
+                "placeholder": "00000-000",
+                "maxlength": "9",
+                "inputmode": "numeric",
+                "data-hint": "8 dígitos. O endereço é preenchido automaticamente.",
+            }
         ),
     )
     logradouro = forms.CharField(

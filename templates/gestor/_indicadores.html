@@ -15,10 +15,10 @@
 {% endif %}
 
 <div class="relatorio-exportacoes">
-    <a class="btn-action" href="{% url 'gestor_relatorio_excel' %}?{{ request.GET.urlencode }}">
+    <a class="btn-action" href="{% url 'relatorios:exportacao' %}?{{ request.GET.urlencode }}&formato=excel">
         <i data-lucide="file-spreadsheet"></i> Exportar Excel
     </a>
-    <a class="btn-action" href="{% url 'gestor_relatorio_pdf' %}?{{ request.GET.urlencode }}">
+    <a class="btn-action" href="{% url 'relatorios:exportacao' %}?{{ request.GET.urlencode }}&formato=pdf">
         <i data-lucide="file-text"></i> Exportar PDF
     </a>
 </div>

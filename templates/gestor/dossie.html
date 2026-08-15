@@ -88,7 +88,7 @@
         </div>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
             <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Renda estimada</span>
-            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{% if ambulante.renda_estimada %}R$ {{ ambulante.renda_estimada }}{% else %}Não informado{% endif %}</strong>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{% if ambulante.renda_mensal_estimada %}R$ {{ ambulante.renda_mensal_estimada }}{% else %}Não informado{% endif %}</strong>
             <small style="color: #475569;">{{ ambulante.num_funcionarios }} auxiliar{{ ambulante.num_funcionarios|pluralize }}</small>
         </div>
     </div>

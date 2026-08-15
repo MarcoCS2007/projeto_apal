@@ -21,7 +21,7 @@
         <div class="title-accent"></div>
         <h2>Olá, {{ user.nome }} {{ user.sobrenome }}</h2>
     </div>
-    <p class="text-muted">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.{% if pode.relatorios %} Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.{% endif %}</p>
+    <p class="text-muted">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.{% if pode.relatorios %} Os indicadores de ocupação estão em <a href="{% url 'relatorios:dashboard' %}">Relatórios</a>.{% endif %}</p>
 </div>
 
 <div class="shortcut-grid">

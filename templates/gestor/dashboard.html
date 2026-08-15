@@ -20,8 +20,8 @@
     <form
         id="filtro-dashboard"
         method="get"
-        action="{% url 'gestor_dashboard' %}"
-        hx-get="{% url 'api_relatorios_ocupacao' %}"
+        action="{% url 'relatorios:dashboard' %}"
+        hx-get="{% url 'relatorios:api_graficos' %}"
         hx-target="#container-indicadores"
         hx-trigger="change delay:200ms, submit"
         class="relatorio-filtros-grid"

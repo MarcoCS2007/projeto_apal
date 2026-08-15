@@ -6,7 +6,6 @@ from django.http import (
     Http404,
     HttpResponse,
     HttpResponseBadRequest,
-    JsonResponse,
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -295,32 +294,6 @@ class RenovarLicencaView(
                 f"Já existe um requerimento em aberto ({nova.protocolo}).",
             )
         return redirect("ambulante_alvara")
-
-
-class RelatorioOcupacaoView(
-    LoginRequiredMixin, AcessoBackofficeMixin, RequerModuloMixin, View
-):
-    """HTMX (HTML) e JSON de ocupação/indicadores para o dashboard do gestor."""
-
-    template_name = "gestor/_indicadores.html"
-    modulo_permissao = "relatorios"
-
-    def get(self, request):
-        from .relatorios import indicadores_gerenciais, indicadores_json
-
-        dados = indicadores_gerenciais(
-            bairro=request.GET.get("bairro", ""),
-            origem=request.GET.get("origem", ""),
-            periodo_dias=request.GET.get("periodo", 30),
-            cidade=request.GET.get("cidade", ""),
-            genero=request.GET.get("genero", ""),
-            faixa_etaria=request.GET.get("faixa", ""),
-            escolaridade=request.GET.get("escolaridade", ""),
-        )
-        html = request.headers.get("HX-Request") or request.GET.get("formato") == "html"
-        if html:
-            return render(request, self.template_name, dados)
-        return JsonResponse(indicadores_json(dados))
 
 
 class DocumentoArquivoView(LoginRequiredMixin, View):

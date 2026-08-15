@@ -29,8 +29,6 @@ from .views_gestor import (
     GestorAmbulanteEditarView,
     GestorAmbulantesView,
     GestorAnalisarLicencaView,
-    GestorDashboardChartDataView,
-    GestorDashboardView,
     GestorDossieExportPDFView,
     GestorDossieView,
     GestorEmitirAlvaraView,
@@ -38,8 +36,6 @@ from .views_gestor import (
     GestorLicencasAtivasView,
     GestorOcorrenciaDetalheView,
     GestorOcorrenciasView,
-    GestorRelatorioExcelView,
-    GestorRelatorioPDFView,
 )
 
 urlpatterns = [
@@ -119,22 +115,6 @@ urlpatterns = [
         "gestor/ocorrencias/<int:pk>/",
         GestorOcorrenciaDetalheView.as_view(),
         name="gestor_ocorrencia_detalhe",
-    ),
-    path("gestor/dashboard/", GestorDashboardView.as_view(), name="gestor_dashboard"),
-    path(
-        "gestor/dashboard/chart-data/",
-        GestorDashboardChartDataView.as_view(),
-        name="gestor_dashboard_chart_data",
-    ),
-    path(
-        "gestor/dashboard/exportar.xlsx",
-        GestorRelatorioExcelView.as_view(),
-        name="gestor_relatorio_excel",
-    ),
-    path(
-        "gestor/dashboard/exportar.pdf",
-        GestorRelatorioPDFView.as_view(),
-        name="gestor_relatorio_pdf",
     ),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/backup/", MasterBackupView.as_view(), name="master_backup"),

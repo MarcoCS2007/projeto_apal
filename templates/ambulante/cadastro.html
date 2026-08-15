@@ -145,10 +145,10 @@
                     {{ form.genero }}
                     {% if form.genero.errors %}<div class="login-error">{{ form.genero.errors.0 }}</div>{% endif %}
                 </div>
-                <div class="input-group">
-                    <label for="req-renda">Renda mensal estimada (R$)</label>
-                    {{ form.renda_estimada }}
-                    {% if form.renda_estimada.errors %}<div class="login-error">{{ form.renda_estimada.errors.0 }}</div>{% endif %}
+                <div class="form-group">
+                    <label for="{{ form.renda_mensal_estimada.id_for_label }}">{{ form.renda_mensal_estimada.label }}</label>
+                    {{ form.renda_mensal_estimada }}
+                    {% if form.renda_mensal_estimada.errors %}<div class="login-error">{{ form.renda_mensal_estimada.errors.0 }}</div>{% endif %}
                 </div>
             </div>
             <p class="field-hint" style="margin: -0.5rem 0 1rem;">A foto 3x4 será inserida depois, no <a href="{% url 'ambulante_perfil' %}">perfil do ambulante</a>.</p>
