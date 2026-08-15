@@ -42,7 +42,7 @@
         <form method="get" action="{% url 'fiscal_painel' %}" style="margin-top: 1rem;">
             <div class="input-group full-width">
                 <label for="qr-manual">Ou cole o código do QR</label>
-                <input type="text" id="qr-manual" name="qr" placeholder="Hash da credencial" value="">
+                <input type="text" id="qr-manual" name="qr" placeholder="Hash da credencial" value="" data-hint="Se a câmera falhar, cole aqui o código lido na credencial.">
             </div>
             <button type="submit" class="btn-action" style="width: 100%; margin-top: 0.75rem;">Validar código</button>
         </form>
@@ -56,7 +56,7 @@
         <form method="get" action="{% url 'fiscal_painel' %}" class="registration-form">
             <div class="input-group full-width" style="margin-bottom: 1.5rem;">
                 <label for="busca-fiscal">CPF, nome ou código do alvará</label>
-                <input type="text" id="busca-fiscal" name="q" placeholder="Ex: 123.456.789-00 ou ALV-2026-0001" value="{{ termo }}">
+                <input type="text" id="busca-fiscal" name="q" placeholder="Ex: 123.456.789-00 ou ALV-2026-0001" value="{{ termo }}" data-hint="Busque por CPF, nome ou número do alvará.">
             </div>
             <button type="submit" class="btn-action" style="width: 100%; padding: 0.8rem; font-size: 1rem; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
                 <i data-lucide="search"></i> Consultar situação
@@ -92,6 +92,8 @@
 
     if (botaoCamera && window.Html5Qrcode) {
         botaoCamera.addEventListener("click", async function () {
+            botaoCamera.disabled = true;
+            botaoCamera.textContent = "Abrindo câmera...";
             try {
                 if (!leitor) {
                     leitor = new Html5Qrcode("qr-reader");
@@ -104,6 +106,7 @@
                     { facingMode: "environment" },
                     { fps: 8, qrbox: { width: 220, height: 220 } },
                     function (texto) {
+                        statusQr.textContent = "QR lido. Abrindo a ficha...";
                         leitor.stop().then(function () {
                             window.location = urlInspecao + "?qr=" + encodeURIComponent(texto);
                         }).catch(function () {
@@ -111,9 +114,24 @@
                         });
                     }
                 );
+                botaoCamera.textContent = "Câmera ativa";
             } catch (erro) {
-                statusQr.textContent = "Não foi possível abrir a câmera. Cole o código do QR ao lado.";
+                botaoCamera.disabled = false;
+                botaoCamera.innerHTML = '<i data-lucide="camera"></i> Ativar câmera e leitor';
+                if (window.lucide) lucide.createIcons();
+                statusQr.textContent = "Não foi possível abrir a câmera. Cole o código do QR no campo abaixo.";
+                if (typeof mostrarToast === "function") {
+                    mostrarToast("Não foi possível abrir a câmera. Cole o código do QR para validar.", "warning");
+                }
             }
+        });
+    } else if (botaoCamera) {
+        botaoCamera.addEventListener("click", function () {
+            statusQr.textContent = "O leitor de câmera não carregou. Cole o código do QR no campo abaixo.";
+            if (typeof mostrarToast === "function") {
+                mostrarToast("O leitor de câmera não carregou. Cole o código do QR para validar.", "warning");
+            }
+            document.getElementById("qr-manual")?.focus();
         });
     }
 </script>

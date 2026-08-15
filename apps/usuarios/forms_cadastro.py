@@ -73,7 +73,11 @@ class DadosPessoaisCadastroForm(forms.Form):
     data_nasc = forms.DateField(
         label="Data de Nascimento",
         widget=forms.DateInput(
-            attrs={"id": "req-data-nasc", "type": "date"},
+            attrs={
+                "id": "req-data-nasc",
+                "type": "date",
+                "data-hint": "Informe a data de nascimento como no documento.",
+            },
             format="%Y-%m-%d",
         ),
     )
@@ -81,7 +85,14 @@ class DadosPessoaisCadastroForm(forms.Form):
         label="Telefone Principal (WhatsApp)",
         max_length=20,
         widget=forms.TextInput(
-            attrs={"id": "req-tel", "placeholder": "(77) 90000-0000", "maxlength": "15"}
+            attrs={
+                "id": "req-tel",
+                "placeholder": "(77) 90000-0000",
+                "maxlength": "15",
+                "autocomplete": "tel",
+                "inputmode": "numeric",
+                "data-hint": "DDD + número do WhatsApp. Exemplo: (77) 99999-0000.",
+            }
         ),
     )
     telefone_2 = forms.CharField(
@@ -93,6 +104,8 @@ class DadosPessoaisCadastroForm(forms.Form):
                 "id": "req-tel-2",
                 "placeholder": "(77) 90000-0000",
                 "maxlength": "15",
+                "inputmode": "numeric",
+                "autocomplete": "tel",
             }
         ),
     )
@@ -119,11 +132,6 @@ class DadosPessoaisCadastroForm(forms.Form):
         max_value=20,
         initial=0,
         widget=forms.NumberInput(attrs={"id": "req-num-funcionarios", "min": "0"}),
-    )
-    foto = forms.ImageField(
-        label="Foto 3x4 (opcional)",
-        required=False,
-        widget=forms.ClearableFileInput(attrs={"id": "req-foto", "accept": "image/*"}),
     )
     rg = forms.CharField(
         required=False,
@@ -152,6 +160,26 @@ class DadosPessoaisCadastroForm(forms.Form):
                 self.fields["num_funcionarios"].initial = ambulante.num_funcionarios
                 self.fields["rg"].initial = extras.get("rg", "")
 
+    def clean_telefone_whatsapp(self):
+        numeros = "".join(
+            ch for ch in (self.cleaned_data.get("telefone_whatsapp") or "") if ch.isdigit()
+        )
+        if len(numeros) < 10:
+            raise ValidationError(
+                "Informe DDD e número, só com dígitos. Exemplo: (77) 99999-0000."
+            )
+        return numeros
+
+    def clean_telefone_2(self):
+        numeros = "".join(
+            ch for ch in (self.cleaned_data.get("telefone_2") or "") if ch.isdigit()
+        )
+        if numeros and len(numeros) < 10:
+            raise ValidationError(
+                "Informe DDD e número, só com dígitos, ou deixe em branco."
+            )
+        return numeros or ""
+
     def clean(self):
         dados = super().clean()
         if dados.get("sem_nis"):
@@ -169,8 +197,6 @@ class DadosPessoaisCadastroForm(forms.Form):
         ambulante.nis = self.cleaned_data.get("nis") or None
         ambulante.escolaridade = self.cleaned_data["escolaridade"]
         ambulante.num_funcionarios = self.cleaned_data["num_funcionarios"]
-        if self.cleaned_data.get("foto"):
-            ambulante.foto = self.cleaned_data["foto"]
         ambulante.save()
         atualizar_complementares(
             ambulante,
@@ -185,7 +211,7 @@ class EnderecoCadastroForm(forms.Form):
         label="CEP",
         max_length=9,
         widget=forms.TextInput(
-            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9"}
+            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9", "inputmode": "numeric", "data-hint": "8 dígitos. O endereço é preenchido automaticamente."}
         ),
     )
     logradouro = forms.CharField(
@@ -279,6 +305,8 @@ class EmpresaCadastroForm(forms.Form):
                 "id": "pj-cnpj",
                 "placeholder": "00.000.000/0001-00",
                 "maxlength": "18",
+                "inputmode": "numeric",
+                "data-hint": "14 dígitos. Se não tiver empresa, marque a opção acima.",
             }
         ),
     )

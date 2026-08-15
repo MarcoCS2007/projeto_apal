@@ -100,7 +100,7 @@
                     <td data-label="Ações">
                         <div class="table-actions">
                             <a href="{% url 'gestor_categorias_editar' categoria.pk %}" class="btn-action" style="text-decoration: none;"><i data-lucide="edit"></i></a>
-                            <form action="{% url 'gestor_categorias_excluir' categoria.pk %}" method="post" onsubmit="return confirm('Excluir esta categoria?');">
+                            <form action="{% url 'gestor_categorias_excluir' categoria.pk %}" method="post" data-confirm="Excluir esta categoria? Ela deixará de aparecer no catálogo municipal." data-confirm-title="Excluir categoria" data-confirm-ok="Excluir">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-action" style="color: #DC2626;"><i data-lucide="trash-2"></i></button>
                             </form>

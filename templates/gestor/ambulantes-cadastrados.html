@@ -78,7 +78,7 @@
                                 <input type="hidden" name="acao" value="suspender">
                                 <button type="submit" class="btn-action"><i data-lucide="pause-circle"></i> Suspender</button>
                             </form>
-                            <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Cancelar a conta e as licenças deste ambulante?');">
+                            <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" style="display: inline;" data-confirm="Cancelar a conta e as licenças deste ambulante? Esta ação não pode ser desfeita." data-confirm-title="Cancelar conta" data-confirm-ok="Cancelar conta">
                                 {% csrf_token %}
                                 <input type="hidden" name="acao" value="cancelar">
                                 <button type="submit" class="btn-action" style="color: #DC2626; border-color: #FCA5A5;"><i data-lucide="ban"></i> Cancelar</button>

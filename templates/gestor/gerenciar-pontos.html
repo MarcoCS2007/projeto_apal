@@ -115,7 +115,7 @@
                         {% endif %}
                     </td>
                     <td data-label="Ações">
-                            <form method="post" action="{% url 'gestor_pontos_excluir' ponto.pk %}" onsubmit="return confirm('Excluir este ponto?');">
+                            <form method="post" action="{% url 'gestor_pontos_excluir' ponto.pk %}" data-confirm="Excluir este ponto? A vaga sai do catálogo de ocupação." data-confirm-title="Excluir ponto" data-confirm-ok="Excluir">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-action" style="color: #DC2626;" title="Excluir"><i data-lucide="trash-2"></i></button>
                             </form>

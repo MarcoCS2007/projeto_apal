@@ -2,6 +2,10 @@
 
 {% block title %}Nova Senha - APAL{% endblock %}
 
+{% block header_nav %}
+{% include "publico/_nav.html" with active="entrar" %}
+{% endblock %}
+
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
@@ -31,13 +35,20 @@
                 <label for="nova-senha">Nova senha</label>
                 <div class="input-password-wrapper">
                     {{ form.new_password1 }}
-                    <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
                 {% if form.new_password1.errors %}
                 <div class="login-error" role="alert">{{ form.new_password1.errors.0 }}</div>
                 {% endif %}
+                <ul class="password-requirements" id="password-requirements" aria-live="polite">
+                    <li data-rule="length">Mínimo de 8 caracteres</li>
+                    <li data-rule="letter">Pelo menos uma letra</li>
+                    <li data-rule="number">Pelo menos um número</li>
+                    <li data-rule="not-numeric">Não use senha só com números</li>
+                    <li data-rule="match">As duas senhas coincidem</li>
+                </ul>
             </div>
         </div>
 
@@ -46,7 +57,7 @@
                 <label for="nova-senha-confirmacao">Confirmar nova senha</label>
                 <div class="input-password-wrapper">
                     {{ form.new_password2 }}
-                    <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -60,6 +71,9 @@
             <button type="submit" class="btn-submit" style="width: 100%;">
                 <i data-lucide="key"></i> Salvar Nova Senha
             </button>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar para o login
+            </a>
         </div>
     </form>
     {% else %}

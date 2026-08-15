@@ -14,6 +14,7 @@ class BuscaCampoForm(forms.Form):
             attrs={
                 "id": "busca-fiscal",
                 "placeholder": "CPF, nome, ALV-2026-0001 ou código do QR",
+                "data-hint": "Busque por CPF, nome, número do alvará ou código do QR.",
             }
         ),
     )
@@ -26,7 +27,8 @@ class OcorrenciaForm(forms.Form):
         label="CPF ou nº da licença",
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Ex: ALV-2026-0001 ou CPF (em branco se não identificado)"
+                "placeholder": "Ex: ALV-2026-0001 ou CPF (em branco se não identificado)",
+                "data-hint": "Opcional se o ambulante já foi identificado na fiscalização.",
             }
         ),
     )
@@ -34,7 +36,10 @@ class OcorrenciaForm(forms.Form):
         required=True,
         label="Local da infração",
         widget=forms.TextInput(
-            attrs={"placeholder": "Endereço, ponto de referência ou via pública"}
+            attrs={
+                "placeholder": "Endereço, ponto de referência ou via pública",
+                "data-hint": "Informe rua, ponto ou referência para localizar a ocorrência.",
+            }
         ),
     )
     tipo_ocorrencia = forms.ChoiceField(
@@ -47,6 +52,7 @@ class OcorrenciaForm(forms.Form):
             attrs={
                 "rows": 4,
                 "placeholder": "Descreva os fatos constatados pelo agente.",
+                "data-hint": "Descreva o que foi visto, horário aproximado e qualquer evidência.",
             }
         ),
     )

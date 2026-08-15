@@ -76,10 +76,17 @@ class HomeViewTests(TestCase):
         self.assertContains(response, reverse("login"))
         self.assertContains(response, reverse("fiscal_entrar"))
         self.assertContains(response, "Área institucional")
-        self.assertContains(response, "Onde você faz login?")
+        self.assertContains(response, "Selecione seu perfil")
+        self.assertNotContains(response, "Onde você faz login")
+        self.assertNotContains(response, "Sou Fiscal")
+        self.assertNotContains(response, "Sou Gestor")
+        self.assertNotContains(response, ">ADM<")
         self.assertNotContains(response, "Acesso ao sistema")
         self.assertContains(response, reverse("sobre"))
         self.assertContains(response, reverse("faq"))
+        html = response.content.decode()
+        self.assertEqual(html.count("Área institucional"), 1)
+        self.assertEqual(html.count(reverse("fiscal_entrar")), 1)
 
 
 class PaginasPublicasTests(TestCase):

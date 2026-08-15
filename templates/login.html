@@ -4,10 +4,7 @@
 {% block title %}Acesso Backoffice - APAL | Aqui Pode, Aqui é Legal{% endblock %}
 
 {% block header_nav %}
-<nav id="header-nav" class="header-nav">
-    <a href="{% url 'index' %}"><i data-lucide="home"></i> Início</a>
-    <a href="{% url 'login' %}" class="active"><i data-lucide="log-in"></i> Backoffice</a>
-</nav>
+{% include "publico/_nav.html" with active="login" %}
 {% endblock %}
 
 {% block hero %}
@@ -56,7 +53,7 @@
                 <label for="user-password">Senha</label>
                 <div class="input-password-wrapper">
                     {{ form.password }}
-                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -76,9 +73,11 @@
             </button>
         </div>
         <p style="text-align: center; margin-top: 1.25rem;">
-            <a href="{% url 'entrar' %}" class="forgot-password">Sou ambulante</a>
+            <a href="{% url 'redefinir_senha' %}" class="forgot-password">Esqueci minha senha</a>
             &nbsp;·&nbsp;
-            <a href="{% url 'fiscal_entrar' %}" class="forgot-password">Sou fiscal</a>
+            <a href="{% url 'entrar' %}" class="forgot-password">Entrar como ambulante</a>
+            &nbsp;·&nbsp;
+            <a href="{% url 'fiscal_entrar' %}" class="forgot-password">Entrar como fiscal</a>
         </p>
     </form>
 </div>

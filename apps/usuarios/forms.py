@@ -27,6 +27,18 @@ from .seguranca import (
     matriz_padrao,
 )
 
+LOGIN_INVALIDO = (
+    "CPF/e-mail ou senha inválidos. Confira os dados ou use Esqueci minha senha."
+)
+
+
+def attrs_campo(base, *, hint="", **extra):
+    attrs = dict(base)
+    if hint:
+        attrs["data-hint"] = hint
+    attrs.update(extra)
+    return attrs
+
 
 def normalizar_cpf(valor):
     return "".join(ch for ch in valor if ch.isdigit())
@@ -89,35 +101,43 @@ class LoginBackofficeForm(AuthenticationForm):
     """Login web exclusivo para Gestores e Administradores."""
 
     error_messages: ClassVar[dict[str, str]] = {
-        "invalid_login": "CPF/e-mail ou senha inválidos.",
-        "inactive": "Esta conta está inativa.",
+        "invalid_login": LOGIN_INVALIDO,
+        "inactive": "Esta conta está inativa. Fale com a administração da prefeitura.",
         "sem_acesso_backoffice": (
-            "Este perfil não possui acesso ao backoffice. "
-            "O acesso web é exclusivo para Gestores e Administradores."
+            "Este perfil não acessa o backoffice. "
+            "Ambulantes devem entrar em /entrar/ e fiscais em /fiscal/entrar/."
         ),
-        "usuario_inativo": "Usuário inativo. Entre em contato com a administração.",
+        "usuario_inativo": (
+            "Usuário inativo. Fale com a administração para reativar o acesso."
+        ),
     }
 
     username = forms.CharField(
         label="E-mail ou CPF",
         widget=forms.TextInput(
-            attrs={
-                "id": "user-login",
-                "placeholder": "Digite seu CPF ou e-mail",
-                "autocomplete": "username",
-                "autofocus": True,
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-login",
+                    "placeholder": "Digite seu CPF ou e-mail",
+                    "autocomplete": "username",
+                    "autofocus": True,
+                },
+                hint="Use o e-mail institucional ou o CPF com 11 dígitos.",
+            )
         ),
     )
     password = forms.CharField(
         label="Senha",
         strip=False,
         widget=forms.PasswordInput(
-            attrs={
-                "id": "user-password",
-                "placeholder": "Digite sua senha",
-                "autocomplete": "current-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-password",
+                    "placeholder": "Digite sua senha",
+                    "autocomplete": "current-password",
+                },
+                hint="A senha diferencia maiúsculas e minúsculas.",
+            )
         ),
     )
 
@@ -139,35 +159,43 @@ class LoginAmbulanteForm(AuthenticationForm):
     """Login web exclusivo para comerciantes ambulantes."""
 
     error_messages: ClassVar[dict[str, str]] = {
-        "invalid_login": "CPF/e-mail ou senha inválidos.",
-        "inactive": "Esta conta está inativa.",
+        "invalid_login": LOGIN_INVALIDO,
+        "inactive": "Esta conta está inativa. Fale com a administração da prefeitura.",
         "sem_acesso_ambulante": (
             "Este acesso é exclusivo para comerciantes ambulantes. "
-            "Gestores e administradores devem usar o backoffice."
+            "Gestores entram no backoffice e fiscais em /fiscal/entrar/."
         ),
-        "usuario_inativo": "Usuário inativo. Entre em contato com a administração.",
+        "usuario_inativo": (
+            "Usuário inativo. Fale com a administração para reativar o acesso."
+        ),
     }
 
     username = forms.CharField(
         label="E-mail ou CPF",
         widget=forms.TextInput(
-            attrs={
-                "id": "user-login",
-                "placeholder": "Digite seu CPF ou e-mail",
-                "autocomplete": "username",
-                "autofocus": True,
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-login",
+                    "placeholder": "Digite seu CPF ou e-mail",
+                    "autocomplete": "username",
+                    "autofocus": True,
+                },
+                hint="Use o e-mail cadastrado ou o CPF com 11 dígitos.",
+            )
         ),
     )
     password = forms.CharField(
         label="Senha",
         strip=False,
         widget=forms.PasswordInput(
-            attrs={
-                "id": "user-password",
-                "placeholder": "Digite sua senha",
-                "autocomplete": "current-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-password",
+                    "placeholder": "Digite sua senha",
+                    "autocomplete": "current-password",
+                },
+                hint="A senha diferencia maiúsculas e minúsculas.",
+            )
         ),
     )
 
@@ -189,35 +217,43 @@ class LoginFiscalForm(AuthenticationForm):
     """Login web exclusivo para fiscais de campo."""
 
     error_messages: ClassVar[dict[str, str]] = {
-        "invalid_login": "CPF/e-mail ou senha inválidos.",
-        "inactive": "Esta conta está inativa.",
+        "invalid_login": LOGIN_INVALIDO,
+        "inactive": "Esta conta está inativa. Fale com a administração da prefeitura.",
         "sem_acesso_fiscal": (
             "Este acesso é exclusivo para fiscais. "
-            "Ambulantes usam /entrar/ e a prefeitura usa o backoffice."
+            "Ambulantes entram em /entrar/ e a prefeitura no backoffice."
         ),
-        "usuario_inativo": "Usuário inativo. Entre em contato com a administração.",
+        "usuario_inativo": (
+            "Usuário inativo. Fale com a administração para reativar o acesso."
+        ),
     }
 
     username = forms.CharField(
         label="E-mail ou CPF",
         widget=forms.TextInput(
-            attrs={
-                "id": "user-login",
-                "placeholder": "Digite seu CPF ou e-mail",
-                "autocomplete": "username",
-                "autofocus": True,
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-login",
+                    "placeholder": "Digite seu CPF ou e-mail",
+                    "autocomplete": "username",
+                    "autofocus": True,
+                },
+                hint="Use o e-mail institucional ou o CPF com 11 dígitos.",
+            )
         ),
     )
     password = forms.CharField(
         label="Senha",
         strip=False,
         widget=forms.PasswordInput(
-            attrs={
-                "id": "user-password",
-                "placeholder": "Digite sua senha",
-                "autocomplete": "current-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "user-password",
+                    "placeholder": "Digite sua senha",
+                    "autocomplete": "current-password",
+                },
+                hint="A senha diferencia maiúsculas e minúsculas.",
+            )
         ),
     )
 
@@ -239,12 +275,18 @@ class RecuperarSenhaForm(PasswordResetForm):
     email = forms.CharField(
         label="E-mail ou CPF",
         widget=forms.TextInput(
-            attrs={
-                "id": "recovery-email",
-                "placeholder": "seu-email@dominio.com ou CPF",
-                "autocomplete": "username",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "recovery-email",
+                    "placeholder": "seu-email@dominio.com ou CPF",
+                    "autocomplete": "username",
+                },
+                hint="Informe o mesmo e-mail ou CPF usado no cadastro. O link chega no e-mail da conta.",
+            )
         ),
+        error_messages={
+            "required": "Informe o e-mail ou o CPF da conta para enviar o link.",
+        },
     )
 
     def get_users(self, email):
@@ -270,18 +312,26 @@ class NovaSenhaForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["new_password1"].widget.attrs.update(
-            {
-                "id": "nova-senha",
-                "placeholder": "Digite a nova senha",
-                "autocomplete": "new-password",
-            }
+            attrs_campo(
+                {
+                    "id": "nova-senha",
+                    "placeholder": "Digite a nova senha",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Use no mínimo 8 caracteres, misturando letras. Evite senhas só numéricas.",
+            )
         )
         self.fields["new_password2"].widget.attrs.update(
-            {
-                "id": "nova-senha-confirmacao",
-                "placeholder": "Repita a nova senha",
-                "autocomplete": "new-password",
-            }
+            attrs_campo(
+                {
+                    "id": "nova-senha-confirmacao",
+                    "placeholder": "Repita a nova senha",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Repita a mesma senha para confirmar.",
+            )
         )
 
 
@@ -289,7 +339,9 @@ class CadastroUsuarioMasterMixin:
     def clean_cpf(self):
         cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
         if len(cpf) != 11:
-            raise ValidationError("Informe um CPF com 11 dígitos.")
+            raise ValidationError(
+                "Informe os 11 dígitos do CPF. Exemplo: 000.000.000-00."
+            )
         if UsuarioBase.objects.filter(cpf=cpf).exists():
             raise ValidationError("Já existe um usuário com este CPF.")
         return cpf
@@ -311,68 +363,91 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
         label="Nome Completo",
         max_length=300,
         widget=forms.TextInput(
-            attrs={
-                "id": "reg-nome",
-                "placeholder": "Digite seu nome completo",
-                "autocomplete": "name",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "reg-nome",
+                    "placeholder": "Digite seu nome completo",
+                    "autocomplete": "name",
+                },
+                hint="Informe nome e sobrenome, como no documento.",
+            )
         ),
     )
     email = forms.EmailField(
         label="E-mail de Acesso",
+        error_messages={
+            "invalid": "Digite um e-mail no formato nome@dominio.com.",
+            "required": "Informe um e-mail para receber avisos e recuperar a senha.",
+        },
         widget=forms.EmailInput(
-            attrs={
-                "id": "reg-email",
-                "placeholder": "seu-email@dominio.com",
-                "autocomplete": "email",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "reg-email",
+                    "placeholder": "seu-email@dominio.com",
+                    "autocomplete": "email",
+                },
+                hint="Este e-mail será o login e o destino da recuperação de senha.",
+            )
         ),
     )
     cpf = forms.CharField(
         label="CPF",
         widget=forms.TextInput(
-            attrs={
-                "id": "cpf-cadastro",
-                "placeholder": "000.000.000-00",
-                "autocomplete": "username",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "cpf-cadastro",
+                    "placeholder": "000.000.000-00",
+                    "autocomplete": "username",
+                    "inputmode": "numeric",
+                    "maxlength": "14",
+                },
+                hint="Digite só os números; a máscara é aplicada automaticamente.",
+            )
         ),
     )
     telefone_whatsapp = forms.CharField(
         label="Telefone / WhatsApp",
         max_length=20,
         widget=forms.TextInput(
-            attrs={
-                "id": "reg-telefone",
-                "placeholder": "(77) 99999-0000",
-                "autocomplete": "tel",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "reg-telefone",
+                    "placeholder": "(77) 99999-0000",
+                    "autocomplete": "tel",
+                    "inputmode": "numeric",
+                    "maxlength": "15",
+                },
+                hint="DDD + número. Exemplo: (77) 99999-0000.",
+            )
         ),
     )
     password = forms.CharField(
         label="Senha de Acesso",
         widget=forms.PasswordInput(
-            attrs={
-                "id": "reg-password",
-                "placeholder": "Mínimo de 8 caracteres",
-                "autocomplete": "new-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "reg-password",
+                    "placeholder": "Mínimo de 8 caracteres",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Mínimo de 8 caracteres. Evite senha só com números.",
+            )
         ),
     )
     password_confirm = forms.CharField(
         label="Confirmar Senha",
         widget=forms.PasswordInput(
-            attrs={
-                "id": "reg-confirm-password",
-                "placeholder": "Repita a senha",
-                "autocomplete": "new-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "reg-confirm-password",
+                    "placeholder": "Repita a senha",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Repita a mesma senha do campo anterior.",
+            )
         ),
-    )
-    foto = forms.ImageField(
-        label="Foto (opcional)",
-        required=False,
-        widget=forms.ClearableFileInput(attrs={"id": "reg-foto", "accept": "image/*"}),
     )
     aceite_lgpd = forms.BooleanField(
         label=(
@@ -388,8 +463,21 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
         senha = dados.get("password")
         confirmacao = dados.get("password_confirm")
         if senha and confirmacao and senha != confirmacao:
-            self.add_error("password_confirm", "As senhas não coincidem.")
+            self.add_error(
+                "password_confirm",
+                "As senhas não coincidem. Digite a mesma senha nos dois campos.",
+            )
         return dados
+
+    def clean_telefone_whatsapp(self):
+        numeros = "".join(
+            ch for ch in (self.cleaned_data.get("telefone_whatsapp") or "") if ch.isdigit()
+        )
+        if len(numeros) < 10:
+            raise ValidationError(
+                "Informe DDD e número, só com dígitos. Exemplo: (77) 99999-0000."
+            )
+        return numeros
 
     def save(self):
         dados = self.cleaned_data
@@ -401,7 +489,6 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
             nome=nome,
             sobrenome=sobrenome,
             telefone_whatsapp=dados["telefone_whatsapp"],
-            foto=dados.get("foto") or None,
             aceite_lgpd=True,
             aceite_lgpd_em=timezone.now(),
             base_legal_lgpd=BASE_LEGAL_LGPD,
@@ -422,19 +509,30 @@ class CadastroGestorForm(CadastroUsuarioMasterMixin, forms.Form):
     cpf = forms.CharField(
         label="CPF do Servidor",
         widget=forms.TextInput(
-            attrs={
-                "id": "gestor-cpf",
-                "placeholder": "000.000.000-00",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "gestor-cpf",
+                    "placeholder": "000.000.000-00",
+                    "inputmode": "numeric",
+                    "maxlength": "14",
+                },
+                hint="Digite os 11 números do CPF do servidor.",
+            )
         ),
     )
     email = forms.EmailField(
         label="E-mail Institucional",
+        error_messages={
+            "invalid": "Digite um e-mail no formato nome@dominio.com.",
+        },
         widget=forms.EmailInput(
-            attrs={
-                "id": "gestor-email",
-                "placeholder": "gestor.nome@pmvc.ba.gov.br",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "gestor-email",
+                    "placeholder": "gestor.nome@pmvc.ba.gov.br",
+                },
+                hint="Use o e-mail institucional da prefeitura.",
+            )
         ),
     )
     telefone_whatsapp = forms.CharField(
@@ -465,11 +563,15 @@ class CadastroGestorForm(CadastroUsuarioMasterMixin, forms.Form):
     password = forms.CharField(
         label="Senha Provisória de Acesso",
         widget=forms.PasswordInput(
-            attrs={
-                "id": "gestor-senha",
-                "placeholder": "Crie uma senha provisória de acesso",
-                "autocomplete": "new-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "gestor-senha",
+                    "placeholder": "Crie uma senha provisória de acesso",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Mínimo de 8 caracteres. O gestor poderá alterar depois.",
+            )
         ),
     )
 
@@ -515,19 +617,30 @@ class CadastroFiscalForm(CadastroUsuarioMasterMixin, forms.Form):
     cpf = forms.CharField(
         label="CPF do Agente",
         widget=forms.TextInput(
-            attrs={
-                "id": "fiscal-cpf",
-                "placeholder": "000.000.000-00",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "fiscal-cpf",
+                    "placeholder": "000.000.000-00",
+                    "inputmode": "numeric",
+                    "maxlength": "14",
+                },
+                hint="Digite os 11 números do CPF do agente.",
+            )
         ),
     )
     email = forms.EmailField(
         label="E-mail Institucional",
+        error_messages={
+            "invalid": "Digite um e-mail no formato nome@dominio.com.",
+        },
         widget=forms.EmailInput(
-            attrs={
-                "id": "fiscal-email",
-                "placeholder": "fiscal.nome@pmvc.ba.gov.br",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "fiscal-email",
+                    "placeholder": "fiscal.nome@pmvc.ba.gov.br",
+                },
+                hint="Use o e-mail institucional da prefeitura.",
+            )
         ),
     )
     zona_atuacao_primaria = forms.ChoiceField(
@@ -538,11 +651,15 @@ class CadastroFiscalForm(CadastroUsuarioMasterMixin, forms.Form):
     password = forms.CharField(
         label="Senha Provisória",
         widget=forms.PasswordInput(
-            attrs={
-                "id": "fiscal-senha",
-                "placeholder": "Crie uma senha provisória",
-                "autocomplete": "new-password",
-            }
+            attrs=attrs_campo(
+                {
+                    "id": "fiscal-senha",
+                    "placeholder": "Crie uma senha provisória",
+                    "autocomplete": "new-password",
+                    "minlength": "8",
+                },
+                hint="Mínimo de 8 caracteres. O fiscal poderá alterar depois.",
+            )
         ),
     )
 

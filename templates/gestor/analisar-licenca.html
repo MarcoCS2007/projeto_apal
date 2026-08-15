@@ -205,19 +205,19 @@
             <div class="input-group">
                 <label for="{{ form.categoria_produto.id_for_label }}">{{ form.categoria_produto.label }}</label>
                 {{ form.categoria_produto }}
-                {{ form.categoria_produto.errors }}
+                {% if form.categoria_produto.errors %}<p class="field-error">{{ form.categoria_produto.errors.0 }}</p>{% endif %}
             </div>
             <div class="input-group">
                 <label for="{{ form.ponto_ocupacao.id_for_label }}">{{ form.ponto_ocupacao.label }}</label>
                 {{ form.ponto_ocupacao }}
-                {{ form.ponto_ocupacao.errors }}
+                {% if form.ponto_ocupacao.errors %}<p class="field-error">{{ form.ponto_ocupacao.errors.0 }}</p>{% endif %}
             </div>
         </div>
         <div class="form-row">
             <div class="input-group full-width">
                 <label for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
                 {{ form.motivo }}
-                {{ form.motivo.errors }}
+                {% if form.motivo.errors %}<p class="field-error">{{ form.motivo.errors.0 }}</p>{% endif %}
             </div>
         </div>
 
@@ -229,7 +229,7 @@
                 <button type="submit" name="acao" value="pendencia" class="btn-action" style="padding: 0.8rem 1.4rem;">
                     <i data-lucide="rotate-ccw"></i> Devolver com pendência
                 </button>
-                <button type="submit" name="acao" value="indeferir" class="btn-action" style="color: #DC2626; border-color: #FCA5A5; padding: 0.8rem 1.4rem;" onclick="return confirm('Confirmar o indeferimento deste requerimento?');">
+                <button type="submit" name="acao" value="indeferir" class="btn-action" style="color: #DC2626; border-color: #FCA5A5; padding: 0.8rem 1.4rem;" data-confirm="Indeferir este requerimento? O ambulante será notificado e o pedido será encerrado." data-confirm-title="Indeferir requerimento" data-confirm-ok="Indeferir">
                     <i data-lucide="x-circle"></i> Indeferir
                 </button>
                 <button type="submit" name="acao" value="deferir" class="btn-submit" style="background-color: #10B981; padding: 0.8rem 1.8rem;">

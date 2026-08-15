@@ -46,7 +46,7 @@
                 <label for="user-password">Senha</label>
                 <div class="input-password-wrapper">
                     {{ form.password }}
-                    <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -68,10 +68,10 @@
                 Esqueci minha senha
             </a>
             <a href="{% url 'registro' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                <i data-lucide="user-plus"></i> Ainda não tem conta? Cadastre-se
+                <i data-lucide="user-plus"></i> Ainda não tem conta? Criar cadastro
             </a>
-            <a href="{% url 'fiscal_entrar' %}" class="forgot-password" style="text-align: center;">Sou fiscal</a>
-            <a href="{% url 'login' %}" class="forgot-password" style="text-align: center;">Sou gestor ou administrador</a>
+            <a href="{% url 'fiscal_entrar' %}" class="forgot-password" style="text-align: center;">Entrar como fiscal</a>
+            <a href="{% url 'login' %}" class="forgot-password" style="text-align: center;">Entrar como gestor ou administrador</a>
         </div>
     </form>
 </div>

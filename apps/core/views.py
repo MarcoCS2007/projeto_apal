@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from apps.usuarios.lgpd import BASE_LEGAL_LGPD_ROTULO
@@ -24,3 +25,11 @@ class PrivacidadeView(TemplateView):
         context["base_legal"] = BASE_LEGAL_LGPD_ROTULO
         context["retencao_meses"] = ConfiguracaoSeguranca.carregar().retencao_logs_meses
         return context
+
+
+def pagina_nao_encontrada(request, exception):
+    return render(request, "404.html", status=404)
+
+
+def erro_servidor(request):
+    return render(request, "500.html", status=500)

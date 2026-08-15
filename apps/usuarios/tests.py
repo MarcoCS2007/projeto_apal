@@ -724,7 +724,15 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "As senhas não coincidem")
         self.assertFalse(Ambulante.objects.filter(cpf="66677788899").exists())
 
-    def test_registro_com_foto_opcional(self):
+    def test_registro_nao_exibe_upload_de_foto(self):
+        response = self.client.get(reverse("registro"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "reg-foto")
+        self.assertNotContains(response, "Foto (opcional)")
+        self.assertContains(response, "password-requirements")
+
+    def test_registro_ignora_foto_enviada(self):
         buffer = io.BytesIO()
         Image.new("RGB", (1, 1), color="red").save(buffer, format="PNG")
         foto = SimpleUploadedFile(
@@ -738,7 +746,7 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
 
             self.assertEqual(response.status_code, 302)
             ambulante = Ambulante.objects.get(cpf="66677788899")
-            self.assertTrue(ambulante.foto)
+            self.assertFalse(ambulante.foto)
 
     def test_login_web_ambulante_abre_painel(self):
         response = self.client.post(

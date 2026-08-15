@@ -25,6 +25,11 @@
 {% block content %}
 <div class="form-card">
     {% if not concluido %}
+    <p style="margin: 0 0 1.25rem;">
+        <a href="{% url 'ambulante_painel' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao painel
+        </a>
+    </p>
     <nav class="stepper-container" id="stepper" aria-label="Etapas do cadastro">
         <div class="stepper-line">
             <div class="stepper-line-progress" id="stepper-progress" style="width: {{ stepper_percent }}%;"></div>
@@ -60,7 +65,7 @@
         <i data-lucide="alert-octagon"></i>
         <div>
             <strong>Atenção! Existem erros no preenchimento.</strong><br>
-            <span id="error-message">{{ form.non_field_errors.0|default:"Revise os campos destacados antes de continuar." }}</span>
+            <span id="error-message">{{ form.non_field_errors.0|default:"Corrija os campos destacados em vermelho. A mensagem de cada campo indica o que ajustar." }}</span>
         </div>
     </div>
     {% endif %}
@@ -134,6 +139,7 @@
                     {{ form.telefone_2 }}
                 </div>
             </div>
+            <p class="field-hint" style="margin: -0.5rem 0 1rem;">A foto 3x4 será inserida depois, no perfil do ambulante.</p>
             <div class="form-row">
                 <div class="input-group">
                     <label for="req-nis">NIS (CadÚnico)</label>
@@ -149,13 +155,6 @@
                     <label for="req-num-funcionarios">Qtd de Auxiliares</label>
                     {{ form.num_funcionarios }}
                     {% if form.num_funcionarios.errors %}<div class="login-error">{{ form.num_funcionarios.errors.0 }}</div>{% endif %}
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="input-group full-width">
-                    <label for="req-foto">Foto 3x4 (opcional)</label>
-                    {{ form.foto }}
-                    {% if ambulante.foto %}<p style="font-size: 0.85rem; color: var(--texto-cinza);">Foto atual já enviada.</p>{% endif %}
                 </div>
             </div>
             <div class="form-actions" style="justify-content: flex-end; margin-top: 1rem;">
@@ -426,20 +425,15 @@
 
             <div class="form-row">
                 <div class="input-group">
-                    <label for="doc-foto">Foto 3x4 (opcional)</label>
-                    {{ form.foto }}
-                    {% if ambulante.foto %}<p style="font-size: 0.85rem; color: var(--texto-cinza);">Foto atual já enviada.</p>{% endif %}
-                </div>
-                <div class="input-group">
                     <label for="doc-estrutura">Foto da estrutura (opcional)</label>
                     {{ form.foto_estrutura }}
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="input-group">
                     <label for="doc-rg">Cópia do RG/CPF {% if "rg_cpf" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
                     {{ form.arquivo_rg_cpf }}
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="input-group">
                     <label for="doc-comprovante">Comprovante de Residência {% if "comprovante_residencia" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
                     {{ form.arquivo_comprovante_residencia }}

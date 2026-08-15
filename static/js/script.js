@@ -5,6 +5,384 @@
 const GEMINI_API_KEY = "AQ.Ab8RN6IbFNK35QDYzePUpmP14T9Geg6NmoeGVu0TqesmaAYEsQ";
 const GROQ_API_KEY = "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";
 
+function obterToastContainer() {
+    let container = document.getElementById('toast-container');
+    if (container) return container;
+
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    container.setAttribute('aria-live', 'polite');
+    container.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(container);
+    return container;
+}
+
+function mostrarToast(mensagem, tipo = 'info') {
+    if (!mensagem) return;
+
+    const tipoNormalizado = {
+        success: 'success',
+        sucesso: 'success',
+        warning: 'warning',
+        aviso: 'warning',
+        error: 'error',
+        erro: 'error',
+        info: 'info',
+        informacao: 'info',
+        informação: 'info',
+    }[tipo] || 'info';
+
+    const toast = document.createElement('div');
+    toast.className = `toast-alert ${tipoNormalizado}`;
+    toast.setAttribute('role', tipoNormalizado === 'error' || tipoNormalizado === 'warning' ? 'alert' : 'status');
+    toast.textContent = mensagem;
+    obterToastContainer().appendChild(toast);
+
+    window.setTimeout(() => {
+        toast.remove();
+    }, tipoNormalizado === 'error' ? 6000 : 4500);
+}
+
+window.mostrarToast = mostrarToast;
+
+function notificarFalhaRede(erro, contexto = '') {
+    const texto = String(erro?.message || erro || '');
+    const status = Number(erro?.status || 0);
+
+    if (erro?.code === 'timeout' || erro?.name === 'AbortError' || /tempo esgotado|timeout/i.test(texto)) {
+        mostrarToast('O tempo da consulta esgotou. Verifique a conexão e tente de novo.', 'warning');
+        return;
+    }
+    if (status === 404 || /não encontrad|nao encontrad|404/i.test(texto)) {
+        mostrarToast('Não encontramos essa informação. Confira os dados ou volte ao início.', 'error');
+        return;
+    }
+    if (status >= 500 || /falha no servidor|http 5/i.test(texto)) {
+        mostrarToast('O servidor não respondeu. Aguarde alguns instantes e tente novamente.', 'error');
+        return;
+    }
+    mostrarToast(contexto || 'Não foi possível concluir a ação. Tente novamente.', 'error');
+}
+
+window.notificarFalhaRede = notificarFalhaRede;
+
+async function requisitarComTimeout(url, options = {}, timeoutMs = 12000) {
+    const controlador = new AbortController();
+    const temporizador = window.setTimeout(() => controlador.abort(), timeoutMs);
+
+    try {
+        const resposta = await fetch(url, { ...options, signal: controlador.signal });
+        if (!resposta.ok) {
+            const erro = new Error(`HTTP ${resposta.status}`);
+            erro.status = resposta.status;
+            throw erro;
+        }
+        return resposta;
+    } catch (erro) {
+        if (erro?.name === 'AbortError') {
+            const timeout = new Error('Tempo esgotado');
+            timeout.code = 'timeout';
+            timeout.name = 'AbortError';
+            throw timeout;
+        }
+        throw erro;
+    } finally {
+        window.clearTimeout(temporizador);
+    }
+}
+
+window.requisitarComTimeout = requisitarComTimeout;
+
+function confirmarAcao({
+    titulo = 'Confirmar ação',
+    mensagem = 'Deseja continuar?',
+    confirmar = 'Confirmar',
+    cancelar = 'Voltar',
+} = {}) {
+    const dialog = document.getElementById('confirm-dialog');
+    const backdrop = document.getElementById('modal-backdrop');
+    const titleEl = document.getElementById('confirm-dialog-title');
+    const msgEl = document.getElementById('confirm-dialog-message');
+    const btnOk = document.getElementById('confirm-dialog-ok');
+    const btnCancel = document.getElementById('confirm-dialog-cancel');
+    const btnVoltar = document.getElementById('confirm-dialog-voltar');
+
+    if (!dialog || !btnOk || !btnCancel) {
+        mostrarToast(mensagem, 'warning');
+        return Promise.resolve(false);
+    }
+
+    return new Promise((resolve) => {
+        if (titleEl) titleEl.textContent = titulo;
+        if (msgEl) msgEl.textContent = mensagem;
+        btnOk.textContent = confirmar;
+        if (btnVoltar) btnVoltar.textContent = cancelar;
+
+        const finalizar = (resultado) => {
+            dialog.classList.add('hidden');
+            backdrop?.classList.remove('active');
+            document.removeEventListener('keydown', noEscape);
+            btnOk.removeEventListener('click', noOk);
+            btnCancel.removeEventListener('click', noCancel);
+            btnVoltar?.removeEventListener('click', noCancel);
+            resolve(resultado);
+        };
+
+        const noOk = () => finalizar(true);
+        const noCancel = () => finalizar(false);
+        const noEscape = (evento) => {
+            if (evento.key === 'Escape') finalizar(false);
+        };
+
+        btnOk.addEventListener('click', noOk);
+        btnCancel.addEventListener('click', noCancel);
+        btnVoltar?.addEventListener('click', noCancel);
+        document.addEventListener('keydown', noEscape);
+
+        dialog.classList.remove('hidden');
+        backdrop?.classList.add('active');
+        if (window.lucide) lucide.createIcons();
+        (btnVoltar || btnCancel).focus();
+    });
+}
+
+window.confirmarAcao = confirmarAcao;
+
+function grupoDoCampo(campo) {
+    return campo?.closest('.input-group') || campo?.parentElement;
+}
+
+function garantirAreaErroCampo(campo) {
+    const grupo = grupoDoCampo(campo);
+    if (!grupo) return null;
+
+    let area = grupo.querySelector('.field-error[data-live-error]');
+    if (area) return area;
+
+    area = document.createElement('p');
+    area.className = 'field-error';
+    area.dataset.liveError = 'true';
+    area.hidden = true;
+    grupo.appendChild(area);
+    return area;
+}
+
+function garantirDicaCampo(campo) {
+    const hint = campo?.dataset?.hint;
+    if (!hint) return;
+
+    const grupo = grupoDoCampo(campo);
+    if (!grupo || grupo.querySelector('.field-hint')) return;
+
+    const dica = document.createElement('p');
+    dica.className = 'field-hint';
+    dica.textContent = hint;
+    const areaErro = grupo.querySelector('.field-error, .login-error, .errorlist');
+    if (areaErro) {
+        grupo.insertBefore(dica, areaErro);
+    } else {
+        grupo.appendChild(dica);
+    }
+}
+
+function mensagemCorrecaoCampo(campo) {
+    if (!campo) return 'Corrija este campo para continuar.';
+
+    if (campo.dataset.msg && campo.validity.customError) {
+        return campo.dataset.msg;
+    }
+
+    if (campo.validity.valueMissing) {
+        if (campo.type === 'checkbox') {
+            return 'Marque esta opção para continuar.';
+        }
+        if (campo.tagName === 'SELECT') {
+            return 'Selecione uma opção da lista.';
+        }
+        return campo.dataset.msgEmpty || 'Preencha este campo para continuar.';
+    }
+
+    if (campo.validity.typeMismatch && campo.type === 'email') {
+        return 'Digite um e-mail no formato nome@dominio.com.';
+    }
+
+    if (campo.validity.tooShort) {
+        return `Digite pelo menos ${campo.minLength} caracteres.`;
+    }
+
+    if (campo.validity.tooLong) {
+        return `Use no máximo ${campo.maxLength} caracteres.`;
+    }
+
+    if (campo.validity.rangeUnderflow) {
+        return `Informe um valor maior ou igual a ${campo.min}.`;
+    }
+
+    if (campo.validity.rangeOverflow) {
+        return `Informe um valor menor ou igual a ${campo.max}.`;
+    }
+
+    if (campo.validity.patternMismatch) {
+        return campo.title || campo.dataset.msg || 'O formato está incorreto. Siga o exemplo do campo.';
+    }
+
+    if (campo.validity.customError) {
+        return campo.validationMessage;
+    }
+
+    return campo.dataset.msg || campo.validationMessage || 'Corrija este campo para continuar.';
+}
+
+function marcarValidadeCampo(campo, valido, mensagem) {
+    const grupo = grupoDoCampo(campo);
+    const area = garantirAreaErroCampo(campo);
+
+    campo.setAttribute('aria-invalid', valido ? 'false' : 'true');
+    grupo?.classList.toggle('has-error', !valido);
+    grupo?.classList.toggle('is-valid', Boolean(valido && campo.value));
+
+    if (area) {
+        if (valido) {
+            area.hidden = true;
+            area.textContent = '';
+        } else {
+            area.hidden = false;
+            area.textContent = mensagem || mensagemCorrecaoCampo(campo);
+        }
+    }
+}
+
+function campoDeveValidarAoVivo(campo) {
+    if (!campo || campo.disabled || campo.readOnly) return false;
+    if (campo.type === 'hidden' || campo.type === 'file' || campo.type === 'submit' || campo.type === 'button') {
+        return false;
+    }
+    if (campo.name === 'csrfmiddlewaretoken' || campo.name === 'next' || campo.name === 'etapa') {
+        return false;
+    }
+    return true;
+}
+
+function validarConfirmacaoSenha(campo) {
+    const form = campo.closest('form');
+    if (!form) return true;
+
+    const senha = form.querySelector('#reg-password, #nova-senha, input[autocomplete="new-password"]');
+    const confirmacao = form.querySelector('#reg-confirm-password, #nova-senha-confirmacao');
+    if (!senha || !confirmacao) return true;
+    if (campo !== senha && campo !== confirmacao) return true;
+    if (!confirmacao.value) return true;
+
+    if (senha.value !== confirmacao.value) {
+        confirmacao.setCustomValidity('As senhas não coincidem. Digite a mesma senha nos dois campos.');
+        return false;
+    }
+
+    confirmacao.setCustomValidity('');
+    return true;
+}
+
+function validarCampoAoVivo(campo, { marcarVazio = false } = {}) {
+    if (!campoDeveValidarAoVivo(campo)) return true;
+
+    garantirDicaCampo(campo);
+    validarConfirmacaoSenha(campo);
+
+    if (campo.id === 'cpf-cadastro' && typeof window.checarCPFInput === 'function') {
+        window.checarCPFInput();
+    }
+
+    if (campo.id === 'user-login' || campo.id === 'recovery-email') {
+        const valor = String(campo.value || '').trim();
+        campo.setCustomValidity('');
+        if (valor) {
+            if (valor.includes('@')) {
+                const emailCompleto = /@[^\s@]+\.[^\s@]+$/.test(valor);
+                if ((marcarVazio || emailCompleto) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+                    campo.setCustomValidity('Digite um e-mail no formato nome@dominio.com.');
+                }
+            } else {
+                const cpf = valor.replace(/\D/g, '');
+                if (marcarVazio || cpf.length >= 11) {
+                    if (cpf.length < 11) {
+                        campo.setCustomValidity('Digite os 11 números do CPF ou um e-mail completo.');
+                    } else if (typeof validarCPF === 'function' && !validarCPF(cpf)) {
+                        campo.setCustomValidity('CPF inválido. Confira os 11 dígitos.');
+                    }
+                }
+            }
+        }
+    }
+
+    const vazio = !String(campo.value || '').trim() && campo.type !== 'checkbox' && campo.type !== 'radio';
+    if (vazio && !marcarVazio && !campo.required) {
+        marcarValidadeCampo(campo, true);
+        return true;
+    }
+
+    const valido = campo.checkValidity();
+    if (valido) {
+        marcarValidadeCampo(campo, true);
+        return true;
+    }
+
+    if (vazio && !marcarVazio) {
+        return false;
+    }
+
+    marcarValidadeCampo(campo, false, mensagemCorrecaoCampo(campo));
+    return false;
+}
+
+window.validarCampoAoVivo = validarCampoAoVivo;
+window.mensagemCorrecaoCampo = mensagemCorrecaoCampo;
+
+function rotuloDoCampo(campo) {
+    const grupo = grupoDoCampo(campo);
+    const label = grupo?.querySelector('label');
+    if (label) {
+        return label.textContent.replace(/\*/g, '').trim();
+    }
+    return campo.getAttribute('aria-label') || campo.name || 'campo';
+}
+
+function validarFormularioAoVivo(form) {
+    const campos = Array.from(form.querySelectorAll('input, select, textarea'))
+        .filter(campoDeveValidarAoVivo);
+
+    let primeiroInvalido = null;
+
+    campos.forEach((campo) => {
+        const ok = validarCampoAoVivo(campo, { marcarVazio: true });
+        if (!ok && !primeiroInvalido) {
+            primeiroInvalido = campo;
+        }
+    });
+
+    return primeiroInvalido;
+}
+
+function marcarBotaoCarregando(botao, carregando, rotulo = 'Enviando...') {
+    if (!botao) return;
+
+    if (carregando) {
+        if (!botao.dataset.labelOriginal) {
+            botao.dataset.labelOriginal = botao.innerHTML;
+        }
+        botao.classList.add('is-loading');
+        botao.setAttribute('aria-busy', 'true');
+        botao.textContent = rotulo;
+        return;
+    }
+
+    botao.classList.remove('is-loading');
+    botao.removeAttribute('aria-busy');
+    if (botao.dataset.labelOriginal) {
+        botao.innerHTML = botao.dataset.labelOriginal;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ---------------------------------------------------
@@ -47,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navToggle = document.getElementById('nav-toggle');
     const headerNav = document.getElementById('header-nav');
     const topHeader = document.querySelector('.top-header');
+    const NAV_BREAKPOINT = 1280;
 
     function atualizarRotuloMenu(aberto) {
         if (!navToggle) return;
@@ -74,6 +453,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function barraEstourou() {
+        if (!headerNav || !topHeader) return false;
+        const headerContainer = topHeader.querySelector('.header-container');
+        if (!headerContainer) return false;
+        return headerContainer.scrollWidth > headerContainer.clientWidth + 1
+            || headerNav.scrollWidth > headerNav.clientWidth + 1;
+    }
+
+    function sincronizarNavCompacta() {
+        if (!headerNav || !navToggle || !topHeader) return;
+
+        if (window.innerWidth <= NAV_BREAKPOINT) {
+            document.body.classList.add('nav-compact');
+            return;
+        }
+
+        const estavaAberta = document.body.classList.contains('nav-open');
+        document.body.classList.remove('nav-compact');
+        fecharNavMobile();
+
+        requestAnimationFrame(() => {
+            const compactar = barraEstourou();
+            document.body.classList.toggle('nav-compact', compactar);
+            if (compactar && estavaAberta) {
+                abrirNavMobile();
+            }
+        });
+    }
+
     navToggle?.addEventListener('click', (event) => {
         event.stopPropagation();
         alternarNavMobile();
@@ -94,10 +502,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 1024) {
-            fecharNavMobile();
-        }
+        sincronizarNavCompacta();
     });
+
+    sincronizarNavCompacta();
+    window.addEventListener('load', sincronizarNavCompacta);
 
     document.querySelectorAll('.nav-inst-menu').forEach((menu) => {
         document.addEventListener('click', (event) => {
@@ -119,11 +528,94 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.querySelectorAll('form').forEach((form) => {
+        form.setAttribute('novalidate', 'novalidate');
+    });
+
+    document.addEventListener('invalid', (evento) => {
+        evento.preventDefault();
+        const campo = evento.target;
+        if (campo && typeof validarCampoAoVivo === 'function') {
+            validarCampoAoVivo(campo, { marcarVazio: true });
+        }
+    }, true);
+
+    document.addEventListener('submit', async (evento) => {
+        const form = evento.target;
+        if (!(form instanceof HTMLFormElement)) return;
+
+        const origem = evento.submitter || form;
+        const mensagem = origem.dataset.confirm || form.dataset.confirm;
+        if (!mensagem || form.dataset.confirmAccepted === '1') return;
+
+        evento.preventDefault();
+        evento.stopImmediatePropagation();
+
+        const aceitou = await confirmarAcao({
+            titulo: origem.dataset.confirmTitle || form.dataset.confirmTitle || 'Confirmar ação',
+            mensagem,
+            confirmar: origem.dataset.confirmOk || form.dataset.confirmOk || 'Confirmar',
+            cancelar: origem.dataset.confirmCancel || form.dataset.confirmCancel || 'Voltar',
+        });
+
+        if (!aceitou) {
+            form.querySelectorAll('.is-loading').forEach((botao) => marcarBotaoCarregando(botao, false));
+            return;
+        }
+
+        form.dataset.confirmAccepted = '1';
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit(evento.submitter || undefined);
+        } else {
+            form.submit();
+        }
+    }, true);
+
+    document.querySelectorAll('.form-card form, form.js-live-form').forEach((form) => {
+        form.setAttribute('novalidate', 'novalidate');
+        form.classList.add('js-live-form');
+
+        form.querySelectorAll('input, select, textarea').forEach((campo) => {
+            garantirDicaCampo(campo);
+            if (grupoDoCampo(campo)?.querySelector('.login-error, .errorlist, .field-error:not([hidden])')) {
+                grupoDoCampo(campo)?.classList.add('has-error');
+            }
+
+            campo.addEventListener('input', () => validarCampoAoVivo(campo));
+            campo.addEventListener('blur', () => validarCampoAoVivo(campo, { marcarVazio: campo.required }));
+            campo.addEventListener('change', () => validarCampoAoVivo(campo, { marcarVazio: campo.required }));
+        });
+
+        form.addEventListener('submit', (event) => {
+            if (form.id !== 'cadastro-form') {
+                const primeiroInvalido = validarFormularioAoVivo(form);
+                if (primeiroInvalido) {
+                    event.preventDefault();
+                    primeiroInvalido.focus({ preventScroll: true });
+                    primeiroInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    mostrarToast(
+                        `Corrija o campo "${rotuloDoCampo(primeiroInvalido)}": ${mensagemCorrecaoCampo(primeiroInvalido)}`,
+                        'error'
+                    );
+                    return;
+                }
+            }
+
+            const botao = event.submitter || form.querySelector('button[type="submit"], .btn-submit');
+            const rotuloEnvio = form.method.toLowerCase() === 'get' ? 'Consultando...' : 'Enviando...';
+            marcarBotaoCarregando(botao, true, rotuloEnvio);
+        });
+    });
+
     // Fechar modais ao clicar no fundo escurecido (Backdrop)
     if (backdrop) {
         backdrop.addEventListener('click', () => {
             fecharModalIA();
             sincronizarPainelAcesso(false);
+            const confirmDialog = document.getElementById('confirm-dialog');
+            if (confirmDialog && !confirmDialog.classList.contains('hidden')) {
+                document.getElementById('confirm-dialog-cancel')?.click();
+            }
         });
     }
 
@@ -145,6 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newSize = currentSize + 2;
         root.style.fontSize = newSize + 'px';
         document.body.style.fontSize = newSize + 'px';
+        mostrarToast('Texto aumentado. Use Diminuir Texto para voltar.', 'info');
     });
 
     // Diminuir Tamanho da Fonte
@@ -155,6 +648,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const newSize = currentSize - 2;
             root.style.fontSize = newSize + 'px';
             document.body.style.fontSize = newSize + 'px';
+            mostrarToast('Texto diminuído.', 'info');
+        } else {
+            mostrarToast('O texto já está no tamanho mínimo.', 'warning');
         }
     });
 
@@ -169,9 +665,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ehEscuro) {
             document.body.style.backgroundColor = '#121824';
             document.body.style.color = '#ffffff';
+            mostrarToast('Contraste escuro ativado.', 'success');
         } else {
             document.body.style.backgroundColor = '';
             document.body.style.color = '';
+            mostrarToast('Contraste escuro desativado.', 'info');
         }
     });
 
@@ -185,6 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.body.style.backgroundColor = '';
         document.body.style.color = '';
+        mostrarToast(ehClaro ? 'Contraste claro ativado.' : 'Contraste claro desativado.', ehClaro ? 'success' : 'info');
     });
 
     // Saturação Alta
@@ -192,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('sat-baixa');
         const ativado = document.body.classList.toggle('sat-alta');
         document.documentElement.style.filter = ativado ? 'saturate(250%)' : '';
+        mostrarToast(ativado ? 'Saturação alta ativada.' : 'Saturação alta desativada.', 'info');
     });
 
     // Saturação Baixa / Monocromático
@@ -199,6 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('sat-alta');
         const ativado = document.body.classList.toggle('sat-baixa');
         document.documentElement.style.filter = ativado ? 'grayscale(100%)' : '';
+        mostrarToast(ativado ? 'Saturação baixa ativada.' : 'Saturação baixa desativada.', 'info');
     });
 
     // Zoom na Tela
@@ -208,9 +709,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.zoom = "1.15";
             document.body.style.transform = "scale(1.02)";
             document.body.style.transformOrigin = "top center";
+            mostrarToast('Zoom na tela ativado.', 'info');
         } else {
             document.body.style.zoom = "1.0";
             document.body.style.transform = "none";
+            mostrarToast('Zoom na tela desativado.', 'info');
         }
     });
 
@@ -268,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLerTexto) {
         btnLerTexto.addEventListener('click', () => {
             if (!('speechSynthesis' in window)) {
-                alert('Seu navegador não suporta a leitura de voz nativa.');
+                mostrarToast('Seu navegador não lê texto em voz alta. Use Chrome, Edge ou Firefox atualizado.', 'warning');
                 return;
             }
 
@@ -288,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLerClique) {
         btnLerClique.addEventListener('click', () => {
             if (!('speechSynthesis' in window)) {
-                alert('Seu navegador não suporta a leitura de voz nativa.');
+                mostrarToast('Seu navegador não lê texto em voz alta. Use Chrome, Edge ou Firefox atualizado.', 'warning');
                 return;
             }
 
@@ -302,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('leitura-select-mode');
             btnLerClique.classList.add('access-option-ativo');
 
-            alert("Modo Leitura por Clique Ativado!\n\nClique sobre qualquer texto da página para ouvir o conteúdo.\n\nPara sair, clique novamente no botão ou aperte a tecla ESC.");
+            mostrarToast('Modo leitura por clique ativado. Clique em qualquer texto para ouvir. Esc ou o mesmo botão cancela.', 'info');
         });
     }
 
@@ -370,9 +873,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('ia-select-mode');
 
         if (modo === "significado") {
-            alert("Modo IA Ativado!\n\nCLIQUE sobre a palavra ou termo que deseja consultar.");
+            mostrarToast('Modo IA ativado. Clique na palavra ou termo que deseja consultar.', 'info');
         } else {
-            alert("Modo IA Ativado!\n\nCLIQUE sobre o parágrafo que você deseja simplificar.");
+            mostrarToast('Modo IA ativado. Clique no parágrafo que deseja simplificar.', 'info');
         }
     }
 
@@ -470,14 +973,14 @@ async function chamarGemini(promptInstrucao, textoSelecionado) {
 
         const promptCompleto = `${contextoAPAL}\n\n${promptInstrucao}\n\nResponda em texto simples, direto, sem saudações e sem perguntas.\n\nTexto/Termo selecionado: "${textoSelecionado}"`;
 
-        const response = await fetch(url, {
+        const response = await requisitarComTimeout(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: promptCompleto }] }],
                 generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
             })
-        });
+        }, 15000);
 
         const data = await response.json();
         if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
@@ -494,7 +997,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
 
         const promptCompleto = `${contextoAPAL}\n\n${promptInstrucao}\n\nResponda em texto simples, direto, sem saudações e sem perguntas.\n\nTexto/Termo: "${textoSelecionado}"`;
 
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const response = await requisitarComTimeout('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -506,7 +1009,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
                 max_tokens: 180,
                 messages: [{ role: 'user', content: promptCompleto }]
             })
-        });
+        }, 15000);
 
         const data = await response.json();
         if (data.choices && data.choices[0]?.message?.content) {
@@ -537,6 +1040,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
                 : `<strong>Texto Simplificado:</strong> Este trecho explica as regras de cadastro e os documentos que o comerciante precisa apresentar para conseguir a sua licença de trabalho.`;
 
             aiResponseContent.innerHTML = formatarTextoIA(respostaExemplo);
+            notificarFalhaRede(error, 'A explicação automática falhou. Tente de novo ou leia o texto original.');
         }
     }
 
@@ -566,6 +1070,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
     // 6. MOSTRAR / OCULTAR SENHA (LOGIN E CADASTRO)
     // ---------------------------------------------------
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
+        btn.setAttribute('aria-label', btn.getAttribute('aria-label') || 'Mostrar senha');
         btn.addEventListener('click', () => {
             const wrapper = btn.closest('.input-password-wrapper');
             const input = wrapper ? wrapper.querySelector('input') : null;
@@ -573,6 +1078,8 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
 
             const ehSenha = input.getAttribute('type') === 'password';
             input.setAttribute('type', ehSenha ? 'text' : 'password');
+            btn.setAttribute('aria-label', ehSenha ? 'Ocultar senha' : 'Mostrar senha');
+            btn.setAttribute('title', ehSenha ? 'Ocultar senha' : 'Mostrar senha');
 
             const icone = btn.querySelector('i');
             if (icone) {
@@ -854,13 +1361,11 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
         });
 
         try {
-            const res = await fetch(
-                'https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome'
+            const res = await requisitarComTimeout(
+                'https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome',
+                {},
+                12000
             );
-
-            if (!res.ok) {
-                throw new Error(`Erro HTTP: ${res.status}`);
-            }
 
             ufsCache = await res.json();
 
@@ -894,6 +1399,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
 
         } catch (error) {
             console.error('Erro ao buscar estados no IBGE:', error);
+            notificarFalhaRede(error, 'Não foi possível carregar os estados. Digite o endereço manualmente.');
 
             selectsEstado.forEach(select => {
                 select.disabled = true;
@@ -930,13 +1436,11 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
         sincronizarDropdownPersonalizado(selectCidade);
 
         try {
-            const res = await fetch(
-                `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${encodeURIComponent(siglaUF)}/municipios`
+            const res = await requisitarComTimeout(
+                `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${encodeURIComponent(siglaUF)}/municipios`,
+                {},
+                12000
             );
-
-            if (!res.ok) {
-                throw new Error(`Erro HTTP: ${res.status}`);
-            }
 
             const cidades = await res.json();
             cidades.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -961,6 +1465,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
 
         } catch (error) {
             console.error('Erro ao carregar cidades do IBGE:', error);
+            notificarFalhaRede(error, 'Não foi possível carregar as cidades. Digite a cidade manualmente.');
 
             selectCidade.disabled = true;
             selectCidade.replaceChildren(new Option('Não foi possível carregar as cidades', '', true, true));
@@ -1090,14 +1595,11 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
         // Primeiro tenta fetch. Se a página estiver sendo aberta diretamente como
         // arquivo local e o navegador bloquear a requisição, usa JSONP como fallback.
         try {
-            const response = await fetch(
+            const response = await requisitarComTimeout(
                 `https://viacep.com.br/ws/${encodeURIComponent(cep)}/json/`,
-                { cache: 'no-store' }
+                { cache: 'no-store' },
+                8000
             );
-
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
 
             const dados = await response.json();
 
@@ -1159,6 +1661,7 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
         } catch (error) {
             console.warn('Não foi possível localizar o CEP:', error);
             atualizarStatusCEP(statusId, '', 'erro');
+            notificarFalhaRede(error, 'Não localizamos este CEP. Confira os 8 dígitos ou preencha o endereço na mão.');
         }
     }
 
@@ -1387,6 +1890,10 @@ function checarCPFInput() {
         cpfInput.style.backgroundColor =
             '';
 
+        if (typeof marcarValidadeCampo === 'function') {
+            marcarValidadeCampo(cpfInput, true);
+        }
+
         if (cpfErroTexto) {
 
             cpfErroTexto.style.display =
@@ -1413,10 +1920,18 @@ function checarCPFInput() {
         cpfInput.style.backgroundColor =
             '#FEF2F2';
 
+        if (typeof marcarValidadeCampo === 'function') {
+            marcarValidadeCampo(
+                cpfInput,
+                false,
+                'Digite os 11 números do CPF. Exemplo: 000.000.000-00.'
+            );
+        }
+
         if (cpfErroTexto) {
 
             cpfErroTexto.textContent =
-                'Digite todos os 11 números do CPF.';
+                'Digite os 11 números do CPF. Exemplo: 000.000.000-00.';
 
             cpfErroTexto.style.display =
                 'block';
@@ -1443,6 +1958,10 @@ function checarCPFInput() {
         cpfInput.style.backgroundColor =
             '';
 
+        if (typeof marcarValidadeCampo === 'function') {
+            marcarValidadeCampo(cpfInput, true);
+        }
+
         if (cpfErroTexto) {
 
             cpfErroTexto.style.display =
@@ -1462,10 +1981,18 @@ function checarCPFInput() {
         cpfInput.style.backgroundColor =
             '#FEF2F2';
 
+        if (typeof marcarValidadeCampo === 'function') {
+            marcarValidadeCampo(
+                cpfInput,
+                false,
+                'CPF inválido. Confira os 11 dígitos; o número não passa na verificação.'
+            );
+        }
+
         if (cpfErroTexto) {
 
             cpfErroTexto.textContent =
-                'CPF inválido. Verifique os números digitados.';
+                'CPF inválido. Confira os 11 dígitos; o número não passa na verificação.';
 
             cpfErroTexto.style.display =
                 'block';
@@ -1782,7 +2309,6 @@ if (
     // ==========================================
 
     function mascararTelefone(valor) {
-        // Remove tudo que NÃO for número e limita a 11 dígitos
         let num = String(valor || '').replace(/\D/g, '').slice(0, 11);
 
         if (num.length <= 10) {
@@ -1793,16 +2319,70 @@ if (
                   .replace(/(\d{5})(\d)/, '$1-$2');
     }
 
-    const telPrincipal = document.getElementById('req-tel');
-    const telSecundario = document.getElementById('req-tel-2');
+    function teclaTelefonePermitida(evento) {
+        if (evento.ctrlKey || evento.metaKey || evento.altKey) return;
+        const especiais = ['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+        if (especiais.includes(evento.key)) return;
+        if (evento.key.length !== 1) return;
+        if (/^\d$/.test(evento.key)) return;
+        evento.preventDefault();
+    }
 
-    [telPrincipal, telSecundario].forEach(input => {
-        if (input) {
-            input.addEventListener('input', (e) => {
-                e.target.value = mascararTelefone(e.target.value);
-            });
+    document.querySelectorAll('#req-tel, #req-tel-2, #reg-telefone, #gestor-telefone').forEach((input) => {
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('autocomplete', input.getAttribute('autocomplete') || 'tel');
+        input.addEventListener('keydown', teclaTelefonePermitida);
+        input.addEventListener('beforeinput', (evento) => {
+            if (evento.inputType === 'insertText' && evento.data && /\D/.test(evento.data)) {
+                evento.preventDefault();
+            }
+        });
+        input.addEventListener('paste', (evento) => {
+            evento.preventDefault();
+            const texto = (evento.clipboardData || window.clipboardData).getData('text');
+            input.value = mascararTelefone(texto);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        input.addEventListener('input', () => {
+            input.value = mascararTelefone(input.value);
+        });
+        if (input.value) {
+            input.value = mascararTelefone(input.value);
         }
     });
+
+    function atualizarRequisitosSenha() {
+        const lista = document.getElementById('password-requirements');
+        if (!lista) return;
+
+        const senha = document.getElementById('reg-password') || document.getElementById('nova-senha');
+        const confirmacao = document.getElementById('reg-confirm-password') || document.getElementById('nova-senha-confirmacao');
+        const valor = senha?.value || '';
+        const repetida = confirmacao?.value || '';
+        const digitou = valor.length > 0;
+
+        const regras = {
+            length: valor.length >= 8,
+            letter: /[A-Za-zÀ-ÿ]/.test(valor),
+            number: /\d/.test(valor),
+            'not-numeric': digitou && !/^\d+$/.test(valor),
+            match: digitou && repetida.length > 0 && valor === repetida,
+        };
+
+        lista.querySelectorAll('[data-rule]').forEach((item) => {
+            const regra = item.dataset.rule;
+            item.classList.remove('valid', 'invalid');
+            if (!digitou && regra !== 'match') return;
+            if (regra === 'match' && (!digitou || !repetida)) return;
+            item.classList.add(regras[regra] ? 'valid' : 'invalid');
+        });
+    }
+
+    const campoSenhaRequisitos = document.getElementById('reg-password') || document.getElementById('nova-senha');
+    const campoSenhaConfirmacao = document.getElementById('reg-confirm-password') || document.getElementById('nova-senha-confirmacao');
+    campoSenhaRequisitos?.addEventListener('input', atualizarRequisitosSenha);
+    campoSenhaConfirmacao?.addEventListener('input', atualizarRequisitosSenha);
+    atualizarRequisitosSenha();
 
 
     // ==========================================
@@ -1931,16 +2511,23 @@ if (
         for (const campo of campos) {
             if (campoDeveSerIgnorado(campo, numeroEtapa)) continue;
 
-            if (!campo.checkValidity()) {
+            const ok = typeof validarCampoAoVivo === 'function'
+                ? validarCampoAoVivo(campo, { marcarVazio: true })
+                : campo.checkValidity();
+
+            if (!ok && !primeiroInvalido) {
                 primeiroInvalido = campo;
-                break;
             }
         }
 
         if (primeiroInvalido) {
-            mostrarErroEtapa(
-                'Por favor, preencha corretamente todos os campos obrigatórios desta etapa antes de continuar.'
-            );
+            const rotulo = typeof rotuloDoCampo === 'function'
+                ? rotuloDoCampo(primeiroInvalido)
+                : 'destacado';
+            const detalhe = typeof mensagemCorrecaoCampo === 'function'
+                ? mensagemCorrecaoCampo(primeiroInvalido)
+                : 'preencha corretamente';
+            mostrarErroEtapa(`Corrija o campo "${rotulo}": ${detalhe}`);
             focarCampoInvalido(primeiroInvalido);
             return false;
         }
@@ -2079,7 +2666,7 @@ if (
             try { await navigator.share(dados); } catch (_) {}
         } else {
             navigator.clipboard.writeText(`Protocolo APAL: ${protocoloTexto}`);
-            alert('Número do protocolo copiado!');
+            mostrarToast('Número do protocolo copiado.', 'success');
         }
     });
 
@@ -2088,6 +2675,9 @@ if (
         if (stepperServidor) {
             if (typeof validarEtapa === 'function' && !validarEtapa(etapaAtual)) {
                 event.preventDefault();
+                form.querySelectorAll('.btn-submit.is-loading, button[type="submit"].is-loading').forEach((botao) => {
+                    marcarBotaoCarregando(botao, false);
+                });
             }
             return;
         }
@@ -2134,7 +2724,7 @@ if (
             }
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert('Link da credencial copiado para a área de transferência!');
+            mostrarToast('Link da credencial copiado.', 'success');
         }
     });
 

@@ -45,6 +45,8 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertTemplateUsed(response, "ambulante/cadastro.html")
         self.assertContains(response, self.ambulante.cpf)
         self.assertContains(response, self.ambulante.nome)
+        self.assertNotContains(response, "req-foto")
+        self.assertContains(response, "A foto 3x4 será inserida depois")
 
     def test_salva_rascunho_da_etapa_1_e_avanca(self):
         self.client.force_login(self.ambulante)

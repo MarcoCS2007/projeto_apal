@@ -31,11 +31,14 @@ body {
 
 .home-header-container {
     max-width: 1200px;
+    width: 100%;
+    min-width: 0;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
+    gap: 1rem;
 }
 
 .home-logo-link {
@@ -114,9 +117,9 @@ body {
 ========================================= */
 .modern-hero {
     position: relative;
-    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+    background: linear-gradient(135deg, #0F172A 0%, #111C44 40%, #1A2B6B 100%);
     color: white;
-    padding: 88px 20px 64px 20px;
+    padding: 95px 20px 85px 20px;
     text-align: center;
     overflow: hidden;
 }
@@ -167,7 +170,7 @@ body {
 }
 
 .hero-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
     font-weight: 800;
     margin: 0 0 20px 0;
     line-height: 1.15;
@@ -179,10 +182,10 @@ body {
 }
 
 .hero-description {
-    font-size: 1.15rem;
-    color: #94A3B8;
-    max-width: 650px;
-    margin: 0 auto 40px auto;
+    font-size: 1.1rem;
+    color: var(--texto-cinza-suave);
+    max-width: 680px;
+    margin: 0 auto 36px auto;
     line-height: 1.6;
 }
 
@@ -196,23 +199,23 @@ body {
 .btn-modern-primary {
     background: var(--brand-pink);
     color: white;
-    padding: 16px 32px;
+    padding: 14px 28px;
     border-radius: 12px;
     font-weight: 700;
+    font-size: 0.98rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--cor-destaque) 40%, transparent);
-    border: 2px solid var(--brand-pink);
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 25px -4px rgba(255, 0, 127, 0.4);
+    border: none;
 }
 
 .btn-modern-primary:hover {
     background: var(--cor-destaque-escuro);
-    border-color: var(--cor-destaque-escuro);
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px -5px color-mix(in srgb, var(--cor-destaque) 50%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px -4px rgba(255, 0, 127, 0.5);
 }
 
 .btn-modern-primary:active,
@@ -223,31 +226,32 @@ body {
 .btn-modern-outline {
     background: rgba(255, 255, 255, 0.05);
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(5px);
-    padding: 16px 32px;
+    padding: 14px 28px;
     border-radius: 12px;
     font-weight: 600;
+    font-size: 0.98rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .btn-modern-outline:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: white;
-    transform: translateY(-3px);
+    transform: translateY(-2px);
 }
 
 /* =========================================
    CONTEÚDO PRINCIPAL (MAIN)
 ========================================= */
 .home-main-container {
-    max-width: 1200px;
-    margin: 0 auto 60px auto;
-    padding: 48px 20px 0 20px;
+    max-width: 1100px;
+    margin: -30px auto 60px auto;
+    padding: 0 20px;
     position: relative;
     z-index: 20;
 }
@@ -276,9 +280,9 @@ body {
 
 @media (hover: hover) and (pointer: fine) {
     .feature-card:hover {
-        translate: 0 -2px;
-        box-shadow: var(--shadow-md);
-        border-color: color-mix(in srgb, var(--azul-vibrante) 28%, var(--borda-cinza));
+        transform: translateY(-6px);
+        box-shadow: 0 18px 25px -5px rgba(15, 23, 42, 0.08);
+        border-color: #CBD5E1;
     }
 }
 
@@ -299,13 +303,13 @@ body {
 
 /* Cores dos Ícones de Benefícios */
 .icon-bg-blue { background: var(--azul-suave); }
-.icon-blue { color: var(--brand-blue); width: 28px; height: 28px; }
+.icon-blue { color: var(--brand-blue); width: 26px; height: 26px; }
 
-.icon-bg-pink { background: var(--cor-destaque-suave); }
-.icon-pink { color: var(--brand-pink); width: 28px; height: 28px; }
+.icon-bg-pink { background: #FDF2F8; }
+.icon-pink { color: var(--brand-pink); width: 26px; height: 26px; }
 
-.icon-bg-green { background: var(--sucesso-bg); }
-.icon-green { color: #059669; width: 28px; height: 28px; }
+.icon-bg-green { background: #ECFDF5; }
+.icon-green { color: #059669; width: 26px; height: 26px; }
 
 .feature-title {
     font-size: 1.25rem;
@@ -360,8 +364,8 @@ body {
 }
 
 .step-card:hover {
-    border-color: var(--brand-blue);
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+    border-color: var(--azul-vibrante);
+    box-shadow: 0 8px 20px -2px rgba(37, 99, 235, 0.08);
 }
 
 .step-number {
@@ -462,14 +466,15 @@ body {
 .cta-alert-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: #FEE2E2;
-    color: #DC2626;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-bottom: 12px;
+    gap: 6px;
+    background: var(--cor-destaque-suave);
+    color: var(--cor-destaque);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
     text-transform: uppercase;
 }
 
@@ -501,18 +506,23 @@ body {
 .btn-download-primary {
     background: var(--brand-blue);
     color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: background 0.2s;
+    gap: 10px;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px -2px rgba(37, 99, 235, 0.3);
+    border: none;
 }
 
 .btn-download-primary:hover {
     background: var(--brand-blue-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px -2px rgba(37, 99, 235, 0.4);
 }
 
 .btn-download-secondary {
@@ -603,7 +613,7 @@ body {
     font-weight: 700;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
     nav.home-nav {
         display: none;
         align-items: stretch;
@@ -613,6 +623,14 @@ body {
     body.nav-open nav.home-nav {
         display: flex;
     }
+}
+
+body.nav-compact nav.home-nav {
+    display: none;
+}
+
+body.nav-compact.nav-open nav.home-nav {
+    display: flex;
 }
 
 @media (max-width: 768px) {
@@ -693,7 +711,9 @@ body {
 
 .home-nav-btn-login:hover {
     color: var(--azul-vibrante) !important;
-    background: var(--hover-azul) !important;
+    background: var(--azul-suave) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+    transform: translateY(-1px);
 }
 
 .home-nav-btn-login:active {

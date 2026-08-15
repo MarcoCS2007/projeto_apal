@@ -46,7 +46,7 @@
                 <label for="user-password">Senha</label>
                 <div class="input-password-wrapper">
                     {{ form.password }}
-                    <button type="button" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -64,8 +64,9 @@
             <button type="submit" class="btn-submit" style="width: 100%;">
                 <i data-lucide="log-in"></i> Entrar
             </button>
-            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center;">Sou ambulante</a>
-            <a href="{% url 'login' %}" class="forgot-password" style="text-align: center;">Sou gestor ou administrador</a>
+            <a href="{% url 'redefinir_senha' %}" class="forgot-password" style="text-align: center;">Esqueci minha senha</a>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center;">Entrar como ambulante</a>
+            <a href="{% url 'login' %}" class="forgot-password" style="text-align: center;">Entrar como gestor ou administrador</a>
         </div>
     </form>
 </div>

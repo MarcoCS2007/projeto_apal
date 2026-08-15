@@ -80,6 +80,8 @@
         {% block content %}{% endblock %}
     </main>
 
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
     <div id="modal-backdrop" class="modal-backdrop"></div>
 
     <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
@@ -91,6 +93,18 @@
         </div>
         <div id="ai-response-content" class="custom-scrollbar">
             Aguardando seleção...
+        </div>
+    </div>
+
+    <div id="confirm-dialog" class="access-panel hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" style="top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); width: 90%; max-width: 420px; position: fixed; max-height: none;">
+        <div class="access-header">
+            <h3 id="confirm-dialog-title">Confirmar ação</h3>
+            <button type="button" id="confirm-dialog-cancel" class="close-btn" aria-label="Cancelar"><i data-lucide="x" aria-hidden="true"></i></button>
+        </div>
+        <p id="confirm-dialog-message" class="field-hint" style="font-size: 0.94rem; color: var(--texto-escuro); margin: 0.75rem 0 1.25rem;">Deseja continuar?</p>
+        <div class="form-actions" style="margin: 0; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" id="confirm-dialog-voltar" class="btn-action">Voltar</button>
+            <button type="button" id="confirm-dialog-ok" class="btn-submit">Confirmar</button>
         </div>
     </div>
 

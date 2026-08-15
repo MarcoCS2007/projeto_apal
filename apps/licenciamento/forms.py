@@ -137,11 +137,6 @@ class AnexosDocumentosForm(forms.Form):
             format="%Y-%m-%d",
         ),
     )
-    foto = forms.ImageField(
-        label="Foto 3x4 recente",
-        required=False,
-        widget=forms.ClearableFileInput(attrs={"id": "doc-foto", "accept": "image/*"}),
-    )
     foto_estrutura = forms.ImageField(
         label="Foto da estrutura",
         required=False,
@@ -165,9 +160,6 @@ class AnexosDocumentosForm(forms.Form):
 
     def save(self):
         ambulante = self.ambulante
-        if self.cleaned_data.get("foto"):
-            ambulante.foto = self.cleaned_data["foto"]
-            ambulante.save(update_fields=["foto", "atualizado_em"])
         estrutura = ambulante.estruturas.order_by("id").first()
         if estrutura and self.cleaned_data.get("foto_estrutura"):
             estrutura.foto_estrutura = self.cleaned_data["foto_estrutura"]

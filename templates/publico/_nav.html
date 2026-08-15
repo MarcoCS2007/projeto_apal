@@ -12,9 +12,9 @@
             <a href="{% url 'ambulante_score' %}"{% if active == "score" %} class="active"{% endif %}><i data-lucide="award"></i> Meu Score</a>
             <a href="{% url 'ambulante_assistente' %}"{% if active == "assistente" %} class="active"{% endif %}><i data-lucide="sparkles"></i> Assistente</a>
         {% elif user.role == "administrador" %}
-            <a href="{% url 'master_admin' %}"><i data-lucide="layout-dashboard"></i> Painel</a>
+            <a href="{% url 'master_admin' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
         {% elif user.role == "gestor" %}
-            <a href="{% url 'backoffice_inicio' %}"><i data-lucide="layout-dashboard"></i> Painel</a>
+            <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
         {% elif user.role == "fiscal" %}
             {% if pode.leitura_qr %}
             <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="scan-line"></i> Fiscalização</a>
@@ -36,7 +36,7 @@
                 <i data-lucide="building-2"></i> Área institucional
             </summary>
             <div class="nav-inst-dropdown">
-                <p class="nav-inst-hint">Onde você faz login?</p>
+                <p class="nav-inst-hint">Selecione seu perfil</p>
                 <a href="{% url 'login' %}">
                     <i data-lucide="briefcase"></i>
                     <span>

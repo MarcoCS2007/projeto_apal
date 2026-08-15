@@ -33,5 +33,8 @@ urlpatterns = [
     path("", include("apps.assistente.urls_web")),
 ]
 
+handler404 = "apps.core.views.pagina_nao_encontrada"
+handler500 = "apps.core.views.erro_servidor"
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

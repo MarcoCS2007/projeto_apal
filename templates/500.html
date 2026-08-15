@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Falha no servidor - APAL{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Não foi possível concluir</h1>
+        <p>O servidor encontrou um problema temporário.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="login-error" role="alert">
+        Falha no servidor. Aguarde alguns instantes e tente de novo. Se continuar, fale com a prefeitura.
+    </div>
+    <p class="field-hint" style="margin-bottom: 1.25rem;">
+        Nada do que você estava preenchendo foi perdido no seu navegador se a tela ainda estiver aberta em outra aba.
+    </p>
+    <a href="{% url 'index' %}" class="btn-submit" style="display: inline-flex; text-decoration: none; justify-content: center;">
+        <i data-lucide="rotate-ccw" aria-hidden="true"></i> Tentar novamente pelo início
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    if (typeof mostrarToast === "function") {
+        mostrarToast("O servidor não respondeu. Tente novamente em alguns instantes.", "error");
+    }
+</script>
+{% endblock %}
