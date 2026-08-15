@@ -1,13 +1,15 @@
 <nav id="header-nav" class="header-nav" aria-label="Principal">
-    <a href="{% url 'master_admin' %}"{% if active == "admin" %} class="active"{% endif %}><i data-lucide="shield-alert"></i> Painel TI</a>
-    <a href="{% url 'master_fiscais' %}"{% if active == "fiscais" %} class="active"{% endif %}><i data-lucide="id-card"></i> Fiscais</a>
-    <a href="{% url 'master_gestores' %}"{% if active == "gestores" %} class="active"{% endif %}><i data-lucide="users"></i> Gestores</a>
-    <a href="{% url 'master_permissoes' %}"{% if active == "permissoes" %} class="active"{% endif %}><i data-lucide="key"></i> Permissões</a>
-    <a href="{% url 'master_logs_ia' %}"{% if active == "logs" %} class="active"{% endif %}><i data-lucide="bot"></i> Logs IA</a>
+    <a href="{% url 'master_admin' %}"{% if active == "admin" %} class="active"{% endif %}><i data-lucide="shield-alert"></i> Painel</a>
+    {% if active == "admin" %}
+    <a href="{% url 'master_fiscais' %}"><i data-lucide="id-card"></i> Fiscais</a>
+    <a href="{% url 'master_gestores' %}"><i data-lucide="users"></i> Gestores</a>
+    <a href="{% url 'master_permissoes' %}"><i data-lucide="key"></i> Permissões</a>
+    <a href="{% url 'master_logs_ia' %}"><i data-lucide="bot"></i> Logs IA</a>
+    {% endif %}
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}
         <button type="submit" class="btn-logout">
-            <i data-lucide="log-out"></i> Encerrar expediente
+            <i data-lucide="log-out"></i> Sair
         </button>
     </form>
 </nav>

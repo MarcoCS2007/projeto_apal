@@ -3,6 +3,23 @@
 from django.db import migrations, models
 
 
+def rename_renda_if_needed(apps, schema_editor):
+    table = "usuarios_ambulante"
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_name = %s AND column_name = %s
+            """,
+            [table, "renda_estimada"],
+        )
+        if cursor.fetchone():
+            cursor.execute(
+                f"ALTER TABLE {table} RENAME COLUMN renda_estimada TO renda_mensal_estimada"
+            )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,10 +27,17 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name="ambulante",
-            old_name="renda_estimada",
-            new_name="renda_mensal_estimada",
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.RenameField(
+                    model_name="ambulante",
+                    old_name="renda_estimada",
+                    new_name="renda_mensal_estimada",
+                ),
+            ],
+            database_operations=[
+                migrations.RunPython(rename_renda_if_needed, migrations.RunPython.noop),
+            ],
         ),
         migrations.AlterField(
             model_name="ambulante",

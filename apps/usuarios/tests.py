@@ -287,7 +287,7 @@ class LoginBackofficeTests(UsuariosAuthFixtures, TestCase):
         self._login_web(self.gestor.cpf)
         response = self.client.get(self.url_backoffice)
 
-        self.assertContains(response, "Encerrar expediente")
+        self.assertContains(response, "Sair")
         self.assertContains(response, reverse("logout"))
 
     def test_fiscal_nao_acessa_backoffice_e_vai_ao_painel_fiscal(self):

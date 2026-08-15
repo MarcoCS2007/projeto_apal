@@ -197,7 +197,7 @@ svg.lucide {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: 1.75rem;
 }
 
 .logo-area {
@@ -209,6 +209,8 @@ svg.lucide {
     font-weight: 600;
     letter-spacing: -0.2px;
     flex-shrink: 0;
+    margin-right: 1.5rem;
+    padding-right: 0.5rem;
 }
 
 .logo-text strong {
@@ -222,6 +224,8 @@ svg.lucide {
     flex-wrap: nowrap;
     gap: 0.3rem;
     min-width: 0;
+    margin-left: auto;
+    padding-left: 1.75rem;
 }
 
 .header-nav a {
@@ -1628,7 +1632,7 @@ a.stepper-step:focus-visible {
 }
 .badge.warning { background-color: #FEF6E7; color: #B54708; }
 .badge.success { background-color: var(--sucesso-bg); color: var(--sucesso-texto); }
-.badge.danger  { background-color: #FEF3F2; color: #B42318; }
+.badge.danger  { background-color: transparent; color: #DC2626; padding-left: 0; padding-right: 0; }
 .badge.purple  { background-color: #F9F0FE; color: #7C3AED; }
 
 /* =========================================
@@ -1640,7 +1644,6 @@ button:focus-visible,
 summary:focus-visible,
 .tab-btn:focus-visible,
 .nav-inst-toggle:focus-visible,
-.nav-toggle:focus-visible,
 .close-btn:focus-visible,
 .floating-access-btn:focus-visible,
 .assistente-widget-link:focus-visible,
@@ -2570,16 +2573,14 @@ body {
     line-height: 1.5;
 }
 
-/* ---------- Cabeçalho APAL ---------- */
+/* ---------- Cabeçalho ---------- */
 .top-header {
     position: sticky;
     top: 0;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.96);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    z-index: 1200;
+    background: var(--branco);
+    border-bottom: 1px solid var(--borda-cinza);
     padding: 0;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 }
 
 .top-header.header-master {
@@ -2590,6 +2591,7 @@ body {
     min-height: 68px;
     max-width: 1180px;
     padding: 0 2rem;
+    gap: 1.75rem;
 }
 
 .logo-area {
@@ -2597,6 +2599,8 @@ body {
     font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: -0.35px;
+    margin-right: 1.5rem;
+    padding-right: 0.5rem;
 }
 
 .logo-icon.lucide,
@@ -2611,6 +2615,8 @@ body {
 
 .header-nav {
     gap: 0.25rem;
+    margin-left: auto;
+    padding-left: 1.75rem;
 }
 
 .header-nav a {
@@ -2681,8 +2687,8 @@ body {
 }
 
 /* =========================================
-   20. IDENTIDADE APAL — MARCA OFICIAL
-   Símbolo + wordmark + município, sem ícone genérico.
+   20. IDENTIDADE — MARCA OFICIAL
+   Símbolo + wordmark Ponto Certo Conquista.
 ========================================= */
 .logo-area > .logo-icon,
 .logo-area > svg.lucide,
@@ -2724,12 +2730,15 @@ body {
 .logo-text a,
 .brand-lockup .logo-text {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.28em;
     text-decoration: none;
     color: var(--cor-destaque) !important;
     font-weight: 800;
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     letter-spacing: -0.4px;
+    line-height: 1.15;
 }
 
 .logo-text strong {
@@ -2738,6 +2747,12 @@ body {
     font-weight: 800 !important;
     letter-spacing: 0.045em;
     line-height: 1;
+}
+
+.brand-conquista,
+.footer-conquista {
+    color: var(--azul-escuro) !important;
+    font-weight: 800;
 }
 
 .brand-city {
@@ -2750,6 +2765,10 @@ body {
 
 .brand-link:hover .logo-text {
     color: var(--cor-destaque-escuro) !important;
+}
+
+.brand-link:hover .brand-conquista {
+    color: var(--azul-vibrante) !important;
 }
 
 /* O botão abre várias ferramentas, então o ícone é tratado
@@ -2765,7 +2784,7 @@ body {
     .logo-text,
     .logo-text strong,
     .brand-lockup .logo-text {
-        font-size: 1.18rem;
+        font-size: 0.98rem;
     }
 
     .brand-city {
@@ -2774,8 +2793,7 @@ body {
 }
 
 .btn-submit,
-.btn-action-card.share,
-.badge.danger {
+.btn-action-card.share {
     background-color: var(--cor-destaque) !important;
     border-color: var(--cor-destaque) !important;
 }
@@ -3514,50 +3532,172 @@ select.styled-select:focus-visible {
 }
 
 /* =========================================
-   BOTÃO HAMBURGER E MENU MOBILE
+   CABEÇALHO — navegação sempre no header
 ========================================= */
-.nav-toggle {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    margin-left: auto;
-    padding: 0;
-    border: 1px solid var(--borda-cinza);
-    border-radius: var(--radius-sm);
+.site-top,
+.top-header {
+    position: sticky;
+    top: 0;
+    z-index: 1200;
     background: var(--branco);
-    color: var(--texto-escuro);
-    cursor: pointer;
-    flex-shrink: 0;
-    z-index: 1002;
 }
 
-.nav-toggle:hover {
-    background: var(--azul-suave);
-    color: var(--azul-vibrante);
-}
-
-.nav-toggle .nav-toggle-icon-close,
-.nav-toggle svg.nav-toggle-icon-close {
+.nav-toggle,
+.hamburger-btn,
+.nav-backdrop {
     display: none !important;
 }
 
-body.nav-open .nav-toggle .nav-toggle-icon-open,
-body.nav-open .nav-toggle svg.nav-toggle-icon-open {
-    display: none !important;
+.logo-area {
+    min-width: 0;
+    margin-right: 1.5rem;
+    padding-right: 0.5rem;
 }
 
-body.nav-open .nav-toggle .nav-toggle-icon-close,
-body.nav-open .nav-toggle svg.nav-toggle-icon-close {
-    display: inline-flex !important;
+.header-nav {
+    margin-left: auto;
+    padding-left: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
+/* Painel lateral — cores institucionais do :root */
 .table-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
+}
+
+.ambulante-status-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+
+.acoes-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.acoes-menu-toggle {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.acoes-menu-toggle::-webkit-details-marker,
+.acoes-menu-toggle::marker {
+    display: none;
+    content: "";
+}
+
+.acoes-menu[open] .acoes-menu-toggle {
+    background-color: var(--azul-vibrante);
+    color: var(--branco);
+}
+
+.acoes-menu-lista {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 40;
+    min-width: 12.5rem;
+    padding: 0.4rem;
+    background: var(--branco);
+    border: 1px solid var(--borda-cinza);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.acoes-menu-lista form {
+    margin: 0;
+    display: block;
+}
+
+.acoes-menu-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.7rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--texto-escuro);
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    min-height: 40px;
+}
+
+.acoes-menu-item:hover {
+    background: var(--hover-azul);
+    color: var(--azul-escuro);
+    text-decoration: none;
+}
+
+.acoes-menu-item .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.acoes-menu-item-success {
+    color: #047857;
+}
+
+.acoes-menu-item-success:hover {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.acoes-menu-item-danger {
+    color: #dc2626;
+}
+
+.acoes-menu-item-danger:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.acoes-menu-item-muted {
+    opacity: 0.6;
+    cursor: default;
+    pointer-events: none;
+}
+
+.acoes-menu-separador {
+    height: 1px;
+    margin: 0.25rem 0.35rem;
+    background: var(--borda-cinza);
+}
+
+.btn-action-danger {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+.btn-action-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: var(--branco);
+}
+
+.btn-action-muted {
+    opacity: 0.72;
+    cursor: default;
+    pointer-events: none;
+    border-color: var(--borda-cinza);
+    color: var(--texto-muted, #64748b);
+    background-color: var(--fundo-cinza);
 }
 
 .resumo-grid {
@@ -3570,146 +3710,40 @@ body.nav-open .nav-toggle svg.nav-toggle-icon-close {
    RESPONSIVIDADE — TABLET E MOBILE
 ========================================= */
 @media (max-width: 1280px) {
-    .top-header {
-        position: relative;
+    .top-header,
+    .site-top {
+        position: sticky;
+        z-index: 1200;
     }
 
-    .nav-toggle {
-        display: inline-flex;
+    .header-container {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
     }
 
     nav.header-nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-height: min(80vh, calc(100vh - 68px));
-        overflow-y: auto;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.25rem;
-        padding: 0.75rem 1rem 1.25rem;
-        background: var(--branco);
-        border-bottom: 1px solid var(--borda-cinza);
-        box-shadow: var(--shadow-md);
-        z-index: 1001;
-    }
-
-    body.nav-open {
-        overflow: hidden;
-    }
-
-    body.nav-open nav.header-nav,
-    .top-header.nav-open nav.header-nav {
-        display: flex;
-    }
-
-    nav.header-nav a,
-    nav.header-nav .nav-inst-toggle,
-    nav.header-nav button {
-        width: 100%;
-        min-height: 44px;
-        justify-content: flex-start;
-        padding: 0.75rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.95rem;
-    }
-
-    .header-nav form {
-        display: block;
-        width: 100%;
-        margin: 0;
-    }
-
-    .header-nav form button {
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: 600;
-    }
-
-    .nav-inst-menu {
-        width: 100%;
-    }
-
-    .nav-inst-dropdown {
+        display: flex !important;
         position: static;
-        min-width: 0;
-        width: 100%;
-        margin-top: 0.35rem;
+        width: auto;
+        max-width: 100%;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.3rem;
+        margin-left: auto;
+        padding: 0;
+        background: transparent;
+        border: none;
         box-shadow: none;
-        border-radius: var(--radius-sm);
+        overflow: visible;
     }
 
     .fiscal-grid {
         grid-template-columns: 1fr;
     }
-}
-
-/* Hambúrguer também quando a barra estoura acima de 1280px (nav longa logada). */
-body.nav-compact .top-header {
-    position: relative;
-}
-
-body.nav-compact .nav-toggle {
-    display: inline-flex !important;
-}
-
-body.nav-compact nav.header-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    max-height: min(80vh, calc(100vh - 68px));
-    overflow-y: auto;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem 1.25rem;
-    background: var(--branco);
-    border-bottom: 1px solid var(--borda-cinza);
-    box-shadow: var(--shadow-md);
-    z-index: 1001;
-}
-
-body.nav-compact.nav-open {
-    overflow: hidden;
-}
-
-body.nav-compact.nav-open nav.header-nav,
-body.nav-compact .top-header.nav-open nav.header-nav {
-    display: flex !important;
-}
-
-body.nav-compact nav.header-nav a,
-body.nav-compact nav.header-nav .nav-inst-toggle,
-body.nav-compact nav.header-nav button {
-    width: 100%;
-    min-height: 44px;
-    justify-content: flex-start;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.95rem;
-}
-
-body.nav-compact .nav-inst-menu {
-    width: 100%;
-}
-
-body.nav-compact .nav-inst-dropdown {
-    position: static;
-    min-width: 0;
-    width: 100%;
-    margin-top: 0.35rem;
-    box-shadow: none;
-    border-radius: var(--radius-sm);
 }
 
 @media (max-width: 768px) {
@@ -4145,7 +4179,6 @@ body.nav-compact .nav-inst-dropdown {
 .btn-action,
 .btn-ghost-back,
 .tab-btn,
-.nav-toggle,
 .assistente-sugestao,
 .access-option,
 .btn-action-card {
@@ -4162,7 +4195,6 @@ body.nav-compact .nav-inst-dropdown {
 .btn-ghost-back:active,
 .tab-btn:active,
 .floating-access-btn:active,
-.nav-toggle:active,
 .assistente-sugestao:active,
 .access-option:active,
 .btn-action-card:active,
@@ -4194,7 +4226,6 @@ a.feature-card:focus-visible {
     .btn-ghost-back:active,
     .tab-btn:active,
     .floating-access-btn:active,
-    .nav-toggle:active,
     .assistente-sugestao:active,
     .access-option:active,
     .btn-action-card:active,
@@ -4207,7 +4238,7 @@ a.feature-card:focus-visible {
 /* ============================================================
    IDENTIDADE VISUAL (front/css) — prioridade sobre o CSS legado
    Tokens, animações, pílula ativa, toast, modal IA e hover.
-   Estilos exclusivos do Django (tabelas, fiscal, assistente, nav-open)
+   Estilos exclusivos do Django (tabelas, fiscal, assistente)
    permanecem nas seções anteriores.
    ============================================================ */
 /* =========================================
@@ -4330,116 +4361,12 @@ a.feature-card:focus-visible {
 }
 
 /* ============================================================
-   MENU HAMBÚRGUER MOBILE (VERSÃO BLINDADA)
+   MENU — links sempre no cabeçalho (sem hambúrguer)
    ============================================================ */
 
-.hamburger-btn {
-    display: none;
-    background: #F1F5F9;
-    border: 1px solid #E2E8F0;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 12px;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-/* Controle dos Ícones */
-.hamburger-btn .icon-close {
+.hamburger-btn,
+.nav-toggle {
     display: none !important;
-}
-
-.hamburger-btn.is-active {
-    background: #EFF6FF !important;
-    border-color: #DBEAFE !important;
-}
-
-.hamburger-btn.is-active .icon-open {
-    display: none !important;
-}
-
-.hamburger-btn.is-active .icon-close {
-    display: inline-block !important;
-    color: #2563EB !important;
-}
-
-/* REGRAS MOBILE (ATÉ 768px) */
-@media (max-width: 768px) {
-    .top-header {
-        position: relative !important;
-        background: #FFFFFF !important;
-        z-index: 1000 !important;
-    }
-
-    .hamburger-btn {
-        display: flex !important;
-    }
-
-    /* Menu Vertical em Largura Total */
-    .header-nav {
-        display: none;
-        position: absolute !important;
-        top: 100% !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        background: #FFFFFF !important;
-        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12) !important;
-        padding: 16px 20px 24px 20px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
-        z-index: 999 !important;
-        border-bottom: 1px solid #E2E8F0 !important;
-    }
-
-    /* Exibe o menu ao abrir */
-    .header-nav.mobile-active,
-    body.nav-open nav.header-nav,
-    .top-header.nav-open nav.header-nav {
-        display: flex !important;
-        animation: slideDownMobile 0.2s ease-out forwards;
-    }
-
-    /* Itens do menu */
-    .header-nav a,
-    .header-nav .header-nav-link,
-    .header-nav .btn-inst-pill {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 12px !important;
-        width: 100% !important;
-        padding: 12px 16px !important;
-        border-radius: 12px !important;
-        font-size: 0.98rem !important;
-        font-weight: 600 !important;
-        color: #475467 !important;
-        background: transparent !important;
-        border: none !important;
-        text-decoration: none !important;
-    }
-
-    /* Item Ativo (Pílula Rosa) */
-    .header-nav a.active-pill,
-    .header-nav a.active {
-        background-color: #FFF0F5 !important;
-        color: #FF007F !important;
-        font-weight: 700 !important;
-    }
-
-    .header-nav a.active-pill .lucide,
-    .header-nav a.active .lucide {
-        color: #FF007F !important;
-    }
-}
-
-@keyframes slideDownMobile {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================
@@ -4525,12 +4452,8 @@ a.feature-card:focus-visible {
         max-width: 1180px;
     }
 
-    .hamburger-btn {
-        display: none !important; /* Esconde o hambúrguer no computador */
-    }
-
-    body:not(.nav-compact) .header-nav {
-        display: flex !important; /* Exibe os links na horizontal */
+    .header-nav {
+        display: flex !important;
     }
 }
 
@@ -4552,66 +4475,60 @@ a.feature-card:focus-visible {
    4. SMARTPHONES E TABLETS EM PORTRAIT (Até 768px)
 ------------------------------------------------------------ */
 @media (max-width: 768px) {
-    /* --- CABEÇALHO E NAVEGAÇÃO --- */
+    /* --- CABEÇALHO E NAVEGAÇÃO NO HEADER --- */
     .top-header {
-        position: relative !important;
-        background: #FFFFFF !important;
-        z-index: 1000 !important;
+        position: sticky !important;
+        background: var(--branco) !important;
+        z-index: 1200 !important;
     }
 
-    /* Trava a logo na esquerda e o hambúrguer na direita */
     .header-container {
         flex-direction: row !important;
+        flex-wrap: wrap !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 12px 20px !important;
+        padding: 12px 16px !important;
         width: 100% !important;
+        gap: 0.65rem !important;
     }
 
-    .hamburger-btn {
-        display: flex !important;
-        margin-left: auto !important; /* Força o botão para a direita */
+    .logo-area {
+        flex: 0 1 auto !important;
+        min-width: 0 !important;
     }
 
-    /* Gaveta de navegação flutuante em largura total */
     .header-nav {
-        display: none;
-        position: absolute !important;
-        top: 100% !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        background: #FFFFFF !important;
-        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12) !important;
-        padding: 16px 20px 24px 20px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
-        z-index: 999 !important;
-        border-bottom: 1px solid #E2E8F0 !important;
-    }
-
-    .header-nav.mobile-active,
-    body.nav-open nav.header-nav,
-    .top-header.nav-open nav.header-nav {
         display: flex !important;
-        animation: slideDownMobile 0.2s ease-out forwards;
+        position: static !important;
+        width: auto !important;
+        max-width: 100% !important;
+        flex: 1 1 auto !important;
+        flex-wrap: wrap !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border: none !important;
+        margin: 0 0 0 auto !important;
+        overflow: visible !important;
     }
 
-    /* Links organizados na vertical */
     .header-nav a,
     .header-nav .header-nav-link,
     .header-nav .btn-inst-pill {
-        display: flex !important;
+        display: inline-flex !important;
         align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 12px !important;
-        width: 100% !important;
-        padding: 12px 16px !important;
-        border-radius: 12px !important;
-        font-size: 0.98rem !important;
-        font-weight: 600 !important;
-        color: #475569 !important;
+        justify-content: center !important;
+        gap: 0.35rem !important;
+        width: auto !important;
+        padding: 0.4rem 0.75rem !important;
+        border-radius: var(--radius-pill) !important;
+        font-size: 0.82rem !important;
+        font-weight: 500 !important;
+        color: var(--texto-cinza) !important;
         background: transparent !important;
         border: none !important;
         text-decoration: none !important;
@@ -4619,27 +4536,27 @@ a.feature-card:focus-visible {
 
     .header-nav a.active-pill,
     .header-nav a.active {
-        background-color: #FFF0F5 !important;
-        color: #FF007F !important;
+        background-color: var(--cor-destaque-suave) !important;
+        color: var(--cor-destaque-escuro) !important;
         font-weight: 700 !important;
     }
 
     .header-nav a.active-pill .lucide,
     .header-nav a.active .lucide {
-        color: #FF007F !important;
+        color: var(--cor-destaque-escuro) !important;
     }
 
     .dropdown-inst-container {
-        width: 100% !important;
+        width: auto !important;
     }
 
     .dropdown-inst-card {
-        position: static !important;
-        width: 100% !important;
-        box-shadow: none !important;
+        position: absolute !important;
+        width: min(280px, 90vw) !important;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14) !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 12px !important;
-        background-color: #F8FAFC !important;
+        background-color: var(--branco) !important;
         margin-top: 6px;
         padding: 12px !important;
     }
@@ -4945,22 +4862,6 @@ a.feature-card:focus-visible {
     margin-bottom: 0.6rem !important;
     line-height: 1.6 !important;
     color: #334155;
-}
-
-/* Ponte visual: o projeto Django usa .nav-toggle / body.nav-open */
-.nav-toggle {
-    background: var(--slate-100);
-    border: 1px solid var(--borda-cinza);
-    border-radius: 12px;
-    width: 42px;
-    height: 42px;
-    transition: all 0.2s ease;
-}
-
-body.nav-open .nav-toggle {
-    background: var(--azul-suave) !important;
-    border-color: #DBEAFE !important;
-    color: var(--azul-vibrante) !important;
 }
 
 .nav-inst-toggle:hover,
@@ -5627,9 +5528,21 @@ body.nav-open .nav-toggle {
 
 .shortcut-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .shortcut-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .shortcut-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 a.form-card-link {
@@ -5647,7 +5560,14 @@ a.form-card-link {
 .stat-value {
     display: block;
     font-size: 1.8rem;
+    line-height: 1.2;
     margin-top: 4px;
+    color: var(--azul-escuro);
+}
+
+.stat-value .lucide {
+    width: 1.75rem;
+    height: 1.75rem;
 }
 
 .text-muted {

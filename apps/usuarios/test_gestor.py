@@ -39,9 +39,14 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
 
     def _completar(self, ambulante):
         ambulante.tipo_atuacao = "fixo"
+        ambulante.genero = "masculino"
+        ambulante.renda_mensal_estimada = Decimal("1500.00")
         ambulante.ponto_pretendido = self.ponto
         extras = dict(ambulante.dados_complementares or {})
         extras["categoria_id"] = self.categoria.pk
+        extras["pais_origem"] = "Brasil"
+        extras["uf_nascimento"] = "BA"
+        extras["cidade_nascimento"] = "Vitória da Conquista"
         ambulante.dados_complementares = extras
         ambulante.save()
         if not ambulante.enderecos.exists():
@@ -199,3 +204,37 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(suspender.status_code, 302)
         self.ambulante.refresh_from_db()
         self.assertEqual(self.ambulante.situacao_conta, "suspensa")
+
+    def test_lista_ambulantes_mostra_aprovar_cadastro(self):
+        self.client.force_login(self.gestor)
+        response = self.client.get(reverse("gestor_ambulantes"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Aprovar cadastro")
+        self.assertContains(
+            response, reverse("gestor_ambulante_acao", args=[self.ambulante.pk])
+        )
+
+    def test_aprovar_cadastro_sem_documentos_vai_para_analise(self):
+        self.client.force_login(self.gestor)
+        response = self.client.post(
+            reverse("gestor_ambulante_acao", args=[self.ambulante.pk]),
+            {"acao": "aprovar_cadastro"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url, reverse("gestor_analisar", args=[self.licenca.pk])
+        )
+        self.licenca.refresh_from_db()
+        self.assertEqual(self.licenca.status, StatusLicenca.EM_ANALISE)
+
+    def test_aprovar_cadastro_encaminha_para_emissao(self):
+        self._aprovar_documentos_obrigatorios()
+        self.client.force_login(self.gestor)
+        response = self.client.post(
+            reverse("gestor_ambulante_acao", args=[self.ambulante.pk]),
+            {"acao": "aprovar_cadastro"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("gestor_emitir", args=[self.licenca.pk]))
+        self.licenca.refresh_from_db()
+        self.assertEqual(self.licenca.status, StatusLicenca.APROVADO)

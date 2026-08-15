@@ -1,10 +1,10 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}APAL | Aqui Pode, Aqui é Legal{% endblock %}</title>
+    <title>{% block title %}Ponto Certo Conquista{% endblock %}</title>
 
     <link rel="icon" type="image/png" href="{% static 'img/logo-apal-simbolo.png' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -24,28 +24,25 @@
 </head>
 <body>
     <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo</a>
-    <header class="top-header{% block header_extra_class %}{% endblock %}">
-        <div class="header-container{% block header_container_extra %}{% endblock %}">
-            {% block logo %}
-            <div class="logo-area">
-                <a href="{% url 'index' %}" class="brand-link" aria-label="APAL — página inicial de Vitória da Conquista">
-                    <img src="{% static 'img/logo-apal-simbolo.png' %}" alt="" class="brand-mark" width="36" height="47" decoding="async">
-                    <span class="brand-lockup">
-                        <span class="logo-text">APAL</span>
-                        <span class="brand-city">Vitória da Conquista</span>
-                    </span>
-                </a>
+    <div class="site-top">
+        <header class="top-header{% block header_extra_class %}{% endblock %}">
+            <div class="header-container{% block header_container_extra %}{% endblock %}">
+                {% block logo %}
+                <div class="logo-area">
+                    <a href="{% url 'index' %}" class="brand-link" aria-label="Ponto Certo Conquista — página inicial">
+                        <img src="{% static 'img/logo-apal-simbolo.png' %}" alt="" class="brand-mark" width="36" height="47" decoding="async">
+                        <span class="brand-lockup">
+                            <span class="logo-text">Ponto Certo <span class="brand-conquista">Conquista</span></span>
+                        </span>
+                    </a>
+                </div>
+                {% endblock %}
+                {% block header_nav %}
+                {% include "publico/_nav.html" %}
+                {% endblock %}
             </div>
-            {% endblock %}
-            <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="header-nav" aria-label="Abrir menu">
-                <i data-lucide="menu" class="nav-toggle-icon nav-toggle-icon-open" aria-hidden="true"></i>
-                <i data-lucide="x" class="nav-toggle-icon nav-toggle-icon-close" aria-hidden="true"></i>
-            </button>
-            {% block header_nav %}
-            {% include "publico/_nav.html" %}
-            {% endblock %}
-        </div>
-    </header>
+        </header>
+    </div>
 
     <div id="access-widget-container" class="access-widget-container">
         <button type="button" id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade" aria-label="Abrir ferramentas de acessibilidade" aria-expanded="false" aria-controls="accessibility-panel">
@@ -124,7 +121,7 @@
 
     {% block footer %}
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">Ponto Certo</span> <span class="footer-conquista">Conquista</span></p>
     </footer>
     {% endblock %}
 

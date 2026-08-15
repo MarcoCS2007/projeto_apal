@@ -587,94 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------
-    // MENU MOBILE (HAMBURGER)
+    // MENU INSTITUCIONAL (dropdown no cabeçalho)
     // ---------------------------------------------------
-    const navToggle = document.getElementById('nav-toggle');
-    const headerNav = document.getElementById('header-nav');
-    const topHeader = document.querySelector('.top-header');
-    const NAV_BREAKPOINT = 1280;
-
-    function atualizarRotuloMenu(aberto) {
-        if (!navToggle) return;
-        navToggle.setAttribute('aria-expanded', aberto ? 'true' : 'false');
-        navToggle.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
-    }
-
-    function fecharNavMobile() {
-        document.body.classList.remove('nav-open');
-        topHeader?.classList.remove('nav-open');
-        atualizarRotuloMenu(false);
-    }
-
-    function abrirNavMobile() {
-        document.body.classList.add('nav-open');
-        topHeader?.classList.add('nav-open');
-        atualizarRotuloMenu(true);
-    }
-
-    function alternarNavMobile() {
-        if (document.body.classList.contains('nav-open')) {
-            fecharNavMobile();
-        } else {
-            abrirNavMobile();
-        }
-    }
-
-    function barraEstourou() {
-        if (!headerNav || !topHeader) return false;
-        const headerContainer = topHeader.querySelector('.header-container');
-        if (!headerContainer) return false;
-        return headerContainer.scrollWidth > headerContainer.clientWidth + 1
-            || headerNav.scrollWidth > headerNav.clientWidth + 1;
-    }
-
-    function sincronizarNavCompacta() {
-        if (!headerNav || !navToggle || !topHeader) return;
-
-        if (window.innerWidth <= NAV_BREAKPOINT) {
-            document.body.classList.add('nav-compact');
-            return;
-        }
-
-        const estavaAberta = document.body.classList.contains('nav-open');
-        document.body.classList.remove('nav-compact');
-        fecharNavMobile();
-
-        requestAnimationFrame(() => {
-            const compactar = barraEstourou();
-            document.body.classList.toggle('nav-compact', compactar);
-            if (compactar && estavaAberta) {
-                abrirNavMobile();
-            }
-        });
-    }
-
-    navToggle?.addEventListener('click', (event) => {
-        event.stopPropagation();
-        alternarNavMobile();
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!document.body.classList.contains('nav-open')) return;
-        if (event.target.closest('#header-nav') || event.target.closest('#nav-toggle')) {
-            return;
-        }
-        fecharNavMobile();
-    });
-
-    headerNav?.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', () => {
-            fecharNavMobile();
-        });
-    });
-
-    window.addEventListener('resize', () => {
-        sincronizarNavCompacta();
-    });
-
-    sincronizarNavCompacta();
-    window.addEventListener('load', sincronizarNavCompacta);
-
     document.querySelectorAll('.nav-inst-menu').forEach((menu) => {
         document.addEventListener('click', (event) => {
             if (!menu.contains(event.target)) {
@@ -688,9 +602,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Um menu de ações aberto por vez (lista de ambulantes etc.)
+    document.querySelectorAll('.acoes-menu').forEach((menu) => {
+        menu.addEventListener('toggle', () => {
+            if (!menu.open) return;
+            document.querySelectorAll('.acoes-menu[open]').forEach((outro) => {
+                if (outro !== menu) outro.removeAttribute('open');
+            });
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        document.querySelectorAll('.acoes-menu[open]').forEach((menu) => {
+            if (!menu.contains(event.target)) {
+                menu.removeAttribute('open');
+            }
+        });
+    });
+
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
-            fecharNavMobile();
+            document.querySelectorAll('.acoes-menu[open]').forEach((menu) => {
+                menu.removeAttribute('open');
+            });
             sincronizarPainelAcesso(false);
         }
     });

@@ -1,67 +1,89 @@
 <nav id="header-nav" class="header-nav{% if nav_extra_class %} {{ nav_extra_class }}{% endif %}" aria-label="Principal">
-    {% if not user.is_authenticated or user.role != "ambulante" %}
+    {% if not user.is_authenticated %}
     <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
     <a href="{% url 'sobre' %}"{% if active == "sobre" %} class="active"{% endif %}><i data-lucide="info"></i> Sobre</a>
     <a href="{% url 'faq' %}"{% if active == "faq" %} class="active"{% endif %}><i data-lucide="help-circle"></i> Dúvidas</a>
+    <a href="{% url 'entrar' %}"{% if active == "entrar" %} class="active"{% endif %}><i data-lucide="log-in"></i> Entrar</a>
+    <details class="nav-inst-menu">
+        <summary class="nav-inst-toggle{% if active == 'login' or active == 'fiscal' %} active{% endif %}">
+            <i data-lucide="building-2"></i> Área institucional
+        </summary>
+        <div class="nav-inst-dropdown">
+            <p class="nav-inst-hint">Selecione seu perfil</p>
+            <a href="{% url 'login' %}">
+                <i data-lucide="briefcase"></i>
+                <span>
+                    <strong>Gestor</strong>
+                    <small>Análise, pontos e emissão de alvará</small>
+                </span>
+            </a>
+            <a href="{% url 'fiscal_entrar' %}">
+                <i data-lucide="scan-line"></i>
+                <span>
+                    <strong>Fiscal</strong>
+                    <small>Validação em campo e ocorrências</small>
+                </span>
+            </a>
+            <a href="{% url 'login' %}">
+                <i data-lucide="shield"></i>
+                <span>
+                    <strong>Administrador</strong>
+                    <small>Painel Master da prefeitura</small>
+                </span>
+            </a>
+        </div>
+    </details>
+    {% elif user.role == "ambulante" %}
+    <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    {% if active == "painel" %}
+    <a href="{% url 'ambulante_perfil' %}"><i data-lucide="user"></i> Meu perfil</a>
+    {% if pode.solicitacao_licenca %}
+    <a href="{% url 'ambulante_alvara' %}"><i data-lucide="file-badge"></i> Meu Alvará</a>
     {% endif %}
-    {% if user.is_authenticated %}
-        {% if user.role == "ambulante" %}
-            <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-            <a href="{% url 'ambulante_perfil' %}"{% if active == "perfil" %} class="active"{% endif %}><i data-lucide="user"></i> Meu perfil</a>
-            {% if pode.solicitacao_licenca %}
-            <a href="{% url 'ambulante_alvara' %}"{% if active == "alvara" %} class="active"{% endif %}><i data-lucide="file-badge"></i> Meu Alvará</a>
-            {% endif %}
-            <a href="{% url 'ambulante_credencial' %}"{% if active == "credencial" %} class="active"{% endif %}><i data-lucide="id-card"></i> Credencial</a>
-            <a href="{% url 'ambulante_score' %}"{% if active == "score" %} class="active"{% endif %}><i data-lucide="award"></i> Meu Score</a>
-            <a href="{% url 'ambulante_assistente' %}"{% if active == "assistente" %} class="active"{% endif %}><i data-lucide="sparkles"></i> Assistente</a>
-        {% elif user.role == "administrador" %}
-            <a href="{% url 'master_admin' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-        {% elif user.role == "gestor" %}
-            <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-        {% elif user.role == "fiscal" %}
-            {% if pode.leitura_qr %}
-            <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="scan-line"></i> Fiscalização</a>
-            {% endif %}
-            {% if pode.ocorrencias %}
-            <a href="{% url 'fiscal_ocorrencia' %}"{% if active == "ocorrencia" %} class="active"{% endif %}><i data-lucide="alert-triangle"></i> Ocorrência</a>
-            {% endif %}
-        {% endif %}
-        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn-logout">
-                <i data-lucide="log-out"></i> Sair
-            </button>
-        </form>
+    <a href="{% url 'ambulante_credencial' %}"><i data-lucide="id-card"></i> Credencial</a>
+    <a href="{% url 'ambulante_score' %}"><i data-lucide="award"></i> Meu Score</a>
+    <a href="{% url 'ambulante_assistente' %}"><i data-lucide="sparkles"></i> Assistente</a>
+    {% endif %}
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "administrador" %}
+    <a href="{% url 'master_admin' %}"{% if active == "painel" or active == "admin" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "gestor" %}
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "fiscal" %}
+    <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    {% if active == "fiscal" and pode.ocorrencias %}
+    <a href="{% url 'fiscal_ocorrencia' %}"><i data-lucide="alert-triangle"></i> Ocorrência</a>
+    {% endif %}
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
     {% else %}
-        <a href="{% url 'entrar' %}"{% if active == "entrar" %} class="active"{% endif %}><i data-lucide="log-in"></i> Entrar</a>
-        <details class="nav-inst-menu">
-            <summary class="nav-inst-toggle{% if active == 'login' or active == 'fiscal' %} active{% endif %}">
-                <i data-lucide="building-2"></i> Área institucional
-            </summary>
-            <div class="nav-inst-dropdown">
-                <p class="nav-inst-hint">Selecione seu perfil</p>
-                <a href="{% url 'login' %}">
-                    <i data-lucide="briefcase"></i>
-                    <span>
-                        <strong>Gestor</strong>
-                        <small>Análise, pontos e emissão de alvará</small>
-                    </span>
-                </a>
-                <a href="{% url 'fiscal_entrar' %}">
-                    <i data-lucide="scan-line"></i>
-                    <span>
-                        <strong>Fiscal</strong>
-                        <small>Validação em campo e ocorrências</small>
-                    </span>
-                </a>
-                <a href="{% url 'login' %}">
-                    <i data-lucide="shield"></i>
-                    <span>
-                        <strong>Administrador</strong>
-                        <small>Painel Master da prefeitura</small>
-                    </span>
-                </a>
-            </div>
-        </details>
+    <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
     {% endif %}
 </nav>

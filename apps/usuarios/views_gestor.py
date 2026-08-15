@@ -26,6 +26,7 @@ from apps.licenciamento.forms import EmitirAlvaraForm, ParecerLicencaForm
 from apps.licenciamento.models import (
     STATUS_FILA,
     STATUS_LISTAGEM_GESTOR,
+    CategoriaProduto,
     DocumentoAnexo,
     LicencaAlvara,
     StatusAprovacaoDocumento,
@@ -65,9 +66,19 @@ class GestorAmbulantesView(PainelGestorMixin, TemplateView):
                 | Q(email__icontains=busca)
                 | Q(apelido_nome_fantasia__icontains=busca)
             )
+        lista = list(ambulantes)
+        for ambulante in lista:
+            licenca = next(iter(ambulante.licencas.all()), None)
+            ambulante.licenca_atual = licenca
+            ambulante.pode_aprovar_cadastro = bool(licenca and licenca.na_fila)
+            ambulante.credencial_ativa = bool(
+                licenca
+                and licenca.status == StatusLicenca.ATIVO
+                and ambulante.codigo_qr_code
+            )
         context["busca"] = busca
-        context["ambulantes"] = ambulantes
-        context["total_ambulantes"] = ambulantes.count()
+        context["ambulantes"] = lista
+        context["total_ambulantes"] = len(lista)
         return context
 
 
@@ -132,11 +143,73 @@ class GestorAmbulanteAcaoView(PainelGestorMixin, View):
 
             pontuar_licenca_cancelada(ambulante)
             messages.success(request, "Conta e licenças canceladas.")
+        elif acao == "aprovar_cadastro":
+            return self._aprovar_cadastro(request, ambulante)
         else:
             messages.error(request, "Ação inválida.")
             return redirect("gestor_ambulantes")
         proximo = request.POST.get("next") or reverse("gestor_ambulantes")
         return redirect(proximo)
+
+    def _aprovar_cadastro(self, request, ambulante):
+        licenca = ambulante.licencas.order_by("-criado_em").first()
+        if licenca is None:
+            messages.error(
+                request,
+                "Este ambulante ainda não possui requerimento de licença para aprovar.",
+            )
+            return redirect("gestor_ambulantes")
+
+        if licenca.status == StatusLicenca.ATIVO and ambulante.codigo_qr_code:
+            messages.info(
+                request,
+                "O cadastro já está aprovado e a credencial já foi gerada.",
+            )
+            return redirect("gestor_ambulantes")
+
+        if licenca.pode_emitir:
+            messages.success(
+                request,
+                "Cadastro já deferido. Confirme a emissão para gerar a credencial.",
+            )
+            return redirect("gestor_emitir", pk=licenca.pk)
+
+        if not licenca.na_fila:
+            messages.error(
+                request,
+                f"Não é possível aprovar agora. Situação do requerimento: {licenca.status}.",
+            )
+            return redirect("gestor_ambulantes")
+
+        try:
+            aplicar_parecer(
+                licenca,
+                request.user,
+                "deferir",
+                motivo=(
+                    f"Cadastro aprovado em {timezone.localdate().strftime('%d/%m/%Y')} "
+                    "pela listagem de ambulantes, com encaminhamento para emissão "
+                    "da credencial."
+                ),
+                categoria=licenca.categoria_produto,
+                ponto=licenca.ponto_ocupacao,
+            )
+        except ValidationError as erro:
+            messages.warning(
+                request,
+                (
+                    erro.messages[0]
+                    if erro.messages
+                    else "Complete a análise do requerimento antes de gerar a credencial."
+                ),
+            )
+            return redirect("gestor_analisar", pk=licenca.pk)
+
+        messages.success(
+            request,
+            "Cadastro aprovado. Emita o alvará para gerar a credencial com QR Code.",
+        )
+        return redirect("gestor_emitir", pk=licenca.pk)
 
 
 class GestorDossieView(PainelGestorMixin, TemplateView):
@@ -494,6 +567,9 @@ def contexto_inicio_gestor(user):
         "licencas_aprovadas": LicencaAlvara.objects.filter(
             status=StatusSolicitacao.APROVADO
         ).count(),
+        "total_categorias": CategoriaProduto.objects.count(),
+        "total_ocorrencias": OcorrenciaInspecao.objects.count(),
+        "total_vagas": PontoOcupacao.objects.count(),
         "eh_gestor": Gestor.objects.filter(pk=user.pk).exists(),
     }
 
