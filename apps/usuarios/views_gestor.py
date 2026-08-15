@@ -4,7 +4,7 @@ from io import BytesIO
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -489,16 +489,10 @@ class GestorDashboardView(PainelGestorMixin, TemplateView):
     modulo_permissao = "relatorios"
 
     def get_context_data(self, **kwargs):
-        from apps.licenciamento.relatorios import indicadores_gerenciais
+        from apps.licenciamento.relatorios import indicadores_da_request
 
         context = super().get_context_data(**kwargs)
-        context.update(
-            indicadores_gerenciais(
-                bairro=self.request.GET.get("bairro", ""),
-                origem=self.request.GET.get("origem", ""),
-                periodo_dias=self.request.GET.get("periodo", 30),
-            )
-        )
+        context.update(indicadores_da_request(self.request))
         return context
 
 
@@ -547,16 +541,43 @@ class GestorDashboardChartDataView(PainelGestorMixin, View):
     modulo_permissao = "relatorios"
 
     def get(self, request):
-        dados = (
-            LicencaAlvara.objects.filter(status=StatusLicenca.ATIVO)
-            .values("categoria_produto__nome_categoria")
-            .annotate(total=Count("id"))
-            .order_by("-total")
+        from apps.licenciamento.relatorios import dados_graficos, indicadores_da_request
+
+        return JsonResponse(dados_graficos(indicadores_da_request(request)))
+
+
+class GestorRelatorioExcelView(PainelGestorMixin, View):
+    modulo_permissao = "relatorios"
+
+    def get(self, request):
+        from apps.licenciamento.relatorios import indicadores_da_request, montar_planilha
+
+        dados = indicadores_da_request(request)
+        arquivo = montar_planilha(dados)
+        hoje = timezone.localdate().isoformat()
+        response = HttpResponse(
+            arquivo.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+        response["Content-Disposition"] = (
+            f'attachment; filename="relatorio-apal-{hoje}.xlsx"'
+        )
+        return response
 
-        labels = [
-            d["categoria_produto__nome_categoria"] or "Sem Categoria" for d in dados
-        ]
-        data = [d["total"] for d in dados]
 
-        return JsonResponse({"labels": labels, "data": data})
+class GestorRelatorioPDFView(PainelGestorMixin, View):
+    modulo_permissao = "relatorios"
+
+    def get(self, request):
+        from apps.licenciamento.relatorios import indicadores_da_request
+
+        dados = indicadores_da_request(request)
+        html_string = render_to_string("gestor/relatorio_export.html", dados)
+        buffer = BytesIO()
+        pisa.pisaDocument(BytesIO(html_string.encode("UTF-8")), buffer)
+        hoje = timezone.localdate().isoformat()
+        response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="relatorio-apal-{hoje}.pdf"'
+        )
+        return response

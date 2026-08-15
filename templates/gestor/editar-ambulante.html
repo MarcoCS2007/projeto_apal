@@ -67,6 +67,18 @@
                 {{ form.escolaridade.errors }}
             </div>
         </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.genero.id_for_label }}">{{ form.genero.label }}</label>
+                {{ form.genero }}
+                {{ form.genero.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.renda_estimada.id_for_label }}">{{ form.renda_estimada.label }}</label>
+                {{ form.renda_estimada }}
+                {{ form.renda_estimada.errors }}
+            </div>
+        </div>
         <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
             <a href="{% url 'gestor_dossie' ambulante.pk %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
                 <i data-lucide="arrow-left"></i> Voltar ao dossiê

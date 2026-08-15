@@ -425,6 +425,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.header-nav a.active').forEach((link) => {
         link.setAttribute('aria-current', 'page');
     });
+    document.querySelectorAll('#conteudo-principal > .form-success, #conteudo-principal > .login-error').forEach((el) => {
+        const texto = (el.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!texto || typeof mostrarToast !== 'function') return;
+        mostrarToast(texto, el.classList.contains('form-success') ? 'success' : 'error');
+    });
 
     function prepararTabelasResponsivas(raiz) {
         const escopo = raiz && raiz.querySelectorAll ? raiz : document;

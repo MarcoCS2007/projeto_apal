@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Relatórios - APAL Gestor{% endblock %}
+{% block title %}Relatórios gerenciais - APAL Gestor{% endblock %}
 
 {% block header_nav %}
 {% include "gestor/_nav.html" with active="dashboard" %}
@@ -9,27 +9,26 @@
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Indicadores de ocupação e relatórios</h1>
-        <p>Licenças, lotação por bairro, infrações no período e distribuição por categoria — números do banco, não mock.</p>
+        <h1>Relatórios gerenciais</h1>
+        <p>Retrato socioeconômico, ocupação e licenças de Vitória da Conquista — números do banco, atualizados na hora.</p>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
-<div class="form-card" style="margin-bottom: 1.5rem;">
+<div class="form-card relatorio-filtros">
     <form
         id="filtro-dashboard"
         method="get"
         action="{% url 'gestor_dashboard' %}"
         hx-get="{% url 'api_relatorios_ocupacao' %}"
         hx-target="#container-indicadores"
-        hx-trigger="change, submit"
-        class="form-row"
-        style="align-items: end;"
+        hx-trigger="change delay:200ms, submit"
+        class="relatorio-filtros-grid"
     >
         <input type="hidden" name="formato" value="html">
         <div class="input-group">
-            <label for="filtro-bairro">Bairro / região</label>
+            <label for="filtro-bairro">Bairro de atuação</label>
             <select id="filtro-bairro" name="bairro" class="styled-select">
                 <option value="">Todos os bairros</option>
                 {% for bairro in bairros %}
@@ -38,16 +37,61 @@
             </select>
         </div>
         <div class="input-group">
-            <label for="filtro-origem">Origem do comerciante</label>
-            <select id="filtro-origem" name="origem" class="styled-select">
-                <option value="">Todos</option>
-                <option value="residentes"{% if filtro_origem == "residentes" %} selected{% endif %}>Residentes (ambulante fixo)</option>
-                <option value="itinerantes"{% if filtro_origem == "itinerantes" %} selected{% endif %}>Itinerantes (ambulante móvel)</option>
+            <label for="filtro-cidade">Cidade de origem</label>
+            <select id="filtro-cidade" name="cidade" class="styled-select">
+                <option value="">Todas as cidades</option>
+                {% for cidade in cidades %}
+                <option value="{{ cidade }}"{% if filtro_cidade == cidade %} selected{% endif %}>{{ cidade }}</option>
+                {% endfor %}
             </select>
         </div>
-        <div class="input-group" style="flex: 0 0 auto;">
+        <div class="input-group">
+            <label for="filtro-origem">Tipo de atuação</label>
+            <select id="filtro-origem" name="origem" class="styled-select">
+                <option value="">Todos</option>
+                <option value="residentes"{% if filtro_origem == "residentes" %} selected{% endif %}>Fixo (ponto autorizado)</option>
+                <option value="itinerantes"{% if filtro_origem == "itinerantes" %} selected{% endif %}>Itinerante (móvel)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-genero">Gênero</label>
+            <select id="filtro-genero" name="genero" class="styled-select">
+                <option value="">Todos</option>
+                {% for valor, rotulo in generos %}
+                <option value="{{ valor }}"{% if filtro_genero == valor %} selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-faixa">Faixa etária</label>
+            <select id="filtro-faixa" name="faixa" class="styled-select">
+                <option value="">Todas</option>
+                {% for valor, rotulo in faixas_filtro %}
+                <option value="{{ valor }}"{% if filtro_faixa == valor %} selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-escolaridade">Escolaridade</label>
+            <select id="filtro-escolaridade" name="escolaridade" class="styled-select">
+                <option value="">Todas</option>
+                {% for valor, rotulo in escolaridades_filtro %}
+                <option value="{{ valor }}"{% if filtro_escolaridade == valor %} selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filtro-periodo">Infrações (dias)</label>
+            <select id="filtro-periodo" name="periodo" class="styled-select">
+                <option value="7"{% if periodo_dias == 7 %} selected{% endif %}>7 dias</option>
+                <option value="30"{% if periodo_dias == 30 %} selected{% endif %}>30 dias</option>
+                <option value="90"{% if periodo_dias == 90 %} selected{% endif %}>90 dias</option>
+                <option value="365"{% if periodo_dias == 365 %} selected{% endif %}>12 meses</option>
+            </select>
+        </div>
+        <div class="input-group relatorio-filtros-acao">
             <button type="submit" class="btn-action">
-                <i data-lucide="filter"></i> Aplicar filtros
+                <i data-lucide="filter"></i> Aplicar
             </button>
         </div>
     </form>
@@ -62,73 +106,77 @@
 <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 <script>
-    function iniciarGraficoCategorias() {
-        const canvas = document.getElementById("graficoOcupacao");
-        if (!canvas || !window.Chart) {
+    const CORES_RELATORIO = ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9", "#64748B", "#DC2626"];
+    window.graficosRelatorio = window.graficosRelatorio || [];
+
+    function lerScriptJson(id) {
+        const no = document.getElementById(id);
+        if (!no) return { labels: [], data: [] };
+        try {
+            return JSON.parse(no.textContent);
+        } catch (erro) {
+            return { labels: [], data: [] };
+        }
+    }
+
+    function montarGrafico(idCanvas, dados, tipo) {
+        const canvas = document.getElementById(idCanvas);
+        if (!canvas || !window.Chart || !dados || !dados.labels || !dados.labels.length) {
             return;
         }
+        const grafico = new Chart(canvas.getContext("2d"), {
+            type: tipo || canvas.dataset.tipo || "bar",
+            data: {
+                labels: dados.labels,
+                datasets: [{
+                    label: canvas.dataset.rotulo || "",
+                    data: dados.data,
+                    backgroundColor: CORES_RELATORIO,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: (tipo || canvas.dataset.tipo || "bar") !== "bar" },
+                },
+            },
+        });
+        window.graficosRelatorio.push(grafico);
+    }
 
-        fetch("{% url 'gestor_dashboard_chart_data' %}")
-            .then(response => response.json())
-            .then(data => {
-                if (window.graficoCategoriasApal) {
-                    window.graficoCategoriasApal.destroy();
-                }
-                
-                if (!data.labels || !data.labels.length) {
-                    return;
-                }
-
-                window.graficoCategoriasApal = new Chart(canvas.getContext("2d"), {
-                    type: canvas.dataset.tipo || "bar",
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: "Licenças ativas",
-                            data: data.data,
-                            backgroundColor: ["#2563EB", "#FF007F", "#10B981", "#F59E0B", "#7C3AED", "#0EA5E9"],
-                        }],
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: (canvas.dataset.tipo || "bar") === "pie" },
-                        },
-                    },
-                });
-            })
-            .catch(error => console.error("Erro ao carregar dados do gráfico:", error));
+    function iniciarGraficosRelatorio() {
+        window.graficosRelatorio.forEach((grafico) => grafico.destroy());
+        window.graficosRelatorio = [];
+        montarGrafico("grafico-categorias", lerScriptJson("dados-categorias"), document.getElementById("grafico-categorias")?.dataset.tipo || "bar");
+        montarGrafico("grafico-idade", lerScriptJson("dados-idade"), "bar");
+        montarGrafico("grafico-genero", lerScriptJson("dados-genero"), "doughnut");
+        montarGrafico("grafico-escolaridade", lerScriptJson("dados-escolaridade"), "bar");
+        montarGrafico("grafico-renda", lerScriptJson("dados-renda"), "bar");
+        montarGrafico("grafico-origem", lerScriptJson("dados-origem"), "doughnut");
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
     function mudarTipoGrafico(tipo) {
-        const canvas = document.getElementById("graficoOcupacao");
+        const canvas = document.getElementById("grafico-categorias");
         const btnBar = document.getElementById("btn-chart-bar");
         const btnPie = document.getElementById("btn-chart-pie");
-        if (!canvas) {
-            return;
-        }
+        if (!canvas) return;
         canvas.dataset.tipo = tipo;
         if (btnBar && btnPie) {
             const ativo = tipo === "pie" ? btnPie : btnBar;
             const inativo = tipo === "pie" ? btnBar : btnPie;
-            ativo.style.background = "#2563EB";
-            ativo.style.color = "#FFFFFF";
-            inativo.style.background = "transparent";
-            inativo.style.color = "#475569";
+            ativo.classList.add("is-active");
+            inativo.classList.remove("is-active");
         }
-        iniciarGraficoCategorias();
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+        iniciarGraficosRelatorio();
     }
 
-    document.addEventListener("DOMContentLoaded", iniciarGraficoCategorias);
+    document.addEventListener("DOMContentLoaded", iniciarGraficosRelatorio);
     document.body.addEventListener("htmx:afterSwap", function () {
-        iniciarGraficoCategorias();
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+        iniciarGraficosRelatorio();
     });
     document.body.addEventListener("htmx:configRequest", function (event) {
         const token = document.querySelector("[name=csrfmiddlewaretoken]");

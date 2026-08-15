@@ -12,8 +12,8 @@ from apps.licenciamento.services import (
     gravar_categoria_pretendida,
 )
 
-from .forms import MSG_TELEFONE, normalizar_telefone, separar_nome
-from .models import Ambulante
+from .forms import MSG_TELEFONE, normalizar_cpf, normalizar_telefone, separar_nome
+from .models import Ambulante, Genero, UsuarioBase
 
 ESCOLARIDADE_CHOICES = (
     ("", "Selecione..."),
@@ -23,6 +23,8 @@ ESCOLARIDADE_CHOICES = (
     ("medio_completo", "Ensino Médio Completo"),
     ("superior", "Ensino Superior (Incompleto / Completo)"),
 )
+
+GENERO_CHOICES = (("", "Selecione..."),) + tuple(Genero.choices)
 
 TIPO_COMERCIO_CHOICES = (
     ("", "Selecione..."),
@@ -79,6 +81,28 @@ class DadosPessoaisCadastroForm(forms.Form):
                 "data-hint": "Informe a data de nascimento como no documento.",
             },
             format="%Y-%m-%d",
+        ),
+    )
+    genero = forms.ChoiceField(
+        label="Gênero",
+        choices=GENERO_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={"id": "req-genero", "class": "styled-select"}),
+    )
+    renda_estimada = forms.DecimalField(
+        label="Renda mensal estimada (R$)",
+        required=False,
+        min_value=0,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(
+            attrs={
+                "id": "req-renda",
+                "placeholder": "Ex: 1800.00",
+                "step": "0.01",
+                "min": "0",
+                "inputmode": "decimal",
+            }
         ),
     )
     telefone_whatsapp = forms.CharField(
@@ -146,12 +170,17 @@ class DadosPessoaisCadastroForm(forms.Form):
             self.fields["escolaridade"].choices = _incluir_valor_atual(
                 ESCOLARIDADE_CHOICES, ambulante.escolaridade
             )
+            self.fields["genero"].choices = _incluir_valor_atual(
+                GENERO_CHOICES, ambulante.genero
+            )
             self.fields["data_nasc"].input_formats = ["%Y-%m-%d"]
             if not args:
                 self.fields["nome_completo"].initial = (
                     f"{ambulante.nome} {ambulante.sobrenome}".strip()
                 )
                 self.fields["data_nasc"].initial = ambulante.data_nasc
+                self.fields["genero"].initial = ambulante.genero or Genero.NAO_INFORMADO
+                self.fields["renda_estimada"].initial = ambulante.renda_estimada
                 self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
                 self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
                 self.fields["nis"].initial = ambulante.nis or ""
@@ -181,6 +210,8 @@ class DadosPessoaisCadastroForm(forms.Form):
         ambulante.nome = nome
         ambulante.sobrenome = sobrenome
         ambulante.data_nasc = self.cleaned_data["data_nasc"]
+        ambulante.genero = self.cleaned_data.get("genero") or Genero.NAO_INFORMADO
+        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
         ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
         ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
         ambulante.nis = self.cleaned_data.get("nis") or None
@@ -534,3 +565,90 @@ class PontoCadastroForm(forms.Form):
 
 class AnexosCadastroForm(AnexosDocumentosForm):
     """Etapa 6 do cadastro: upload e reenvio de documentos."""
+
+
+def rotulo_escolha(choices, valor, vazio="Não informado"):
+    if not valor:
+        return vazio
+    return dict(choices).get(valor, valor)
+
+
+class PerfilAmbulanteForm(EnderecoCadastroForm):
+    email = forms.EmailField(
+        label="E-mail",
+        error_messages={
+            "invalid": "Digite um e-mail no formato nome@dominio.com.",
+            "required": "Informe um e-mail para avisos e recuperação de senha.",
+        },
+        widget=forms.EmailInput(
+            attrs={
+                "id": "perfil-email",
+                "placeholder": "seu-email@dominio.com",
+                "autocomplete": "email",
+            }
+        ),
+    )
+    cpf = forms.CharField(
+        label="CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "cpf-cadastro",
+                "placeholder": "000.000.000-00",
+                "autocomplete": "username",
+                "inputmode": "numeric",
+                "maxlength": "14",
+            }
+        ),
+    )
+    foto = forms.ImageField(
+        label="Foto 3x4",
+        required=False,
+        widget=forms.FileInput(
+            attrs={
+                "id": "perfil-foto",
+                "accept": "image/jpeg,image/png,image/webp",
+            }
+        ),
+    )
+
+    def __init__(self, *args, ambulante=None, **kwargs):
+        super().__init__(*args, ambulante=ambulante, **kwargs)
+        if ambulante and not args:
+            self.fields["email"].initial = ambulante.email
+            self.fields["cpf"].initial = ambulante.cpf_formatado
+
+    def clean_cpf(self):
+        cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
+        if len(cpf) != 11:
+            raise ValidationError(
+                "Informe os 11 dígitos do CPF. Exemplo: 000.000.000-00."
+            )
+        duplicado = (
+            UsuarioBase.objects.filter(cpf=cpf).exclude(pk=self.ambulante.pk).exists()
+        )
+        if duplicado:
+            raise ValidationError("Já existe um usuário com este CPF.")
+        return cpf
+
+    def clean_email(self):
+        email = UsuarioBase.objects.normalize_email(self.cleaned_data["email"])
+        duplicado = (
+            UsuarioBase.objects.filter(email__iexact=email)
+            .exclude(pk=self.ambulante.pk)
+            .exists()
+        )
+        if duplicado:
+            raise ValidationError("Já existe um usuário com este e-mail.")
+        return email
+
+    def save(self):
+        ambulante = self.ambulante
+        ambulante.email = self.cleaned_data["email"]
+        ambulante.cpf = self.cleaned_data["cpf"]
+        campos = ["email", "cpf", "atualizado_em"]
+        if self.cleaned_data.get("foto"):
+            ambulante.foto = self.cleaned_data["foto"]
+            campos.append("foto")
+        ambulante.save(update_fields=campos)
+        super().save()
+        return ambulante

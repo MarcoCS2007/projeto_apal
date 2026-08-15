@@ -138,7 +138,7 @@ O dossiê do ambulante lista as ocorrências e o score já refletido.
 - [licenciamento](LICENCIAMENTO.md): ficha, escala, vencimento, suspensão/cancelamento.
 - [usuarios](USUARIOS.md): Fiscal, Ambulante, score.
 
-Não há `urls.py` próprio neste app para as telas web: as rotas do fiscal estão em `usuarios.urls_web`; as do gestor, em `views_gestor`. A API JWT fica em `apps/fiscalizacao/urls.py` (`/api/fiscal/`).
+Não há `urls_web.py` neste app: as telas do fiscal estão em `usuarios.urls_web`; as do gestor, em `views_gestor`. A API JWT fica em `apps/fiscalizacao/urls.py` (`/api/fiscal/`).
 
 ---
 

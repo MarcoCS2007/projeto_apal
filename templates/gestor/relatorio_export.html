@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório gerencial APAL</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #0F172A; }
+        h1 { font-size: 18px; margin: 0 0 6px; }
+        h2 { font-size: 13px; margin: 18px 0 8px; border-bottom: 2px solid #2563EB; padding-bottom: 4px; }
+        p { margin: 0 0 10px; color: #475569; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        th, td { border: 1px solid #E2E8F0; padding: 6px 8px; text-align: left; }
+        th { background: #2563EB; color: #fff; font-size: 10px; }
+        .kpis td { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <h1>Relatório gerencial APAL</h1>
+    <p>Vitória da Conquista · recorte com {{ total_ambulantes }} ambulantes · período de infrações: {{ periodo_dias }} dias.</p>
+
+    <h2>Indicadores</h2>
+    <table class="kpis">
+        <tr><th>Indicador</th><th>Valor</th></tr>
+        <tr><td>Licenças ativas</td><td>{{ licencas_ativas }}</td></tr>
+        <tr><td>Licenças vencidas</td><td>{{ licencas_vencidas }}</td></tr>
+        <tr><td>Pendentes na fila</td><td>{{ licencas_pendentes }}</td></tr>
+        <tr><td>Infrações no período</td><td>{{ ocorrencias_periodo }}</td></tr>
+        <tr><td>Com NIS / CadÚnico</td><td>{{ percentual_vulnerabilidade }}%</td></tr>
+        <tr><td>Empregos indiretos</td><td>{{ empregos_indiretos }}</td></tr>
+        <tr><td>Renda média</td><td>{% if renda_media %}R$ {{ renda_media }}{% else %}—{% endif %}</td></tr>
+        <tr><td>Moram na sede</td><td>{{ residentes_sede }}</td></tr>
+        <tr><td>Outros municípios</td><td>{{ residentes_fora }}</td></tr>
+    </table>
+
+    <h2>Ocupação por bairro</h2>
+    <table>
+        <tr><th>Bairro</th><th>Ocupadas</th><th>Total</th><th>Lotação</th></tr>
+        {% for item in ocupacao %}
+        <tr><td>{{ item.bairro }}</td><td>{{ item.ocupados }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+        {% empty %}
+        <tr><td colspan="4">Sem pontos neste recorte.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Faixa etária</h2>
+    <table>
+        <tr><th>Faixa</th><th>Qtd</th><th>%</th></tr>
+        {% for item in faixas_etarias %}
+        <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Gênero</h2>
+    <table>
+        <tr><th>Perfil</th><th>Qtd</th><th>%</th></tr>
+        {% for item in distribuicao_genero %}
+        <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Escolaridade</h2>
+    <table>
+        <tr><th>Nível</th><th>Qtd</th><th>%</th></tr>
+        {% for item in distribuicao_escolaridade %}
+        <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Origem × local de atuação</h2>
+    <table>
+        <tr><th>Cidade de origem</th><th>Bairro de atuação</th><th>Ambulantes</th></tr>
+        {% for item in origem_x_local %}
+        <tr><td>{{ item.cidade_origem }}</td><td>{{ item.bairro_atuacao }}</td><td>{{ item.total }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

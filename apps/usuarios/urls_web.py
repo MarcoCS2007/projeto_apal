@@ -18,6 +18,7 @@ from .views import (
     MasterLogsIAView,
     MasterPermissoesView,
     PainelAmbulanteView,
+    PerfilAmbulanteView,
     RecuperarSenhaView,
     RedefinirSenhaConfirmView,
     RegistroAmbulanteView,
@@ -37,6 +38,8 @@ from .views_gestor import (
     GestorLicencasAtivasView,
     GestorOcorrenciaDetalheView,
     GestorOcorrenciasView,
+    GestorRelatorioExcelView,
+    GestorRelatorioPDFView,
 )
 
 urlpatterns = [
@@ -58,6 +61,7 @@ urlpatterns = [
         name="redefinir_senha_confirmar",
     ),
     path("ambulante/", PainelAmbulanteView.as_view(), name="ambulante_painel"),
+    path("ambulante/perfil/", PerfilAmbulanteView.as_view(), name="ambulante_perfil"),
     path("ambulante/score/", ScoreAmbulanteView.as_view(), name="ambulante_score"),
     path(
         "ambulante/cadastro/",
@@ -121,6 +125,16 @@ urlpatterns = [
         "gestor/dashboard/chart-data/",
         GestorDashboardChartDataView.as_view(),
         name="gestor_dashboard_chart_data",
+    ),
+    path(
+        "gestor/dashboard/exportar.xlsx",
+        GestorRelatorioExcelView.as_view(),
+        name="gestor_relatorio_excel",
+    ),
+    path(
+        "gestor/dashboard/exportar.pdf",
+        GestorRelatorioPDFView.as_view(),
+        name="gestor_relatorio_pdf",
     ),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/backup/", MasterBackupView.as_view(), name="master_backup"),

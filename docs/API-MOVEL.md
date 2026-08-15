@@ -85,11 +85,15 @@ Tipos de documento: `comprovante_residencia`, `rg_cpf`, `mei`, `laudo_sanitario`
   "etapa": 1,
   "nome_completo": "João Ambulante Silva",
   "data_nasc": "1991-05-20",
+  "genero": "masculino",
+  "renda_estimada": "1800.00",
   "telefone_whatsapp": "77999999999",
   "escolaridade": "medio_completo",
   "num_funcionarios": 0
 }
 ```
+
+O `GET` devolve um snapshot com os mesmos campos (incluindo `genero`, `renda_estimada`, endereço e estrutura). E-mail, CPF e foto 3x4 são alterados na web em `/ambulante/perfil/`, não neste endpoint.
 
 ---
 

@@ -88,6 +88,9 @@
     <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="clipboard-list"></i> Completar cadastro
     </a>
+    <a href="{% url 'ambulante_perfil' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="user"></i> Meu perfil
+    </a>
     <a href="{% url 'ambulante_assistente' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="sparkles"></i> Assistente
     </a>
@@ -96,6 +99,9 @@
 <p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
     <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="pencil"></i> Revisar cadastro
+    </a>
+    <a href="{% url 'ambulante_perfil' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="user"></i> Meu perfil
     </a>
     <a href="{% url 'ambulante_score' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
         <i data-lucide="award"></i> Meu score ({{ pontuacao }}/{{ maximo }})

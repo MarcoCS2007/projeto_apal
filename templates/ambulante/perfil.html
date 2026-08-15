@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Meu perfil - APAL{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="perfil" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Meu perfil</h1>
+        <p>Consulte seus dados e atualize e-mail, CPF, endereço e a foto 3x4.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card perfil-card">
+    <p style="margin: 0 0 1.25rem;">
+        <a href="{% url 'ambulante_painel' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao painel
+        </a>
+    </p>
+
+    {% if form.errors %}
+    <div id="error-card" class="error-card" style="display: flex;" role="alert">
+        <i data-lucide="alert-octagon"></i>
+        <div>
+            <strong>Não foi possível salvar o perfil.</strong><br>
+            <span id="error-message">{{ form.non_field_errors.0|default:"Corrija os campos destacados. A mensagem de cada campo indica o que ajustar." }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <form id="perfil-form" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <section class="perfil-secao" aria-labelledby="perfil-foto-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-foto-titulo">Foto 3x4</h2>
+            </div>
+            <div class="perfil-foto">
+                <div class="perfil-foto-preview" id="perfil-foto-preview">
+                    {% if ambulante.foto %}
+                    <img src="{{ ambulante.foto.url }}" alt="Foto 3x4 de {{ ambulante.nome_completo }}" id="perfil-foto-img" width="96" height="128" decoding="async">
+                    {% else %}
+                    <span id="perfil-foto-iniciais" aria-hidden="true">{{ ambulante.iniciais }}</span>
+                    <span class="sr-only">Nenhuma foto 3x4 enviada ainda</span>
+                    {% endif %}
+                </div>
+                <div class="input-group" style="flex: 1; min-width: min(100%, 220px);">
+                    <label for="perfil-foto">Inserir ou atualizar foto</label>
+                    {{ form.foto }}
+                    {% if form.foto.errors %}<div class="login-error">{{ form.foto.errors.0 }}</div>{% endif %}
+                    <p class="field-hint">Use uma foto recente no formato 3x4, em JPEG ou PNG. A foto fica só no perfil, não no cadastro da licença.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="perfil-secao" aria-labelledby="perfil-pessoais-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-pessoais-titulo">Dados pessoais</h2>
+            </div>
+            <dl class="perfil-dl">
+                <div>
+                    <dt>Nome completo</dt>
+                    <dd>{{ ambulante.nome_completo }}</dd>
+                </div>
+                <div>
+                    <dt>Data de nascimento</dt>
+                    <dd>{% if ambulante.data_nasc %}{{ ambulante.data_nasc|date:"d/m/Y" }}{% else %}Não informado{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>Gênero</dt>
+                    <dd>{{ ambulante.get_genero_display }}</dd>
+                </div>
+                <div>
+                    <dt>Renda mensal estimada</dt>
+                    <dd>{% if ambulante.renda_estimada %}R$ {{ ambulante.renda_estimada }}{% else %}Não informado{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>Telefone / WhatsApp</dt>
+                    <dd>{{ ambulante.telefone_whatsapp|default:"Não informado" }}</dd>
+                </div>
+                <div>
+                    <dt>Telefone secundário</dt>
+                    <dd>{{ ambulante.telefone_2|default:"Não informado" }}</dd>
+                </div>
+                <div>
+                    <dt>RG</dt>
+                    <dd>{{ extras.rg|default:"Não informado" }}</dd>
+                </div>
+                <div>
+                    <dt>NIS (CadÚnico)</dt>
+                    <dd>{% if extras.sem_nis %}Não possui NIS{% else %}{{ ambulante.nis|default:"Não informado" }}{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>Escolaridade</dt>
+                    <dd>{{ escolaridade_label }}</dd>
+                </div>
+                <div>
+                    <dt>Auxiliares</dt>
+                    <dd>{{ ambulante.num_funcionarios }}</dd>
+                </div>
+            </dl>
+            <div class="form-row" style="margin-top: 1.25rem;">
+                <div class="input-group">
+                    <label for="perfil-email">E-mail <span class="required-marker">*</span></label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="login-error">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="cpf-cadastro">CPF <span class="required-marker">*</span></label>
+                    {{ form.cpf }}
+                    {% if form.cpf.errors %}<div class="login-error">{{ form.cpf.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <p class="field-hint">Nome, telefones e dados socioeconômicos são atualizados no <a href="{% url 'ambulante_cadastro' %}?etapa=1">cadastro da licença</a>.</p>
+        </section>
+
+        <section class="perfil-secao" aria-labelledby="perfil-endereco-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-endereco-titulo">Endereço residencial</h2>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="cep-input">CEP <span class="required-marker">*</span></label>
+                    {{ form.cep }}
+                    {% if form.cep.errors %}<div class="login-error">{{ form.cep.errors.0 }}</div>{% endif %}
+                    <p id="cep-residencial-status" class="field-hint" hidden></p>
+                </div>
+                <div class="input-group" style="flex: 3;">
+                    <label for="endereco-input">Endereço <span class="required-marker">*</span></label>
+                    {{ form.logradouro }}
+                    {% if form.logradouro.errors %}<div class="login-error">{{ form.logradouro.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="numero-input">Número <span class="required-marker">*</span></label>
+                    {{ form.numero }}
+                    {% if form.numero.errors %}<div class="login-error">{{ form.numero.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="complemento-input">Complemento</label>
+                    {{ form.complemento }}
+                </div>
+                <div class="input-group">
+                    <label for="bairro-input">Bairro <span class="required-marker">*</span></label>
+                    {{ form.bairro }}
+                    {% if form.bairro.errors %}<div class="login-error">{{ form.bairro.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="estado-input">Estado (UF) <span class="required-marker">*</span></label>
+                    <select id="estado-input" name="estado_uf" class="styled-select" required data-valor-inicial="{{ form.estado_uf.value|default:'' }}">
+                        <option value="" disabled {% if not form.estado_uf.value %}selected{% endif %}>Selecione o Estado...</option>
+                        {% if form.estado_uf.value %}
+                        <option value="{{ form.estado_uf.value }}" selected>{{ form.estado_uf.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.estado_uf.errors %}<div class="login-error">{{ form.estado_uf.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="cidade-input">Cidade <span class="required-marker">*</span></label>
+                    <select id="cidade-input" name="cidade" class="styled-select" required data-valor-inicial="{{ form.cidade.value|default:'' }}">
+                        <option value="" disabled {% if not form.cidade.value %}selected{% endif %}>Selecione a cidade...</option>
+                        {% if form.cidade.value %}
+                        <option value="{{ form.cidade.value }}" selected>{{ form.cidade.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.cidade.errors %}<div class="login-error">{{ form.cidade.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions" style="justify-content: space-between; margin-top: 0.5rem;">
+            <a href="{% url 'ambulante_painel' %}" class="btn-action">Cancelar</a>
+            <button type="submit" class="btn-submit">Salvar perfil</button>
+        </div>
+    </form>
+</div>
+
+<section class="form-card perfil-card" aria-labelledby="perfil-atividade-titulo">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2 id="perfil-atividade-titulo">Atividade e ponto</h2>
+    </div>
+    <dl class="perfil-dl">
+        <div>
+            <dt>Nome fantasia / apelido</dt>
+            <dd>{{ ambulante.apelido_nome_fantasia|default:"Não informado" }}</dd>
+        </div>
+        <div>
+            <dt>CNPJ</dt>
+            <dd>{% if extras.sem_cnpj %}Não possui CNPJ{% else %}{{ ambulante.cnpj|default:"Não informado" }}{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Razão social</dt>
+            <dd>{{ extras.razao_social|default:"Não informado" }}</dd>
+        </div>
+        <div>
+            <dt>Tipo de comércio</dt>
+            <dd>{{ tipo_atuacao_label }}</dd>
+        </div>
+        <div>
+            <dt>Estrutura</dt>
+            <dd>{{ tipo_estrutura_label }}</dd>
+        </div>
+        <div>
+            <dt>Metragem</dt>
+            <dd>{% if estrutura %}{{ estrutura.dimensoes_metragem }} m²{% else %}Não informado{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Mercadoria / descrição</dt>
+            <dd>{% if estrutura %}{{ estrutura.descricao }}{% else %}Não informado{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Ponto pretendido</dt>
+            <dd>{% if ambulante.ponto_pretendido %}{{ ambulante.ponto_pretendido.nome_identificacao }} — {{ ambulante.ponto_pretendido.bairro }}{% else %}Não informado{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Categoria</dt>
+            <dd>{% if categoria %}{{ categoria.nome_categoria }}{% else %}Não informado{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Situação da conta</dt>
+            <dd>{{ ambulante.situacao_conta }}</dd>
+        </div>
+        <div>
+            <dt>Score</dt>
+            <dd>{{ ambulante.pontuacao }}</dd>
+        </div>
+        <div>
+            <dt>Licença / alvará</dt>
+            <dd>{% if licenca %}{{ licenca.protocolo }} — {{ licenca.status }}{% else %}Nenhuma solicitação{% endif %}</dd>
+        </div>
+    </dl>
+    <p class="field-hint" style="margin-top: 1.25rem;">Para alterar empresa, estrutura ou ponto, use o <a href="{% url 'ambulante_cadastro' %}?etapa=3">cadastro da licença</a>.</p>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var campoFoto = document.getElementById("perfil-foto");
+        var preview = document.getElementById("perfil-foto-preview");
+        if (campoFoto && preview) {
+            campoFoto.addEventListener("change", function () {
+                var arquivo = campoFoto.files && campoFoto.files[0];
+                if (!arquivo || !arquivo.type.startsWith("image/")) return;
+                var leitor = new FileReader();
+                leitor.onload = function () {
+                    var imagem = document.getElementById("perfil-foto-img");
+                    if (!imagem) {
+                        preview.innerHTML = "";
+                        imagem = document.createElement("img");
+                        imagem.id = "perfil-foto-img";
+                        imagem.width = 96;
+                        imagem.height = 128;
+                        preview.appendChild(imagem);
+                    }
+                    imagem.src = leitor.result;
+                    imagem.alt = "Pré-visualização da foto 3x4";
+                };
+                leitor.readAsDataURL(arquivo);
+            });
+        }
+        {% if form.errors %}
+        if (typeof mostrarToast === "function") {
+            mostrarToast("Não foi possível salvar o perfil. Corrija os campos destacados e tente de novo.", "error");
+        }
+        {% endif %}
+    })();
+</script>
+{% endblock %}

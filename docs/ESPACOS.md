@@ -103,7 +103,7 @@ Quando o alvará é emitido o ponto passa a **Ocupado**. Quando a licença vence
 
 - Referenciado por [usuarios](USUARIOS.md) (`Ambulante.ponto_pretendido`) e pelo cadastro.
 - Referenciado por [licenciamento](LICENCIAMENTO.md) na licença (ponto + estrutura).
-- Relatórios de ocupação por bairro usam `status_ocupacao`.
+- Relatórios de ocupação por bairro usam `status_ocupacao`. Filtros de cidade usam `Endereco.cidade`.
 
 ---
 
@@ -116,3 +116,5 @@ Quando o alvará é emitido o ponto passa a **Ocupado**. Quando a licença vence
 | `apps/espacos/views.py` | CRUD do gestor |
 | `apps/espacos/urls_web.py` | Rotas `/gestor/pontos/` |
 | `templates/gestor/gerenciar-pontos.html` | Tela |
+
+O menu do gestor chama esta área de **Vagas** (`/gestor/pontos/`).

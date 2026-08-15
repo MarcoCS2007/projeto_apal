@@ -29,6 +29,10 @@ def snapshot_cadastro(ambulante):
         "email": ambulante.email,
         "nome_completo": ambulante.nome_completo,
         "data_nasc": ambulante.data_nasc,
+        "genero": ambulante.genero,
+        "renda_estimada": (
+            str(ambulante.renda_estimada) if ambulante.renda_estimada is not None else ""
+        ),
         "telefone_whatsapp": ambulante.telefone_whatsapp,
         "telefone_2": ambulante.telefone_2 or "",
         "nis": ambulante.nis or "",

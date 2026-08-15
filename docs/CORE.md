@@ -2,17 +2,19 @@
 
 Pasta: `apps/core`
 
-O `core` não tem um painel próprio de negócio. Ele concentra o que **todos os outros módulos reutilizam**: modelo base com auditoria, permissões por perfil, páginas públicas, QR Code da credencial, consulta educativa local (RAG) e o seed de dados de demonstração.
+O `core` não tem um painel próprio de negócio. Ele concentra o que **todos os outros módulos reutilizam**: modelo base com auditoria, permissões por perfil, páginas públicas, QR Code da credencial, consulta educativa local (RAG), seed, backup e retenção LGPD.
 
 ---
 
 ## Para que serve
 
 - Padronizar `criado_em`, `atualizado_em` e `ativo` em quase todas as entidades.
-- Expor as páginas institucionais (home, sobre, FAQ).
+- Expor as páginas institucionais (home, sobre, FAQ, privacidade).
+- Tratar páginas de erro 404 e 500.
 - Gerar e validar o hash HMAC do QR da credencial.
 - Responder o assistente **offline**, sem API externa de IA.
 - Popular o banco com categorias, pontos e usuários de teste.
+- Gerar dump restaurável e aplicar a política de retenção de logs.
 
 ---
 
@@ -32,7 +34,7 @@ Não há tabelas próprias neste app (sem migrações de modelo).
 
 ---
 
-## Páginas públicas
+## Páginas públicas e erros
 
 Rotas em `apps/core/urls.py`, incluídas na raiz do projeto:
 
@@ -41,8 +43,16 @@ Rotas em `apps/core/urls.py`, incluídas na raiz do projeto:
 | `/` | `index` | `home.html` | Landing institucional |
 | `/sobre/` | `sobre` | `publico/sobre.html` | Sobre o APAL |
 | `/faq/` | `faq` | `publico/faq.html` | Perguntas frequentes |
+| `/privacidade/` | `privacidade` | `publico/privacidade.html` | Política LGPD (base legal e meses de retenção) |
 
 Qualquer visitante acessa. Login e cadastro ficam no módulo [usuarios](USUARIOS.md).
+
+Em `config/urls.py`:
+
+- `handler404` → `apps.core.views.pagina_nao_encontrada` (`templates/404.html`)
+- `handler500` → `apps.core.views.erro_servidor` (`templates/500.html`)
+
+Com `DEBUG=True`, o Django mostra a página de diagnóstico; os handlers valem em produção.
 
 ---
 
@@ -114,21 +124,26 @@ Com o projeto no ar:
 
 ```bash
 python manage.py seed_inicial
+python manage.py seed_massivo   # volume extra para gráficos e relatórios
 ```
 
-No Docker: `make cmd="python manage.py seed_inicial"` (ou `./dev.sh exec python manage.py seed_inicial`).
+No Docker: `make seed_inicial` / `make seed_massivo` (ou `./dev.sh exec python manage.py seed_inicial`).
 
-O comando cria categorias, pontos de ocupação e contas de demonstração (Master, gestores, fiscais e ambulantes). Senhas: ver [README da pasta docs](README.md).
+`seed_inicial` cria categorias (com fator financeiro), pontos de ocupação e contas de demonstração (Master, gestores, fiscais e ambulantes). Senhas: ver [README da pasta docs](README.md).
 
 ### Visitante — páginas institucionais
 
 1. Abra `http://localhost:8000`.
-2. Use **Sobre** e **FAQ** no menu público.
+2. Use **Sobre**, **FAQ** e a política de privacidade no site público.
 3. Para entrar no sistema, siga o canal do seu perfil em [USUARIOS.md](USUARIOS.md).
 
 ### Gestor / fiscal — o QR não é configurado aqui
 
 A geração acontece na emissão do alvará. Este módulo só fornece o algoritmo. Se o QR “não bate”, confira `SECRET_KEY` (o hash muda se a chave mudar) e se a licença ainda está **Ativa**.
+
+### Master / TI — backup e retenção
+
+Backup e purge estão documentados em [BACKUP.md](BACKUP.md). Os comandos moram neste app (`backup_banco`, `purgar_retencao`); a tela **Gerar backup** do Painel TI dispara `POST /master/backup/`.
 
 ---
 
@@ -138,8 +153,12 @@ A geração acontece na emissão do alvará. Este módulo só fornece o algoritm
 | --- | --- |
 | `apps/core/models.py` | `ModeloBase` e `AtivoManager` |
 | `apps/core/permissions.py` | Permissões DRF por perfil |
-| `apps/core/urls.py` / `views.py` | Home, sobre, FAQ |
+| `apps/core/urls.py` / `views.py` | Home, sobre, FAQ, privacidade, 404/500 |
 | `apps/core/qrcode.py` | Hash e validação do QR |
 | `apps/core/qr_imagem.py` | PNG do QR |
 | `apps/core/ia.py` | RAG local do assistente |
+| `apps/core/backup.py` | Dump JSON restaurável |
 | `apps/core/management/commands/seed_inicial.py` | Dados de demonstração |
+| `apps/core/management/commands/seed_massivo.py` | Volume para gráficos (`scripts/seed_massivo.py`) |
+| `apps/core/management/commands/backup_banco.py` | Backup pela linha de comando |
+| `apps/core/management/commands/purgar_retencao.py` | Retenção LGPD |

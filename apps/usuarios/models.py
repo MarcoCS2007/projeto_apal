@@ -42,6 +42,13 @@ class Perfil(models.TextChoices):
     ADMINISTRADOR = "administrador", "Administrador"
 
 
+class Genero(models.TextChoices):
+    FEMININO = "feminino", "Feminino"
+    MASCULINO = "masculino", "Masculino"
+    OUTRO = "outro", "Outro"
+    NAO_INFORMADO = "nao_informado", "Não informado"
+
+
 class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
     cpf = models.CharField(max_length=14, unique=True)
     nome = models.CharField(max_length=150)
@@ -119,8 +126,21 @@ class Ambulante(UsuarioBase):
         max_length=255, unique=True, blank=True, null=True
     )
     data_nasc = models.DateField(blank=True, null=True)
+    genero = models.CharField(
+        max_length=20,
+        choices=Genero.choices,
+        default=Genero.NAO_INFORMADO,
+        blank=True,
+    )
     escolaridade = models.CharField(max_length=100, blank=True, default="")
     nis = models.CharField(max_length=20, blank=True, null=True)
+    renda_estimada = models.DecimalField(
+        "Renda mensal estimada (R$)",
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
     num_funcionarios = models.IntegerField(default=0)
     pontuacao = models.IntegerField(default=100)
     aceite_lgpd = models.BooleanField(default=False)

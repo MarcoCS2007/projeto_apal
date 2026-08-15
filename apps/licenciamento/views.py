@@ -312,6 +312,10 @@ class RelatorioOcupacaoView(
             bairro=request.GET.get("bairro", ""),
             origem=request.GET.get("origem", ""),
             periodo_dias=request.GET.get("periodo", 30),
+            cidade=request.GET.get("cidade", ""),
+            genero=request.GET.get("genero", ""),
+            faixa_etaria=request.GET.get("faixa", ""),
+            escolaridade=request.GET.get("escolaridade", ""),
         )
         html = request.headers.get("HX-Request") or request.GET.get("formato") == "html"
         if html:

@@ -160,3 +160,58 @@ class DashboardIndicadoresTests(UsuariosAuthFixtures, TestCase):
         residentes = indicadores_gerenciais(origem="residentes")
         self.assertEqual(residentes["licencas_ativas"], 1)
         self.assertEqual(residentes["residentes"], 1)
+
+    def test_retrato_social_usa_campos_do_ambulante(self):
+        self.ambulante.genero = "feminino"
+        self.ambulante.nis = "12345678901"
+        self.ambulante.renda_estimada = Decimal("1800.00")
+        self.ambulante.num_funcionarios = 2
+        self.ambulante.escolaridade = "medio_completo"
+        self.ambulante.save()
+        self._emitir()
+
+        dados = indicadores_gerenciais()
+        self.assertEqual(dados["total_ambulantes"], 1)
+        self.assertEqual(dados["com_nis"], 1)
+        self.assertEqual(dados["percentual_vulnerabilidade"], 100.0)
+        self.assertEqual(dados["empregos_indiretos"], 2)
+        self.assertEqual(dados["renda_media"], Decimal("1800.00"))
+        nomes_idade = [item["nome"] for item in dados["faixas_etarias"]]
+        self.assertTrue(any("25" in nome for nome in nomes_idade))
+        nomes_genero = [item["nome"] for item in dados["distribuicao_genero"]]
+        self.assertIn("Feminino", nomes_genero)
+        nomes_escola = [item["nome"] for item in dados["distribuicao_escolaridade"]]
+        self.assertIn("Ensino Médio", nomes_escola)
+
+    def test_origem_x_local_cruza_cidade_e_bairro(self):
+        self._emitir()
+        dados = indicadores_gerenciais()
+        self.assertEqual(dados["residentes_sede"], 1)
+        self.assertTrue(dados["origem_x_local"])
+        self.assertEqual(dados["origem_x_local"][0]["cidade_origem"], "Vitória da Conquista")
+        self.assertEqual(dados["origem_x_local"][0]["bairro_atuacao"], "Brasil")
+
+    def test_exporta_excel_e_pdf_com_os_filtros(self):
+        self._emitir()
+        self.client.force_login(self.gestor)
+        excel = self.client.get(reverse("gestor_relatorio_excel"), {"bairro": "Brasil"})
+        self.assertEqual(excel.status_code, 200)
+        self.assertIn(
+            "spreadsheetml.sheet",
+            excel["Content-Type"],
+        )
+        self.assertTrue(excel.content[:2] == b"PK")
+
+        pdf = self.client.get(reverse("gestor_relatorio_pdf"), {"bairro": "Brasil"})
+        self.assertEqual(pdf.status_code, 200)
+        self.assertEqual(pdf["Content-Type"], "application/pdf")
+        self.assertTrue(pdf.content.startswith(b"%PDF"))
+
+    def test_dashboard_mostra_secoes_sociais_e_exportacao(self):
+        self.client.force_login(self.gestor)
+        pagina = self.client.get(self.url)
+        self.assertContains(pagina, "Retrato sociodemográfico")
+        self.assertContains(pagina, "Origem × local de atuação")
+        self.assertContains(pagina, reverse("gestor_relatorio_excel"))
+        self.assertContains(pagina, reverse("gestor_relatorio_pdf"))
+        self.assertContains(pagina, "Exportar Excel")

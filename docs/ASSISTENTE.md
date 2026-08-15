@@ -103,7 +103,7 @@ Não coloque segredos nem dados pessoais na base: ela é compartilhada por todos
 ## Dependências
 
 - [core](CORE.md): motor RAG (`ia.py`).
-- [usuarios](USUARIOS.md): `AcessoAmbulanteMixin` na tela; `MasterLogsIAView` na auditoria.
+- [usuarios](USUARIOS.md): `AcessoAmbulanteMixin` na tela; `MasterLogsIAView` na auditoria. Logs antigos saem com `python manage.py purgar_retencao`.
 
 ---
 

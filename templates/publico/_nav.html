@@ -5,6 +5,7 @@
     {% if user.is_authenticated %}
         {% if user.role == "ambulante" %}
             <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+            <a href="{% url 'ambulante_perfil' %}"{% if active == "perfil" %} class="active"{% endif %}><i data-lucide="user"></i> Meu perfil</a>
             {% if pode.solicitacao_licenca %}
             <a href="{% url 'ambulante_alvara' %}"{% if active == "alvara" %} class="active"{% endif %}><i data-lucide="file-badge"></i> Meu Alvará</a>
             {% endif %}

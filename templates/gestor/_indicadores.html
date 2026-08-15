@@ -14,83 +14,261 @@
 </div>
 {% endif %}
 
-<div class="stats-grid" style="margin-bottom: 1.5rem;">
-    <a href="{% url 'gestor_licencas' %}?status=Ativo" class="stat-card" style="text-decoration: none; color: inherit;">
-        <div class="stat-icon" style="color: #10B981; background: #D1FAE5;"><i data-lucide="check-circle"></i></div>
-        <div class="stat-info">
-            <label>Licenças ativas</label>
-            <p>{{ licencas_ativas }}</p>
-        </div>
+<div class="relatorio-exportacoes">
+    <a class="btn-action" href="{% url 'gestor_relatorio_excel' %}?{{ request.GET.urlencode }}">
+        <i data-lucide="file-spreadsheet"></i> Exportar Excel
     </a>
-    <a href="{% url 'gestor_licencas' %}?status=Vencido" class="stat-card" style="text-decoration: none; color: inherit;">
-        <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="badge-alert"></i></div>
-        <div class="stat-info">
-            <label>Licenças vencidas</label>
-            <p>{{ licencas_vencidas }}</p>
-        </div>
-    </a>
-    <a href="{% url 'gestor_fila' %}" class="stat-card" style="text-decoration: none; color: inherit;">
-        <div class="stat-icon" style="color: #F59E0B; background: #FEF3C7;"><i data-lucide="clock"></i></div>
-        <div class="stat-info">
-            <label>Pendentes na fila</label>
-            <p>{{ licencas_pendentes }}</p>
-        </div>
-    </a>
-    <a href="{% url 'gestor_ocorrencias' %}" class="stat-card" style="text-decoration: none; color: inherit;">
-        <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="gavel"></i></div>
-        <div class="stat-info">
-            <label>Infrações ({{ periodo_dias }} dias)</label>
-            <p>{{ ocorrencias_periodo }}</p>
-        </div>
+    <a class="btn-action" href="{% url 'gestor_relatorio_pdf' %}?{{ request.GET.urlencode }}">
+        <i data-lucide="file-text"></i> Exportar PDF
     </a>
 </div>
 
-<div class="form-card" style="margin-bottom: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+<section class="relatorio-secao" aria-labelledby="relatorio-kpis">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2 id="relatorio-kpis">Visão geral do recorte</h2>
+    </div>
+    <div class="stats-grid" style="margin-bottom: 0;">
+        <a href="{% url 'gestor_licencas' %}?status=Ativo" class="stat-card" style="text-decoration: none; color: inherit;">
+            <div class="stat-icon" style="color: #10B981; background: #D1FAE5;"><i data-lucide="check-circle"></i></div>
+            <div class="stat-info">
+                <label>Licenças ativas</label>
+                <p>{{ licencas_ativas }}</p>
+            </div>
+        </a>
+        <a href="{% url 'gestor_licencas' %}?status=Vencido" class="stat-card" style="text-decoration: none; color: inherit;">
+            <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="badge-alert"></i></div>
+            <div class="stat-info">
+                <label>Licenças vencidas</label>
+                <p>{{ licencas_vencidas }}</p>
+            </div>
+        </a>
+        <a href="{% url 'gestor_fila' %}" class="stat-card" style="text-decoration: none; color: inherit;">
+            <div class="stat-icon" style="color: #F59E0B; background: #FEF3C7;"><i data-lucide="clock"></i></div>
+            <div class="stat-info">
+                <label>Pendentes na fila</label>
+                <p>{{ licencas_pendentes }}</p>
+            </div>
+        </a>
+        <a href="{% url 'gestor_ocorrencias' %}" class="stat-card" style="text-decoration: none; color: inherit;">
+            <div class="stat-icon" style="color: #EF4444; background: #FEE2E2;"><i data-lucide="gavel"></i></div>
+            <div class="stat-info">
+                <label>Infrações ({{ periodo_dias }} dias)</label>
+                <p>{{ ocorrencias_periodo }}</p>
+            </div>
+        </a>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #2563EB; background: #DBEAFE;"><i data-lucide="users"></i></div>
+            <div class="stat-info">
+                <label>Ambulantes</label>
+                <p>{{ total_ambulantes }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #7C3AED; background: #EDE9FE;"><i data-lucide="briefcase"></i></div>
+            <div class="stat-info">
+                <label>Empregos indiretos</label>
+                <p>{{ empregos_indiretos }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #D97706; background: #FEF3C7;"><i data-lucide="heart-handshake"></i></div>
+            <div class="stat-info">
+                <label>Com NIS / CadÚnico</label>
+                <p>{{ percentual_vulnerabilidade }}%</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #059669; background: #D1FAE5;"><i data-lucide="wallet"></i></div>
+            <div class="stat-info">
+                <label>Renda média</label>
+                <p>{% if renda_media %}R$ {{ renda_media }}{% else %}—{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="form-card relatorio-secao" aria-labelledby="relatorio-categorias">
+    <div class="relatorio-secao-cabecalho">
         <div class="section-title" style="margin: 0;">
             <div class="title-accent"></div>
-            <h2>Distribuição por categoria</h2>
+            <h2 id="relatorio-categorias">Licenças ativas por categoria</h2>
         </div>
-        <div style="display: flex; gap: 8px; background: #F1F5F9; padding: 4px; border-radius: 8px;">
-            <button type="button" onclick="mudarTipoGrafico('bar')" id="btn-chart-bar" style="background: #2563EB; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
-                Barras
-            </button>
-            <button type="button" onclick="mudarTipoGrafico('pie')" id="btn-chart-pie" style="background: transparent; color: #475569; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
-                Pizza
-            </button>
+        <div class="relatorio-chart-toggle">
+            <button type="button" onclick="mudarTipoGrafico('bar')" id="btn-chart-bar" class="is-active">Barras</button>
+            <button type="button" onclick="mudarTipoGrafico('pie')" id="btn-chart-pie">Pizza</button>
         </div>
     </div>
-    {{ categorias|json_script:"dados-categorias" }}
+    {{ graficos.categorias|json_script:"dados-categorias" }}
     {% if categorias %}
-    <div style="position: relative; height: 320px; width: 100%;">
-        <canvas id="graficoOcupacao" data-tipo="bar"></canvas>
+    <div class="relatorio-chart">
+        <canvas id="grafico-categorias" data-tipo="bar" data-rotulo="Licenças ativas"></canvas>
     </div>
     {% else %}
-    <p style="color: #64748B; margin: 0;">Nenhuma licença ativa neste recorte para montar o gráfico.</p>
+    <p class="text-muted">Nenhuma licença ativa neste recorte para montar o gráfico.</p>
     {% endif %}
-</div>
+</section>
 
-<div class="form-card">
+<section class="form-card relatorio-secao" aria-labelledby="relatorio-ocupacao">
     <div class="section-title">
         <div class="title-accent" style="background-color: #2563EB;"></div>
-        <h2>Ocupação de vagas por bairro</h2>
+        <h2 id="relatorio-ocupacao">Ocupação de vagas por bairro</h2>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+    <div class="relatorio-cards">
         {% for item in ocupacao %}
-        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">{{ item.bairro }}</span>
-            <strong style="display: block; font-size: 1.5rem; color: #2563EB; margin-top: 4px;">{{ item.ocupados }}/{{ item.total }} ocupadas</strong>
-            <small style="color: {% if item.percentual >= 90 %}#B42318{% elif item.percentual >= 70 %}#D97706{% else %}#059669{% endif %}; font-weight: 600;">
+        <div class="relatorio-mini-card">
+            <span>{{ item.bairro }}</span>
+            <strong>{{ item.ocupados }}/{{ item.total }} ocupadas</strong>
+            <small style="color: {% if item.percentual >= 90 %}#B42318{% elif item.percentual >= 70 %}#D97706{% else %}#059669{% endif %};">
                 {{ item.percentual }}% de lotação · {{ item.licencas_ativas }} alvará{{ item.licencas_ativas|pluralize }} ativo{{ item.licencas_ativas|pluralize }}
             </small>
         </div>
         {% empty %}
-        <p style="color: #64748B; margin: 0;">Nenhum ponto de ocupação neste recorte.</p>
+        <p class="text-muted">Nenhum ponto de ocupação neste recorte.</p>
         {% endfor %}
-        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fixos / itinerantes</span>
-            <strong style="display: block; font-size: 1.5rem; color: #EC4899; margin-top: 4px;">{{ residentes }} / {{ itinerantes }}</strong>
-            <small style="color: #64748B; font-weight: 600;">Identificados pelo tipo de atuação</small>
+        <div class="relatorio-mini-card">
+            <span>Fixos / itinerantes / eventuais</span>
+            <strong>{{ residentes }} / {{ itinerantes }} / {{ eventuais }}</strong>
+            <small>Identificados pelo tipo de atuação</small>
         </div>
     </div>
-</div>
+</section>
+
+<section class="form-card relatorio-secao" aria-labelledby="relatorio-socio">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2 id="relatorio-socio">Retrato sociodemográfico</h2>
+    </div>
+    <p class="field-hint">Uma coluna por vez: idade, gênero, escolaridade, NIS e renda da base filtrada.</p>
+    <div class="relatorio-grid-2">
+        <div>
+            <h3 class="relatorio-subtitulo">Faixa etária</h3>
+            {{ graficos.idades|json_script:"dados-idade" }}
+            {% if faixas_etarias %}
+            <div class="relatorio-chart relatorio-chart-sm"><canvas id="grafico-idade" data-rotulo="Ambulantes"></canvas></div>
+            {% endif %}
+            <table class="data-table">
+                <thead><tr><th>Faixa</th><th>Qtd</th><th>%</th></tr></thead>
+                <tbody>
+                    {% for item in faixas_etarias %}
+                    <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+                    {% empty %}
+                    <tr><td colspan="3">Sem data de nascimento neste recorte.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3 class="relatorio-subtitulo">Gênero</h3>
+            {{ graficos.generos|json_script:"dados-genero" }}
+            {% if distribuicao_genero %}
+            <div class="relatorio-chart relatorio-chart-sm"><canvas id="grafico-genero"></canvas></div>
+            {% endif %}
+            <table class="data-table">
+                <thead><tr><th>Perfil</th><th>Qtd</th><th>%</th></tr></thead>
+                <tbody>
+                    {% for item in distribuicao_genero %}
+                    <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+                    {% empty %}
+                    <tr><td colspan="3">Sem registros de gênero.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3 class="relatorio-subtitulo">Grau de instrução</h3>
+            {{ graficos.escolaridade|json_script:"dados-escolaridade" }}
+            {% if distribuicao_escolaridade %}
+            <div class="relatorio-chart relatorio-chart-sm"><canvas id="grafico-escolaridade" data-rotulo="Ambulantes"></canvas></div>
+            {% endif %}
+            <table class="data-table">
+                <thead><tr><th>Nível</th><th>Qtd</th><th>%</th></tr></thead>
+                <tbody>
+                    {% for item in distribuicao_escolaridade %}
+                    <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+                    {% empty %}
+                    <tr><td colspan="3">Sem escolaridade informada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3 class="relatorio-subtitulo">Estimativa de renda</h3>
+            {{ graficos.renda|json_script:"dados-renda" }}
+            {% if faixas_renda %}
+            <div class="relatorio-chart relatorio-chart-sm"><canvas id="grafico-renda" data-rotulo="Ambulantes"></canvas></div>
+            {% endif %}
+            <table class="data-table">
+                <thead><tr><th>Faixa</th><th>Qtd</th><th>%</th></tr></thead>
+                <tbody>
+                    {% for item in faixas_renda %}
+                    <tr><td>{{ item.nome }}</td><td>{{ item.total }}</td><td>{{ item.percentual }}%</td></tr>
+                    {% empty %}
+                    <tr><td colspan="3">Sem renda informada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="field-hint">{% if renda_media %}Média dos que informaram: R$ {{ renda_media }} ({{ com_renda_informada }} cadastros).{% else %}Nenhum cadastro deste recorte informou renda.{% endif %}</p>
+        </div>
+    </div>
+    <div class="relatorio-cards" style="margin-top: 1.25rem;">
+        <div class="relatorio-mini-card">
+            <span>Índice de vulnerabilidade (NIS preenchido)</span>
+            <strong>{{ percentual_vulnerabilidade }}%</strong>
+            <small>{{ com_nis }} com CadÚnico · {{ sem_nis }} sem NIS</small>
+        </div>
+        <div class="relatorio-mini-card">
+            <span>Volume de empregos indiretos</span>
+            <strong>{{ empregos_indiretos }}</strong>
+            <small>Soma de auxiliares informados no cadastro</small>
+        </div>
+    </div>
+</section>
+
+<section class="form-card relatorio-secao" aria-labelledby="relatorio-origem">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2 id="relatorio-origem">Origem × local de atuação</h2>
+    </div>
+    <p class="field-hint">Cidade do endereço residencial cruzada com o bairro do ponto ou da licença.</p>
+    <div class="relatorio-grid-2">
+        <div>
+            {{ graficos.origem|json_script:"dados-origem" }}
+            <div class="relatorio-chart relatorio-chart-sm"><canvas id="grafico-origem"></canvas></div>
+            <div class="relatorio-cards">
+                <div class="relatorio-mini-card">
+                    <span>Moram na sede</span>
+                    <strong>{{ residentes_sede }}</strong>
+                    <small>{{ cidade_sede }}</small>
+                </div>
+                <div class="relatorio-mini-card">
+                    <span>Vêm de outro município</span>
+                    <strong>{{ residentes_fora }}</strong>
+                    <small>Endereço fora da sede</small>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Cidade de origem</th>
+                        <th>Bairro de atuação</th>
+                        <th>Ambulantes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in origem_x_local %}
+                    <tr>
+                        <td>{{ item.cidade_origem }}</td>
+                        <td>{{ item.bairro_atuacao }}</td>
+                        <td>{{ item.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3">Sem cruzamento neste recorte.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

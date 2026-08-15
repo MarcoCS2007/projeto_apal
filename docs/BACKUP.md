@@ -4,7 +4,7 @@ O banco de produção é PostgreSQL (`config/settings/base.py`). Os dumps ficam 
 
 ## 1. Gerar backup
 
-Pelo painel Master (Administrador com `acesso_painel_tecnico`): **Painel TI → Gerar backup**.
+Pelo painel Master (Administrador com `acesso_painel_tecnico`): **Painel TI** (`/master/`) → **Gerar backup restaurável** (`POST /master/backup/`).
 
 Pela linha de comando:
 

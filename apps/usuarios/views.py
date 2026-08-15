@@ -41,12 +41,17 @@ from .forms import (
     RecuperarSenhaForm,
 )
 from .forms_cadastro import (
+    ESCOLARIDADE_CHOICES,
+    TIPO_COMERCIO_CHOICES,
+    TIPO_ESTRUTURA_CHOICES,
     AnexosCadastroForm,
     DadosPessoaisCadastroForm,
     EmpresaCadastroForm,
     EnderecoCadastroForm,
     EstruturaCadastroForm,
+    PerfilAmbulanteForm,
     PontoCadastroForm,
+    rotulo_escolha,
 )
 from .models import (
     Administrador,
@@ -321,6 +326,54 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
 
             context.update(resumo_score(ambulante))
         return context
+
+
+class PerfilAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
+    template_name = "ambulante/perfil.html"
+    login_url = reverse_lazy("entrar")
+
+    def _ambulante(self):
+        return Ambulante.objects.get(pk=self.request.user.pk)
+
+    def _contexto(self, ambulante, form):
+        extras = ambulante.dados_complementares or {}
+        estrutura = ambulante.estruturas.order_by("id").first()
+        return {
+            "form": form,
+            "ambulante": ambulante,
+            "endereco": ambulante.enderecos.order_by("id").first(),
+            "estrutura": estrutura,
+            "extras": extras,
+            "categoria": categoria_do_ambulante(ambulante),
+            "licenca": licenca_atual(ambulante),
+            "escolaridade_label": rotulo_escolha(
+                ESCOLARIDADE_CHOICES, ambulante.escolaridade
+            ),
+            "tipo_atuacao_label": rotulo_escolha(
+                TIPO_COMERCIO_CHOICES, ambulante.tipo_atuacao
+            ),
+            "tipo_estrutura_label": rotulo_escolha(
+                TIPO_ESTRUTURA_CHOICES,
+                estrutura.tipo_estrutura if estrutura else "",
+            ),
+        }
+
+    def get(self, request):
+        ambulante = self._ambulante()
+        form = PerfilAmbulanteForm(ambulante=ambulante)
+        return render(request, self.template_name, self._contexto(ambulante, form))
+
+    def post(self, request):
+        ambulante = self._ambulante()
+        form = PerfilAmbulanteForm(request.POST, request.FILES, ambulante=ambulante)
+        if not form.is_valid():
+            return render(request, self.template_name, self._contexto(ambulante, form))
+        form.save()
+        messages.success(
+            request,
+            "Perfil atualizado. E-mail, CPF, endereço e foto foram salvos.",
+        )
+        return redirect("ambulante_perfil")
 
 
 class ScoreAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView):

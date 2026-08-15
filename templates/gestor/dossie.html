@@ -77,15 +77,19 @@
             </small>
         </div>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
-            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Categoria / estrutura</span>
-            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">
-                {% if licenca_atual and licenca_atual.categoria_produto %}
-                {{ licenca_atual.categoria_produto.nome_categoria }}
-                {% else %}
-                Sem categoria definida
-                {% endif %}
-            </strong>
-            <small style="color: #475569;">{% if estrutura %}{{ estrutura.tipo_estrutura }} · {{ estrutura.dimensoes_metragem }} m²{% else %}Estrutura não cadastrada{% endif %}</small>
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Gênero</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{{ ambulante.get_genero_display }}</strong>
+            <small style="color: #475569;">{% if ambulante.data_nasc %}Nasc. {{ ambulante.data_nasc|date:"d/m/Y" }}{% else %}Idade não informada{% endif %}</small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Escolaridade / NIS</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{{ ambulante.escolaridade|default:"Não informado" }}</strong>
+            <small style="color: #475569;">{% if ambulante.nis %}CadÚnico {{ ambulante.nis }}{% else %}Sem NIS informado{% endif %}</small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Renda estimada</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{% if ambulante.renda_estimada %}R$ {{ ambulante.renda_estimada }}{% else %}Não informado{% endif %}</strong>
+            <small style="color: #475569;">{{ ambulante.num_funcionarios }} auxiliar{{ ambulante.num_funcionarios|pluralize }}</small>
         </div>
     </div>
 </div>

@@ -121,7 +121,12 @@ def run():
             data_nasc=data_nasc,
             escolaridade=random.choice(escolaridades),
             tipo_atuacao=random.choice(tipos_atuacao),
-            nis=fake.numerify("###########"),
+            nis=fake.numerify("###########") if random.random() < 0.45 else None,
+            genero=random.choice(
+                ["feminino", "masculino", "feminino", "masculino", "outro", "nao_informado"]
+            ),
+            renda_estimada=Decimal(random.randint(800, 6500)),
+            num_funcionarios=random.randint(0, 4),
             aceite_lgpd=True,
             aceite_lgpd_em=hoje,
             base_legal_lgpd="Seed Massivo",

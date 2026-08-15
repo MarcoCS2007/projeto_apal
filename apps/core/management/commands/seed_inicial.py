@@ -363,6 +363,9 @@ class Command(BaseCommand):
                 "descricao": "Tapioca, cuscuz e sucos naturais.",
             },
             extras={"razao_social": "Maria das Dores MEI", "sem_cnpj": False},
+            genero="feminino",
+            renda_estimada=Decimal("2200.00"),
+            num_funcionarios=1,
         )
         self._ambulante_completo(
             cpf=CPF_ANTONIO,
@@ -382,8 +385,8 @@ class Command(BaseCommand):
                 "logradouro": "Rua Grande",
                 "numero": "45",
                 "complemento": "Fundos",
-                "bairro": "Alto Maron",
-                "cidade": "Vitória da Conquista",
+                "bairro": "Centro",
+                "cidade": "Planalto",
                 "estado_uf": "BA",
             },
             estrutura={
@@ -392,6 +395,9 @@ class Command(BaseCommand):
                 "descricao": "Roupas e acessórios populares.",
             },
             extras={"sem_cnpj": True},
+            genero="masculino",
+            renda_estimada=Decimal("1800.00"),
+            num_funcionarios=0,
         )
         self._ambulante_completo(
             cpf=CPF_RAIMUNDA,
@@ -420,6 +426,9 @@ class Command(BaseCommand):
                 "descricao": "Lanches, hambúrguer e milho verde.",
             },
             extras={"razao_social": "Raimunda Alves Lanches ME", "sem_cnpj": False},
+            genero="feminino",
+            renda_estimada=Decimal("3500.00"),
+            num_funcionarios=2,
         )
         self._ambulante_completo(
             cpf=CPF_CARLOS_AMB,
@@ -448,6 +457,9 @@ class Command(BaseCommand):
                 "descricao": "Frutas da época e amendoim.",
             },
             extras={"sem_cnpj": True},
+            genero="masculino",
+            renda_estimada=Decimal("1200.00"),
+            num_funcionarios=1,
         )
         self._ambulante_completo(
             cpf=CPF_FATIMA,
@@ -477,6 +489,9 @@ class Command(BaseCommand):
             },
             extras={"sem_cnpj": True},
             ativo=False,
+            genero="feminino",
+            renda_estimada=Decimal("900.00"),
+            num_funcionarios=0,
         )
         self._ambulante_conta(
             cpf=CPF_LUCIANA,
@@ -511,6 +526,7 @@ class Command(BaseCommand):
             codigo_qr_code="QR-001",
             data_nasc=datetime.date(1990, 1, 1),
             escolaridade="Ensino Médio",
+            genero="masculino",
             pontuacao=100,
             **self._dados_lgpd(),
         )
@@ -589,10 +605,25 @@ class Command(BaseCommand):
         estrutura,
         extras,
         ativo=True,
+        genero="nao_informado",
+        renda_estimada=None,
+        num_funcionarios=0,
     ):
         existente = Ambulante.objects.filter(cpf=cpf).first()
         if existente:
             self._garantir_aceite_lgpd(existente)
+            campos = []
+            if genero and existente.genero in ("", "nao_informado"):
+                existente.genero = genero
+                campos.append("genero")
+            if renda_estimada is not None and existente.renda_estimada is None:
+                existente.renda_estimada = renda_estimada
+                campos.append("renda_estimada")
+            if num_funcionarios and not existente.num_funcionarios:
+                existente.num_funcionarios = num_funcionarios
+                campos.append("num_funcionarios")
+            if campos:
+                existente.save(update_fields=campos + ["atualizado_em"])
             self.stdout.write(f"Ambulante {cpf} já existe.")
             return
         ambulante = Ambulante.objects.create_user(
@@ -608,6 +639,9 @@ class Command(BaseCommand):
             escolaridade=escolaridade,
             data_nasc=data_nasc,
             nis=nis,
+            genero=genero,
+            renda_estimada=renda_estimada,
+            num_funcionarios=num_funcionarios,
             ponto_pretendido=ponto,
             dados_complementares=extras,
             pontuacao=100 if ativo else 40,
