@@ -34,22 +34,6 @@
         </div>
     </details>
     {% elif user.role == "ambulante" %}
-    <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-    {% if active == "painel" %}
-    <a href="{% url 'ambulante_perfil' %}"><i data-lucide="user"></i> Meu perfil</a>
-    {% if pode.solicitacao_licenca %}
-    <a href="{% url 'ambulante_alvara' %}"><i data-lucide="file-badge"></i> Meu Alvará</a>
-    {% endif %}
-    <a href="{% url 'ambulante_credencial' %}"><i data-lucide="id-card"></i> Credencial</a>
-    <a href="{% url 'ambulante_score' %}"><i data-lucide="award"></i> Meu Score</a>
-    <a href="{% url 'ambulante_assistente' %}"><i data-lucide="sparkles"></i> Assistente</a>
-    {% endif %}
-    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn-logout">
-            <i data-lucide="log-out"></i> Sair
-        </button>
-    </form>
     {% elif user.role == "administrador" %}
     <a href="{% url 'master_admin' %}"{% if active == "painel" or active == "admin" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
     <form action="{% url 'logout' %}" method="post" style="display: inline;">

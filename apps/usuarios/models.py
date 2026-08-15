@@ -89,7 +89,7 @@ class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
     def cpf_mascarado(self):
         digits = "".join(ch for ch in (self.cpf or "") if ch.isdigit())
         if len(digits) == 11:
-            return f"***.***.***-{digits[9:]}"
+            return f"{digits[:3]}.***.***-{digits[9:]}"
         return "***"
 
     @property

@@ -2461,6 +2461,14 @@ form[novalidate] textarea:invalid {
     overflow: hidden;
 }
 
+.credential-wrapper .id-back-content--qr {
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    gap: 1rem;
+    padding-top: 0.35rem;
+}
+
 .credential-wrapper .id-back-meta {
     min-height: 0;
     overflow: hidden;
@@ -2477,10 +2485,25 @@ form[novalidate] textarea:invalid {
     width: 118px;
     height: 118px;
     background: #FFFFFF;
+    margin: 0 auto;
     border: 1.5px solid #93C5FD;
     border-radius: 12px;
     padding: 4px;
     box-sizing: border-box;
+}
+
+.credential-wrapper .id-qr-box--large {
+    margin-top: 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+}
+
+.credential-wrapper .id-qr-box--large img {
+    width: 200px;
+    height: 200px;
 }
 
 .id-back-header {
@@ -5691,6 +5714,18 @@ a.form-card-link {
     margin: 0;
 }
 
+.shortcut-grid .form-card-link {
+    border: 1.5px solid color-mix(in srgb, var(--azul-vibrante) 28%, var(--borda-cinza));
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.shortcut-grid .form-card-link:hover {
+    border-color: var(--azul-vibrante);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
 .stat-kicker {
     font-size: 0.85rem;
     color: var(--texto-muted);
@@ -5702,12 +5737,17 @@ a.form-card-link {
     font-size: 1.8rem;
     line-height: 1.2;
     margin-top: 4px;
-    color: var(--azul-escuro);
+    color: var(--azul-vibrante);
+}
+
+.shortcut-grid .stat-value {
+    color: var(--azul-vibrante);
 }
 
 .stat-value .lucide {
     width: 1.75rem;
     height: 1.75rem;
+    color: var(--azul-vibrante);
 }
 
 .text-muted {
