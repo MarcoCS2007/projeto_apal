@@ -1,5 +1,6 @@
 <nav id="header-nav" class="header-nav{% if nav_extra_class %} {{ nav_extra_class }}{% endif %}" aria-label="Principal">
     {% if not user.is_authenticated %}
+    {% if active != "fiscal_login" %}
     <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
     <a href="{% url 'sobre' %}"{% if active == "sobre" %} class="active"{% endif %}><i data-lucide="info"></i> Sobre</a>
     <a href="{% url 'faq' %}"{% if active == "faq" %} class="active"{% endif %}><i data-lucide="help-circle"></i> Dúvidas</a>
@@ -33,6 +34,7 @@
             </a>
         </div>
     </details>
+    {% endif %}
     {% elif user.role == "ambulante" %}
     {% elif user.role == "administrador" %}
     <a href="{% url 'master_admin' %}"{% if active == "painel" or active == "admin" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
