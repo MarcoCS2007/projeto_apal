@@ -44,6 +44,23 @@ def normalizar_cpf(valor):
     return "".join(ch for ch in valor if ch.isdigit())
 
 
+MSG_TELEFONE = (
+    "O telefone precisa ter 10 dígitos (fixo) ou 11 dígitos (celular), com DDD. "
+    "Exemplo: (77) 99999-0000."
+)
+
+
+def normalizar_telefone(valor, *, obrigatorio=True):
+    numeros = "".join(ch for ch in (valor or "") if ch.isdigit())
+    if not numeros:
+        if obrigatorio:
+            raise ValidationError(MSG_TELEFONE)
+        return ""
+    if len(numeros) not in (10, 11):
+        raise ValidationError(MSG_TELEFONE)
+    return numeros
+
+
 def separar_nome(nome_completo):
     partes = nome_completo.strip().split()
     if not partes:
@@ -368,8 +385,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "id": "reg-nome",
                     "placeholder": "Digite seu nome completo",
                     "autocomplete": "name",
-                },
-                hint="Informe nome e sobrenome, como no documento.",
+                }
             )
         ),
     )
@@ -385,8 +401,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "id": "reg-email",
                     "placeholder": "seu-email@dominio.com",
                     "autocomplete": "email",
-                },
-                hint="Este e-mail será o login e o destino da recuperação de senha.",
+                }
             )
         ),
     )
@@ -400,8 +415,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "autocomplete": "username",
                     "inputmode": "numeric",
                     "maxlength": "14",
-                },
-                hint="Digite só os números; a máscara é aplicada automaticamente.",
+                }
             )
         ),
     )
@@ -416,8 +430,9 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "autocomplete": "tel",
                     "inputmode": "numeric",
                     "maxlength": "15",
-                },
-                hint="DDD + número. Exemplo: (77) 99999-0000.",
+                    "pattern": r"\(\d{2}\) \d{4,5}-\d{4}",
+                    "data-msg": MSG_TELEFONE,
+                }
             )
         ),
     )
@@ -430,8 +445,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "placeholder": "Mínimo de 8 caracteres",
                     "autocomplete": "new-password",
                     "minlength": "8",
-                },
-                hint="Mínimo de 8 caracteres. Evite senha só com números.",
+                }
             )
         ),
     )
@@ -444,8 +458,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
                     "placeholder": "Repita a senha",
                     "autocomplete": "new-password",
                     "minlength": "8",
-                },
-                hint="Repita a mesma senha do campo anterior.",
+                }
             )
         ),
     )
@@ -470,14 +483,7 @@ class CadastroAmbulanteForm(CadastroUsuarioMasterMixin, forms.Form):
         return dados
 
     def clean_telefone_whatsapp(self):
-        numeros = "".join(
-            ch for ch in (self.cleaned_data.get("telefone_whatsapp") or "") if ch.isdigit()
-        )
-        if len(numeros) < 10:
-            raise ValidationError(
-                "Informe DDD e número, só com dígitos. Exemplo: (77) 99999-0000."
-            )
-        return numeros
+        return normalizar_telefone(self.cleaned_data.get("telefone_whatsapp"))
 
     def save(self):
         dados = self.cleaned_data

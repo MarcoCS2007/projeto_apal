@@ -1,4 +1,4 @@
-<nav id="header-nav" class="header-nav">
+<nav id="header-nav" class="header-nav" aria-label="Principal">
     <a href="{% url 'master_admin' %}"{% if active == "admin" %} class="active"{% endif %}><i data-lucide="shield-alert"></i> Painel TI</a>
     <a href="{% url 'master_fiscais' %}"{% if active == "fiscais" %} class="active"{% endif %}><i data-lucide="id-card"></i> Fiscais</a>
     <a href="{% url 'master_gestores' %}"{% if active == "gestores" %} class="active"{% endif %}><i data-lucide="users"></i> Gestores</a>
@@ -6,7 +6,7 @@
     <a href="{% url 'master_logs_ia' %}"{% if active == "logs" %} class="active"{% endif %}><i data-lucide="bot"></i> Logs IA</a>
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}
-        <button type="submit" style="background: none; border: none; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">
+        <button type="submit" class="btn-logout">
             <i data-lucide="log-out"></i> Encerrar expediente
         </button>
     </form>

@@ -50,7 +50,6 @@
             <div class="input-group">
                 <label for="cpf-cadastro">CPF</label>
                 {{ form.cpf }}
-                <span id="cpf-erro-texto" class="field-error" style="display: none;"></span>
                 {% if form.cpf.errors %}
                 <div class="login-error" role="alert">{{ form.cpf.errors.0 }}</div>
                 {% endif %}
@@ -114,12 +113,6 @@
                 <div class="login-error" role="alert">{{ form.aceite_lgpd.errors.0 }}</div>
                 {% endif %}
             </div>
-        </div>
-
-        <div class="info-callout-box">
-            <p>
-                Nesta etapa você cria apenas a conta de acesso. A foto 3x4 entra depois, no perfil. Dados socioeconômicos, MEI, estrutura e ponto serão preenchidos no painel.
-            </p>
         </div>
 
         <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">

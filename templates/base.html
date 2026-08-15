@@ -11,9 +11,12 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    </noscript>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -23,9 +26,12 @@
         <div class="header-container{% block header_container_extra %}{% endblock %}">
             {% block logo %}
             <div class="logo-area">
-                <a href="{% url 'index' %}" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;" aria-hidden="true"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                <a href="{% url 'index' %}" class="brand-link" aria-label="APAL — página inicial de Vitória da Conquista">
+                    <img src="{% static 'img/logo-apal-simbolo.png' %}" alt="" class="brand-mark" width="36" height="47" decoding="async">
+                    <span class="brand-lockup">
+                        <span class="logo-text">APAL</span>
+                        <span class="brand-city">Vitória da Conquista</span>
+                    </span>
                 </a>
             </div>
             {% endblock %}
@@ -40,13 +46,13 @@
     </header>
 
     <div id="access-widget-container" class="access-widget-container">
-        <button type="button" id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade" aria-expanded="false" aria-controls="accessibility-panel">
+        <button type="button" id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade" aria-label="Abrir ferramentas de acessibilidade" aria-expanded="false" aria-controls="accessibility-panel">
             <span class="access-text">Acessibilidade</span>
             <i data-lucide="eye-off" aria-hidden="true"></i>
         </button>
     </div>
 
-    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden" role="dialog" aria-labelledby="access-panel-title" aria-modal="true">
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden" role="dialog" aria-labelledby="access-panel-title" aria-modal="true" aria-hidden="true">
         <div class="access-header">
             <h3 id="access-panel-title">Acessibilidade</h3>
             <button type="button" id="close-access" class="close-btn" aria-label="Fechar painel de acessibilidade"><i data-lucide="x" aria-hidden="true"></i></button>
@@ -82,12 +88,12 @@
 
     <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <div id="modal-backdrop" class="modal-backdrop"></div>
+    <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true"></div>
 
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title" aria-hidden="true">
         <div class="access-header">
             <h3 id="ai-modal-title">
-                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+                <i data-lucide="sparkles" aria-hidden="true"></i> Assistente de Acessibilidade
             </h3>
             <button type="button" id="close-ai-modal" class="close-btn" aria-label="Fechar assistente de acessibilidade"><i data-lucide="x" aria-hidden="true"></i></button>
         </div>
@@ -96,7 +102,7 @@
         </div>
     </div>
 
-    <div id="confirm-dialog" class="access-panel hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" style="top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); width: 90%; max-width: 420px; position: fixed; max-height: none;">
+    <div id="confirm-dialog" class="access-panel hidden" role="alertdialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" style="top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); width: 90%; max-width: 420px; position: fixed; max-height: none;">
         <div class="access-header">
             <h3 id="confirm-dialog-title">Confirmar ação</h3>
             <button type="button" id="confirm-dialog-cancel" class="close-btn" aria-label="Cancelar"><i data-lucide="x" aria-hidden="true"></i></button>
@@ -126,14 +132,28 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
+        (function () {
+            function iniciarVLibras() {
+                var raiz = document.querySelector("[vw]");
+                if (!raiz || !window.VLibras || !window.VLibras.Widget) return;
+                if (raiz.dataset.vlibrasReady === "1") return;
+                raiz.dataset.vlibrasReady = "1";
+                new window.VLibras.Widget("https://vlibras.gov.br/app");
+            }
 
-    <script src="{% static 'js/script.js' %}"></script>
-    <script>
-        lucide.createIcons();
+            iniciarVLibras();
+            window.addEventListener("load", iniciarVLibras);
+            window.addEventListener("pageshow", function (evento) {
+                if (!evento.persisted) return;
+                var raiz = document.querySelector("[vw]");
+                if (raiz) raiz.dataset.vlibrasReady = "";
+                iniciarVLibras();
+            });
+        })();
     </script>
     {% block extra_js %}{% endblock %}
 </body>

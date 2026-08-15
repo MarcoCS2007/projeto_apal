@@ -70,7 +70,7 @@
         <h2>Evidência fotográfica</h2>
     </div>
     <a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">
-        <img src="{{ ocorrencia.evidencia_foto.url }}" alt="Evidência da ocorrência {{ ocorrencia.pk }}" style="max-width: 100%; max-height: 420px; border-radius: 12px; border: 1px solid #E2E8F0;">
+        <img src="{{ ocorrencia.evidencia_foto.url }}" alt="Evidência da ocorrência {{ ocorrencia.pk }}" loading="lazy" decoding="async" style="max-width: 100%; max-height: 420px; border-radius: 12px; border: 1px solid #E2E8F0;">
     </a>
     <p style="margin-top: 0.75rem;">
         <a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">Abrir foto em tamanho original</a>

@@ -1,4 +1,4 @@
-<nav id="header-nav" class="header-nav">
+<nav id="header-nav" class="header-nav" aria-label="Principal">
     <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
     {% if pode.relatorios %}
     <a href="{% url 'gestor_dashboard' %}"{% if active == "dashboard" %} class="active"{% endif %}><i data-lucide="bar-chart-3"></i> Relatórios</a>
@@ -22,7 +22,7 @@
     {% endif %}
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}
-        <button type="submit" style="background: none; border: none; color: #DC2626; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">
+        <button type="submit" class="btn-logout">
             <i data-lucide="log-out"></i> Encerrar expediente
         </button>
     </form>

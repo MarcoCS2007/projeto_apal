@@ -84,9 +84,16 @@ class HomeViewTests(TestCase):
         self.assertNotContains(response, "Acesso ao sistema")
         self.assertContains(response, reverse("sobre"))
         self.assertContains(response, reverse("faq"))
+        self.assertContains(response, "static/css/style.css")
+        self.assertNotContains(response, "static/css/home.css")
+        self.assertContains(response, "logo-apal-simbolo.png")
+        self.assertContains(response, "Vitória da Conquista")
         html = response.content.decode()
         self.assertEqual(html.count("Área institucional"), 1)
         self.assertEqual(html.count(reverse("fiscal_entrar")), 1)
+        self.assertNotContains(response, "lucide@latest")
+        self.assertContains(response, "vlibras.gov.br/app/vlibras-plugin.js")
+        self.assertContains(response, "VLibras.Widget")
 
 
 class PaginasPublicasTests(TestCase):

@@ -12,7 +12,7 @@ from apps.licenciamento.services import (
     gravar_categoria_pretendida,
 )
 
-from .forms import separar_nome
+from .forms import MSG_TELEFONE, normalizar_telefone, separar_nome
 from .models import Ambulante
 
 ESCOLARIDADE_CHOICES = (
@@ -91,7 +91,7 @@ class DadosPessoaisCadastroForm(forms.Form):
                 "maxlength": "15",
                 "autocomplete": "tel",
                 "inputmode": "numeric",
-                "data-hint": "DDD + número do WhatsApp. Exemplo: (77) 99999-0000.",
+                "data-msg": MSG_TELEFONE,
             }
         ),
     )
@@ -161,24 +161,13 @@ class DadosPessoaisCadastroForm(forms.Form):
                 self.fields["rg"].initial = extras.get("rg", "")
 
     def clean_telefone_whatsapp(self):
-        numeros = "".join(
-            ch for ch in (self.cleaned_data.get("telefone_whatsapp") or "") if ch.isdigit()
-        )
-        if len(numeros) < 10:
-            raise ValidationError(
-                "Informe DDD e número, só com dígitos. Exemplo: (77) 99999-0000."
-            )
-        return numeros
+        return normalizar_telefone(self.cleaned_data.get("telefone_whatsapp"))
 
     def clean_telefone_2(self):
-        numeros = "".join(
-            ch for ch in (self.cleaned_data.get("telefone_2") or "") if ch.isdigit()
+        return normalizar_telefone(
+            self.cleaned_data.get("telefone_2"),
+            obrigatorio=False,
         )
-        if numeros and len(numeros) < 10:
-            raise ValidationError(
-                "Informe DDD e número, só com dígitos, ou deixe em branco."
-            )
-        return numeros or ""
 
     def clean(self):
         dados = super().clean()

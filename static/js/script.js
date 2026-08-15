@@ -121,6 +121,7 @@ function confirmarAcao({
 
         const finalizar = (resultado) => {
             dialog.classList.add('hidden');
+            dialog.setAttribute('aria-hidden', 'true');
             backdrop?.classList.remove('active');
             document.removeEventListener('keydown', noEscape);
             btnOk.removeEventListener('click', noOk);
@@ -141,13 +142,27 @@ function confirmarAcao({
         document.addEventListener('keydown', noEscape);
 
         dialog.classList.remove('hidden');
+        dialog.setAttribute('aria-hidden', 'false');
         backdrop?.classList.add('active');
         if (window.lucide) lucide.createIcons();
+        marcarIconesDecorativos(dialog);
         (btnVoltar || btnCancel).focus();
     });
 }
 
 window.confirmarAcao = confirmarAcao;
+
+function marcarIconesDecorativos(raiz = document) {
+    raiz.querySelectorAll('i[data-lucide], svg.lucide').forEach((el) => {
+        if (
+            !el.hasAttribute('aria-hidden')
+            && !el.getAttribute('aria-label')
+            && !el.getAttribute('aria-labelledby')
+        ) {
+            el.setAttribute('aria-hidden', 'true');
+        }
+    });
+}
 
 function grupoDoCampo(campo) {
     return campo?.closest('.input-group') || campo?.parentElement;
@@ -283,11 +298,30 @@ function validarConfirmacaoSenha(campo) {
     return true;
 }
 
+function validarTelefoneAoVivo(campo) {
+    if (!campo) return;
+    const ids = ['reg-telefone', 'req-tel', 'req-tel-2', 'gestor-telefone'];
+    if (!ids.includes(campo.id)) return;
+
+    const digitos = String(campo.value || '').replace(/\D/g, '');
+    campo.setCustomValidity('');
+    if (!digitos) {
+        return;
+    }
+    if (digitos.length !== 10 && digitos.length !== 11) {
+        campo.setCustomValidity(
+            campo.dataset.msg
+            || 'O telefone precisa ter 10 dígitos (fixo) ou 11 dígitos (celular), com DDD.'
+        );
+    }
+}
+
 function validarCampoAoVivo(campo, { marcarVazio = false } = {}) {
     if (!campoDeveValidarAoVivo(campo)) return true;
 
     garantirDicaCampo(campo);
     validarConfirmacaoSenha(campo);
+    validarTelefoneAoVivo(campo);
 
     if (campo.id === 'cpf-cadastro' && typeof window.checarCPFInput === 'function') {
         window.checarCPFInput();
@@ -384,6 +418,60 @@ function marcarBotaoCarregando(botao, carregando, rotulo = 'Enviando...') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
+    marcarIconesDecorativos();
+    document.querySelectorAll('.header-nav a.active').forEach((link) => {
+        link.setAttribute('aria-current', 'page');
+    });
+
+    function prepararTabelasResponsivas(raiz) {
+        const escopo = raiz && raiz.querySelectorAll ? raiz : document;
+        const tabelas = (escopo.matches && escopo.matches('table.data-table'))
+            ? [escopo]
+            : Array.from(escopo.querySelectorAll('table.data-table'));
+
+        tabelas.forEach((tabela) => {
+            let wrapper = tabela.closest('.table-responsive');
+            if (!wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive';
+                tabela.parentNode.insertBefore(wrapper, tabela);
+                wrapper.appendChild(tabela);
+            }
+
+            const cabecalhos = Array.from(tabela.querySelectorAll('thead th')).map((th) =>
+                (th.textContent || '').replace(/\s+/g, ' ').trim()
+            );
+            if (!cabecalhos.length) {
+                return;
+            }
+
+            wrapper.classList.add('table-stack');
+            tabela.querySelectorAll('tbody tr').forEach((linha) => {
+                let indice = 0;
+                Array.from(linha.children).forEach((celula) => {
+                    if (celula.tagName !== 'TD') {
+                        return;
+                    }
+                    if (celula.hasAttribute('colspan')) {
+                        indice += Number(celula.getAttribute('colspan')) || 1;
+                        return;
+                    }
+                    if (!celula.getAttribute('data-label')) {
+                        celula.setAttribute('data-label', cabecalhos[indice] || '');
+                    }
+                    indice += 1;
+                });
+            });
+        });
+    }
+
+    prepararTabelasResponsivas();
+    document.body.addEventListener('htmx:afterSwap', (event) => {
+        prepararTabelasResponsivas(event.detail?.target || event.target);
+    });
 
     // ---------------------------------------------------
     // 1. WIDGET, BACKDROP E PAINEL DE ACESSIBILIDADE
@@ -397,9 +485,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!accessPanel || !openBtn) {
             return;
         }
+        const estavaAberto = !accessPanel.classList.contains('hidden');
         accessPanel.classList.toggle('hidden', !aberto);
+        accessPanel.setAttribute('aria-hidden', aberto ? 'false' : 'true');
         openBtn.classList.toggle('expanded', aberto);
         openBtn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+        if (aberto) {
+            closeBtn?.focus();
+        } else if (estavaAberto) {
+            openBtn.focus();
+        }
     }
 
     if (openBtn && accessPanel) {
@@ -887,12 +982,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function abrirModalIA() {
-        if (aiModal) aiModal.classList.remove('hidden');
+        if (aiModal) {
+            aiModal.classList.remove('hidden');
+            aiModal.setAttribute('aria-hidden', 'false');
+            closeAiModal?.focus();
+        }
         if (backdrop) backdrop.classList.add('active');
     }
 
     function fecharModalIA() {
-        if (aiModal) aiModal.classList.add('hidden');
+        if (aiModal) {
+            aiModal.classList.add('hidden');
+            aiModal.setAttribute('aria-hidden', 'true');
+        }
         if (backdrop) backdrop.classList.remove('active');
     }
 
@@ -1056,13 +1158,35 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
     // 5. SANFONA (ACCORDION) DA CENTRAL DE AJUDA / FAQ
     // ---------------------------------------------------
     const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach(question => {
+
+    function sincronizarItemFaq(item) {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const aberto = item.classList.contains('active');
+        if (question) {
+            question.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+            if (answer?.id) {
+                question.setAttribute('aria-controls', answer.id);
+            }
+        }
+        if (answer) {
+            answer.setAttribute('aria-hidden', aberto ? 'false' : 'true');
+        }
+    }
+
+    faqQuestions.forEach((question, index) => {
+        const faqItem = question.parentElement;
+        const answer = faqItem?.querySelector('.faq-answer');
+        if (answer && !answer.id) {
+            answer.id = `faq-resposta-${index + 1}`;
+        }
+        sincronizarItemFaq(faqItem);
         question.addEventListener('click', () => {
-            const faqItem = question.parentElement;
-            document.querySelectorAll('.faq-item').forEach(item => {
+            document.querySelectorAll('.faq-item').forEach((item) => {
                 if (item !== faqItem) item.classList.remove('active');
             });
             faqItem.classList.toggle('active');
+            document.querySelectorAll('.faq-item').forEach(sincronizarItemFaq);
         });
     });
 
@@ -1726,11 +1850,6 @@ const cpfInput =
         'cpf-cadastro'
     );
 
-const cpfErroTexto =
-    document.getElementById(
-        'cpf-erro-texto'
-    );
-
 
 function validarCPF(cpfBruto) {
 
@@ -1894,13 +2013,6 @@ function checarCPFInput() {
             marcarValidadeCampo(cpfInput, true);
         }
 
-        if (cpfErroTexto) {
-
-            cpfErroTexto.style.display =
-                'none';
-
-        }
-
         return true;
     }
 
@@ -1928,16 +2040,6 @@ function checarCPFInput() {
             );
         }
 
-        if (cpfErroTexto) {
-
-            cpfErroTexto.textContent =
-                'Digite os 11 números do CPF. Exemplo: 000.000.000-00.';
-
-            cpfErroTexto.style.display =
-                'block';
-
-        }
-
         return false;
     }
 
@@ -1962,13 +2064,6 @@ function checarCPFInput() {
             marcarValidadeCampo(cpfInput, true);
         }
 
-        if (cpfErroTexto) {
-
-            cpfErroTexto.style.display =
-                'none';
-
-        }
-
     } else {
 
         cpfInput.setCustomValidity(
@@ -1987,16 +2082,6 @@ function checarCPFInput() {
                 false,
                 'CPF inválido. Confira os 11 dígitos; o número não passa na verificação.'
             );
-        }
-
-        if (cpfErroTexto) {
-
-            cpfErroTexto.textContent =
-                'CPF inválido. Confira os 11 dígitos; o número não passa na verificação.';
-
-            cpfErroTexto.style.display =
-                'block';
-
         }
 
     }

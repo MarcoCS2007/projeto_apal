@@ -44,7 +44,7 @@ Gera o par de tokens. **Não cria cookie `sessionid`.**
 
 ```json
 {
-  "cpf": "33333333333",
+  "cpf": "10020030088",
   "password": "amb123"
 }
 ```
@@ -73,25 +73,25 @@ Exemplo:
 ```bash
 curl -X POST http://localhost:8000/api/login/ \
   -H "Content-Type: application/json" \
-  -d "{\"cpf\": \"33333333333\", \"password\": \"amb123\"}"
+  -d "{\"cpf\": \"10020030088\", \"password\": \"amb123\"}"
 ```
 
 Usuários do seed local (`python manage.py seed_inicial`):
 
 | Perfil | CPF | Senha | Observação |
 | --- | --- | --- | --- |
-| Administrador | `00000000000` | `admin123` | Painel Master |
-| Gestor | `11111111111` | `gestor123` | Posturas |
-| Gestor | `44444444444` | `gestor123` | Vigilância Sanitária |
-| Gestor | `55555555555` | `gestor123` | SEFIN |
-| Fiscal | `22222222222` | `fiscal123` | Centro |
-| Fiscal | `66666666666` | `fiscal123` | Feira do Bairro Brasil |
-| Fiscal | `77777777777` | `fiscal123` | Terminal |
-| Fiscal | `88888888888` | `fiscal123` | Itinerante |
-| Ambulante | `33333333333` | `amb123` | Cadastro pendente |
+| Administrador | `52998224725` | `admin123` | Painel Master |
+| Gestor | `11144477735` | `gestor123` | Posturas |
+| Gestor | `20030040094` | `gestor123` | Vigilância Sanitária |
+| Gestor | `30040050009` | `gestor123` | SEFIN |
+| Fiscal | `12345678909` | `fiscal123` | Centro |
+| Fiscal | `40050060007` | `fiscal123` | Feira do Bairro Brasil |
+| Fiscal | `50060070013` | `fiscal123` | Terminal |
+| Fiscal | `60070080020` | `fiscal123` | Itinerante |
+| Ambulante | `10020030088` | `amb123` | Cadastro pendente |
 | Ambulante | `39053344705` | `amb123` | Cadastro completo (MEI) |
-| Ambulante | `50293847122` | `amb123` | Só a conta |
-| Ambulante | `17482956011` | `amb123` | Completo e inativo |
+| Ambulante | `30405060726` | `amb123` | Só a conta |
+| Ambulante | `20304050601` | `amb123` | Completo e inativo |
 
 Há outros ambulantes fictícios (Antônio, Raimunda, Carlos, Pedro) com a mesma senha `amb123`, em situações de cadastro completo ou parcial.
 
@@ -129,7 +129,7 @@ curl http://localhost:8000/api/me/ \
 ```json
 {
   "id": 1,
-  "cpf": "33333333333",
+  "cpf": "10020030088",
   "nome": "João",
   "sobrenome": "Ambulante",
   "email": "ambulante@apal.com",

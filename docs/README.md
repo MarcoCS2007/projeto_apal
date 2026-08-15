@@ -56,9 +56,9 @@ Depois de `python manage.py seed_inicial` (ou equivalente no container):
 
 | Perfil | CPF | Senha | Entrada |
 | --- | --- | --- | --- |
-| Administrador (Master) | `00000000000` | `admin123` | `/login/` |
-| Gestor | `11111111111` | `gestor123` | `/login/` |
-| Fiscal | `22222222222` | `fiscal123` | `/fiscal/entrar/` |
-| Ambulante | `33333333333` | `amb123` | `/entrar/` |
+| Administrador (Master) | `52998224725` | `admin123` | `/login/` |
+| Gestor | `11144477735` | `gestor123` | `/login/` |
+| Fiscal | `12345678909` | `fiscal123` | `/fiscal/entrar/` |
+| Ambulante | `10020030088` | `amb123` | `/entrar/` |
 
 Detalhes e demais usuários fictícios: [API-AUTENTICACAO.md](API-AUTENTICACAO.md).

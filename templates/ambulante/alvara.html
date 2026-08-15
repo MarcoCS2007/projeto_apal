@@ -3,10 +3,6 @@
 
 {% block title %}Meu Alvará - APAL{% endblock %}
 
-{% block extra_css %}
-<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-{% endblock %}
-
 {% block header_nav %}
 {% include "publico/_nav.html" with active="alvara" %}
 {% endblock %}
@@ -137,6 +133,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous" defer></script>
 <script>
     document.body.addEventListener("htmx:configRequest", function (event) {
         const csrfToken = document.querySelector("meta[name='csrf-token']");

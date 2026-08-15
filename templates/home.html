@@ -3,25 +3,8 @@
 
 {% block title %}APAL - Vitória da Conquista{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
-{% endblock %}
-
-{% block header_extra_class %} home-header{% endblock %}
-
-{% block header_container_extra %} home-header-container{% endblock %}
-
-{% block logo %}
-<div class="logo-area">
-    <a href="{% url 'index' %}" class="home-logo-link">
-        <i data-lucide="map-pin" class="home-logo-icon" aria-hidden="true"></i>
-        <span class="logo-text home-logo-text">APAL</span>
-    </a>
-</div>
-{% endblock %}
-
 {% block header_nav %}
-{% include "publico/_nav.html" with active="inicio" nav_extra_class="home-nav" %}
+{% include "publico/_nav.html" with active="inicio" %}
 {% endblock %}
 
 {% block hero %}
@@ -49,6 +32,8 @@
 {% block main_class %}home-main-container{% endblock %}
 
 {% block content %}
+<section aria-labelledby="home-recursos-titulo">
+<h2 id="home-recursos-titulo" class="sr-only">Recursos da plataforma</h2>
 <div class="features-grid">
 
     <div class="feature-card">
@@ -82,6 +67,7 @@
     </div>
 
 </div>
+</section>
 
 <div class="steps-header">
     <h2 class="steps-title">Como funciona a regularização?</h2>
@@ -95,7 +81,7 @@
         <div class="step-icon-wrapper">
             <i data-lucide="user" class="step-icon" aria-hidden="true"></i>
         </div>
-        <h4 class="step-card-title">Seu Cadastro</h4>
+        <h3 class="step-card-title">Seu Cadastro</h3>
         <p class="step-card-description">Crie sua conta informando seus dados pessoais, endereço e tipo de comércio.</p>
     </div>
 
@@ -104,7 +90,7 @@
         <div class="step-icon-wrapper">
             <i data-lucide="file-text" class="step-icon" aria-hidden="true"></i>
         </div>
-        <h4 class="step-card-title">Envio de Documentos</h4>
+        <h3 class="step-card-title">Envio de Documentos</h3>
         <p class="step-card-description">Anexe as cópias do seu RG, CPF, Comprovante de Residência e fotos da estrutura.</p>
     </div>
 
@@ -113,7 +99,7 @@
         <div class="step-icon-wrapper">
             <i data-lucide="search" class="step-icon" aria-hidden="true"></i>
         </div>
-        <h4 class="step-card-title">Análise do Município</h4>
+        <h3 class="step-card-title">Análise do Município</h3>
         <p class="step-card-description">A fiscalização avalia os documentos enviados e a viabilidade do ponto solicitado.</p>
     </div>
 
@@ -122,7 +108,7 @@
         <div class="step-icon-wrapper">
             <i data-lucide="badge-check" class="step-icon" aria-hidden="true"></i>
         </div>
-        <h4 class="step-card-title">Credencial Liberada</h4>
+        <h3 class="step-card-title">Credencial Liberada</h3>
         <p class="step-card-description">Após a aprovação do requerimento, seu alvará digital é emitido direto no seu painel.</p>
     </div>
 
@@ -151,12 +137,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block footer %}
-<footer class="home-footer">
-    <p class="home-footer-text">
-        Prefeitura Municipal de Vitória da Conquista &bull; <span class="home-footer-highlight">APAL - Aqui Pode, Aqui é Legal</span>
-    </p>
-</footer>
 {% endblock %}

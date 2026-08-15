@@ -3,7 +3,7 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 16px;">
         <div style="display: flex; gap: 16px; align-items: center;">
             {% if resultado.ambulante.foto %}
-            <img src="{{ resultado.ambulante.foto.url }}" alt="Foto de {{ resultado.ambulante.nome_completo }}" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 1px solid #BFDBFE;">
+            <img src="{{ resultado.ambulante.foto.url }}" alt="Foto de {{ resultado.ambulante.nome_completo }}" width="72" height="72" decoding="async" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 1px solid #BFDBFE;">
             {% else %}
             <div style="width: 72px; height: 72px; border-radius: 12px; background: #DBEAFE; color: #2563EB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">{{ resultado.ambulante.iniciais }}</div>
             {% endif %}

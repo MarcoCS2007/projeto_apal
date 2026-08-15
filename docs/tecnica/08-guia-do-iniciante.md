@@ -5,7 +5,7 @@ Como usar este repositório no primeiro dia e nos primeiros PRs.
 ## 8.1 Antes de escrever código
 
 1. Suba o projeto ([README da raiz](../../README.md)): Docker, `.envs/.env.dev`, `migrate`, `seed_inicial`.
-2. Entre com as contas seed (Master `00000000000`, gestor `11111111111`, fiscal `22222222222`, ambulante `33333333333`).
+2. Entre com as contas seed (Master `52998224725`, gestor `11144477735`, fiscal `12345678909`, ambulante `10020030088`).
 3. Percorra o ciclo com a mão: completar cadastro → triagem → deferir → taxa → emitir → credencial → `/fiscal/` → ocorrência → dossiê/score.
 4. Leia os capítulos 3–6 com o editor aberto no trecho citado. O 7 é o ciclo inteiro; use a tabela de sintomas no final quando algo “não acontecer”.
 

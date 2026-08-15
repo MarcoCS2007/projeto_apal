@@ -726,6 +726,27 @@ class ContaAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "As senhas não coincidem")
         self.assertFalse(Ambulante.objects.filter(cpf="66677788899").exists())
 
+    def test_registro_telefone_incompleto_e_rejeitado(self):
+        response = self.client.post(
+            reverse("registro"),
+            self._payload_registro(telefone_whatsapp="77999"),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "10 dígitos")
+        self.assertContains(response, "11 dígitos")
+        self.assertFalse(Ambulante.objects.filter(cpf="66677788899").exists())
+
+    def test_registro_telefone_fixo_com_10_digitos_e_aceito(self):
+        response = self.client.post(
+            reverse("registro"),
+            self._payload_registro(telefone_whatsapp="7732293745"),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        ambulante = Ambulante.objects.get(cpf="66677788899")
+        self.assertEqual(ambulante.telefone_whatsapp, "7732293745")
+
     def test_registro_nao_exibe_upload_de_foto(self):
         response = self.client.get(reverse("registro"))
 

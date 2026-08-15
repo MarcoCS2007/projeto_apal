@@ -19,6 +19,24 @@ SENHA_GESTOR = "gestor123"
 SENHA_FISCAL = "fiscal123"
 SENHA_AMBULANTE = "amb123"
 
+# CPFs fictícios com dígitos verificadores válidos (mesma regra do cadastro).
+CPF_ADMIN = "52998224725"
+CPF_GESTOR = "11144477735"
+CPF_GESTOR_MARIANA = "20030040094"
+CPF_GESTOR_ROBERTO = "30040050009"
+CPF_FISCAL = "12345678909"
+CPF_FISCAL_CARLOS = "40050060007"
+CPF_FISCAL_ANA = "50060070013"
+CPF_FISCAL_PAULO = "60070080020"
+CPF_AMBULANTE = "10020030088"
+CPF_MARIA = "39053344705"
+CPF_ANTONIO = "80190200391"
+CPF_RAIMUNDA = "90200310402"
+CPF_CARLOS_AMB = "10203040570"
+CPF_FATIMA = "20304050601"
+CPF_LUCIANA = "30405060726"
+CPF_PEDRO = "70080090036"
+
 CATEGORIAS = (
     {
         "nome_categoria": "Alimentos Manipulados",
@@ -111,7 +129,7 @@ PONTOS = (
 
 GESTORES = (
     {
-        "cpf": "11111111111",
+        "cpf": CPF_GESTOR,
         "email": "gestor@apal.com",
         "password": SENHA_GESTOR,
         "nome": "Gestor",
@@ -123,7 +141,7 @@ GESTORES = (
         "is_staff": True,
     },
     {
-        "cpf": "44444444444",
+        "cpf": CPF_GESTOR_MARIANA,
         "email": "mariana.almeida@pmvc.ba.gov.br",
         "password": SENHA_GESTOR,
         "nome": "Mariana",
@@ -135,7 +153,7 @@ GESTORES = (
         "is_staff": True,
     },
     {
-        "cpf": "55555555555",
+        "cpf": CPF_GESTOR_ROBERTO,
         "email": "roberto.lima@pmvc.ba.gov.br",
         "password": SENHA_GESTOR,
         "nome": "Roberto",
@@ -150,7 +168,7 @@ GESTORES = (
 
 FISCAIS = (
     {
-        "cpf": "22222222222",
+        "cpf": CPF_FISCAL,
         "email": "fiscal@apal.com",
         "password": SENHA_FISCAL,
         "nome": "Fiscal",
@@ -161,7 +179,7 @@ FISCAIS = (
         "is_staff": True,
     },
     {
-        "cpf": "66666666666",
+        "cpf": CPF_FISCAL_CARLOS,
         "email": "carlos.moreira@pmvc.ba.gov.br",
         "password": SENHA_FISCAL,
         "nome": "Carlos Eduardo",
@@ -172,7 +190,7 @@ FISCAIS = (
         "is_staff": True,
     },
     {
-        "cpf": "77777777777",
+        "cpf": CPF_FISCAL_ANA,
         "email": "ana.souza@pmvc.ba.gov.br",
         "password": SENHA_FISCAL,
         "nome": "Ana Paula",
@@ -183,7 +201,7 @@ FISCAIS = (
         "is_staff": True,
     },
     {
-        "cpf": "88888888888",
+        "cpf": CPF_FISCAL_PAULO,
         "email": "paulo.itinerante@pmvc.ba.gov.br",
         "password": SENHA_FISCAL,
         "nome": "Paulo",
@@ -258,11 +276,11 @@ class Command(BaseCommand):
         return ambulante
 
     def _administrador(self):
-        if Administrador.objects.filter(cpf="00000000000").exists():
+        if Administrador.objects.filter(cpf=CPF_ADMIN).exists():
             self.stdout.write("Administrador Master já existe.")
             return
         Administrador.objects.create_superuser(
-            cpf="00000000000",
+            cpf=CPF_ADMIN,
             email="admin@apal.com",
             password="admin123",
             nome="Admin",
@@ -319,7 +337,7 @@ class Command(BaseCommand):
     def _ambulantes(self, pontos):
         self._ambulante_joao()
         self._ambulante_completo(
-            cpf="39053344705",
+            cpf=CPF_MARIA,
             email="maria.dores@email.com",
             nome="Maria",
             sobrenome="das Dores",
@@ -347,7 +365,7 @@ class Command(BaseCommand):
             extras={"razao_social": "Maria das Dores MEI", "sem_cnpj": False},
         )
         self._ambulante_completo(
-            cpf="28174691000",
+            cpf=CPF_ANTONIO,
             email="antonio.bispo@email.com",
             nome="Antônio",
             sobrenome="Bispo",
@@ -376,7 +394,7 @@ class Command(BaseCommand):
             extras={"sem_cnpj": True},
         )
         self._ambulante_completo(
-            cpf="83716209433",
+            cpf=CPF_RAIMUNDA,
             email="raimunda.alves@email.com",
             nome="Raimunda",
             sobrenome="Alves",
@@ -404,7 +422,7 @@ class Command(BaseCommand):
             extras={"razao_social": "Raimunda Alves Lanches ME", "sem_cnpj": False},
         )
         self._ambulante_completo(
-            cpf="91827364544",
+            cpf=CPF_CARLOS_AMB,
             email="carlos.feira@email.com",
             nome="Carlos",
             sobrenome="Ferreira",
@@ -432,7 +450,7 @@ class Command(BaseCommand):
             extras={"sem_cnpj": True},
         )
         self._ambulante_completo(
-            cpf="17482956011",
+            cpf=CPF_FATIMA,
             email="fatima.inativa@email.com",
             nome="Fátima",
             sobrenome="Oliveira",
@@ -461,14 +479,14 @@ class Command(BaseCommand):
             ativo=False,
         )
         self._ambulante_conta(
-            cpf="50293847122",
+            cpf=CPF_LUCIANA,
             email="luciana.rocha@email.com",
             nome="Luciana",
             sobrenome="Rocha",
             telefone="77991001006",
         )
         self._ambulante_parcial(
-            cpf="61504938233",
+            cpf=CPF_PEDRO,
             email="pedro.nunes@email.com",
             nome="Pedro",
             sobrenome="Nunes",
@@ -477,13 +495,13 @@ class Command(BaseCommand):
         )
 
     def _ambulante_joao(self):
-        existente = Ambulante.objects.filter(cpf="33333333333").first()
+        existente = Ambulante.objects.filter(cpf=CPF_AMBULANTE).first()
         if existente:
             self._garantir_aceite_lgpd(existente)
-            self.stdout.write("Ambulante 33333333333 já existe.")
+            self.stdout.write(f"Ambulante {CPF_AMBULANTE} já existe.")
             return
         Ambulante.objects.create_user(
-            cpf="33333333333",
+            cpf=CPF_AMBULANTE,
             email="ambulante@apal.com",
             password=SENHA_AMBULANTE,
             nome="João",
@@ -607,10 +625,10 @@ class Command(BaseCommand):
         from apps.licenciamento.services import abrir_requerimento
 
         mapa = {
-            "39053344705": "Lanches e Salgados",
-            "28174691000": "Vestuário e Acessórios",
-            "83716209433": "Alimentos Manipulados",
-            "91827364544": "Frutas e Hortifruti",
+            CPF_MARIA: "Lanches e Salgados",
+            CPF_ANTONIO: "Vestuário e Acessórios",
+            CPF_RAIMUNDA: "Alimentos Manipulados",
+            CPF_CARLOS_AMB: "Frutas e Hortifruti",
         }
         for cpf, nome_categoria in mapa.items():
             ambulante = Ambulante.objects.filter(cpf=cpf, ativo=True).first()
@@ -634,11 +652,11 @@ class Command(BaseCommand):
     def _resumo(self):
         self.stdout.write("")
         self.stdout.write("Contas para teste (todas idempotentes):")
-        self.stdout.write("  Admin     CPF 00000000000  senha admin123")
-        self.stdout.write("  Gestor    CPF 11111111111  senha gestor123")
-        self.stdout.write("  Fiscal    CPF 22222222222  senha fiscal123")
+        self.stdout.write(f"  Admin     CPF {CPF_ADMIN}  senha admin123")
+        self.stdout.write(f"  Gestor    CPF {CPF_GESTOR}  senha gestor123")
+        self.stdout.write(f"  Fiscal    CPF {CPF_FISCAL}  senha fiscal123")
         self.stdout.write(
-            "  Ambulante CPF 33333333333  senha amb123  (cadastro pendente)"
+            f"  Ambulante CPF {CPF_AMBULANTE}  senha amb123  (cadastro pendente)"
         )
         self.stdout.write("  Demais gestores/fiscais usam gestor123 / fiscal123.")
         self.stdout.write("  Demais ambulantes usam amb123.")

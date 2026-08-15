@@ -17,7 +17,7 @@ Permissões: `IsAmbulante` e `IsFiscal` em `apps/core/permissions.py`. Perfil er
 ```bash
 curl -X POST http://localhost:8000/api/login/ \
   -H "Content-Type: application/json" \
-  -d "{\"cpf\": \"33333333333\", \"password\": \"amb123\"}"
+  -d "{\"cpf\": \"10020030088\", \"password\": \"amb123\"}"
 
 curl http://localhost:8000/api/ambulante/solicitacao/ \
   -H "Authorization: Bearer <access>"
@@ -46,7 +46,7 @@ curl http://localhost:8000/api/ambulante/solicitacao/ \
 ```bash
 curl -X POST http://localhost:8000/api/login/ \
   -H "Content-Type: application/json" \
-  -d "{\"cpf\": \"22222222222\", \"password\": \"fiscal123\"}"
+  -d "{\"cpf\": \"12345678909\", \"password\": \"fiscal123\"}"
 
 curl "http://localhost:8000/api/fiscal/qr/?codigo=<hash-hmac>" \
   -H "Authorization: Bearer <access>"
@@ -110,7 +110,7 @@ Tipos de documento: `comprovante_residencia`, `rg_cpf`, `mei`, `laudo_sanitario`
   "mensagem": "Credencial válida.",
   "fora_horario": false,
   "tipo_sugerido": "Outra irregularidade",
-  "ambulante": {"id": 1, "nome_completo": "João Ambulante", "cpf": "33333333333"},
+  "ambulante": {"id": 1, "nome_completo": "João Ambulante", "cpf": "10020030088"},
   "licenca": {"numero_licenca": "ALV-2026-0001", "status": "Ativo"},
   "candidatos": []
 }
@@ -130,10 +130,10 @@ As mesmas da autenticação (`python manage.py seed_inicial`):
 
 | Perfil | CPF | Senha |
 | --- | --- | --- |
-| Fiscal | `22222222222` | `fiscal123` |
-| Ambulante | `33333333333` | `amb123` |
+| Fiscal | `12345678909` | `fiscal123` |
+| Ambulante | `10020030088` | `amb123` |
 
-O ambulante `33333333333` do seed começa sem alvará emitido: `GET /api/ambulante/solicitacao/` funciona, mas o QR só fica `valido` depois da emissão no backoffice.
+O ambulante `10020030088` do seed começa sem alvará emitido: `GET /api/ambulante/solicitacao/` funciona, mas o QR só fica `valido` depois da emissão no backoffice.
 
 ---
 

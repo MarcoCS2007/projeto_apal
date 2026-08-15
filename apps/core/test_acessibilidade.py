@@ -12,6 +12,8 @@ class AcessibilidadeTransversalTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, WIDGET, count=1)
         self.assertContains(response, SKIP)
+        self.assertContains(response, 'href="#conteudo-principal"')
+        self.assertContains(response, 'aria-label="Principal"')
         self.assertTemplateUsed(response, "base.html")
 
     def test_telas_master_herdam_widget(self):
@@ -51,4 +53,6 @@ class AcessibilidadeTransversalTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, 'id="ai-modal"')
         self.assertContains(response, 'id="ai-response-content"')
         self.assertContains(response, "Simplificar com IA")
+        self.assertContains(response, 'aria-label="APAL — página inicial de Vitória da Conquista"')
+        self.assertContains(response, "Recursos da plataforma")
         self.assertNotContains(response, "max-width: 500px")

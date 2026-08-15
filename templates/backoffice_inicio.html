@@ -21,32 +21,32 @@
         <div class="title-accent"></div>
         <h2>Olá, {{ user.nome }} {{ user.sobrenome }}</h2>
     </div>
-    <p style="color: var(--texto-cinza);">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.{% if pode.relatorios %} Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.{% endif %}</p>
+    <p class="text-muted">Use o menu para abrir a fila, consultar ambulantes e registrar o parecer técnico.{% if pode.relatorios %} Os indicadores de ocupação estão em <a href="{% url 'gestor_dashboard' %}">Relatórios</a>.{% endif %}</p>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+<div class="shortcut-grid">
     {% if pode.solicitacao_licenca %}
-    <a href="{% url 'gestor_fila' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Fila em análise</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ fila_analise }}</strong>
-        <small style="color: #D97706;">Requerimentos pendentes</small>
+    <a href="{% url 'gestor_fila' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Fila em análise</span>
+        <strong class="stat-value">{{ fila_analise }}</strong>
+        <small class="text-muted">Requerimentos pendentes</small>
     </a>
-    <a href="{% url 'gestor_ambulantes' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ambulantes</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ total_ambulantes }}</strong>
-        <small style="color: #475569;">Cadastros no município</small>
+    <a href="{% url 'gestor_ambulantes' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Ambulantes</span>
+        <strong class="stat-value">{{ total_ambulantes }}</strong>
+        <small class="text-muted">Cadastros no município</small>
     </a>
-    <a href="{% url 'gestor_triagem' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Documentos pendentes</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ docs_pendentes }}</strong>
-        <small style="color: #475569;">Aguardando triagem</small>
+    <a href="{% url 'gestor_triagem' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Documentos pendentes</span>
+        <strong class="stat-value">{{ docs_pendentes }}</strong>
+        <small class="text-muted">Aguardando triagem</small>
     </a>
     {% endif %}
     {% if pode.emissao_alvara %}
-    <a href="{% url 'gestor_licencas' %}" class="form-card" style="text-decoration: none; color: inherit; margin: 0;">
-        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Prontos para emissão</span>
-        <strong style="display: block; font-size: 1.8rem; margin-top: 4px;">{{ licencas_aprovadas }}</strong>
-        <small style="color: #059669;">Deferidos nesta etapa</small>
+    <a href="{% url 'gestor_licencas' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Prontos para emissão</span>
+        <strong class="stat-value">{{ licencas_aprovadas }}</strong>
+        <small class="text-muted">Deferidos nesta etapa</small>
     </a>
     {% endif %}
 </div>
