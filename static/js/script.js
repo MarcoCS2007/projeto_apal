@@ -18,8 +18,8 @@ function obterToastContainer() {
     return container;
 }
 
-function mostrarToast(mensagem, tipo = 'info') {
-    if (!mensagem) return;
+function mostrarToast(mensagem, tipo = 'info', titulo = null) {
+    if (!mensagem && !titulo) return;
 
     const tipoNormalizado = {
         success: 'success',
@@ -36,12 +36,25 @@ function mostrarToast(mensagem, tipo = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast-alert ${tipoNormalizado}`;
     toast.setAttribute('role', tipoNormalizado === 'error' || tipoNormalizado === 'warning' ? 'alert' : 'status');
-    toast.textContent = mensagem;
+
+    if (titulo) {
+        const tituloEl = document.createElement('strong');
+        tituloEl.textContent = titulo;
+        toast.appendChild(tituloEl);
+        if (mensagem) {
+            const textoEl = document.createElement('span');
+            textoEl.textContent = mensagem;
+            toast.appendChild(textoEl);
+        }
+    } else {
+        toast.textContent = mensagem;
+    }
+
     obterToastContainer().appendChild(toast);
 
     window.setTimeout(() => {
         toast.remove();
-    }, tipoNormalizado === 'error' ? 6000 : 4500);
+    }, tipoNormalizado === 'error' || tipoNormalizado === 'warning' ? 6000 : 4500);
 }
 
 window.mostrarToast = mostrarToast;
@@ -429,7 +442,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const texto = (el.textContent || '').replace(/\s+/g, ' ').trim();
         if (!texto || typeof mostrarToast !== 'function') return;
         mostrarToast(texto, el.classList.contains('form-success') ? 'success' : 'error');
+        el.remove();
     });
+
+    function atualizarNomeArquivoPicker(input, nomeEl) {
+        const arquivo = input.files && input.files[0];
+        nomeEl.textContent = arquivo ? arquivo.name : 'Nenhum arquivo selecionado';
+    }
+
+    function inicializarSeletorArquivo(input) {
+        if (!input || input.type !== 'file' || input.closest('.custom-file-picker')) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-file-picker';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        const botao = document.createElement('span');
+        botao.className = 'custom-file-picker-btn';
+        botao.textContent = 'Selecione um arquivo';
+        const nome = document.createElement('span');
+        nome.className = 'custom-file-picker-name';
+        nome.textContent = 'Nenhum arquivo selecionado';
+        wrapper.appendChild(botao);
+        wrapper.appendChild(nome);
+
+        input.addEventListener('change', () => atualizarNomeArquivoPicker(input, nome));
+        atualizarNomeArquivoPicker(input, nome);
+    }
+
+    document.querySelectorAll('.input-group input[type="file"]').forEach(inicializarSeletorArquivo);
+
+    const pendenciaDocumental = document.getElementById('pendencia-documental-toast');
+    if (pendenciaDocumental && typeof mostrarToast === 'function') {
+        const documentos = (pendenciaDocumental.dataset.documentos || '').trim();
+        const titulo = (pendenciaDocumental.dataset.titulo || 'Pendência documental').trim();
+        if (documentos) {
+            mostrarToast(documentos, 'error', titulo);
+        }
+        pendenciaDocumental.remove();
+    }
 
     function prepararTabelasResponsivas(raiz) {
         const escopo = raiz && raiz.querySelectorAll ? raiz : document;
@@ -516,6 +568,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeBtn?.addEventListener('click', () => {
             sincronizarPainelAcesso(false);
+        });
+    }
+
+    // ---------------------------------------------------
+    // WIDGET FLUTUANTE DO ASSISTENTE (ambulante)
+    // ---------------------------------------------------
+    const assistenteFloat = document.getElementById('assistente-widget-float');
+    if (assistenteFloat) {
+        assistenteFloat.addEventListener('mouseenter', () => {
+            assistenteFloat.classList.add('expanded');
+            assistenteFloat.setAttribute('aria-expanded', 'true');
+        });
+        assistenteFloat.addEventListener('mouseleave', () => {
+            assistenteFloat.classList.remove('expanded');
+            assistenteFloat.setAttribute('aria-expanded', 'false');
         });
     }
 
@@ -1526,6 +1593,16 @@ async function chamarGroq(promptInstrucao, textoSelecionado) {
                 );
             }
 
+            const estadoNascimento = document.getElementById('estado-nascimento');
+            const cidadeNascimento = document.getElementById('cidade-nascimento');
+            if (estadoNascimento?.value && cidadeNascimento) {
+                window.carregarCidades(
+                    'estado-nascimento',
+                    'cidade-nascimento',
+                    cidadeNascimento.dataset.valorInicial || cidadeNascimento.value || null
+                );
+            }
+
         } catch (error) {
             console.error('Erro ao buscar estados no IBGE:', error);
             notificarFalhaRede(error, 'Não foi possível carregar os estados. Digite o endereço manualmente.');
@@ -2353,37 +2430,69 @@ if (
     const estadoNascSelect = document.getElementById('estado-nascimento');
     const cidadeNascSelect = document.getElementById('cidade-nascimento');
 
+    function prepararCidadeNascimento() {
+        if (!cidadeNascSelect || !estadoNascSelect) return;
+        if (paisOrigemSelect && paisOrigemSelect.value !== 'Brasil') return;
+
+        const uf = estadoNascSelect.value;
+        if (uf) {
+            window.carregarCidades(
+                'estado-nascimento',
+                'cidade-nascimento',
+                cidadeNascSelect.dataset.valorInicial || cidadeNascSelect.value || null
+            );
+            return;
+        }
+
+        cidadeNascSelect.disabled = true;
+        cidadeNascSelect.replaceChildren(new Option('Selecione o Estado primeiro...', '', true, true));
+        cidadeNascSelect.options[0].disabled = true;
+        sincronizarDropdownPersonalizado(cidadeNascSelect);
+    }
+
     function aplicarRegraNacionalidade() {
         if (!paisOrigemSelect) return;
 
         const ehBrasil = paisOrigemSelect.value === 'Brasil';
 
         if (estadoNascSelect) {
-            estadoNascSelect.disabled = !ehBrasil;
             estadoNascSelect.required = ehBrasil;
 
             if (!ehBrasil) {
+                estadoNascSelect.disabled = true;
                 estadoNascSelect.value = '';
+                estadoNascSelect.dataset.valorInicial = '';
                 estadoNascSelect.replaceChildren(new Option('Não aplicável (Estrangeiro)', '', true, true));
+                sincronizarDropdownPersonalizado(estadoNascSelect);
             } else {
-                carregarEstados();
+                estadoNascSelect.disabled = false;
+                const precisaRecarregar = estadoNascSelect.options.length <= 1
+                    || Array.from(estadoNascSelect.options).some(
+                        (opcao) => opcao.textContent.includes('Estrangeiro')
+                    );
+
+                if (precisaRecarregar) {
+                    carregarEstados().then(() => prepararCidadeNascimento());
+                } else {
+                    prepararCidadeNascimento();
+                }
             }
         }
 
         if (cidadeNascSelect) {
-            cidadeNascSelect.disabled = true; // Habilita somente após escolher a UF
             cidadeNascSelect.required = ehBrasil;
 
             if (!ehBrasil) {
+                cidadeNascSelect.disabled = true;
                 cidadeNascSelect.value = '';
+                cidadeNascSelect.dataset.valorInicial = '';
                 cidadeNascSelect.replaceChildren(new Option('Não aplicável (Estrangeiro)', '', true, true));
-            } else {
-                cidadeNascSelect.replaceChildren(new Option('Selecione o Estado primeiro...', '', true, true));
+                sincronizarDropdownPersonalizado(cidadeNascSelect);
             }
         }
     }
 
-   paisOrigemSelect?.addEventListener('change', aplicarRegraNacionalidade);
+    paisOrigemSelect?.addEventListener('change', aplicarRegraNacionalidade);
 
     // ---> GATILHO: Inicia a busca no IBGE ao carregar a página <---
     if (estadoNascSelect || document.getElementById('estado-input') || document.getElementById('estado-ponto')) {
@@ -2393,6 +2502,14 @@ if (
     } else {
         aplicarRegraNacionalidade();
     }
+
+    // Campos disabled não entram no POST e são ignorados na validação do cliente.
+    // Reabilita UF/cidade antes da validação/envio quando o país for Brasil.
+    document.getElementById('cadastro-form')?.addEventListener('submit', () => {
+        if (paisOrigemSelect && paisOrigemSelect.value !== 'Brasil') return;
+        if (estadoNascSelect) estadoNascSelect.disabled = false;
+        if (cidadeNascSelect) cidadeNascSelect.disabled = false;
+    }, true);
 
     // ==========================================
     // MÁSCARA E BLOQUEIO DE LETRAS NO TELEFONE

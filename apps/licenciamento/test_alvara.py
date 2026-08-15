@@ -82,11 +82,10 @@ class AlvaraAmbulanteTests(UsuariosAuthFixtures, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, licenca.protocolo)
-        self.assertContains(response, "Em Análise")
-        self.assertContains(response, "Praça Central")
-        self.assertContains(response, "Alimentos Manipulados")
-        self.assertContains(response, "João Ambulante")
-        self.assertContains(response, "Histórico de requerimentos")
+        self.assertContains(response, "solicitação está em andamento")
+        self.assertNotContains(response, "Histórico de requerimentos")
+        self.assertNotContains(response, "Praça Central")
+        self.assertContains(response, "Meu alvará")
 
         painel = self.client.get(reverse("ambulante_painel"))
         self.assertContains(painel, licenca.protocolo)
@@ -108,16 +107,16 @@ class AlvaraAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "Indeferido")
         self.assertContains(response, "Ponto incompatível com a estrutura.")
 
-    def test_pendencia_oferece_reenvio_de_documentos(self):
+    def test_pendencia_mostra_apenas_protocolo_em_andamento(self):
         licenca, _criado = abrir_requerimento(self.ambulante, self.categoria)
         licenca.status = StatusLicenca.PENDENCIA_DOCUMENTAL
         licenca.save(update_fields=["status"])
 
         self.client.force_login(self.ambulante)
         response = self.client.get(self.url)
-        self.assertContains(response, "Pendência Documental")
-        self.assertContains(response, reverse("ambulante_cadastro"))
-        self.assertContains(response, "Reenviar documentos")
+        self.assertContains(response, licenca.protocolo)
+        self.assertContains(response, "solicitação está em andamento")
+        self.assertNotContains(response, "Reenviar documentos")
 
     def test_aprovado_permite_simular_pagamento_htmx(self):
         licenca, _criado = abrir_requerimento(self.ambulante, self.categoria)
@@ -187,7 +186,8 @@ class AlvaraAmbulanteTests(UsuariosAuthFixtures, TestCase):
 
         alvara = self.client.get(self.url)
         self.assertContains(alvara, nova.protocolo)
-        self.assertContains(alvara, "Renovação")
+        self.assertContains(alvara, "solicitação está em andamento")
+        self.assertNotContains(alvara, "Renovação")
 
         self.client.logout()
         self.client.force_login(self.gestor)

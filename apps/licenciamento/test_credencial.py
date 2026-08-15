@@ -146,7 +146,7 @@ class CredencialAmbulanteTests(UsuariosAuthFixtures, TestCase):
 
         painel = self.client.get(reverse("ambulante_painel"))
         self.assertContains(painel, self.url)
-        self.assertContains(painel, "Ver credencial")
+        self.assertContains(painel, "Credencial")
 
     def test_suspensa_nao_mostra_qr_valido(self):
         self._emitir()

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import (
     LoginView,
@@ -20,8 +20,11 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.assistente.models import LogAssistente
+from apps.core.qrcode import validar_codigo_qr
+from apps.licenciamento.models import StatusLicenca
 from apps.licenciamento.services import (
     categoria_do_ambulante,
+    licenca_ativa,
     licenca_atual,
     pode_avancar_solicitacao,
     tipos_faltando_aprovacao,
@@ -321,10 +324,49 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
             if documentos is not None
             else []
         )
+        context.update(
+            _resumo_status_painel(
+                ambulante,
+                context["licenca"],
+                cadastro_completo=context["cadastro_completo"],
+                documentos_rejeitados=context["documentos_rejeitados"],
+            )
+        )
+        context.update(
+            _stepper_painel(
+                ambulante,
+                context["licenca"],
+                cadastro_completo=context["cadastro_completo"],
+                documentos_rejeitados=context["documentos_rejeitados"],
+            )
+        )
+        context.update(_card_protocolo_prazos(context["licenca"]))
         if ambulante:
             from .score import resumo_score
 
             context.update(resumo_score(ambulante))
+            ativa = licenca_ativa(ambulante)
+            qr_liberado = bool(
+                ativa
+                and ativa.qr_valido
+                and ambulante.codigo_qr_code
+                and validar_codigo_qr(ambulante.codigo_qr_code) is not None
+            )
+            context["qr_liberado"] = qr_liberado
+            context["licenca_ativa"] = ativa
+            context["licenca_credencial"] = (
+                ativa if qr_liberado else context["licenca"]
+            )
+            context["historico_licencas"] = list(
+                ambulante.licencas.order_by("-criado_em")
+            )
+            context["categoria"] = categoria_do_ambulante(ambulante)
+        else:
+            context["qr_liberado"] = False
+            context["licenca_ativa"] = None
+            context["licenca_credencial"] = None
+            context["historico_licencas"] = []
+            context["categoria"] = None
         return context
 
 
@@ -335,9 +377,16 @@ class PerfilAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
     def _ambulante(self):
         return Ambulante.objects.get(pk=self.request.user.pk)
 
-    def _contexto(self, ambulante, form):
+    def _contexto(self, ambulante, form, *, modo_edicao=False):
         extras = ambulante.dados_complementares or {}
         estrutura = ambulante.estruturas.order_by("id").first()
+        situacao = ambulante.situacao_conta
+        situacao_rotulos = {
+            "cancelada": "Cancelada",
+            "suspensa": "Suspensa",
+            "completa": "Completa",
+            "pendente": "Pendente",
+        }
         return {
             "form": form,
             "ambulante": ambulante,
@@ -356,23 +405,44 @@ class PerfilAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
                 TIPO_ESTRUTURA_CHOICES,
                 estrutura.tipo_estrutura if estrutura else "",
             ),
+            "situacao_conta_label": situacao_rotulos.get(situacao, situacao.title()),
+            "modo_edicao": modo_edicao,
         }
 
     def get(self, request):
         ambulante = self._ambulante()
         form = PerfilAmbulanteForm(ambulante=ambulante)
-        return render(request, self.template_name, self._contexto(ambulante, form))
+        return render(
+            request,
+            self.template_name,
+            self._contexto(
+                ambulante,
+                form,
+                modo_edicao=request.GET.get("editar") == "1",
+            ),
+        )
 
     def post(self, request):
         ambulante = self._ambulante()
         form = PerfilAmbulanteForm(request.POST, request.FILES, ambulante=ambulante)
         if not form.is_valid():
-            return render(request, self.template_name, self._contexto(ambulante, form))
+            return render(
+                request,
+                self.template_name,
+                self._contexto(ambulante, form, modo_edicao=True),
+            )
         form.save()
-        messages.success(
-            request,
-            "Perfil atualizado. E-mail, CPF, endereço e foto foram salvos.",
-        )
+        if form.cleaned_data.get("senha_nova"):
+            update_session_auth_hash(request, ambulante)
+            messages.success(
+                request,
+                "Perfil atualizado. A senha foi alterada com sucesso.",
+            )
+        else:
+            messages.success(
+                request,
+                "Perfil atualizado. Os dados foram salvos com sucesso.",
+            )
         return redirect("ambulante_perfil")
 
 
@@ -398,6 +468,217 @@ ETAPAS_CADASTRO = {
     5: PontoCadastroForm,
     6: AnexosCadastroForm,
 }
+
+
+def _etapas_pendentes_cadastro(ambulante):
+    extras = ambulante.dados_complementares or {}
+    pendentes = 0
+    pais = extras.get("pais_origem")
+    naturalidade_ok = bool(pais) and (
+        pais != "Brasil"
+        or (extras.get("uf_nascimento") and extras.get("cidade_nascimento"))
+    )
+    dados_pessoais_ok = bool(
+        ambulante.data_nasc
+        and ambulante.escolaridade
+        and ambulante.genero
+        and ambulante.renda_estimada is not None
+        and naturalidade_ok
+    )
+    if not dados_pessoais_ok:
+        pendentes += 1
+    if not ambulante.enderecos.exists():
+        pendentes += 1
+    if not (ambulante.cnpj or extras.get("sem_cnpj")):
+        pendentes += 1
+    estrutura = ambulante.estruturas.order_by("id").first()
+    tem_estrutura = bool(
+        estrutura
+        and estrutura.tipo_estrutura
+        and estrutura.dimensoes_metragem
+        and estrutura.dimensoes_metragem > 0
+    )
+    if not (tem_estrutura and ambulante.tipo_atuacao):
+        pendentes += 1
+    if not ambulante.ponto_pretendido_id:
+        pendentes += 1
+    if not ambulante.documentos.exists():
+        pendentes += 1
+    return pendentes
+
+
+def _resumo_status_painel(ambulante, licenca, *, cadastro_completo, documentos_rejeitados):
+    if not ambulante:
+        return {
+            "status_rotulo": "Sem conta",
+            "status_badge": "danger",
+            "status_com_alvara": False,
+            "proximo_passo": "Faça login novamente para continuar.",
+        }
+
+    if not cadastro_completo:
+        faltam = _etapas_pendentes_cadastro(ambulante)
+        if faltam <= 0:
+            proximo = "Complete os dados pendentes do cadastro para solicitar a licença."
+        elif faltam == 1:
+            proximo = "Falta 1 etapa para você emitir sua licença."
+        else:
+            proximo = f"Faltam {faltam} etapas para você emitir sua licença."
+        return {
+            "status_rotulo": "Cadastro Incompleto",
+            "status_badge": "warning",
+            "status_com_alvara": False,
+            "proximo_passo": proximo,
+        }
+
+    if licenca:
+        mensagens = {
+            StatusLicenca.EM_ANALISE: "",
+            StatusLicenca.PENDENCIA_DOCUMENTAL: (
+                "Há pendência documental. Reenvie os anexos solicitados."
+            ),
+            StatusLicenca.APROVADO: (
+                "Sua solicitação foi aprovada. Confira se falta pagar a taxa ou emitir o alvará."
+            ),
+            StatusLicenca.AGUARDANDO_PAGAMENTO: (
+                "Pague a taxa de licenciamento para emitir seu alvará."
+            ),
+            StatusLicenca.ATIVO: (
+                "Sua licença está ativa. Use a credencial digital quando for fiscalizado."
+            ),
+            StatusLicenca.VENCIDO: (
+                "Sua licença venceu. Inicie a renovação pelo painel."
+            ),
+            StatusLicenca.SUSPENSO: (
+                "Sua licença está suspensa. Fale com a prefeitura para regularizar."
+            ),
+            StatusLicenca.INDEFERIDO: (
+                "Sua solicitação foi indeferida. Veja o motivo e corrija o cadastro."
+            ),
+            StatusLicenca.CANCELADO: (
+                "Sua licença foi cancelada. Procure a prefeitura se precisar de orientação."
+            ),
+        }
+        return {
+            "status_rotulo": licenca.status,
+            "status_badge": licenca.classe_badge,
+            "status_com_alvara": True,
+            "proximo_passo": mensagens.get(
+                licenca.status,
+                "Acompanhe o andamento da sua solicitação neste painel.",
+            ),
+        }
+
+    if documentos_rejeitados:
+        return {
+            "status_rotulo": "Pendência Documental",
+            "status_badge": "purple",
+            "status_com_alvara": False,
+            "proximo_passo": (
+                "Reenvie os documentos rejeitados para a fiscalização retomar a análise."
+            ),
+        }
+
+    return {
+        "status_rotulo": "Cadastro Completo",
+        "status_badge": "success",
+        "status_com_alvara": False,
+        "proximo_passo": (
+            "Envie seus documentos na etapa de anexos para solicitar a licença."
+        ),
+    }
+
+
+def _stepper_painel(ambulante, licenca, *, cadastro_completo, documentos_rejeitados):
+    """Linha do tempo do painel: conta → dados → documentos → análise → licença."""
+    etapas = [
+        {"chave": "conta", "rotulo": "Conta Criada"},
+        {"chave": "dados", "rotulo": "Dados do Ponto e Atividade"},
+        {"chave": "documentos", "rotulo": "Documentos Anexados"},
+        {"chave": "analise", "rotulo": "Análise da Prefeitura"},
+        {"chave": "licenca", "rotulo": "Licença Liberada"},
+    ]
+
+    tem_documentos = bool(ambulante and ambulante.documentos.exists())
+    docs_ok = tem_documentos and not documentos_rejeitados
+    status = getattr(licenca, "status", None) if licenca else None
+
+    if status == StatusLicenca.ATIVO:
+        atual = 6
+    elif status in (
+        StatusLicenca.APROVADO,
+        StatusLicenca.AGUARDANDO_PAGAMENTO,
+    ):
+        atual = 5
+    elif status in (
+        StatusLicenca.EM_ANALISE,
+        StatusLicenca.PENDENCIA_DOCUMENTAL,
+    ):
+        atual = 4
+    elif status in (
+        StatusLicenca.VENCIDO,
+        StatusLicenca.SUSPENSO,
+        StatusLicenca.INDEFERIDO,
+        StatusLicenca.CANCELADO,
+    ):
+        atual = 5
+    elif docs_ok and cadastro_completo:
+        atual = 4
+    elif cadastro_completo or documentos_rejeitados:
+        atual = 3
+    else:
+        atual = 2
+
+    for indice, etapa in enumerate(etapas, start=1):
+        if indice < atual:
+            etapa["estado"] = "completed"
+        elif indice == atual:
+            etapa["estado"] = "active"
+        else:
+            etapa["estado"] = "pending"
+
+    total = len(etapas)
+    if atual > total:
+        percent = 100
+    else:
+        percent = int(((atual - 1) / max(total - 1, 1)) * 100)
+
+    return {
+        "painel_stepper": etapas,
+        "painel_stepper_percent": percent,
+    }
+
+
+def _card_protocolo_prazos(licenca):
+    if not licenca:
+        return {"mostrar_protocolo": False}
+
+    status_visiveis = (
+        StatusLicenca.EM_ANALISE,
+        StatusLicenca.PENDENCIA_DOCUMENTAL,
+        StatusLicenca.APROVADO,
+        StatusLicenca.AGUARDANDO_PAGAMENTO,
+        StatusLicenca.ATIVO,
+    )
+    if licenca.status not in status_visiveis:
+        return {"mostrar_protocolo": False}
+
+    return {
+        "mostrar_protocolo": True,
+        "protocolo_numero": licenca.protocolo,
+        "protocolo_data_solicitacao": licenca.criado_em,
+        "protocolo_prazo_texto": "Prazo estimado de até 5 dias úteis.",
+        "protocolo_validade": licenca.data_vencimento,
+        "protocolo_mostra_validade": bool(
+            licenca.data_vencimento
+            and licenca.status
+            in (
+                StatusLicenca.APROVADO,
+                StatusLicenca.AGUARDANDO_PAGAMENTO,
+                StatusLicenca.ATIVO,
+            )
+        ),
+    }
 
 
 class CadastroCompletoAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, View):
@@ -494,7 +775,7 @@ class CadastroCompletoAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, Vi
                     "Cadastro concluído. A solicitação entrou na fila de análise "
                     "da prefeitura. Acompanhe pelo protocolo em Meu Alvará.",
                 )
-                return redirect("ambulante_alvara")
+                return redirect("ambulante_credencial")
             messages.error(
                 request,
                 "Ainda faltam dados obrigatórios (pessoais, endereço, "
@@ -503,9 +784,7 @@ class CadastroCompletoAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, Vi
             return redirect(f"{reverse('ambulante_cadastro')}?etapa={etapa}")
 
         proxima = min(etapa + 1, 6)
-        messages.success(
-            request, "Etapa salva. Você pode continuar sem perder os dados."
-        )
+        messages.success(request, "Etapa salva...")
         return redirect(f"{reverse('ambulante_cadastro')}?etapa={proxima}")
 
 

@@ -126,10 +126,6 @@
             </tbody>
         </table>
     </div>
-    <p style="margin-top: 1.2rem;">
-        <a href="{% url 'ambulante_painel' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
-            <i data-lucide="arrow-left"></i> Voltar ao painel
-        </a>
-    </p>
+    {% include "ambulante/_voltar_painel.html" %}
 </div>
 {% endblock %}

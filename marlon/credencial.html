@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Ambulante e Credencial - APAL</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Cabeçalho Institucional -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <i data-lucide="map-pin"
+                        style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
+                    <span class="logo-text"
+                        style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="../index.html"><i data-lucide="home"></i> Início</a>
+                <a href="cadastro.html"><i data-lucide="file-text"></i> Novo Cadastro</a>
+                <a href="../publico/sobre.html"><i data-lucide="info"></i> Sobre o Projeto</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o
+                Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao
+                Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar
+                Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com
+                IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de
+                Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- FAIXA SUPERIOR DA SEÇÃO -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Painel do Ambulante</h1>
+            <p>Gerencie suas licenças, acompanhe solicitações e acesse sua credencial digital oficial.</p>
+        </div>
+    </section>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-container">
+
+        <div class="form-card">
+
+            <!-- NAVEGAÇÃO DE ABAS -->
+            <div class="credential-tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('tab-credencial', this)">
+                    <i data-lucide="id-card"></i> Credencial / Licença
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-renovar', this)">
+                    <i data-lucide="refresh-cw"></i> Renovar Licença
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-cancelar', this)">
+                    <i data-lucide="x-circle"></i> Cancelar Licença
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-status', this)">
+                    <i data-lucide="clock"></i> Acompanhar Status
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-historico', this)">
+                    <i data-lucide="history"></i> Histórico
+                </button>
+                <a href="score.html" class="tab-btn" style="text-decoration: none;">
+                    <i data-lucide="award" style="color: #FDB022;"></i> Score do Ambulante
+                </a>
+            </div>
+
+            <!-- ABA 1: CREDENCIAL / LICENÇA ATUAL (FRENTE E VERSO LADO A LADO) -->
+            <div id="tab-credencial" class="tab-pane active">
+                <div class="credential-wrapper"
+                    style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+
+                    <!-- CONTAINER DOS DOIS CARTÕES LADO A LADO -->
+                    <div
+                        style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
+
+                        <!-- FRENTE DO CARTÃO -->
+                        <div class="apal-id-front"
+                            style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; font-family: 'Inter', sans-serif;">
+
+                            <!-- Formas geométricas decorativas -->
+                            <div
+                                style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #1D4ED8 0%, #2563EB 72%, rgba(37,99,235,0.55) 100%); z-index: 1; pointer-events: none;">
+                            </div>
+                            <div
+                                style="position: absolute; top: -52px; left: 28px; width: 86px; height: 220px; border-radius: 50%; border: 2px solid rgba(37, 99, 235, 0.75); transform: rotate(43deg); z-index: 1; pointer-events: none;">
+                            </div>
+                            <div
+                                style="position: absolute; top: -68px; left: 6px; width: 118px; height: 228px; border-radius: 50%; border: 14px solid rgba(255, 0, 127, 0.07); transform: rotate(43deg); z-index: 1; pointer-events: none;">
+                            </div>
+
+                            <div
+                                style="position: absolute; top: 24px; right: 24px; width: 52px; height: 56px; background-image: radial-gradient(circle, rgba(37,99,235,0.58) 2.2px, transparent 2.6px); background-size: 13px 13px; z-index: 1; pointer-events: none;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 202px; left: 18px; width: 34px; height: 64px; background-image: radial-gradient(circle, rgba(37,99,235,0.46) 2px, transparent 2.4px); background-size: 12px 12px; z-index: 1; pointer-events: none;">
+                            </div>
+
+                            <div
+                                style="position: absolute; right: -72px; top: 250px; width: 142px; height: 178px; border-radius: 48% 0 0 48%; border: 2px solid rgba(255, 0, 127, 0.72); background: rgba(255, 0, 127, 0.06); transform: rotate(8deg); z-index: 1; pointer-events: none;">
+                            </div>
+                            <div
+                                style="position: absolute; right: -88px; top: 286px; width: 138px; height: 146px; border-radius: 48% 0 0 48%; background: linear-gradient(180deg, rgba(255,0,127,0.52), rgba(255,0,127,0.20)); transform: rotate(8deg); z-index: 1; pointer-events: none;">
+                            </div>
+
+                            <!-- Marca APAL -->
+                            <div
+                                style="position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 64px 34px 0 56px;">
+                                <span aria-hidden="true"
+                                    style="width: 64px; height: 64px; flex-shrink: 0; display: block;"></span>
+                                <div style="min-width: 0;">
+                                    <div
+                                        style="font-size: 2rem; line-height: 1; font-weight: 800; color: #FF007F; letter-spacing: -1.2px;">
+                                        APAL</div>
+                                    <p
+                                        style="margin: 8px 0 0 0; max-width: 210px; font-size: 0.68rem; line-height: 1.35; color: #0F172A; font-weight: 500;">
+                                        Plataforma de licenciamento e gestão do comércio ambulante
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Foto centralizada no centro exato da credencial -->
+                            <div class="id-photo-front"
+                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 100px; border-radius: 15px; overflow: hidden; background: transparent; border: none; box-shadow: none; z-index: 3;">
+                                <img src="../img/foto-ambulante.jpg" alt="Foto do Titular"
+                                    onerror="this.src='https://ui-avatars.com/api/?name=Joao+Silva&background=DBEAFE&color=2563EB'"
+                                    style="display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 15px; background: #DBEAFE; border: 1px solid #BFDBFE;">
+                            </div>
+
+                            <!-- Identificação -->
+                            <div
+                                style="position: absolute; left: 34px; right: 34px; bottom: 66px; z-index: 3; border-left: 4px solid #2563EB; padding-left: 14px;">
+                                <h2 class="id-name"
+                                    style="margin: 0; font-size: 1.1rem; line-height: 1.12; font-weight: 800; color: #0F172A; letter-spacing: -0.5px;">
+                                    João da Silva Santos</h2>
+                                <p class="id-cpf"
+                                    style="margin: 8px 0 0 0; font-size: 0.88rem; line-height: 1.2; font-weight: 600; color: #0F172A;">
+                                    <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> 123.456.789-00
+                                </p>
+                            </div>
+
+                            <!-- Rodapé visual -->
+                            <div
+                                style="position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: #1D4ED8; z-index: 3;">
+                            </div>
+                            <div
+                                style="position: absolute; left: 0; right: 0; bottom: 36px; height: 4px; background: #FF007F; z-index: 3;">
+                            </div>
+                        </div>
+
+                        <!-- VERSO DO CARTÃO -->
+                        <div class="apal-id-back"
+                            style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; font-family: 'Inter', sans-serif; transform: none !important; backface-visibility: visible !important;">
+
+                            <!-- Cabeçalho azul com acabamento rosa -->
+                            <div
+                                style="position: absolute; top: 0; left: 0; right: 0; height: 112px; background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%); z-index: 1;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 86px; left: -18px; right: -18px; height: 46px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; box-sizing: border-box; z-index: 2;">
+                            </div>
+
+
+                            <!-- Dados principais -->
+                            <div
+                                style="position: absolute; top: 118px; left: 24px; right: 24px; z-index: 4; text-align: center;">
+                                <h2 class="id-name"
+                                    style="margin: 0; font-size: 1.22rem; line-height: 1.15; font-weight: 800; color: #0F172A; letter-spacing: -0.45px;">
+                                    João da Silva Santos</h2>
+
+                                <div style="margin-top: 10px;">
+                                    <span
+                                        style="display: block; font-size: 0.64rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">CPF</span>
+                                    <strong
+                                        style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">123.456.789-00</strong>
+                                </div>
+
+                                <div style="margin-top: 10px;">
+                                    <span
+                                        style="display: block; font-size: 0.64rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Nº
+                                        do Alvará</span>
+                                    <strong
+                                        style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">ALV-2026/8842</strong>
+                                </div>
+
+                                <div class="id-qr-box"
+                                    style="display: flex; justify-content: center; margin-top: 10px;">
+                                    <div class="qr-placeholder"
+                                        style="width: 118px; height: 118px; background: #FFFFFF; border: 1.5px solid #93C5FD; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(15,23,42,0.06);">
+                                        <i data-lucide="qr-code"
+                                            style="width: 94px; height: 94px; color: #000000; stroke-width: 1.35px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rodapé de demonstração -->
+                            <div
+                                style="position: absolute; left: 0; right: 0; bottom: 0; min-height: 52px; background: #1D4ED8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 9px 18px; text-align: center; font-size: 0.62rem; line-height: 1.35; font-weight: 600; z-index: 4;">
+                                Prefeitura Municipal<br>Vitória da Conquista
+                            </div>
+                            <div
+                                style="position: absolute; left: 0; right: 0; bottom: 52px; height: 4px; background: #FF007F; z-index: 4;">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Botões de Ação da Credencial -->
+                    <div class="credential-actions"
+                        style="display: flex; gap: 1rem; margin-top: 1rem; width: 100%; max-width: 420px; justify-content: center;">
+                        <button type="button" id="btn-imprimir-cred" class="btn-action-card"
+                            style="flex: 1; background-color: #FFFFFF; color: #1D4ED8; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
+                            <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Imprimir Credencial
+                        </button>
+                        <button type="button" id="btn-compartilhar-cred" class="btn-action-card share"
+                            style="flex: 1; background-color: #1D4ED8; color: #FFFFFF; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.2s;">
+                            <i data-lucide="share-2" style="width: 16px; height: 16px;"></i> Compartilhar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA 2: RENOVAR LICENÇA -->
+            <div id="tab-renovar" class="tab-pane">
+                <div class="section-title">
+                    <div class="title-accent"></div>
+                    <h2>Solicitação de Renovação de Licença</h2>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--texto-cinza);">A renovação deve ser solicitada com até 30
+                    dias de antecedência do vencimento da licença atual.</p>
+                <form
+                    onsubmit="event.preventDefault(); alert('Solicitação de renovação enviada com sucesso! Acompanhe o status.');">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="licenca-num">Número da Licença Atual</label>
+                            <input type="text" id="licenca-num" value="ALV-2026/8842" readonly
+                                style="background: var(--fundo-cinza);">
+                        </div>
+                        <div class="input-group">
+                            <label for="periodo-renovacao">Período de Renovação Desejado</label>
+                            <select id="periodo-renovacao" required>
+                                <option value="1_ano">Mais 1 Ano (Exercício 2027)</option>
+                                <option value="semestral">Renovação Semestral</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group full-width">
+                            <label for="doc-renovacao">Comprovante de Atualização Cadastral / Quitação (Anexo)</label>
+                            <input type="file" id="doc-renovacao" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i data-lucide="send"></i> Enviar Pedido de Renovação
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA 3: CANCELAR LICENÇA -->
+            <div id="tab-cancelar" class="tab-pane">
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: var(--cor-destaque);"></div>
+                    <h2>Solicitação de Cancelamento / Baixa de Licença</h2>
+                </div>
+
+                <div class="info-callout-box"
+                    style="background-color: #FEE2E2; border-left-color: #DC2626; margin-bottom: 2rem;">
+                    <p style="color: #991B1B;">
+                        <strong>Atenção:</strong> O cancelamento da licença é definitivo e libera o ponto público para
+                        novos requerentes na fila de espera.
+                    </p>
+                </div>
+
+                <form
+                    onsubmit="event.preventDefault(); alert('Solicitação de cancelamento registrada. A fiscalização entrará em contato.');">
+                    <div class="form-row">
+                        <div class="input-group full-width">
+                            <label for="motivo-cancelamento">Motivo do Cancelamento</label>
+                            <select id="motivo-cancelamento" required>
+                                <option value="" disabled selected>Selecione o motivo...</option>
+                                <option value="mudanca_ramo">Mudança de ramo de atividade</option>
+                                <option value="mudanca_cidade">Mudança de município</option>
+                                <option value="problemas_saude">Motivos de saúde / Força maior</option>
+                                <option value="outro">Outro motivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group full-width">
+                            <label for="justificativa-text">Justificativa Detalhada</label>
+                            <textarea id="justificativa-text" rows="4"
+                                placeholder="Descreva o motivo do encerramento das atividades no local..."
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" style="background-color: #DC2626;">
+                            <i data-lucide="alert-triangle"></i> Confirmar Cancelamento de Licença
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ABA 4: ACOMPANHAR STATUS -->
+            <div id="tab-status" class="tab-pane">
+                <div class="section-title">
+                    <div class="title-accent"></div>
+                    <h2>Acompanhamento de Solicitação em Andamento</h2>
+                </div>
+                <div
+                    style="background: var(--fundo-cinza); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <span
+                                style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase; display: block;">Protocolo
+                                #8842-2026</span>
+                            <h3 style="font-size: 1.1rem; color: var(--texto-escuro);">Solicitação de Licença Inicial
+                                (Praça 9 de Novembro)</h3>
+                        </div>
+                        <span class="badge warning"><i data-lucide="clock"></i> EM ANÁLISE PELA FISCALIZAÇÃO</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i data-lucide="check-circle" style="color: #059669;"></i>
+                            <div>
+                                <strong style="font-size: 0.9rem;">Requerimento Enviado</strong>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Recebido pelo sistema em
+                                    01/08/2026 às 10:15</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i data-lucide="check-circle" style="color: #059669;"></i>
+                            <div>
+                                <strong style="font-size: 0.9rem;">Validação Documental</strong>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Documentos conferidos e
+                                    aprovados em 02/08/2026</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i data-lucide="circle-dot" style="color: #D97706;"></i>
+                            <div>
+                                <strong style="font-size: 0.9rem; color: #D97706;">Vistoria de Local e
+                                    Viabilidade</strong>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Aguardando parecer da
+                                    Secretaria de Urbanismo</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem; opacity: 0.5;">
+                            <i data-lucide="circle"></i>
+                            <div>
+                                <strong style="font-size: 0.9rem;">Emissão de Credencial</strong>
+                                <p style="font-size: 0.8rem; color: var(--texto-cinza);">Disponibilização do QR Code
+                                    oficial</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 5: HISTÓRICO DE SOLICITAÇÕES -->
+            <div id="tab-historico" class="tab-pane">
+                <div class="section-title">
+                    <div class="title-accent"></div>
+                    <h2>Histórico Geral de Solicitações</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Protocolo</th>
+                                <th>Tipo de Solicitação</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#8842-2026</td>
+                                <td>Licença Inicial (Ambulante)</td>
+                                <td>01/08/2026</td>
+                                <td><span class="badge warning"><i data-lucide="clock"></i> Em Análise</span></td>
+                                <td>
+                                    <button class="btn-action"
+                                        onclick="alert('Visualizando detalhes do protocolo #8842')">
+                                        <i data-lucide="eye"></i> Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#5102-2024</td>
+                                <td>Renovação Anual de Licença</td>
+                                <td>15/11/2024</td>
+                                <td><span class="badge success"><i data-lucide="check-circle"></i> Aprovado</span></td>
+                                <td>
+                                    <button class="btn-action" onclick="alert('Visualizando histórico #5102')">
+                                        <i data-lucide="eye"></i> Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#3210-2023</td>
+                                <td>Licença Eventual (Festa Junina)</td>
+                                <td>10/06/2023</td>
+                                <td><span class="badge success"><i data-lucide="check-circle"></i> Concluído</span></td>
+                                <td>
+                                    <button class="btn-action" onclick="alert('Visualizando histórico #3210')">
+                                        <i data-lucide="eye"></i> Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden"
+        style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é
+                Legal</span></p>
+    </footer>
+
+    <!-- SCRIPT PARA TROCA DE ABAS E BOTÕES DA CREDENCIAL -->
+    <script>
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Garante inicialização correta dos ícones
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+            // Ação de Imprimir Credencial
+            const btnImprimir = document.getElementById('btn-imprimir-cred');
+            btnImprimir?.addEventListener('click', () => {
+                window.print();
+            });
+
+            // Ação de Compartilhar Credencial
+            const btnCompartilhar = document.getElementById('btn-compartilhar-cred');
+            btnCompartilhar?.addEventListener('click', async () => {
+                const dadosCompartilhamento = {
+                    title: 'Credencial Digital - APAL',
+                    text: 'Confira a minha credencial oficial de comerciante ambulante emitida pela Prefeitura de Vitória da Conquista (APAL).',
+                    url: window.location.href
+                };
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share(dadosCompartilhamento);
+                    } catch (err) {
+                        console.log('Compartilhamento cancelado');
+                    }
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link da credencial copiado para a área de transferência!');
+                }
+            });
+        });
+    </script>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- JS GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>

@@ -27,6 +27,7 @@ from .models import (
     DocumentoAnexo,
     LicencaAlvara,
     StatusAprovacaoDocumento,
+    StatusLicenca,
     TipoDocumento,
 )
 from .services import (
@@ -234,11 +235,23 @@ class AlvaraAmbulanteView(
         context = super().get_context_data(**kwargs)
         ambulante = get_object_or_404(Ambulante, pk=self.request.user.pk)
         historico = licencas_do_ambulante(ambulante)
+        licenca = historico.first()
+        status_aprovados = (
+            StatusLicenca.APROVADO,
+            StatusLicenca.AGUARDANDO_PAGAMENTO,
+            StatusLicenca.ATIVO,
+            StatusLicenca.VENCIDO,
+            StatusLicenca.SUSPENSO,
+            StatusLicenca.CANCELADO,
+            StatusLicenca.INDEFERIDO,
+        )
         context.update(
             {
                 "ambulante": ambulante,
-                "licenca": historico.first(),
-                "historico": historico,
+                "licenca": licenca,
+                "licenca_aprovada": bool(
+                    licenca and licenca.status in status_aprovados
+                ),
             }
         )
         return context

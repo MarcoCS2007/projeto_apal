@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Painel do Ambulante - APAL{% endblock %}
 
@@ -10,118 +11,306 @@
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
         <h1>Painel do Ambulante</h1>
-        <p>Acompanhe o cadastro e a situação da sua licença em Vitória da Conquista.</p>
+        <p>Gerencie suas licenças, acompanhe solicitações e acesse sua credencial digital oficial.</p>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
-<div class="form-card" style="max-width: 720px; margin: 0 auto;">
-    <div class="section-title">
-        <div class="title-accent"></div>
-        <h2>Olá, {{ user.nome }}</h2>
+<div class="form-card" style="max-width: 960px; margin: 0 auto;">
+    <div class="credential-tabs-nav painel-tabs-grid" role="tablist" aria-label="Seções do painel">
+        <a href="{% url 'ambulante_perfil' %}" class="tab-btn" style="text-decoration: none;">
+            <i data-lucide="user"></i> Meu perfil
+        </a>
+        <button type="button" class="tab-btn active" data-tab="tab-credencial" role="tab" aria-selected="true">
+            <i data-lucide="id-card"></i> Credencial / Licença
+        </button>
+        <a href="{% url 'ambulante_alvara' %}" class="tab-btn" style="text-decoration: none;">
+            <i data-lucide="file-badge"></i> Meu Alvará
+        </a>
+        <button type="button" class="tab-btn" data-tab="tab-status" role="tab" aria-selected="false">
+            <i data-lucide="clock"></i> Acompanhar Status
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-historico" role="tab" aria-selected="false">
+            <i data-lucide="history"></i> Histórico
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-renovar" role="tab" aria-selected="false">
+            <i data-lucide="refresh-cw"></i> Renovar Licença
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-cancelar" role="tab" aria-selected="false">
+            <i data-lucide="x-circle"></i> Cancelar Licença
+        </button>
+        <a href="{% url 'ambulante_score' %}" class="tab-btn" style="text-decoration: none;">
+            <i data-lucide="award" style="color: #FDB022;"></i> Score{% if pontuacao is not None %} ({{ pontuacao }}/{{ maximo }}){% endif %}
+        </a>
     </div>
 
-    <div class="info-callout-box">
-        <p>
-            {% if cadastro_completo %}
-                Seu cadastro está preenchido. Acompanhe aqui o andamento da licença.
-            {% else %}
-                Complete seu cadastro para solicitar a licença. Nesta etapa você já tem uma conta, mas ainda faltam dados socioeconômicos, MEI, estrutura e ponto.
-            {% endif %}
+    {# ——— Credencial (conteúdo completo de credencial.html) ——— #}
+    <div id="tab-credencial" class="tab-pane active" role="tabpanel">
+        {% include "ambulante/_credencial_conteudo.html" with licenca=licenca_credencial|default:licenca %}
+    </div>
+
+    {# ——— Renovar ——— #}
+    <div id="tab-renovar" class="tab-pane" role="tabpanel" hidden>
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Solicitação de Renovação de Licença</h2>
+        </div>
+        <p style="margin-bottom: 1.5rem; color: var(--texto-cinza);">
+            A renovação deve ser solicitada com até 30 dias de antecedência do vencimento da licença atual.
         </p>
+        {% if licenca and licenca.numero_licenca %}
+        <div class="form-row">
+            <div class="input-group">
+                <label for="painel-licenca-num">Número da Licença Atual</label>
+                <input type="text" id="painel-licenca-num" value="{{ licenca.numero_licenca }}" readonly style="background: var(--fundo-cinza);">
+            </div>
+            <div class="input-group">
+                <label for="painel-validade">Validade</label>
+                <input type="text" id="painel-validade" value="{% if licenca.data_vencimento %}{{ licenca.data_vencimento|date:'d/m/Y' }}{% else %}Não informada{% endif %}" readonly style="background: var(--fundo-cinza);">
+            </div>
+        </div>
+        <div class="form-actions" style="justify-content: flex-start;">
+            <a href="{% url 'ambulante_alvara' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+                <i data-lucide="refresh-cw"></i> Solicitar renovação no Alvará
+            </a>
+        </div>
+        {% else %}
+        <div class="info-callout-box">
+            <p>Não há licença emitida para renovar. Conclua o cadastro e aguarde a emissão do alvará.</p>
+        </div>
+        {% endif %}
     </div>
 
-    <div class="about-features" style="margin-top: 1.5rem;">
-        <ul>
-            <li style="align-items: flex-start;">
-                <i data-lucide="user-check" style="margin-top: 2px;"></i>
+    {# ——— Cancelar ——— #}
+    <div id="tab-cancelar" class="tab-pane" role="tabpanel" hidden>
+        <div class="section-title">
+            <div class="title-accent" style="background-color: var(--cor-destaque);"></div>
+            <h2>Solicitação de Cancelamento / Baixa de Licença</h2>
+        </div>
+        {% if licenca_ativa %}
+        <div class="info-callout-box" style="background-color: #FEE2E2; border-left-color: #DC2626; margin-bottom: 1.5rem;">
+            <p style="color: #991B1B; margin: 0;">
+                <strong>Atenção:</strong> o cancelamento da licença é definitivo e pode liberar o ponto público para novos requerentes.
+            </p>
+        </div>
+        <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
+            Protocolo: <strong>{{ licenca_ativa.protocolo }}</strong>
+            {% if licenca_ativa.numero_licenca %} — Alvará <strong>{{ licenca_ativa.numero_licenca }}</strong>{% endif %}.
+        </p>
+        <div class="form-actions" style="justify-content: flex-start;">
+            <a href="{% url 'ambulante_alvara' %}" class="btn-submit" style="display: inline-flex; text-decoration: none; background-color: #DC2626;">
+                <i data-lucide="alert-triangle"></i> Ir ao Alvará para cancelar
+            </a>
+        </div>
+        {% else %}
+        <div class="info-callout-box">
+            <p>O cancelamento só pode ser solicitado quando houver uma <strong>licença ativa</strong>. No momento você não possui licença ativa para cancelar.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ——— Status ——— #}
+    <div id="tab-status" class="tab-pane" role="tabpanel" hidden>
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Acompanhamento de Solicitação em Andamento</h2>
+        </div>
+
+        {% if licenca %}
+        <div class="painel-status-card">
+            <div class="painel-status-card-head">
                 <div>
-                    <strong style="color: var(--texto-escuro);">Conta de acesso:</strong>
-                    <span style="font-weight: 400; color: var(--texto-cinza);"> ativa com o CPF {{ user.cpf }} e o e-mail {{ user.email }}.</span>
-                </div>
-            </li>
-            <li style="align-items: flex-start;">
-                <i data-lucide="clipboard-list" style="margin-top: 2px;"></i>
-                <div>
-                    <strong style="color: var(--texto-escuro);">Cadastro completo:</strong>
-                    <span style="font-weight: 400; color: var(--texto-cinza);">
-                        {% if cadastro_completo %}preenchido.{% else %}pendente.{% endif %}
-                    </span>
-                </div>
-            </li>
-            <li style="align-items: flex-start;">
-                <i data-lucide="file-check" style="margin-top: 2px;"></i>
-                <div>
-                    <strong style="color: var(--texto-escuro);">Documentos:</strong>
-                    <span style="font-weight: 400; color: var(--texto-cinza);">
-                        {% if documentos_rejeitados %}
-                            há pendência documental. Reenvie os anexos rejeitados.
-                        {% elif documentos_pendentes %}
-                            em análise na triagem da prefeitura.
-                        {% else %}
-                            envie comprovante, RG/CPF e laudos exigidos na etapa de anexos.
+                    <span class="painel-status-protocolo">Protocolo {{ licenca.protocolo }}</span>
+                    <h3 class="painel-status-pedido">
+                        {% if licenca.licenca_origem_id %}Solicitação de Renovação{% else %}Solicitação de Licença Inicial{% endif %}
+                        {% if licenca.ponto_ocupacao %}
+                            ({{ licenca.ponto_ocupacao.nome_identificacao }})
+                        {% elif ambulante.ponto_pretendido %}
+                            ({{ ambulante.ponto_pretendido.nome_identificacao }})
                         {% endif %}
-                    </span>
+                    </h3>
                 </div>
-            </li>
-            <li style="align-items: flex-start;">
-                <i data-lucide="badge-alert" style="margin-top: 2px;"></i>
-                <div>
-                    <strong style="color: var(--texto-escuro);">Licença / alvará:</strong>
-                    <span style="font-weight: 400; color: var(--texto-cinza);">
-                        {% if licenca %}
-                            protocolo {{ licenca.protocolo }} — {{ licenca.status }}.
-                        {% elif tem_licenca %}
-                            já existe um registro vinculado.
-                        {% else %}
-                            você ainda não possui licença.
-                        {% endif %}
-                    </span>
+                {% include "ambulante/_status_badge.html" with licenca=licenca %}
+            </div>
+
+            <div class="painel-status-track">
+                {# 1. Requerimento #}
+                <div class="painel-status-track-item is-done">
+                    <i data-lucide="check-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Requerimento Enviado</strong>
+                        <p>Recebido pelo sistema em {{ licenca.criado_em|date:"d/m/Y" }} às {{ licenca.criado_em|date:"H:i" }}</p>
+                    </div>
                 </div>
-            </li>
-        </ul>
+
+                {# 2. Validação Documental #}
+                {% if licenca.status == "Pendência Documental" %}
+                <div class="painel-status-track-item is-current">
+                    <i data-lucide="circle-dot" aria-hidden="true"></i>
+                    <div>
+                        <strong>Validação Documental</strong>
+                        <p>Há pendência documental. Reenvie os anexos para continuar a análise.</p>
+                    </div>
+                </div>
+                {% elif licenca.status == "Em Análise" or licenca.status == "Aprovado" or licenca.status == "Aguardando Pagamento da Taxa" or licenca.status == "Ativo" or licenca.status == "Indeferido" %}
+                <div class="painel-status-track-item is-done">
+                    <i data-lucide="check-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Validação Documental</strong>
+                        <p>Documentos conferidos e aprovados.</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="painel-status-track-item">
+                    <i data-lucide="circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Validação Documental</strong>
+                        <p>Conferência dos documentos enviados.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {# 3. Vistoria #}
+                {% if licenca.status == "Em Análise" %}
+                <div class="painel-status-track-item is-current">
+                    <i data-lucide="circle-dot" aria-hidden="true"></i>
+                    <div>
+                        <strong>Vistoria de Local e Viabilidade</strong>
+                        <p>Aguardando parecer da Secretaria de Urbanismo.</p>
+                    </div>
+                </div>
+                {% elif licenca.status == "Aprovado" or licenca.status == "Aguardando Pagamento da Taxa" or licenca.status == "Ativo" %}
+                <div class="painel-status-track-item is-done">
+                    <i data-lucide="check-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Vistoria de Local e Viabilidade</strong>
+                        <p>Parecer de viabilidade concluído.</p>
+                    </div>
+                </div>
+                {% elif licenca.status == "Indeferido" %}
+                <div class="painel-status-track-item is-danger">
+                    <i data-lucide="x-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Vistoria de Local e Viabilidade</strong>
+                        <p>{% if licenca.motivo_parecer %}{{ licenca.motivo_parecer }}{% else %}Solicitação indeferida na análise de viabilidade.{% endif %}</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="painel-status-track-item">
+                    <i data-lucide="circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Vistoria de Local e Viabilidade</strong>
+                        <p>Aguardando parecer da Secretaria de Urbanismo.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {# 4. Credencial #}
+                {% if licenca.status == "Ativo" %}
+                <div class="painel-status-track-item is-done">
+                    <i data-lucide="check-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Emissão de Credencial</strong>
+                        <p>Credencial e QR Code disponíveis.</p>
+                    </div>
+                </div>
+                {% elif licenca.status == "Aprovado" or licenca.status == "Aguardando Pagamento da Taxa" %}
+                <div class="painel-status-track-item is-current">
+                    <i data-lucide="circle-dot" aria-hidden="true"></i>
+                    <div>
+                        <strong>Emissão de Credencial</strong>
+                        <p>Aguardando confirmação da taxa e emissão do alvará oficial.</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="painel-status-track-item">
+                    <i data-lucide="circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Emissão de Credencial</strong>
+                        <p>Disponibilização do QR Code oficial.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="info-callout-box">
+            <p>Ainda não há solicitação em andamento. Complete o cadastro e envie os documentos para abrir o requerimento.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ——— Histórico ——— #}
+    <div id="tab-historico" class="tab-pane" role="tabpanel" hidden>
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Histórico de Solicitações</h2>
+        </div>
+        {% if historico_licencas %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Protocolo</th>
+                        <th>Alvará</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in historico_licencas %}
+                    <tr>
+                        <td>{{ item.protocolo|default:"—" }}</td>
+                        <td>{{ item.numero_licenca|default:"—" }}</td>
+                        <td>{{ item.criado_em|date:"d/m/Y" }}</td>
+                        <td>{% include "ambulante/_status_badge.html" with licenca=item %}</td>
+                        <td>
+                            <a href="{% url 'ambulante_alvara' %}" class="btn-action" style="text-decoration: none; display: inline-flex;">
+                                <i data-lucide="eye"></i> Detalhes
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="info-callout-box">
+            <p>Nenhuma solicitação no histórico. você ainda não possui licença registrada.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
-{% if not cadastro_completo %}
-<p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-    <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="clipboard-list"></i> Completar cadastro
-    </a>
-    <a href="{% url 'ambulante_perfil' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="user"></i> Meu perfil
-    </a>
-    <a href="{% url 'ambulante_assistente' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="sparkles"></i> Assistente
-    </a>
-</p>
-{% else %}
-<p style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-    <a href="{% url 'ambulante_cadastro' %}?etapa=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="pencil"></i> Revisar cadastro
-    </a>
-    <a href="{% url 'ambulante_perfil' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="user"></i> Meu perfil
-    </a>
-    <a href="{% url 'ambulante_score' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="award"></i> Meu score ({{ pontuacao }}/{{ maximo }})
-    </a>
-    <a href="{% url 'ambulante_assistente' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="sparkles"></i> Assistente
-    </a>
-    <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="upload"></i> {% if documentos_rejeitados %}Reenviar documentos{% else %}Enviar documentos{% endif %}
-    </a>
-    {% if licenca %}
-    <a href="{% url 'ambulante_alvara' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="file-badge"></i> Acompanhar solicitação
-    </a>
-    {% if licenca.status == "Ativo" %}
-    <a href="{% url 'ambulante_credencial' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
-        <i data-lucide="id-card"></i> Ver credencial
-    </a>
-    {% endif %}
-    {% endif %}
-</p>
-{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    function ativarAba(tabId, botao) {
+        document.querySelectorAll('.credential-tabs-nav .tab-btn[data-tab]').forEach((btn) => {
+            const ativo = btn === botao;
+            btn.classList.toggle('active', ativo);
+            btn.setAttribute('aria-selected', ativo ? 'true' : 'false');
+        });
+        document.querySelectorAll('.tab-pane').forEach((pane) => {
+            const ativo = pane.id === tabId;
+            pane.classList.toggle('active', ativo);
+            if (ativo) {
+                pane.removeAttribute('hidden');
+            } else {
+                pane.setAttribute('hidden', '');
+            }
+        });
+        if (window.lucide) lucide.createIcons();
+    }
+
+    document.querySelectorAll('.credential-tabs-nav .tab-btn[data-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => ativarAba(btn.dataset.tab, btn));
+    });
+
+    document.getElementById('btn-imprimir-cred')?.addEventListener('click', () => window.print());
+})();
+</script>
 {% endblock %}

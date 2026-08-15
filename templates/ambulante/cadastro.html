@@ -4,7 +4,7 @@
 {% block title %}Cadastro e Regularização de Ambulante - APAL{% endblock %}
 
 {% block header_nav %}
-{% include "publico/_nav.html" with active="painel" %}
+{% include "publico/_nav.html" with active="cadastro" %}
 {% endblock %}
 
 {% block hero %}
@@ -80,7 +80,7 @@
             O gestor municipal já consegue consultar o seu registro. Acompanhe o protocolo da solicitação em Meu Alvará. A licença oficial e o QR Code só serão gerados na emissão.
         </p>
         <div class="success-actions">
-            <a href="{% url 'ambulante_alvara' %}" class="btn-submit">
+            <a href="{% url 'ambulante_credencial' %}" class="btn-submit">
                 <i data-lucide="file-badge"></i> Ver meu protocolo
             </a>
             <a href="{% url 'ambulante_painel' %}" class="btn-action">
@@ -111,39 +111,43 @@
             </div>
             <div class="form-row">
                 <div class="input-group">
-                    <label for="cpf-cadastro">CPF</label>
-                    <input type="text" id="cpf-cadastro" value="{{ ambulante.cpf }}" readonly>
+                    <label for="cpf-cadastro">CPF <span class="required-marker">*</span></label>
+                    {{ form.cpf }}
+                    {% if form.cpf.errors %}<div class="login-error">{{ form.cpf.errors.0 }}</div>{% endif %}
                 </div>
                 <div class="input-group">
                     <label for="req-rg">RG (opcional)</label>
                     {{ form.rg }}
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="input-group">
                     <label for="req-data-nasc">Data de Nascimento <span class="required-marker">*</span></label>
                     {{ form.data_nasc }}
                     {% if form.data_nasc.errors %}<div class="login-error">{{ form.data_nasc.errors.0 }}</div>{% endif %}
                 </div>
+                <div class="input-group">
+                    <label for="req-genero">Gênero <span class="required-marker">*</span></label>
+                    {{ form.genero }}
+                    {% if form.genero.errors %}<div class="login-error">{{ form.genero.errors.0 }}</div>{% endif %}
+                </div>
             </div>
             <div class="form-row">
                 <div class="input-group">
-                    <label for="req-email">E-mail</label>
-                    <input type="email" id="req-email" value="{{ ambulante.email }}" readonly>
+                    <label for="req-email">E-mail <span class="required-marker">*</span></label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="login-error">{{ form.email.errors.0 }}</div>{% endif %}
                 </div>
                 <div class="input-group">
                     <label for="req-tel">Telefone Principal (WhatsApp) <span class="required-marker">*</span></label>
                     {{ form.telefone_whatsapp }}
                     {% if form.telefone_whatsapp.errors %}<div class="login-error">{{ form.telefone_whatsapp.errors.0 }}</div>{% endif %}
                 </div>
-                <div class="input-group">
-                    <label for="req-tel-2">Telefone Secundário / Recado</label>
-                    {{ form.telefone_2 }}
-                </div>
             </div>
             <div class="form-row">
                 <div class="input-group">
-                    <label for="req-genero">Gênero</label>
-                    {{ form.genero }}
-                    {% if form.genero.errors %}<div class="login-error">{{ form.genero.errors.0 }}</div>{% endif %}
+                    <label for="req-tel-2">Telefone Secundário / Recado</label>
+                    {{ form.telefone_2 }}
                 </div>
                 <div class="form-group">
                     <label for="{{ form.renda_mensal_estimada.id_for_label }}">{{ form.renda_mensal_estimada.label }}</label>
@@ -151,22 +155,52 @@
                     {% if form.renda_mensal_estimada.errors %}<div class="login-error">{{ form.renda_mensal_estimada.errors.0 }}</div>{% endif %}
                 </div>
             </div>
-            <p class="field-hint" style="margin: -0.5rem 0 1rem;">A foto 3x4 será inserida depois, no <a href="{% url 'ambulante_perfil' %}">perfil do ambulante</a>.</p>
             <div class="form-row">
                 <div class="input-group">
-                    <label for="req-nis">NIS (CadÚnico)</label>
-                    {{ form.nis }}
-                    <label class="checkbox-label">{{ form.sem_nis }} Não possuo NIS</label>
+                    <label for="pais-origem">País de Origem <span class="required-marker">*</span></label>
+                    {{ form.pais_origem }}
+                    {% if form.pais_origem.errors %}<div class="login-error">{{ form.pais_origem.errors.0 }}</div>{% endif %}
                 </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="estado-nascimento">Estado de Nascimento (UF) <span class="required-marker">*</span></label>
+                    <select id="estado-nascimento" name="uf_nascimento" class="styled-select" required data-valor-inicial="{{ form.uf_nascimento.value|default:'' }}">
+                        <option value="" disabled {% if not form.uf_nascimento.value %}selected{% endif %}>Selecione o estado...</option>
+                        {% if form.uf_nascimento.value %}
+                        <option value="{{ form.uf_nascimento.value }}" selected>{{ form.uf_nascimento.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.uf_nascimento.errors %}<div class="login-error">{{ form.uf_nascimento.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="cidade-nascimento">Cidade de Nascimento <span class="required-marker">*</span></label>
+                    <select id="cidade-nascimento" name="cidade_nascimento" class="styled-select" required data-valor-inicial="{{ form.cidade_nascimento.value|default:'' }}">
+                        <option value="" disabled {% if not form.cidade_nascimento.value %}selected{% endif %}>Selecione a cidade...</option>
+                        {% if form.cidade_nascimento.value %}
+                        <option value="{{ form.cidade_nascimento.value }}" selected>{{ form.cidade_nascimento.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.cidade_nascimento.errors %}<div class="login-error">{{ form.cidade_nascimento.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="input-group">
                     <label for="req-escolaridade">Grau de Escolaridade <span class="required-marker">*</span></label>
                     {{ form.escolaridade }}
                     {% if form.escolaridade.errors %}<div class="login-error">{{ form.escolaridade.errors.0 }}</div>{% endif %}
                 </div>
                 <div class="input-group">
-                    <label for="req-num-funcionarios">Qtd de Auxiliares</label>
+                    <label for="req-num-funcionarios">Qtd de Auxiliares <span class="required-marker">*</span></label>
                     {{ form.num_funcionarios }}
                     {% if form.num_funcionarios.errors %}<div class="login-error">{{ form.num_funcionarios.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="req-nis">NIS (CadÚnico)</label>
+                    {{ form.nis }}
+                    <label class="checkbox-label">{{ form.sem_nis }} Não possuo NIS</label>
                 </div>
             </div>
             <div class="form-actions" style="justify-content: flex-end; margin-top: 1rem;">
@@ -303,12 +337,6 @@
                     {% if form.dimensoes_metragem.errors %}<div class="login-error">{{ form.dimensoes_metragem.errors.0 }}</div>{% endif %}
                 </div>
             </div>
-            <div class="form-row">
-                <div class="input-group full-width">
-                    <label for="foto-estrutura">Foto da estrutura (opcional)</label>
-                    {{ form.foto_estrutura }}
-                </div>
-            </div>
             <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
                 <a href="?etapa=3" class="btn-action" id="btn-prev-4"><i data-lucide="arrow-left"></i> Voltar</a>
                 <button type="submit" name="acao" value="proxima" class="btn-submit" id="btn-next-4">Salvar e continuar <i data-lucide="arrow-right"></i></button>
@@ -325,7 +353,7 @@
             {% if categorias_catalogo %}
             <div class="form-row">
                 <div class="input-group full-width">
-                    <label for="categoria-pretendida">Categoria de produto (catálogo municipal)</label>
+                    <label for="categoria-pretendida">Categoria de produto (catálogo municipal) <span class="required-marker">*</span></label>
                     {{ form.categoria_pretendida }}
                     {% if form.categoria_pretendida.errors %}<div class="login-error">{{ form.categoria_pretendida.errors.0 }}</div>{% endif %}
                     <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.4rem;">
@@ -341,12 +369,9 @@
             {% if pontos_catalogo %}
             <div class="form-row">
                 <div class="input-group full-width">
-                    <label for="ponto-pretendido">Ponto desejado (catálogo municipal)</label>
+                    <label for="ponto-pretendido">Ponto desejado (catálogo municipal) <span class="required-marker">*</span></label>
                     {{ form.ponto_pretendido }}
                     {% if form.ponto_pretendido.errors %}<div class="login-error">{{ form.ponto_pretendido.errors.0 }}</div>{% endif %}
-                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.4rem;">
-                        Só aparecem pontos <strong>Livres</strong>. A metragem da sua estrutura não pode ultrapassar a do ponto. A ocupação só ocorre quando o gestor emitir a licença.
-                    </p>
                 </div>
             </div>
             {% else %}
@@ -422,16 +447,9 @@
             {% endif %}
 
             {% if tipos_faltando_envio %}
-            <div class="error-card" style="display: flex; margin-bottom: 1.25rem;">
-                <i data-lucide="alert-octagon"></i>
-                <div>
-                    <strong>Pendência documental</strong><br>
-                    <span>Ainda faltam (ou foram rejeitados):
-                        {% for tipo in tipos_faltando_envio %}
-                            {% if tipo == "comprovante_residencia" %}Comprovante de Residência{% elif tipo == "rg_cpf" %}RG/CPF{% elif tipo == "mei" %}MEI / CNPJ{% elif tipo == "laudo_sanitario" %}Laudo Sanitário{% elif tipo == "laudo_bombeiros" %}Laudo dos Bombeiros{% else %}{{ tipo }}{% endif %}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}.
-                    </span>
-                </div>
+            <div id="pendencia-documental-toast" hidden
+                 data-titulo="Pendência documental"
+                 data-documentos="{% for tipo in tipos_faltando_envio %}{% if tipo == 'comprovante_residencia' %}Comprovante de Residência{% elif tipo == 'rg_cpf' %}RG/CPF{% elif tipo == 'mei' %}MEI / CNPJ{% elif tipo == 'laudo_sanitario' %}Laudo Sanitário{% elif tipo == 'laudo_bombeiros' %}Laudo dos Bombeiros{% else %}{{ tipo }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}">
             </div>
             {% endif %}
 
@@ -450,25 +468,19 @@
                     <label for="doc-comprovante">Comprovante de Residência {% if "comprovante_residencia" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
                     {{ form.arquivo_comprovante_residencia }}
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="input-group">
                     <label for="doc-mei">Comprovante de MEI / CNPJ {% if "mei" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
                     {{ form.arquivo_mei }}
                 </div>
-                <div class="input-group">
-                    <label for="doc-saude">Laudo Sanitário {% if "laudo_sanitario" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
-                    {{ form.arquivo_laudo_sanitario }}
-                    <label for="validade-saude" style="margin-top: 0.6rem;">Validade (se houver)</label>
-                    {{ form.validade_laudo_sanitario }}
-                </div>
             </div>
             <div class="form-row">
                 <div class="input-group">
+                    <label for="doc-saude">Laudo Sanitário {% if "laudo_sanitario" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
+                    {{ form.arquivo_laudo_sanitario }}
+                </div>
+                <div class="input-group">
                     <label for="doc-bombeiros">Laudo dos Bombeiros {% if "laudo_bombeiros" in tipos_obrigatorios %}<span class="required-marker">*</span>{% endif %}</label>
                     {{ form.arquivo_laudo_bombeiros }}
-                    <label for="validade-bombeiros" style="margin-top: 0.6rem;">Validade (se houver)</label>
-                    {{ form.validade_laudo_bombeiros }}
                 </div>
             </div>
 
@@ -488,14 +500,9 @@
 
             <div class="form-actions" style="margin-top: 2.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
                 <a href="?etapa=5" class="btn-action" id="btn-prev-6"><i data-lucide="arrow-left"></i> Voltar</a>
-                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                    <button type="submit" name="acao" value="salvar" class="btn-action" id="btn-salvar-anexos">
-                        <i data-lucide="upload"></i> Salvar anexos
-                    </button>
-                    <button type="submit" name="acao" value="enviar" class="btn-submit" id="btn-enviar-final">
-                        <i data-lucide="send"></i> Concluir cadastro
-                    </button>
-                </div>
+                <button type="submit" name="acao" value="enviar" class="btn-submit" id="btn-enviar-final">
+                    <i data-lucide="send"></i> Concluir cadastro
+                </button>
             </div>
         </div>
         {% endif %}

@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.espacos.models import Endereco, EstruturaTrabalho, PontoOcupacao
-from apps.licenciamento.models import LicencaAlvara
+from apps.licenciamento.models import CategoriaProduto, LicencaAlvara
 from apps.usuarios.models import Ambulante
 from apps.usuarios.tests import UsuariosAuthFixtures
 
@@ -19,6 +19,10 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
             bairro="Centro",
             metragem_maxima=Decimal("10.00"),
             status_ocupacao="Livre",
+        )
+        self.categoria = CategoriaProduto.objects.create(
+            nome_categoria="Comércio Geral",
+            descricao="Categoria de teste.",
         )
 
     def _post_etapa(self, etapa, dados, acao="proxima"):
@@ -46,7 +50,8 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, self.ambulante.cpf)
         self.assertContains(response, self.ambulante.nome)
         self.assertNotContains(response, "req-foto")
-        self.assertContains(response, "A foto 3x4 será inserida depois")
+        self.assertNotContains(response, "A foto 3x4 será inserida depois")
+        self.assertNotContains(response, "Informe a data de nascimento como no documento")
 
     def test_salva_rascunho_da_etapa_1_e_avanca(self):
         self.client.force_login(self.ambulante)
@@ -54,7 +59,14 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
             1,
             {
                 "nome_completo": "João Ambulante Silva",
+                "email": self.ambulante.email,
+                "cpf": self.ambulante.cpf,
                 "data_nasc": "1991-05-20",
+                "genero": "masculino",
+                "renda_estimada": "1800.00",
+                "pais_origem": "Brasil",
+                "uf_nascimento": "BA",
+                "cidade_nascimento": "Vitória da Conquista",
                 "telefone_whatsapp": "77999999999",
                 "escolaridade": "medio_completo",
                 "num_funcionarios": "1",
@@ -68,6 +80,12 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(self.ambulante.data_nasc.isoformat(), "1991-05-20")
         self.assertEqual(self.ambulante.escolaridade, "medio_completo")
         self.assertEqual(self.ambulante.nis, "123456")
+        self.assertEqual(self.ambulante.genero, "masculino")
+        self.assertEqual(str(self.ambulante.renda_estimada), "1800.00")
+        extras = self.ambulante.dados_complementares or {}
+        self.assertEqual(extras.get("pais_origem"), "Brasil")
+        self.assertEqual(extras.get("uf_nascimento"), "BA")
+        self.assertEqual(extras.get("cidade_nascimento"), "Vitória da Conquista")
         self.assertFalse(self.ambulante.cadastro_completo)
 
     def test_salva_endereco_na_etapa_2(self):
@@ -135,7 +153,14 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
             1,
             {
                 "nome_completo": "Joana Nova",
+                "email": "joana.cadastro@email.com",
+                "cpf": "66677788899",
                 "data_nasc": "1990-01-01",
+                "genero": "feminino",
+                "renda_estimada": "1500.00",
+                "pais_origem": "Brasil",
+                "uf_nascimento": "BA",
+                "cidade_nascimento": "Vitória da Conquista",
                 "telefone_whatsapp": "77944444444",
                 "escolaridade": "medio_completo",
                 "num_funcionarios": "0",
@@ -165,22 +190,25 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
                 "dimensoes_metragem": "2.50",
             },
         )
-        self._post_etapa(5, {"ponto_pretendido": self.ponto.pk})
+        self._post_etapa(
+            5,
+            {
+                "categoria_pretendida": self.categoria.pk,
+                "ponto_pretendido": self.ponto.pk,
+            },
+        )
         response = self._post_etapa(6, {}, acao="enviar")
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("ambulante_alvara"))
+        self.assertEqual(response.url, reverse("ambulante_credencial"))
         novo.refresh_from_db()
         self.assertTrue(novo.cadastro_completo)
         self.assertIsNone(novo.codigo_qr_code)
         self.assertEqual(novo.ponto_pretendido_id, self.ponto.pk)
 
-        licenca = LicencaAlvara.objects.get(ambulante=novo)
-        alvara = self.client.get(reverse("ambulante_alvara"))
-        self.assertEqual(alvara.status_code, 200)
-        self.assertContains(alvara, licenca.protocolo)
-        self.assertContains(alvara, "Em Análise")
-        self.assertContains(alvara, "Praça Central")
+        self.assertTrue(LicencaAlvara.objects.filter(ambulante=novo).exists())
+        credencial = self.client.get(reverse("ambulante_credencial"))
+        self.assertEqual(credencial.status_code, 200)
 
         self.client.logout()
         self.client.force_login(self.gestor)
@@ -208,4 +236,6 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.client.force_login(self.ambulante)
         response = self.client.get(reverse("ambulante_painel"))
         self.assertContains(response, reverse("ambulante_cadastro"))
-        self.assertContains(response, "Completar cadastro")
+        self.assertContains(response, "Cadastro Incompleto")
+        self.assertContains(response, "Concluir cadastro")
+        self.assertContains(response, "etapas para você emitir sua licença")
