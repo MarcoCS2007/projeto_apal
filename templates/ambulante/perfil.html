@@ -81,10 +81,10 @@
                 <div class="input-group">
                     <label for="perfil-renda">Renda mensal estimada</label>
                     {% if modo_edicao %}
-                    {{ form.renda_estimada }}
-                    {% if form.renda_estimada.errors %}<div class="login-error">{{ form.renda_estimada.errors.0 }}</div>{% endif %}
+                    {{ form.renda_mensal_estimada }}
+                    {% if form.renda_mensal_estimada.errors %}<div class="login-error">{{ form.renda_mensal_estimada.errors.0 }}</div>{% endif %}
                     {% else %}
-                    <input id="perfil-renda" type="text" value="{% if ambulante.renda_estimada %}R$ {{ ambulante.renda_estimada }}{% else %}Não informado{% endif %}" readonly>
+                    <input id="perfil-renda" type="text" value="{% if ambulante.renda_mensal_estimada %}R$ {{ ambulante.renda_mensal_estimada }}{% else %}Não informado{% endif %}" readonly>
                     {% endif %}
                 </div>
                 <div class="input-group">

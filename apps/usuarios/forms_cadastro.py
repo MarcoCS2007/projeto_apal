@@ -25,9 +25,7 @@ ESCOLARIDADE_CHOICES = (
     ("superior", "Ensino Superior (Incompleto / Completo)"),
 )
 
-GENERO_CHOICES = (
-    ("", "Selecione..."),
-) + tuple(Genero.choices)
+GENERO_CHOICES = (("", "Selecione..."),) + tuple(Genero.choices)
 
 PAIS_ORIGEM_CHOICES = (
     ("", "Selecione..."),
@@ -239,8 +237,8 @@ class DadosPessoaisCadastroForm(forms.Form):
                 GENERO_CHOICES, ambulante.genero
             )
             self.fields["data_nasc"].input_formats = ["%Y-%m-%d"]
-            self.fields["uf_nascimento"].widget.attrs["data-valor-inicial"] = extras.get(
-                "uf_nascimento", ""
+            self.fields["uf_nascimento"].widget.attrs["data-valor-inicial"] = (
+                extras.get("uf_nascimento", "")
             )
             self.fields["cidade_nascimento"].widget.attrs["data-valor-inicial"] = (
                 extras.get("cidade_nascimento", "")
@@ -711,7 +709,7 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
             }
         ),
     )
-    renda_estimada = forms.DecimalField(
+    renda_mensal_estimada = forms.DecimalField(
         label="Renda mensal estimada (R$)",
         min_value=0,
         max_digits=10,
@@ -805,7 +803,9 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
         super().__init__(*args, ambulante=ambulante, **kwargs)
         if ambulante and not args:
             self.fields["email"].initial = ambulante.email
-            self.fields["renda_estimada"].initial = ambulante.renda_estimada
+            self.fields["renda_mensal_estimada"].initial = (
+                ambulante.renda_mensal_estimada
+            )
             self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
             self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
 
@@ -872,12 +872,12 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
     def save(self):
         ambulante = self.ambulante
         ambulante.email = self.cleaned_data["email"]
-        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
+        ambulante.renda_mensal_estimada = self.cleaned_data.get("renda_mensal_estimada")
         ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
         ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
         campos = [
             "email",
-            "renda_estimada",
+            "renda_mensal_estimada",
             "telefone_whatsapp",
             "telefone_2",
             "atualizado_em",

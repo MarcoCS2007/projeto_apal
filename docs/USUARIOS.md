@@ -34,7 +34,7 @@ CPF, nome, e-mail, telefones, foto, flags Django (`is_active`, `is_staff`) e cam
 Dados do ofício (apelido, CNPJ, tipo de atuação, escolaridade, NIS, ponto pretendido) e:
 
 - `genero` — feminino, masculino, outro ou não informado
-- `renda_estimada` — valor opcional usado nos relatórios sociodemográficos
+- `renda_mensal_estimada` — valor opcional usado nos relatórios sociodemográficos
 - `codigo_qr_code` — hash HMAC gravado na emissão do alvará
 - `pontuacao` — score 0–100 (inicia em 100)
 - `dados_complementares` — JSON (categoria pretendida, conta suspensa/cancelada, RG, flags de cadastro)

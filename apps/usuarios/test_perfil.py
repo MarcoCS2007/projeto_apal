@@ -42,7 +42,7 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
     def _payload(self, **extra):
         dados = {
             "email": self.ambulante.email,
-            "renda_estimada": self.ambulante.renda_estimada or "1800.00",
+            "renda_mensal_estimada": self.ambulante.renda_mensal_estimada or "1800.00",
             "telefone_whatsapp": self.ambulante.telefone_whatsapp,
             "telefone_2": self.ambulante.telefone_2 or "",
             "cep": "45000-000",
@@ -114,7 +114,7 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
             self.url,
             self._payload(
                 email="novo.ambulante@apal.com",
-                renda_estimada="2500.50",
+                renda_mensal_estimada="2500.50",
                 telefone_whatsapp="77988887777",
                 telefone_2="7732211000",
                 logradouro="Avenida Brasil",
@@ -132,7 +132,7 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.ambulante.refresh_from_db()
         self.assertEqual(self.ambulante.email, "novo.ambulante@apal.com")
         self.assertEqual(self.ambulante.cpf, cpf_original)
-        self.assertEqual(str(self.ambulante.renda_estimada), "2500.50")
+        self.assertEqual(str(self.ambulante.renda_mensal_estimada), "2500.50")
         self.assertEqual(self.ambulante.telefone_whatsapp, "77988887777")
         self.assertEqual(self.ambulante.telefone_2, "7732211000")
         endereco = self.ambulante.enderecos.order_by("id").first()

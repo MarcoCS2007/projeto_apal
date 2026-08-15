@@ -354,9 +354,7 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
             )
             context["qr_liberado"] = qr_liberado
             context["licenca_ativa"] = ativa
-            context["licenca_credencial"] = (
-                ativa if qr_liberado else context["licenca"]
-            )
+            context["licenca_credencial"] = ativa if qr_liberado else context["licenca"]
             context["historico_licencas"] = list(
                 ambulante.licencas.order_by("-criado_em")
             )
@@ -482,7 +480,7 @@ def _etapas_pendentes_cadastro(ambulante):
         ambulante.data_nasc
         and ambulante.escolaridade
         and ambulante.genero
-        and ambulante.renda_estimada is not None
+        and ambulante.renda_mensal_estimada is not None
         and naturalidade_ok
     )
     if not dados_pessoais_ok:
@@ -507,7 +505,9 @@ def _etapas_pendentes_cadastro(ambulante):
     return pendentes
 
 
-def _resumo_status_painel(ambulante, licenca, *, cadastro_completo, documentos_rejeitados):
+def _resumo_status_painel(
+    ambulante, licenca, *, cadastro_completo, documentos_rejeitados
+):
     if not ambulante:
         return {
             "status_rotulo": "Sem conta",
@@ -519,7 +519,9 @@ def _resumo_status_painel(ambulante, licenca, *, cadastro_completo, documentos_r
     if not cadastro_completo:
         faltam = _etapas_pendentes_cadastro(ambulante)
         if faltam <= 0:
-            proximo = "Complete os dados pendentes do cadastro para solicitar a licença."
+            proximo = (
+                "Complete os dados pendentes do cadastro para solicitar a licença."
+            )
         elif faltam == 1:
             proximo = "Falta 1 etapa para você emitir sua licença."
         else:

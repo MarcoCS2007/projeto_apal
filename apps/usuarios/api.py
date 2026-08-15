@@ -30,7 +30,7 @@ def snapshot_cadastro(ambulante):
         "nome_completo": ambulante.nome_completo,
         "data_nasc": ambulante.data_nasc,
         "genero": ambulante.genero,
-        "renda_estimada": (
+        "renda_mensal_estimada": (
             str(ambulante.renda_mensal_estimada)
             if ambulante.renda_mensal_estimada is not None
             else ""

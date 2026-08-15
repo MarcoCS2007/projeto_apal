@@ -178,7 +178,7 @@ class Ambulante(UsuarioBase):
             and self.escolaridade
             and self.tipo_atuacao
             and self.genero
-            and self.renda_estimada is not None
+            and self.renda_mensal_estimada is not None
             and naturalidade_ok
             and self.enderecos.exists()
             and tem_estrutura

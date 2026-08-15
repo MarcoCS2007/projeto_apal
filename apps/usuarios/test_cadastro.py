@@ -51,7 +51,9 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, self.ambulante.nome)
         self.assertNotContains(response, "req-foto")
         self.assertNotContains(response, "A foto 3x4 será inserida depois")
-        self.assertNotContains(response, "Informe a data de nascimento como no documento")
+        self.assertNotContains(
+            response, "Informe a data de nascimento como no documento"
+        )
 
     def test_salva_rascunho_da_etapa_1_e_avanca(self):
         self.client.force_login(self.ambulante)
@@ -63,7 +65,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
                 "cpf": self.ambulante.cpf,
                 "data_nasc": "1991-05-20",
                 "genero": "masculino",
-                "renda_estimada": "1800.00",
+                "renda_mensal_estimada": "1800.00",
                 "pais_origem": "Brasil",
                 "uf_nascimento": "BA",
                 "cidade_nascimento": "Vitória da Conquista",
@@ -81,7 +83,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(self.ambulante.escolaridade, "medio_completo")
         self.assertEqual(self.ambulante.nis, "123456")
         self.assertEqual(self.ambulante.genero, "masculino")
-        self.assertEqual(str(self.ambulante.renda_estimada), "1800.00")
+        self.assertEqual(str(self.ambulante.renda_mensal_estimada), "1800.00")
         extras = self.ambulante.dados_complementares or {}
         self.assertEqual(extras.get("pais_origem"), "Brasil")
         self.assertEqual(extras.get("uf_nascimento"), "BA")
@@ -157,7 +159,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
                 "cpf": "66677788899",
                 "data_nasc": "1990-01-01",
                 "genero": "feminino",
-                "renda_estimada": "1500.00",
+                "renda_mensal_estimada": "1500.00",
                 "pais_origem": "Brasil",
                 "uf_nascimento": "BA",
                 "cidade_nascimento": "Vitória da Conquista",
