@@ -2851,8 +2851,7 @@ body {
     }
 }
 
-.btn-submit,
-.btn-action-card.share {
+.btn-submit {
     background-color: var(--cor-destaque) !important;
     border-color: var(--cor-destaque) !important;
 }
@@ -2864,9 +2863,15 @@ body {
     transform: translateY(-1px);
 }
 
+.credential-actions .btn-action-card.share {
+    background-color: #FFFFFF !important;
+    border-color: var(--cor-destaque) !important;
+    color: var(--cor-destaque) !important;
+}
+
 .credential-actions .btn-action-card.share:hover {
-    background-color: var(--azul-escuro) !important;
-    border-color: var(--azul-escuro) !important;
+    background-color: var(--cor-destaque) !important;
+    border-color: var(--cor-destaque) !important;
     color: #FFFFFF !important;
     transform: translateY(-1px);
 }
