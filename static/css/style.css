@@ -2110,7 +2110,12 @@ form[novalidate] textarea:invalid {
         margin: 10mm;
     }
 
-    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .assistente-widget-link, .access-panel, [vw], #toast-container, .credential-tabs-nav, .credential-actions, .modal-backdrop, .site-top, .nav-backdrop {
+    .top-header, .hero-section, .footer-pmvc, .access-widget-container, .assistente-widget-link, .access-panel, [vw], #toast-container, .credential-tabs-nav, .modal-backdrop, .site-top, .nav-backdrop {
+        display: none !important;
+    }
+
+    .credential-actions,
+    .credential-wrapper .credential-actions {
         display: none !important;
     }
 
@@ -2129,7 +2134,6 @@ form[novalidate] textarea:invalid {
         width: 100% !important;
     }
 
-    .credential-wrapper > div,
     .credential-wrapper .credential-print-stack {
         display: flex !important;
         flex-direction: column !important;
@@ -4227,22 +4231,22 @@ body.doc-fullscreen-open {
         right: 0;
     }
 
+    div[vw].enabled {
+        top: auto !important;
+        bottom: calc(1.25rem + 64px) !important;
+        transform: none !important;
+    }
+
     .access-widget-container {
         top: auto;
-        bottom: calc(1.25rem + 60px);
+        bottom: calc(1.25rem + 128px);
         transform: none;
     }
 
     .access-panel:not(#ai-modal):not(#confirm-dialog) {
         top: auto;
-        bottom: 7.5rem;
-        max-height: 55vh;
-    }
-
-    div[vw].enabled {
-        top: auto !important;
-        bottom: 1.25rem !important;
-        transform: none !important;
+        bottom: calc(1.25rem + 188px);
+        max-height: 50vh;
     }
 
     .floating-access-btn.expanded {
