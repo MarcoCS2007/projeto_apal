@@ -127,6 +127,9 @@ class DocumentoHtmxMixin:
     def _responder(self, request, documento):
         if request.headers.get("HX-Request"):
             return render(request, self.template_name, {"documento": documento})
+        proximo = request.POST.get("next") or request.META.get("HTTP_REFERER")
+        if proximo:
+            return redirect(proximo)
         return redirect("gestor_triagem")
 
 
@@ -318,8 +321,9 @@ class DocumentoArquivoView(LoginRequiredMixin, View):
             raise PermissionDenied
         if not documento.arquivo:
             raise Http404
+        baixar = request.GET.get("download") in ("1", "true", "yes")
         return FileResponse(
             documento.arquivo.open("rb"),
-            as_attachment=False,
+            as_attachment=baixar,
             filename=documento.arquivo.name.rsplit("/", 1)[-1],
         )

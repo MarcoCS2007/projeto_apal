@@ -136,7 +136,25 @@
                     <td data-label="Documento"><strong>Foto 3x4 do titular</strong></td>
                     <td data-label="Arquivo">{{ ambulante.foto.name }}</td>
                     <td data-label="Status"><span class="badge success">Anexado</span></td>
-                    <td data-label="Ações"><a href="{{ ambulante.foto.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
+                    <td data-label="Ações">
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                <a href="{{ ambulante.foto.url }}" class="doc-abrir-item" download role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{{ ambulante.foto.url }}"
+                                    data-doc-titulo="Foto 3x4 do titular"
+                                    data-doc-tipo="image">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
+                    </td>
                 </tr>
                 {% endif %}
                 {% if estrutura and estrutura.foto_estrutura %}
@@ -144,11 +162,29 @@
                     <td data-label="Documento"><strong>Foto da estrutura</strong></td>
                     <td data-label="Arquivo">{{ estrutura.foto_estrutura.name }}</td>
                     <td data-label="Status"><span class="badge success">Anexado</span></td>
-                    <td data-label="Ações"><a href="{{ estrutura.foto_estrutura.url }}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a></td>
+                    <td data-label="Ações">
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                <a href="{{ estrutura.foto_estrutura.url }}" class="doc-abrir-item" download role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{{ estrutura.foto_estrutura.url }}"
+                                    data-doc-titulo="Foto da estrutura"
+                                    data-doc-tipo="image">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
+                    </td>
                 </tr>
                 {% endif %}
                 {% for doc in documentos %}
-                <tr>
+                <tr id="analise-doc-{{ doc.pk }}">
                     <td data-label="Documento"><strong>{{ doc.get_tipo_documento_display }}</strong></td>
                     <td data-label="Arquivo">{% if doc.arquivo %}{{ doc.arquivo.name }}{% else %}—{% endif %}</td>
                     <td data-label="Status">
@@ -162,7 +198,31 @@
                     </td>
                     <td data-label="Ações">
                         {% if doc.arquivo %}
-                        <a href="{% url 'documento_arquivo' doc.pk %}" class="btn-action" style="text-decoration: none;" target="_blank"><i data-lucide="eye"></i> Visualizar</a>
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                {% if doc.pendente %}
+                                <form action="{% url 'documento_aprovar' doc.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="doc-abrir-item doc-abrir-item-success" role="menuitem">
+                                        <i data-lucide="check-circle-2"></i> Aprovar documento
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <a href="{% url 'documento_arquivo' doc.pk %}?download=1" class="doc-abrir-item" role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{% url 'documento_arquivo' doc.pk %}"
+                                    data-doc-titulo="{{ doc.get_tipo_documento_display }}">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
                         {% endif %}
                     </td>
                 </tr>
@@ -240,4 +300,90 @@
     </form>
     {% endif %}
 </div>
+
+<div id="doc-fullscreen-modal" class="doc-fullscreen-modal" hidden aria-hidden="true">
+    <div class="doc-fullscreen-barra">
+        <strong id="doc-fullscreen-titulo">Documento</strong>
+        <button type="button" id="doc-fullscreen-fechar" class="btn-action" aria-label="Fechar tela cheia">
+            <i data-lucide="x"></i> Fechar
+        </button>
+    </div>
+    <div class="doc-fullscreen-corpo" id="doc-fullscreen-corpo"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    document.querySelectorAll(".doc-abrir-menu").forEach(function (menu) {
+        menu.addEventListener("toggle", function () {
+            if (!menu.open) return;
+            document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (outro) {
+                if (outro !== menu) outro.removeAttribute("open");
+            });
+        });
+    });
+
+    document.addEventListener("click", function (event) {
+        document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (menu) {
+            if (!menu.contains(event.target)) menu.removeAttribute("open");
+        });
+    });
+
+    var modal = document.getElementById("doc-fullscreen-modal");
+    var tituloEl = document.getElementById("doc-fullscreen-titulo");
+    var corpo = document.getElementById("doc-fullscreen-corpo");
+    var fechar = document.getElementById("doc-fullscreen-fechar");
+
+    function fecharFullscreen() {
+        if (!modal) return;
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("doc-fullscreen-open");
+        if (corpo) corpo.innerHTML = "";
+    }
+
+    function abrirFullscreen(url, titulo, tipo) {
+        if (!modal || !corpo) return;
+        tituloEl.textContent = titulo || "Documento";
+        corpo.innerHTML = "";
+        var ehImagem = tipo === "image" || /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url);
+        if (ehImagem) {
+            var img = document.createElement("img");
+            img.src = url;
+            img.alt = titulo || "Documento";
+            corpo.appendChild(img);
+        } else {
+            var iframe = document.createElement("iframe");
+            iframe.src = url;
+            iframe.title = titulo || "Documento";
+            corpo.appendChild(iframe);
+        }
+        modal.hidden = false;
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("doc-fullscreen-open");
+        document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (menu) {
+            menu.removeAttribute("open");
+        });
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+            window.lucide.createIcons();
+        }
+    }
+
+    document.querySelectorAll("[data-doc-fullscreen]").forEach(function (botao) {
+        botao.addEventListener("click", function () {
+            abrirFullscreen(
+                botao.getAttribute("data-doc-url"),
+                botao.getAttribute("data-doc-titulo"),
+                botao.getAttribute("data-doc-tipo")
+            );
+        });
+    });
+
+    fechar && fechar.addEventListener("click", fecharFullscreen);
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && modal && !modal.hidden) fecharFullscreen();
+    });
+})();
+</script>
 {% endblock %}
