@@ -1,10 +1,11 @@
+import uuid
+
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-import uuid
-from django.db import transaction
 
-from .models import UsuarioBase, Ambulante
+from .models import Ambulante, UsuarioBase
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -43,13 +44,17 @@ class RegisterAmbulanteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     # Torna os campos da Etapa 2 opcionais na criação inicial da conta
-    tipo_atuacao = serializers.CharField(required=False, allow_blank=True, default="Pendente")
+    tipo_atuacao = serializers.CharField(
+        required=False, allow_blank=True, default="Pendente"
+    )
     data_nasc = serializers.DateField(required=False, allow_null=True, default=None)
-    escolaridade = serializers.CharField(required=False, allow_blank=True, default="Não informada")
+    escolaridade = serializers.CharField(
+        required=False, allow_blank=True, default="Não informada"
+    )
 
     class Meta:
         model = Ambulante
-        fields = [
+        fields = (
             "nome_completo",
             "cpf",
             "email",
@@ -61,7 +66,7 @@ class RegisterAmbulanteSerializer(serializers.ModelSerializer):
             "escolaridade",
             "codigo_qr_code",
             "pontuacao",
-        ]
+        )
         read_only_fields = ("codigo_qr_code", "pontuacao")
 
     def create(self, validated_data):
