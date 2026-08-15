@@ -84,7 +84,7 @@ O seed (`python manage.py seed_inicial`) já cria pontos no Centro e em outros b
 No cadastro completo:
 
 1. **Etapa 2** — endereço. Sem ele o cadastro não fecha.
-2. **Etapa 4** — tipo de estrutura, metragem em m² e foto. Se a metragem for maior que a do ponto escolhido, o gestor verá alerta e **não conseguirá deferir** naquele ponto.
+2. **Etapa 4** — tipo de atuação, tipo de estrutura, metragem em m² e foto. Se a metragem for maior que a do ponto escolhido, o gestor verá alerta e **não conseguirá deferir** naquele ponto.
 3. **Etapa 5** — escolha um ponto **Livre** do catálogo e a categoria de produto.
 
 Depois disso, quem ocupa ou libera o ponto é a emissão / vencimento da licença, não o ambulante.

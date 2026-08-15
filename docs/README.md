@@ -63,6 +63,6 @@ Depois de `python manage.py seed_inicial` (ou equivalente no container):
 | Fiscal | `12345678909` | `fiscal123` | `/fiscal/entrar/` |
 | Ambulante | `10020030088` | `amb123` | `/entrar/` |
 
-Para volume de dados nos gráficos: `python manage.py seed_massivo` (atalho: `make seed_massivo`).
+Para volume de dados nos gráficos: `python manage.py seed_massivo` (atalho: `make seed_massivo`). O seed básico é `make seed` / `python manage.py seed_inicial`.
 
 Detalhes e demais usuários fictícios: [API-AUTENTICACAO.md](API-AUTENTICACAO.md).

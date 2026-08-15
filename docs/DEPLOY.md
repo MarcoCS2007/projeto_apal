@@ -15,7 +15,7 @@ Para o deploy, precisaremos de três ajustes principais:
 
 ## 2. Preparando o Código para Produção
 
-`gunicorn` e `whitenoise` já estão em `requirements/base.txt`. O `STATIC_ROOT` (`staticfiles/`) e o middleware do WhiteNoise já estão em `config/settings/base.py`.
+`gunicorn` e `whitenoise` já estão em `requirements/base.txt` (Django 5+). O `STATIC_ROOT` (`staticfiles/`) e o middleware do WhiteNoise já estão em `config/settings/base.py`. Os apps instalados são só `core`, `usuarios`, `licenciamento`, `espacos`, `fiscalizacao` e `assistente`.
 
 Com `DEBUG=False` o Django **não** serve CSS/JS pelo `runserver`. Depois de `pip install -r requirements/base.txt`:
 
@@ -156,3 +156,4 @@ Como a variável `COMPOSE_FILE` já está ativa na sessão do seu servidor, os c
 * **Derrubar o ambiente completamente:**
 `docker compose down`
 * **Backup e restauração:** ver `docs/BACKUP.md` (`manage.py backup_banco` e `loaddata` / `pg_restore`).
+* **Dados de demonstração (não use em produção real):** `python manage.py seed_inicial`. Volume extra para gráficos: `seed_massivo`.

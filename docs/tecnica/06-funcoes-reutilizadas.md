@@ -24,9 +24,12 @@ Rejeitar é mais agressivo: `DocumentoAnexo.rejeitar` grava o motivo e chama `ma
 
 ## 6.2 Abrir requerimento: não nascer dois protocolos
 
-```133:156:apps/licenciamento/services.py
+```135:158:apps/licenciamento/services.py
 @transaction.atomic
 def abrir_requerimento(ambulante, categoria=None):
+    """Cria (ou reaproveita) um requerimento Em Análise para o ambulante."""
+    from apps.licenciamento.models import LicencaAlvara
+
     existente = requerimento_em_aberto(ambulante)
     if existente:
         return existente, False
@@ -76,7 +79,7 @@ Os três ramos:
 4. Metragem da estrutura ≤ máximo do ponto.
 5. Tem categoria?
 
-Só então `status = Aprovado`. **Não** gera `ALV-`, **não** ocupa o ponto, **não** gera QR. Isso é de propósito: o produto separa “parecer técnico” de “emissão com validade e escala”. A view de análise, se a ação foi deferir, redireciona para `/gestor/emitir/<id>/`.
+Só então `status = Aprovado` e `valor_taxa = metragem × fator_financeiro`. **Não** gera `ALV-`, **não** ocupa o ponto, **não** gera QR. Isso é de propósito: o produto separa “parecer técnico” de “emissão com validade e escala”. A view de análise, se a ação foi deferir, redireciona para `/gestor/emitir/<id>/`.
 
 ---
 

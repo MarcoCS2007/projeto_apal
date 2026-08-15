@@ -22,7 +22,7 @@ O Python resolve herança da esquerda para a direita:
 
 `AcessoAmbulanteMixin.test_func` é literalmente:
 
-```163:165:apps/usuarios/views.py
+```165:170:apps/usuarios/views.py
     def test_func(self):
         user = self.request.user
         return bool(user.is_authenticated and user.role == Perfil.AMBULANTE)
@@ -82,7 +82,7 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 Não são seis URLs. É uma classe e `?etapa=N` / `POST etapa=N`.
 
-```340:347:apps/usuarios/views.py
+```393:400:apps/usuarios/views.py
 ETAPAS_CADASTRO = {
     1: DadosPessoaisCadastroForm,
     2: EnderecoCadastroForm,
@@ -97,7 +97,7 @@ ETAPAS_CADASTRO = {
 
 No GET, instancia o form da etapa **já com o ambulante**, para o form preencher valores salvos (rascunho). No POST:
 
-```410:426:apps/usuarios/views.py
+```463:477:apps/usuarios/views.py
     def post(self, request):
         ambulante = self._ambulante()
         etapa = self._etapa(request.POST)
@@ -127,6 +127,8 @@ Fluxo mental:
 Depois do `save()`, se `acao == "enviar"` e `cadastro_completo`, a view importa `abrir_requerimento` e protocola. A view **não** cria `LicencaAlvara` direto: se criar, fura a regra de “já existe requerimento na fila”.
 
 `_ambulante()` usa `Ambulante.objects.get(pk=self.request.user.pk)` porque o mixin já garantiu o perfil; um `UsuarioBase` puro não passaria do `test_func`.
+
+A etapa 1 grava gênero e renda estimada (opcionais para `cadastro_completo`, obrigatórios para o retrato do dashboard). A etapa 4 grava **tipo de atuação** junto com a estrutura. E-mail, CPF e foto 3x4 saem do wizard: `PerfilAmbulanteView` em `/ambulante/perfil/` usa `PerfilAmbulanteForm`.
 
 ## 4.5 `form_valid` do assistente: o padrão “view magra”
 

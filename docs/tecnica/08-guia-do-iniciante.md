@@ -6,7 +6,7 @@ Como usar este repositório no primeiro dia e nos primeiros PRs.
 
 1. Suba o projeto ([README da raiz](../../README.md)): Docker, `.envs/.env.dev`, `migrate`, `seed_inicial`.
 2. Entre com as contas seed (Master `52998224725`, gestor `11144477735`, fiscal `12345678909`, ambulante `10020030088`).
-3. Percorra o ciclo com a mão: completar cadastro → triagem → deferir → taxa → emitir → credencial → `/fiscal/` → ocorrência → dossiê/score.
+3. Percorra o ciclo com a mão: completar cadastro → triagem → deferir → taxa → emitir → credencial → `/fiscal/` → ocorrência → dossiê/score. Opcional: `make seed_massivo` para encher os gráficos.
 4. Leia os capítulos 3–6 com o editor aberto no trecho citado. O 7 é o ciclo inteiro; use a tabela de sintomas no final quando algo “não acontecer”.
 
 ## 8.2 “Quero alterar X” → abra Y
@@ -17,11 +17,15 @@ Como usar este repositório no primeiro dia e nos primeiros PRs.
 | Mudar quem pode ver um menu | `templates/gestor/_nav.html` + `permissoes.py` | Matriz no Master |
 | Travar uma tela por perfil | Mixin em `usuarios/views.py` | `RequerModuloMixin` se for módulo da matriz |
 | Mudar regra de alvará/docs/taxa | `apps/licenciamento/services.py` | Testes `test_emissao.py`, `test_alvara.py` |
+| Mudar cálculo da taxa / fator R$/m² | `CategoriaProduto.fator_financeiro` + `aplicar_parecer` | Seed e tela de categorias |
+| Mudar indicadores / Excel / PDF | `apps/licenciamento/relatorios.py` | `test_relatorios.py` e templates de exportação |
 | Mudar leitura de QR / auto | `apps/fiscalizacao/services.py` | `test_campo.py`, `test_auditoria.py` |
 | Mudar pontos do score | `PONTOS` em `usuarios/score.py` | `test_score.py` |
 | Nova pergunta do assistente | `BASE_CONHECIMENTO` em `core/ia.py` | `assistente/tests.py` |
 | Novo campo no cadastro do ambulante | `forms_cadastro.py` + model/migração | Wizard web **e** `usuarios/api.py` |
+| E-mail, CPF ou foto do ambulante | `PerfilAmbulanteForm` + `PerfilAmbulanteView` | `test_perfil.py` |
 | Novo ponto/categoria no seed | `seed_inicial.py` | Rode o comando de novo (idempotente) |
+| Volume para gráficos | `scripts/seed_massivo.py` | `make seed_massivo` |
 | Novo endpoint JSON | `api.py` + `urls.py` do app | Chame o **service** já existente; documente em `docs/API-MOVEL.md` |
 | Nova página HTML | `views.py` + `urls_web.py` + template `extends "base.html"` | `{% url %}` e mixin de acesso |
 | Esquema do banco | `models.py` → `makemigrations` → `migrate` | Nunca edite migração antiga já compartilhada |
@@ -59,7 +63,7 @@ URL no browser
 | Protocolo | `REQ-2026-0003` |
 | Credencial | Tela/PNG do crachá com QR |
 | HMAC / `codigo_qr_code` | Hash estável, não um UUID aleatório |
-| DAM | Taxa municipal simulada (R$ 120) |
+| DAM | Taxa municipal simulada (`metragem × fator financeiro` da categoria) |
 | MTI | Herança de usuário em várias tabelas |
 | Soft-delete | `ativo=False` em vez de apagar a linha |
 | HTMX | Troca um pedaço de HTML sem recarregar a página |

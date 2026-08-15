@@ -39,13 +39,21 @@ Há dois managers de propósito:
 
 O Django espera um `User` com campo `username`. Aqui o modelo de autenticação é `UsuarioBase` (`AUTH_USER_MODEL` em `config/settings/base.py`).
 
-```45:60:apps/usuarios/models.py
+```52:67:apps/usuarios/models.py
 class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
     cpf = models.CharField(max_length=14, unique=True)
     nome = models.CharField(max_length=150)
     sobrenome = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
-    ...
+    telefone_whatsapp = models.CharField(max_length=20)
+    telefone_2 = models.CharField(max_length=20, blank=True, null=True)
+    foto = models.ImageField(upload_to="usuarios/fotos/", blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UsuarioBaseManager()
+
     USERNAME_FIELD = "cpf"
     REQUIRED_FIELDS = ("email", "nome", "sobrenome")
 ```
@@ -70,7 +78,7 @@ O pk do `request.user` (que pode ter sido carregado como `UsuarioBase`) **é** o
 
 ## 3.4 `user.role`: como o sistema descobre quem você é
 
-```92:103:apps/usuarios/models.py
+```96:106:apps/usuarios/models.py
     @property
     def role(self):
         try:
@@ -99,7 +107,7 @@ Se `role` voltar `None`, os mixins recusam acesso. Isso acontece se alguém cria
 
 Não é um campo no banco. É uma propriedade calculada:
 
-```143:158:apps/usuarios/models.py
+```161:176:apps/usuarios/models.py
     @property
     def cadastro_completo(self):
         estrutura = self.estruturas.order_by("id").first()
@@ -120,7 +128,7 @@ Não é um campo no banco. É uma propriedade calculada:
 
 Em português: tem data de nascimento, escolaridade, tipo de atuação (fixo/móvel/eventual), **pelo menos um** `Endereco` (`related_name="enderecos"`) e uma `EstruturaTrabalho` com tipo e m² > 0.
 
-O que isso **não** exige: CNPJ, ponto pretendido, documentos anexados. Ponto e anexos entram depois, na etapa 5–6 e no parecer do gestor. Por isso um ambulante “completo” ainda pode estar sem requerimento.
+O que isso **não** exige: CNPJ, ponto pretendido, documentos anexados, gênero nem renda. Gênero e renda alimentam o dashboard; ponto e anexos entram na etapa 5–6 e no parecer. Por isso um ambulante “completo” ainda pode estar sem requerimento.
 
 `abrir_requerimento` consulta exatamente essa propriedade. Se você marcar cadastro completo só com um checkbox na tela, o service ainda recusa.
 
@@ -136,7 +144,7 @@ Dois campos booleanos (`ativo` do `ModeloBase` e `is_active` do auth) são atual
 
 Na criação, `status` default é `"Em Análise"`. O `save()` gera o protocolo **depois** do primeiro INSERT, porque precisa do `pk`:
 
-```250:257:apps/licenciamento/models.py
+```264:271:apps/licenciamento/models.py
     def save(self, *args, **kwargs):
         from django.utils import timezone
 
@@ -161,20 +169,22 @@ Propriedades que as telas usam como se fossem colunas:
 
 `qr_valido` é a trava da credencial:
 
-```274:282:apps/licenciamento/models.py
+```288:296:apps/licenciamento/models.py
     def qr_valido(self):
         from django.utils import timezone
 
         if self.status != StatusLicenca.ATIVO:
             return False
-        if self.data_vencimento and self.data_vencimento < timezone.localdate():
-            return False
-        return True
+        return not (
+            self.data_vencimento and self.data_vencimento < timezone.localdate()
+        )
 ```
 
 Mesmo que o HMAC no ambulante ainda exista, a tela do crachá recusa se isso for False. Suspensão não apaga o hash; só faz `qr_valido` falhar pelo status.
 
 `pode_emitir` impede emitir duas vezes a mesma linha: depois que `_gerar_numero_licenca` preenche `ALV-…`, a propriedade vira False.
+
+No deferimento, `valor_taxa` passa a ser `estrutura.dimensoes_metragem * categoria.fator_financeiro`. O default do campo no banco (`VALOR_TAXA_DAM` = R$ 120) só vale até o parecer calcular.
 
 ## 3.8 Ponto de ocupação: Livre no papel vs Livre de verdade
 
@@ -206,6 +216,8 @@ Constraint `uniq_documento_ambulante_tipo`: o ambulante não tem dois RG. Reenvi
 ## 3.10 Score: histórico + saldo
 
 `Ambulante.pontuacao` é o saldo atual (default 100). `EventoScore` é o extrato. A constraint única em `(ambulante, chave)` com `chave != ""` impede o mesmo alvará pontuar +10 duas vezes. O capítulo 6 mostra o `if chave already exists: return None` que completa essa garantia no Python.
+
+`LogAcessoDossie` grava quem abriu o dossiê (HTML ou PDF). Não altera o ambulante; serve à auditoria LGPD e some com `purgar_retencao`.
 
 ## 3.11 O que o banco *não* faz sozinho
 

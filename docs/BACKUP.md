@@ -46,3 +46,5 @@ python manage.py purgar_retencao
 ```
 
 Remove `LogAssistente` e `LogAcessoDossie` anteriores ao prazo configurado.
+
+A política de privacidade pública (`/privacidade/`) mostra a mesma base legal e os meses de retenção lidos de `ConfiguracaoSeguranca`.

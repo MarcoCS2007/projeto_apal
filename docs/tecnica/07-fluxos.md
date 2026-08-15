@@ -18,8 +18,10 @@ Nesse momento `cadastro_completo` é False: não há endereço nem estrutura. O 
 
 Cada POST traz `etapa` escondido no form. A view escolhe a classe em `ETAPAS_CADASTRO`, valida, `form.save()`.
 
+- Etapa 1: dados pessoais (nascimento, gênero, renda, escolaridade, telefones, NIS). Foto 3x4 fica em `/ambulante/perfil/`.
 - Etapa 2: o form cria/atualiza `Endereco` com `related_name="enderecos"`. A propriedade `cadastro_completo` passa a ver `.enderecos.exists()`.
-- Etapa 4: `EstruturaTrabalho` com `dimensoes_metragem`. Se o usuário mandar 0, o form recusa — a propriedade também recusaria.
+- Etapa 3: CNPJ/MEI e nome fantasia. Sem CNPJ, a flag `sem_cnpj` vai para o JSON.
+- Etapa 4: `tipo_atuacao` + `EstruturaTrabalho` com `dimensoes_metragem`. Se o usuário mandar 0, o form recusa — a propriedade também recusaria.
 - Etapa 5: queryset do campo ponto já vem filtrado para Livre. O form ainda compara metragem com o ponto escolhido. `gravar_categoria_pretendida` escreve `categoria_id` no JSON do ambulante — é isso que `tipos_obrigatorios` lerá na etapa 6 (laudo sanitário se a categoria exigir).
 - Etapa 6 + `acao=enviar`: `form.save()` grava anexos; a view recarrega o ambulante; se `cadastro_completo`, chama `abrir_requerimento`. O segundo retorno `True` dispara a mensagem com o protocolo. Redirect para `ambulante_alvara`, não para o painel — o critério de pronto do item 6 era o trabalhador **ver** o `REQ-`.
 
@@ -43,7 +45,7 @@ Ela reenvia o arquivo: `reenviar` volta Pendente e, se era o único rejeitado, `
 
 Deferer com sucesso: `messages.success` + `redirect("gestor_emitir", pk=licenca.pk)`. Status Aprovado. `pode_emitir` agora é True. `qr_valido` ainda é False (não está Ativo). A credencial da Maria, se ela abrir agora, **não** mostra QR: a view da credencial exige `licenca_ativa` + `validar_codigo_qr`.
 
-Maria pode confirmar a taxa: `simular_pagamento_taxa` checa `aguardando_taxa` e `licenca.ambulante_id == ambulante.pk` (não pagar a taxa da vizinha). Seta `taxa_paga=True`. Continua sem HMAC.
+Maria pode confirmar a taxa: `simular_pagamento_taxa` checa `aguardando_taxa` e `licenca.ambulante_id == ambulante.pk` (não pagar a taxa da vizinha). Seta `taxa_paga=True`. O valor já foi gravado no deferimento (`metragem × fator`). Continua sem HMAC.
 
 ---
 
@@ -92,9 +94,9 @@ Improcedente **não** chama score nem suspende. Convertida em multa só é legal
 
 ## Passo 9 — Dashboard bate com o banco
 
-`indicadores_gerenciais` chama `marcar_licencas_vencidas`, conta Ativas/Vencidas/fila, agrupa pontos por bairro, conta ocorrências no período. Não há array mockado no template. Se o filtro `origem=itinerantes` entra, `_aplicar_origem` restringe a `tipo_atuacao="movel"`. Lotação ≥ 90% preenche `alerta_lotacao` com o primeiro bairro que cruzar a linha.
+`indicadores_gerenciais` chama `marcar_licencas_vencidas`, conta Ativas/Vencidas/fila, agrupa pontos por bairro, conta ocorrências no período e monta o retrato sociodemográfico (`genero`, faixa etária, escolaridade, renda). Não há array mockado no template. Filtros extras: `cidade`, `genero`, `faixa`, `escolaridade`. Se o filtro `origem=itinerantes` entra, `_aplicar_origem` restringe a `tipo_atuacao="movel"`. Lotação ≥ 90% preenche `alerta_lotacao` com o primeiro bairro que cruzar a linha.
 
-A API `/api/relatorios/ocupacao/` reusa a mesma função e corta o dicionário em `indicadores_json` (sem querysets).
+A API `/api/relatorios/ocupacao/` reusa a mesma função e corta o dicionário em `indicadores_json` (sem querysets). Excel e PDF (`/gestor/dashboard/exportar.xlsx` e `.pdf`) chamam `indicadores_da_request` e geram o arquivo. Os gráficos do dashboard pedem JSON em `/gestor/dashboard/chart-data/`.
 
 ---
 
@@ -113,6 +115,7 @@ Não existe um segundo motor. Se o status no app diverge do site, o bug está no
 | Enviar não gera protocolo | `cadastro_completo` False? `abrir_requerimento` retornou `(None, False)`? Já havia fila? |
 | Deferir recusa | `tipos_faltando_aprovacao` ainda tem itens? Ponto não Livre? m²? |
 | Credencial sem QR | `pode_emitir` já era False (não emitiu)? `taxa_paga` não emite sozinha. Status não Ativo? |
+| Taxa zerada ou estranha | Categoria sem `fator_financeiro`? Estrutura sem metragem no deferimento? |
 | QR “adulterado” | `SECRET_KEY` mudou? `numero_licenca` alterado na mão? Hash truncado na câmera? |
 | Score não andou | `chave` repetida? `ambulante` None na ocorrência? Já no piso 0? |
 | Assistente genérico | tokens só de stopword, ou nenhum trecho pontuou > 0 |

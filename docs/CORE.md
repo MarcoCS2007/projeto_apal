@@ -127,7 +127,7 @@ python manage.py seed_inicial
 python manage.py seed_massivo   # volume extra para gráficos e relatórios
 ```
 
-No Docker: `make seed_inicial` / `make seed_massivo` (ou `./dev.sh exec python manage.py seed_inicial`).
+No Docker: `make seed` / `make seed_massivo` (ou `./dev.sh exec python manage.py seed_inicial`).
 
 `seed_inicial` cria categorias (com fator financeiro), pontos de ocupação e contas de demonstração (Master, gestores, fiscais e ambulantes). Senhas: ver [README da pasta docs](README.md).
 

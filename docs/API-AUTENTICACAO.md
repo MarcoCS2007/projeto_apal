@@ -187,7 +187,7 @@ Elas já exigem usuário autenticado. Combine com `|` do DRF se a rota aceitar m
 
 ## 5. Relação com o backoffice
 
-O login web (`POST /login/`, template `login.html`) usa sessão Django e cookie `sessionid`. Só **Gestor** e **Administrador** entram. Ambulante e Fiscal recebem erro de formulário e **não** ganham sessão.
+O login web usa sessão Django e cookie `sessionid`, em canais separados: `/login/` (Gestor/Master), `/entrar/` (Ambulante) e `/fiscal/entrar/` (Fiscal). No backoffice, ambulante e fiscal recebem erro de formulário e **não** ganham sessão.
 
 O encerramento do expediente é `POST /logout/` (CSRF obrigatório). A view invalida a sessão, apaga o cookie `sessionid` e redireciona Gestor/Administrador para `/login/?encerrado=1`. Ambulante autenticado na web volta para `/entrar/`. `GET /logout/` não encerra a sessão (405).
 
@@ -202,7 +202,7 @@ Não misture os fluxos no cliente:
 
 | Arquivo | Papel |
 | --- | --- |
-| `apps/usuarios/urls.py` | Rotas `/api/login/`, `/api/token/refresh/`, `/api/me/` |
+| `apps/usuarios/urls.py` | Rotas `/api/login/`, `/api/token/refresh/`, `/api/me/`, cadastro e score |
 | `apps/usuarios/serializers.py` | `LoginSerializer` (claim `role`) |
 | `apps/usuarios/authentication.py` | JWT com `select_related` dos perfis |
 | `apps/usuarios/urls_web.py` | Login/logout por cookie |

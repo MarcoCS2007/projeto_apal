@@ -4,7 +4,7 @@ Antes de models e services, precisa ficar claro **o que acontece quando alguém 
 
 ## O que está ligado
 
-- **Python / Django 5** processa HTTP, lê o Postgres pelo ORM e renderiza HTML.
+- **Python / Django 5+** processa HTTP, lê o Postgres pelo ORM e renderiza HTML.
 - **PostgreSQL** guarda as linhas. Arquivos (foto, PDF) vão para a pasta `media/`; o banco só guarda o caminho.
 - **DRF + SimpleJWT** devolvem JSON para o app móvel, com o mesmo usuário do site.
 - **Templates + `static/`** são o front-end. A pasta `front/` é protótipo antigo: alterar lá **não** muda `localhost:8000`.
@@ -15,7 +15,7 @@ Docker (`docker-compose.yml`) sobe `db` (Postgres) e `web` (Django na porta 8000
 
 Toda request entra em `config/urls.py`. Esse arquivo **não** contém as views. Ele só diz *qual app* cuida de cada prefixo:
 
-```23:34:config/urls.py
+```23:37:config/urls.py
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("apps.usuarios.urls")),
@@ -28,13 +28,18 @@ urlpatterns = [
     path("", include("apps.espacos.urls_web")),
     path("", include("apps.assistente.urls_web")),
 ]
+
+handler404 = "apps.core.views.pagina_nao_encontrada"
+handler500 = "apps.core.views.erro_servidor"
 ```
 
 Leia assim:
 
 1. `/admin/` → admin do Django.
 2. Qualquer coisa que comece com `/api/` → um dos `urls.py` (JSON). Vários `include` no mesmo prefixo: o Django tenta o primeiro, depois o segundo, até achar a rota.
-3. O resto (`""`) → `urls_web.py` (HTML). A home (`/`) está em `apps.core.urls`; `/ambulante/` está em `usuarios.urls_web`; `/ambulante/alvara/` está em `licenciamento.urls_web`.
+3. O resto (`""`) → `urls_web.py` (HTML). A home (`/`) está em `apps.core.urls`; `/privacidade/` também; `/ambulante/` e `/ambulante/perfil/` estão em `usuarios.urls_web`; `/ambulante/alvara/` está em `licenciamento.urls_web`.
+
+Rotas que não existem caem em `handler404`; falha não tratada, em `handler500` (templates `404.html` e `500.html`).
 
 O `name=` de cada `path(...)` é o identificador que templates usam em `{% url 'ambulante_alvara' %}` e o Python usa em `reverse("ambulante_alvara")`. Se você mudar a URL e esquecer o `name`, os links quebram.
 

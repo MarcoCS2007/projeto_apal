@@ -32,7 +32,7 @@ O Django:
 4. Injeta o hero acima do `<main>`.
 5. O `{% block content %}` da filha cai **dentro** do `<main>` do base — por isso o skip link “Pular para o conteúdo” sempre acerta.
 
-Se você criar um HTML solto sem `extends`, a página nasce sem acessibilidade, sem CSRF meta, sem CSS. Por isso a regra do item 16: tela nova = `extends "base.html"`.
+Se você criar um HTML solto sem `extends`, a página nasce sem acessibilidade, sem CSRF meta, sem CSS. Tela nova = `extends "base.html"`.
 
 `{% include %}` é outro mecanismo: cola um arquivo no lugar (nav, badge, ficha do fiscal). O `_` no nome (`_nav.html`) é convenção de “não é página, é pedaço”.
 
@@ -70,6 +70,8 @@ E para a licença:
 
 `{{ user.nome }}` vem do context processor `django.contrib.auth`: todo template autenticado tem `user`. Mixins já garantiram que esse `user` é ambulante nesta tela.
 
+O menu público (`templates/publico/_nav.html`) inclui **Meu perfil** (`ambulante_perfil`) quando o ambulante está logado. Essa tela edita e-mail, CPF, foto e endereço — não o wizard de 6 etapas.
+
 ## 5.3 `{% url %}` e `{% static %}`
 
 Nunca escreva `href="/ambulante/alvara/"` num template novo. O `name` da rota em `urls_web.py` é a fonte da verdade:
@@ -104,7 +106,7 @@ Se HTMX falhar, a mesma view ainda redireciona (capítulo 4). O fragmento `_docu
 
 `static/js/script.js` liga o painel de acessibilidade (classes no `body`), o menu mobile (`nav-open`) e leitura em voz. **Não** há `if (licenca.status === 'Ativo')` no JS de negócio.
 
-Exceções pontuais no `{% block extra_js %}`: Chart.js no dashboard (recebe números **já calculados** em `indicadores_gerenciais`); câmera no painel do fiscal (só preenche o campo `q` / `qr` e submete). A classificação do QR continua sendo `inspecionar_qr` no servidor.
+Exceções pontuais no `{% block extra_js %}`: Chart.js no dashboard (recebe números **já calculados** em `indicadores_gerenciais` / `chart-data`); câmera no painel do fiscal (só preenche o campo `q` / `qr` e submete). A classificação do QR continua sendo `inspecionar_qr` no servidor.
 
 ## 5.8 O que a pasta `front/` é
 
