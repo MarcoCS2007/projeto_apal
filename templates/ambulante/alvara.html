@@ -10,8 +10,8 @@
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
-        <h1>Licença e taxas de ocupação</h1>
-        <p>Acompanhe o protocolo, o status da solicitação e o histórico dos seus requerimentos.</p>
+        <h1>Meu alvará</h1>
+        <p>Acompanhe o protocolo e o status da sua solicitação de alvará.</p>
     </div>
 </section>
 {% endblock %}
@@ -41,6 +41,16 @@
         </a>
         {% endif %}
     </p>
+</div>
+{% elif not licenca_aprovada %}
+<div class="form-card" style="padding: 28px; max-width: 720px; margin: 0 auto; text-align: center;">
+    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Protocolo nº</span>
+    <h2 style="font-size: 1.4rem; font-weight: 700; color: #0F172A; margin: 4px 0 1.25rem 0;">{{ licenca.protocolo }}</h2>
+    <div class="info-callout-box" style="margin: 0 auto; text-align: left;">
+        <p style="margin: 0; color: #475569;">
+            Sua solicitação está em andamento. Acompanhe o protocolo acima; a prefeitura ainda não concluiu a aprovação do alvará.
+        </p>
+    </div>
 </div>
 {% else %}
 <div class="form-card" style="padding: 28px; margin-bottom: 24px;">
@@ -91,45 +101,8 @@
 
     {% include "ambulante/_painel_taxa.html" with licenca=licenca %}
 </div>
-
-{% if historico %}
-<div class="form-card">
-    <div class="section-title">
-        <div class="title-accent"></div>
-        <h2>Histórico de requerimentos</h2>
-    </div>
-    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
-        Solicitações, alterações e renovações vinculadas à sua conta.
-    </p>
-    <div class="table-responsive">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>PROTOCOLO</th>
-                    <th>TIPO</th>
-                    <th>PONTO</th>
-                    <th>CATEGORIA</th>
-                    <th>STATUS</th>
-                    <th>DATA</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in historico %}
-                <tr>
-                    <td>{{ item.protocolo }}</td>
-                    <td>{{ item.tipo_pedido }}</td>
-                    <td>{% if item.ponto_ocupacao %}{{ item.ponto_ocupacao.nome_identificacao }}{% else %}—{% endif %}</td>
-                    <td>{% if item.categoria_produto %}{{ item.categoria_produto.nome_categoria }}{% else %}—{% endif %}</td>
-                    <td>{{ item.status }}</td>
-                    <td>{{ item.criado_em|date:"d/m/Y" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 {% endif %}
-{% endif %}
+{% include "ambulante/_voltar_painel.html" %}
 {% endblock %}
 
 {% block extra_js %}

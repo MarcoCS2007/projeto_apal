@@ -27,11 +27,6 @@ CAMPOS_ARQUIVO = (
     ("arquivo_laudo_bombeiros", TipoDocumento.LAUDO_BOMBEIROS),
 )
 
-CAMPOS_VALIDADE = {
-    TipoDocumento.LAUDO_SANITARIO: "validade_laudo_sanitario",
-    TipoDocumento.LAUDO_BOMBEIROS: "validade_laudo_bombeiros",
-}
-
 
 def _arquivo_widget(input_id):
     return forms.ClearableFileInput(
@@ -115,27 +110,11 @@ class AnexosDocumentosForm(forms.Form):
         validators=[FileExtensionValidator(EXTENSOES_DOCUMENTO)],
         widget=_arquivo_widget("doc-saude"),
     )
-    validade_laudo_sanitario = forms.DateField(
-        label="Validade do laudo sanitário",
-        required=False,
-        widget=forms.DateInput(
-            attrs={"id": "validade-saude", "type": "date"},
-            format="%Y-%m-%d",
-        ),
-    )
     arquivo_laudo_bombeiros = forms.FileField(
         label="Laudo dos Bombeiros",
         required=False,
         validators=[FileExtensionValidator(EXTENSOES_DOCUMENTO)],
         widget=_arquivo_widget("doc-bombeiros"),
-    )
-    validade_laudo_bombeiros = forms.DateField(
-        label="Validade do laudo dos bombeiros",
-        required=False,
-        widget=forms.DateInput(
-            attrs={"id": "validade-bombeiros", "type": "date"},
-            format="%Y-%m-%d",
-        ),
     )
     foto_estrutura = forms.ImageField(
         label="Foto da estrutura",
@@ -149,13 +128,6 @@ class AnexosDocumentosForm(forms.Form):
         self.ambulante = ambulante
         self.acao = acao
         super().__init__(*args, **kwargs)
-        self.fields["validade_laudo_sanitario"].input_formats = ["%Y-%m-%d"]
-        self.fields["validade_laudo_bombeiros"].input_formats = ["%Y-%m-%d"]
-        if ambulante and not args:
-            for tipo, campo in CAMPOS_VALIDADE.items():
-                doc = ambulante.documentos.filter(tipo_documento=tipo).first()
-                if doc and doc.data_validade:
-                    self.fields[campo].initial = doc.data_validade
         self.categoria = categoria_do_ambulante(ambulante) if ambulante else None
 
     def save(self):
@@ -169,9 +141,7 @@ class AnexosDocumentosForm(forms.Form):
             arquivo = self.cleaned_data.get(campo)
             if not arquivo:
                 continue
-            validade_campo = CAMPOS_VALIDADE.get(tipo)
-            validade = self.cleaned_data.get(validade_campo) if validade_campo else None
-            registrar_documento(ambulante, tipo, arquivo, data_validade=validade)
+            registrar_documento(ambulante, tipo, arquivo)
         return ambulante
 
 

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
@@ -24,7 +25,15 @@ ESCOLARIDADE_CHOICES = (
     ("superior", "Ensino Superior (Incompleto / Completo)"),
 )
 
-GENERO_CHOICES = (("", "Selecione..."),) + tuple(Genero.choices)
+GENERO_CHOICES = (
+    ("", "Selecione..."),
+) + tuple(Genero.choices)
+
+PAIS_ORIGEM_CHOICES = (
+    ("", "Selecione..."),
+    ("Brasil", "Brasil"),
+    ("Outro", "Outro"),
+)
 
 TIPO_COMERCIO_CHOICES = (
     ("", "Selecione..."),
@@ -72,13 +81,38 @@ class DadosPessoaisCadastroForm(forms.Form):
             attrs={"id": "req-nome", "placeholder": "Nome completo do requerente"}
         ),
     )
+    email = forms.EmailField(
+        label="E-mail",
+        error_messages={
+            "invalid": "Digite um e-mail no formato nome@dominio.com.",
+            "required": "Informe um e-mail válido.",
+        },
+        widget=forms.EmailInput(
+            attrs={
+                "id": "req-email",
+                "placeholder": "seu-email@dominio.com",
+                "autocomplete": "email",
+            }
+        ),
+    )
+    cpf = forms.CharField(
+        label="CPF",
+        widget=forms.TextInput(
+            attrs={
+                "id": "cpf-cadastro",
+                "placeholder": "000.000.000-00",
+                "autocomplete": "username",
+                "inputmode": "numeric",
+                "maxlength": "14",
+            }
+        ),
+    )
     data_nasc = forms.DateField(
         label="Data de Nascimento",
         widget=forms.DateInput(
             attrs={
                 "id": "req-data-nasc",
                 "type": "date",
-                "data-hint": "Informe a data de nascimento como no documento.",
             },
             format="%Y-%m-%d",
         ),
@@ -86,15 +120,15 @@ class DadosPessoaisCadastroForm(forms.Form):
     genero = forms.ChoiceField(
         label="Gênero",
         choices=GENERO_CHOICES,
-        required=False,
+        error_messages={"required": "Selecione o gênero."},
         widget=forms.Select(attrs={"id": "req-genero", "class": "styled-select"}),
     )
     renda_estimada = forms.DecimalField(
         label="Renda mensal estimada (R$)",
-        required=False,
         min_value=0,
         max_digits=10,
         decimal_places=2,
+        error_messages={"required": "Informe a renda mensal estimada."},
         widget=forms.NumberInput(
             attrs={
                 "id": "req-renda",
@@ -102,6 +136,37 @@ class DadosPessoaisCadastroForm(forms.Form):
                 "step": "0.01",
                 "min": "0",
                 "inputmode": "decimal",
+            }
+        ),
+    )
+    pais_origem = forms.ChoiceField(
+        label="País de Origem",
+        choices=PAIS_ORIGEM_CHOICES,
+        initial="Brasil",
+        error_messages={"required": "Selecione o país de origem."},
+        widget=forms.Select(attrs={"id": "pais-origem", "class": "styled-select"}),
+    )
+    uf_nascimento = forms.CharField(
+        label="Estado de Nascimento (UF)",
+        max_length=2,
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "id": "estado-nascimento",
+                "class": "styled-select",
+                "name": "uf_nascimento",
+            }
+        ),
+    )
+    cidade_nascimento = forms.CharField(
+        label="Cidade de Nascimento",
+        max_length=100,
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "id": "cidade-nascimento",
+                "class": "styled-select",
+                "name": "cidade_nascimento",
             }
         ),
     )
@@ -174,13 +239,26 @@ class DadosPessoaisCadastroForm(forms.Form):
                 GENERO_CHOICES, ambulante.genero
             )
             self.fields["data_nasc"].input_formats = ["%Y-%m-%d"]
+            self.fields["uf_nascimento"].widget.attrs["data-valor-inicial"] = extras.get(
+                "uf_nascimento", ""
+            )
+            self.fields["cidade_nascimento"].widget.attrs["data-valor-inicial"] = (
+                extras.get("cidade_nascimento", "")
+            )
             if not args:
                 self.fields["nome_completo"].initial = (
                     f"{ambulante.nome} {ambulante.sobrenome}".strip()
                 )
+                self.fields["email"].initial = ambulante.email
+                self.fields["cpf"].initial = ambulante.cpf_formatado
                 self.fields["data_nasc"].initial = ambulante.data_nasc
-                self.fields["genero"].initial = ambulante.genero or Genero.NAO_INFORMADO
+                self.fields["genero"].initial = ambulante.genero or ""
                 self.fields["renda_estimada"].initial = ambulante.renda_estimada
+                self.fields["pais_origem"].initial = extras.get("pais_origem", "Brasil")
+                self.fields["uf_nascimento"].initial = extras.get("uf_nascimento", "")
+                self.fields["cidade_nascimento"].initial = extras.get(
+                    "cidade_nascimento", ""
+                )
                 self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
                 self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
                 self.fields["nis"].initial = ambulante.nis or ""
@@ -188,6 +266,30 @@ class DadosPessoaisCadastroForm(forms.Form):
                 self.fields["escolaridade"].initial = ambulante.escolaridade
                 self.fields["num_funcionarios"].initial = ambulante.num_funcionarios
                 self.fields["rg"].initial = extras.get("rg", "")
+
+    def clean_cpf(self):
+        cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
+        if len(cpf) != 11:
+            raise ValidationError(
+                "Informe os 11 dígitos do CPF. Exemplo: 000.000.000-00."
+            )
+        duplicado = (
+            UsuarioBase.objects.filter(cpf=cpf).exclude(pk=self.ambulante.pk).exists()
+        )
+        if duplicado:
+            raise ValidationError("Já existe um usuário com este CPF.")
+        return cpf
+
+    def clean_email(self):
+        email = UsuarioBase.objects.normalize_email(self.cleaned_data["email"])
+        duplicado = (
+            UsuarioBase.objects.filter(email__iexact=email)
+            .exclude(pk=self.ambulante.pk)
+            .exists()
+        )
+        if duplicado:
+            raise ValidationError("Já existe um usuário com este e-mail.")
+        return email
 
     def clean_telefone_whatsapp(self):
         return normalizar_telefone(self.cleaned_data.get("telefone_whatsapp"))
@@ -202,6 +304,26 @@ class DadosPessoaisCadastroForm(forms.Form):
         dados = super().clean()
         if dados.get("sem_nis"):
             dados["nis"] = ""
+
+        pais = dados.get("pais_origem")
+        uf = (dados.get("uf_nascimento") or "").strip().upper()
+        cidade = (dados.get("cidade_nascimento") or "").strip()
+        if pais == "Brasil":
+            if not uf:
+                self.add_error(
+                    "uf_nascimento",
+                    "Informe o estado de nascimento.",
+                )
+            if not cidade:
+                self.add_error(
+                    "cidade_nascimento",
+                    "Informe a cidade de nascimento.",
+                )
+            dados["uf_nascimento"] = uf
+            dados["cidade_nascimento"] = cidade
+        elif pais:
+            dados["uf_nascimento"] = ""
+            dados["cidade_nascimento"] = ""
         return dados
 
     def save(self):
@@ -209,9 +331,11 @@ class DadosPessoaisCadastroForm(forms.Form):
         nome, sobrenome = separar_nome(self.cleaned_data["nome_completo"])
         ambulante.nome = nome
         ambulante.sobrenome = sobrenome
+        ambulante.email = self.cleaned_data["email"]
+        ambulante.cpf = self.cleaned_data["cpf"]
         ambulante.data_nasc = self.cleaned_data["data_nasc"]
-        ambulante.genero = self.cleaned_data.get("genero") or Genero.NAO_INFORMADO
-        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
+        ambulante.genero = self.cleaned_data["genero"]
+        ambulante.renda_estimada = self.cleaned_data["renda_estimada"]
         ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
         ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
         ambulante.nis = self.cleaned_data.get("nis") or None
@@ -222,6 +346,9 @@ class DadosPessoaisCadastroForm(forms.Form):
             ambulante,
             rg=self.cleaned_data.get("rg", ""),
             sem_nis=self.cleaned_data.get("sem_nis", False),
+            pais_origem=self.cleaned_data.get("pais_origem", ""),
+            uf_nascimento=self.cleaned_data.get("uf_nascimento", ""),
+            cidade_nascimento=self.cleaned_data.get("cidade_nascimento", ""),
         )
         return ambulante
 
@@ -231,7 +358,7 @@ class EnderecoCadastroForm(forms.Form):
         label="CEP",
         max_length=9,
         widget=forms.TextInput(
-            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9", "inputmode": "numeric", "data-hint": "8 dígitos. O endereço é preenchido automaticamente."}
+            attrs={"id": "cep-input", "placeholder": "00000-000", "maxlength": "9", "inputmode": "numeric", "data-hint": "Digite o cep, o endereço é preenchido automaticamente"}
         ),
     )
     logradouro = forms.CharField(
@@ -429,13 +556,6 @@ class EstruturaCadastroForm(forms.Form):
             }
         ),
     )
-    foto_estrutura = forms.ImageField(
-        label="Foto da estrutura (opcional)",
-        required=False,
-        widget=forms.ClearableFileInput(
-            attrs={"id": "foto-estrutura", "accept": "image/*"}
-        ),
-    )
 
     def __init__(self, *args, ambulante=None, **kwargs):
         self.ambulante = ambulante
@@ -478,8 +598,6 @@ class EstruturaCadastroForm(forms.Form):
         estrutura.tipo_estrutura = self.cleaned_data["tipo_estrutura"]
         estrutura.descricao = self.cleaned_data["descricao"]
         estrutura.dimensoes_metragem = self.cleaned_data["dimensoes_metragem"]
-        if self.cleaned_data.get("foto_estrutura"):
-            estrutura.foto_estrutura = self.cleaned_data["foto_estrutura"]
         estrutura.save()
         return estrutura
 
@@ -500,8 +618,9 @@ class PontoCadastroForm(forms.Form):
     categoria_pretendida = CategoriaCatalogoChoiceField(
         label="Categoria de produto",
         queryset=CategoriaProduto.objects.none(),
-        required=False,
-        empty_label="Selecione a categoria (opcional)",
+        required=True,
+        empty_label="Selecione a categoria...",
+        error_messages={"required": "Selecione a categoria de produto."},
         widget=forms.Select(
             attrs={"id": "categoria-pretendida", "class": "styled-select"}
         ),
@@ -509,8 +628,9 @@ class PontoCadastroForm(forms.Form):
     ponto_pretendido = forms.ModelChoiceField(
         label="Ponto desejado",
         queryset=PontoOcupacao.objects.none(),
-        required=False,
-        empty_label="Selecione um ponto do catálogo (opcional)",
+        required=True,
+        empty_label="Selecione um ponto do catálogo...",
+        error_messages={"required": "Selecione o ponto desejado."},
         widget=forms.Select(attrs={"id": "ponto-pretendido", "class": "styled-select"}),
     )
 
@@ -588,15 +708,47 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
             }
         ),
     )
-    cpf = forms.CharField(
-        label="CPF",
+    renda_estimada = forms.DecimalField(
+        label="Renda mensal estimada (R$)",
+        min_value=0,
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(
+            attrs={
+                "id": "perfil-renda",
+                "placeholder": "Ex: 1800.00",
+                "step": "0.01",
+                "min": "0",
+                "inputmode": "decimal",
+            }
+        ),
+    )
+    telefone_whatsapp = forms.CharField(
+        label="Telefone Principal (WhatsApp)",
+        max_length=20,
         widget=forms.TextInput(
             attrs={
-                "id": "cpf-cadastro",
-                "placeholder": "000.000.000-00",
-                "autocomplete": "username",
+                "id": "perfil-telefone",
+                "placeholder": "(77) 90000-0000",
+                "maxlength": "15",
+                "autocomplete": "tel",
                 "inputmode": "numeric",
-                "maxlength": "14",
+                "data-msg": MSG_TELEFONE,
+            }
+        ),
+    )
+    telefone_2 = forms.CharField(
+        label="Telefone Secundário / Recado",
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "id": "perfil-telefone-2",
+                "placeholder": "(77) 90000-0000",
+                "maxlength": "15",
+                "inputmode": "numeric",
+                "autocomplete": "tel",
             }
         ),
     )
@@ -610,25 +762,49 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
             }
         ),
     )
+    senha_atual = forms.CharField(
+        label="Senha atual",
+        required=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "perfil-senha-atual",
+                "placeholder": "Digite a senha atual",
+                "autocomplete": "current-password",
+            }
+        ),
+    )
+    senha_nova = forms.CharField(
+        label="Nova senha",
+        required=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "perfil-senha-nova",
+                "placeholder": "Digite a nova senha",
+                "autocomplete": "new-password",
+                "minlength": "8",
+            }
+        ),
+    )
+    senha_nova_confirmacao = forms.CharField(
+        label="Confirmar nova senha",
+        required=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "id": "perfil-senha-confirmacao",
+                "placeholder": "Repita a nova senha",
+                "autocomplete": "new-password",
+                "minlength": "8",
+            }
+        ),
+    )
 
     def __init__(self, *args, ambulante=None, **kwargs):
         super().__init__(*args, ambulante=ambulante, **kwargs)
         if ambulante and not args:
             self.fields["email"].initial = ambulante.email
-            self.fields["cpf"].initial = ambulante.cpf_formatado
-
-    def clean_cpf(self):
-        cpf = normalizar_cpf(self.cleaned_data.get("cpf", ""))
-        if len(cpf) != 11:
-            raise ValidationError(
-                "Informe os 11 dígitos do CPF. Exemplo: 000.000.000-00."
-            )
-        duplicado = (
-            UsuarioBase.objects.filter(cpf=cpf).exclude(pk=self.ambulante.pk).exists()
-        )
-        if duplicado:
-            raise ValidationError("Já existe um usuário com este CPF.")
-        return cpf
+            self.fields["renda_estimada"].initial = ambulante.renda_estimada
+            self.fields["telefone_whatsapp"].initial = ambulante.telefone_whatsapp
+            self.fields["telefone_2"].initial = ambulante.telefone_2 or ""
 
     def clean_email(self):
         email = UsuarioBase.objects.normalize_email(self.cleaned_data["email"])
@@ -641,14 +817,75 @@ class PerfilAmbulanteForm(EnderecoCadastroForm):
             raise ValidationError("Já existe um usuário com este e-mail.")
         return email
 
+    def clean_telefone_whatsapp(self):
+        return normalizar_telefone(self.cleaned_data.get("telefone_whatsapp"))
+
+    def clean_telefone_2(self):
+        return normalizar_telefone(
+            self.cleaned_data.get("telefone_2"),
+            obrigatorio=False,
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        senha_atual = (cleaned.get("senha_atual") or "").strip()
+        senha_nova = cleaned.get("senha_nova") or ""
+        confirmacao = cleaned.get("senha_nova_confirmacao") or ""
+        quer_trocar = bool(senha_atual or senha_nova or confirmacao)
+
+        if not quer_trocar:
+            return cleaned
+
+        if not senha_atual:
+            self.add_error(
+                "senha_atual",
+                "Informe a senha atual para definir uma nova senha.",
+            )
+        elif not self.ambulante.check_password(senha_atual):
+            self.add_error("senha_atual", "Senha atual incorreta.")
+
+        if not senha_nova:
+            self.add_error("senha_nova", "Informe a nova senha.")
+        else:
+            try:
+                validate_password(senha_nova, user=self.ambulante)
+            except ValidationError as exc:
+                for mensagem in exc.messages:
+                    self.add_error("senha_nova", mensagem)
+
+        if not confirmacao:
+            self.add_error(
+                "senha_nova_confirmacao",
+                "Confirme a nova senha.",
+            )
+        elif senha_nova and senha_nova != confirmacao:
+            self.add_error(
+                "senha_nova_confirmacao",
+                "As senhas não coincidem. Digite a mesma senha nos dois campos.",
+            )
+
+        return cleaned
+
     def save(self):
         ambulante = self.ambulante
         ambulante.email = self.cleaned_data["email"]
-        ambulante.cpf = self.cleaned_data["cpf"]
-        campos = ["email", "cpf", "atualizado_em"]
+        ambulante.renda_estimada = self.cleaned_data.get("renda_estimada")
+        ambulante.telefone_whatsapp = self.cleaned_data["telefone_whatsapp"]
+        ambulante.telefone_2 = self.cleaned_data.get("telefone_2") or None
+        campos = [
+            "email",
+            "renda_estimada",
+            "telefone_whatsapp",
+            "telefone_2",
+            "atualizado_em",
+        ]
         if self.cleaned_data.get("foto"):
             ambulante.foto = self.cleaned_data["foto"]
             campos.append("foto")
         ambulante.save(update_fields=campos)
+        senha_nova = self.cleaned_data.get("senha_nova")
+        if senha_nova:
+            ambulante.set_password(senha_nova)
+            ambulante.save(update_fields=["password"])
         super().save()
         return ambulante

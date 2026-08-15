@@ -199,6 +199,7 @@ class CatalogoNoCadastroAmbulanteTests(UsuariosAuthFixtures, TestCase):
             {
                 "etapa": "5",
                 "acao": "proxima",
+                "categoria_pretendida": self.categoria.pk,
                 "ponto_pretendido": self.ponto_ocupado.pk,
             },
         )
@@ -220,6 +221,7 @@ class CatalogoNoCadastroAmbulanteTests(UsuariosAuthFixtures, TestCase):
             {
                 "etapa": "5",
                 "acao": "proxima",
+                "categoria_pretendida": self.categoria.pk,
                 "ponto_pretendido": self.ponto_livre.pk,
             },
         )

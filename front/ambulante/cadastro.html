@@ -144,9 +144,23 @@
                                     style="font-size: 0.8rem; color: #9CA3AF; font-weight: normal;">(Opcional)</span></label>
                             <input type="text" id="req-rg" placeholder="Número do RG">
                         </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="input-group">
                             <label for="req-data-nasc">Data de Nascimento <span class="required-marker">*</span></label>
                             <input type="date" id="req-data-nasc" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="req-estado-civil">Estado Civil <span class="required-marker">*</span></label>
+                            <select id="req-estado-civil" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="solteiro">Solteiro(a)</option>
+                                <option value="casado">Casado(a)</option>
+                                <option value="divorciado">Divorciado(a)</option>
+                                <option value="viuvo">Viúvo(a)</option>
+                                <option value="uniao_estavel">União Estável</option>
+                            </select>
                         </div>
                     </div>
 
@@ -160,20 +174,41 @@
                                     class="required-marker">*</span></label>
                             <input type="text" id="req-tel" placeholder="(77) 90000-0000" maxlength="15" required>
                         </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="input-group">
                             <label for="req-tel-2">Telefone Secundário / Recado</label>
                             <input type="text" id="req-tel-2" placeholder="(77) 90000-0000" maxlength="15">
+                        </div>
+                        <div class="input-group">
+                            <label for="pais-origem">País de Origem <span class="required-marker">*</span></label>
+                            <select id="pais-origem" name="pais_origem" class="styled-select" required>
+                                <option value="Brasil" selected>Brasil</option>
+                                <option value="Outro">Outro</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="input-group">
-                            <label for="req-nis">NIS (CadÚnico)</label>
-                            <input type="text" id="req-nis" placeholder="Digite o número do NIS">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="check-no-nis"> Não possuo NIS
-                            </label>
+                            <label for="estado-nascimento">Estado de Nascimento (UF) <span
+                                    class="required-marker">*</span></label>
+                            <select id="estado-nascimento" name="uf_nascimento" class="styled-select" required>
+                                <option value="" disabled selected>Carregando Estados...</option>
+                            </select>
                         </div>
+                        <div class="input-group">
+                            <label for="cidade-nascimento">Cidade de Nascimento <span
+                                    class="required-marker">*</span></label>
+                            <select id="cidade-nascimento" name="cidade_nascimento" class="styled-select" required
+                                disabled>
+                                <option value="" disabled selected>Selecione o Estado primeiro...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="input-group">
                             <label for="req-escolaridade">Grau de Escolaridade <span
                                     class="required-marker">*</span></label>
@@ -193,44 +228,13 @@
                         </div>
                     </div>
 
-
                     <div class="form-row">
                         <div class="input-group">
-                            <label for="req-estado-civil">Estado Civil <span class="required-marker">*</span></label>
-                            <select id="req-estado-civil" class="styled-select" required>
-                                <option value="" disabled selected>Selecione...</option>
-                                <option value="solteiro">Solteiro(a)</option>
-                                <option value="casado">Casado(a)</option>
-                                <option value="divorciado">Divorciado(a)</option>
-                                <option value="viuvo">Viúvo(a)</option>
-                                <option value="uniao_estavel">União Estável</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="pais-origem">País de Origem <span class="required-marker">*</span></label>
-                            <select id="pais-origem" name="pais_origem" class="styled-select" required>
-                                <option value="Brasil" selected>Brasil</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Cascata de Naturalidade (IBGE) -->
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label for="estado-nascimento">Estado de Nascimento (UF) <span
-                                    class="required-marker">*</span></label>
-                            <select id="estado-nascimento" name="uf_nascimento" class="styled-select" required>
-                                <option value="" disabled selected>Carregando Estados...</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="cidade-nascimento">Cidade de Nascimento <span
-                                    class="required-marker">*</span></label>
-                            <select id="cidade-nascimento" name="cidade_nascimento" class="styled-select" required
-                                disabled>
-                                <option value="" disabled selected>Selecione o Estado primeiro...</option>
-                            </select>
+                            <label for="req-nis">NIS (CadÚnico)</label>
+                            <input type="text" id="req-nis" placeholder="Digite o número do NIS">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="check-no-nis"> Não possuo NIS
+                            </label>
                         </div>
                     </div>
 

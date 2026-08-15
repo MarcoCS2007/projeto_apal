@@ -11,7 +11,7 @@
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
         <h1>Credencial digital</h1>
-        <p>Crachá oficial com QR Code para apresentação ao fiscal em Vitória da Conquista.</p>
+        <p>Gerencie suas licenças, acompanhe solicitações e acesse sua credencial digital oficial.</p>
     </div>
 </section>
 {% endblock %}
@@ -19,171 +19,18 @@
 {% block content %}
 {% if qr_liberado %}
 <div class="form-card">
-    <div class="credential-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-        <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
-
-            <div class="apal-id-front" style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0;">
-                <div style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #1D4ED8 0%, #2563EB 72%, rgba(37,99,235,0.55) 100%); z-index: 1; pointer-events: none;"></div>
-                <div style="position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 64px 34px 0 32px;">
-                    <img src="{% static 'img/logo-apal-simbolo.png' %}" alt="Símbolo da APAL" width="48" height="48" style="flex-shrink: 0; object-fit: contain;">
-                    <div style="min-width: 0;">
-                        <div style="font-size: 2rem; line-height: 1; font-weight: 800; color: #FF007F; letter-spacing: -1.2px;">APAL</div>
-                        <p style="margin: 8px 0 0 0; max-width: 210px; font-size: 0.68rem; line-height: 1.35; color: #0F172A; font-weight: 500;">
-                            Plataforma de licenciamento e gestão do comércio ambulante
-                        </p>
-                    </div>
-                </div>
-
-                <div class="id-photo-front" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 100px; border-radius: 15px; overflow: hidden; z-index: 3; background: #DBEAFE; border: 1px solid #BFDBFE;">
-                    {% if ambulante.foto %}
-                    <img src="{{ ambulante.foto.url }}" alt="Foto de {{ ambulante.nome_completo }}" width="88" height="100" decoding="async" style="display: block; width: 100%; height: 100%; object-fit: cover;">
-                    {% else %}
-                    <div aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-weight: 800; font-size: 1.5rem; color: #2563EB;">{{ ambulante.iniciais }}</div>
-                    {% endif %}
-                </div>
-
-                <div style="position: absolute; left: 34px; right: 34px; bottom: 66px; z-index: 3; border-left: 4px solid #2563EB; padding-left: 14px;">
-                    <h2 class="id-name" style="margin: 0; font-size: 1.1rem; line-height: 1.12; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
-                    {% if ambulante.apelido_nome_fantasia %}
-                    <p style="margin: 6px 0 0 0; font-size: 0.82rem; font-weight: 600; color: #475569;">{{ ambulante.apelido_nome_fantasia }}</p>
-                    {% endif %}
-                    <p class="id-cpf" style="margin: 8px 0 0 0; font-size: 0.88rem; font-weight: 600; color: #0F172A;">
-                        <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_formatado }}
-                    </p>
-                </div>
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: #1D4ED8; z-index: 3;"></div>
-                <div style="position: absolute; left: 0; right: 0; bottom: 36px; height: 4px; background: #FF007F; z-index: 3;"></div>
-            </div>
-
-            <div class="apal-id-back" style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0;">
-                <div style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%); z-index: 1;"></div>
-                <div style="position: absolute; top: 56px; left: -18px; right: -18px; height: 36px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; z-index: 2;"></div>
-
-                <div class="id-back-content" style="text-align: center;">
-                    <div class="id-back-meta">
-                        <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
-                        <p style="margin: 4px 0 0; font-size: 0.78rem; font-weight: 600; color: #475569;">
-                            {{ ambulante.apelido_nome_fantasia|default:"Sem nome fantasia" }}
-                        </p>
-
-                        <div style="margin-top: 8px;">
-                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Nº do alvará</span>
-                            <strong style="display: block; margin-top: 2px; font-size: 0.88rem; font-weight: 800; color: #0F172A;">{{ licenca.numero_licenca }}</strong>
-                        </div>
-                        <div style="margin-top: 8px;">
-                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Ponto</span>
-                            <strong style="display: block; margin-top: 2px; font-size: 0.8rem; font-weight: 700; color: #0F172A;">
-                                {% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }}{% else %}Não informado{% endif %}
-                            </strong>
-                        </div>
-                        <div style="margin-top: 8px;">
-                            <span style="display: block; font-size: 0.62rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.4px;">Horário autorizado</span>
-                            <strong style="display: block; margin-top: 2px; font-size: 0.72rem; line-height: 1.3; font-weight: 700; color: #0F172A;">{{ licenca.texto_horario_autorizado }}</strong>
-                        </div>
-                        <div style="margin-top: 8px;">
-                            {% include "ambulante/_status_badge.html" with licenca=licenca %}
-                        </div>
-                    </div>
-                    <div class="id-qr-box">
-                        <img
-                            src="{% url 'ambulante_credencial_qr' %}"
-                            alt="QR Code da licença {{ licenca.numero_licenca }}"
-                            data-qr-codigo="{{ ambulante.codigo_qr_code }}"
-                            width="118"
-                            height="118">
-                    </div>
-                </div>
-
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; min-height: 48px; background: #1D4ED8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 8px 18px; text-align: center; font-size: 0.62rem; line-height: 1.35; font-weight: 600; z-index: 4;">
-                    Prefeitura Municipal<br>Vitória da Conquista
-                </div>
-                <div style="position: absolute; left: 0; right: 0; bottom: 48px; height: 4px; background: #FF007F; z-index: 4;"></div>
-            </div>
-        </div>
-
-        <div class="credential-actions" style="display: flex; gap: 1rem; margin-top: 1.25rem; width: 100%; max-width: 520px; justify-content: center; flex-wrap: wrap;">
-            <button type="button" id="btn-imprimir-cred" class="btn-action-card" style="flex: 1; min-width: 140px; background-color: #FFFFFF; color: #1D4ED8; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
-                <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Imprimir
-            </button>
-            <a href="{% url 'ambulante_credencial_qr' %}?download=1" class="btn-action-card" style="flex: 1; min-width: 140px; background-color: #1D4ED8; color: #FFFFFF; border: 1.5px solid #1D4ED8; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
-                <i data-lucide="download" style="width: 16px; height: 16px;"></i> Baixar QR
-            </a>
-            <a href="{% url 'ambulante_alvara' %}" class="btn-action-card" style="flex: 1; min-width: 140px; background-color: #FFFFFF; color: #0F172A; border: 1.5px solid #E2E8F0; padding: 0.6rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
-                <i data-lucide="file-badge" style="width: 16px; height: 16px;"></i> Meu Alvará
-            </a>
-        </div>
-    </div>
-</div>
 {% else %}
 <div class="form-card" style="max-width: 720px; margin: 0 auto;">
-    <div class="section-title">
-        <div class="title-accent"></div>
-        <h2>Credencial ainda não disponível</h2>
-    </div>
-    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
-        O QR Code só é exibido quando a prefeitura emite o alvará e a licença está <strong>Ativa</strong>.
-        Não há credencial válida para apresentar ao fiscal neste momento.
-    </p>
-    {% if licenca %}
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 1rem;">
-        <div>
-            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Protocolo</span>
-            <p style="margin: 4px 0 0; font-weight: 700; color: #0F172A;">{{ licenca.protocolo }}</p>
-            {% if licenca.numero_licenca %}
-            <p style="margin: 4px 0 0; color: #475569;">Alvará {{ licenca.numero_licenca }}</p>
-            {% endif %}
-        </div>
-        {% include "ambulante/_status_badge.html" with licenca=licenca %}
-    </div>
-    {% if licenca.aguardando_taxa %}
-    <p style="color: #475569;">A solicitação foi deferida. Confirme o pagamento da taxa no alvará para a prefeitura emitir o QR Code.</p>
-    {% elif licenca.taxa_paga and licenca.status == "Aprovado" %}
-    <p style="color: #475569;">Pagamento confirmado. Aguarde a emissão oficial do alvará e do QR Code.</p>
-    {% elif licenca.status == "Em Análise" %}
-    <p style="color: #475569;">Sua solicitação está na fila da prefeitura. A credencial será liberada após a emissão.</p>
-    {% elif licenca.status == "Pendência Documental" %}
-    <p style="color: #475569;">Há pendência documental. Reenvie os anexos rejeitados para retomar a análise.</p>
-    {% elif licenca.status == "Indeferido" %}
-    <p style="color: #475569;">A solicitação foi indeferida.{% if licenca.motivo_parecer %} Motivo: {{ licenca.motivo_parecer }}{% endif %}</p>
-    {% elif licenca.status == "Vencido" %}
-    <p style="color: #475569;">Esta licença venceu. O QR Code não é mais válido. Abra uma renovação pelo alvará.</p>
-    {% elif licenca.status == "Suspenso" %}
-    <p style="color: #475569;">A licença está suspensa. O QR Code não é aceito pela fiscalização.</p>
-    {% elif licenca.status == "Cancelado" %}
-    <p style="color: #475569;">A licença foi cancelada. Não há credencial válida.</p>
-    {% else %}
-    <p style="color: #475569;">Acompanhe o andamento pelo status do protocolo no alvará.</p>
-    {% endif %}
-    {% else %}
-    <p style="color: #475569;">
-        {% if ambulante.cadastro_completo %}
-            Envie os documentos para abrir o requerimento. Depois da emissão, a credencial aparece aqui.
-        {% else %}
-            Complete o cadastro socioeconômico e envie os documentos para solicitar a licença.
-        {% endif %}
-    </p>
-    {% endif %}
-    <p style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{% url 'ambulante_alvara' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
-            <i data-lucide="file-badge"></i> Ir para Meu Alvará
-        </a>
-        {% if not licenca and not ambulante.cadastro_completo %}
-        <a href="{% url 'ambulante_cadastro' %}" class="btn-action" style="display: inline-flex; text-decoration: none;">
-            <i data-lucide="clipboard-list"></i> Completar cadastro
-        </a>
-        {% endif %}
-    </p>
-</div>
 {% endif %}
+    {% include "ambulante/_credencial_conteudo.html" %}
+</div>
+{% include "ambulante/_voltar_painel.html" %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    const botaoImprimir = document.getElementById("btn-imprimir-cred");
-    if (botaoImprimir) {
-        botaoImprimir.addEventListener("click", function () {
-            window.print();
-        });
-    }
+    document.getElementById("btn-imprimir-cred")?.addEventListener("click", function () {
+        window.print();
+    });
 </script>
 {% endblock %}

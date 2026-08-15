@@ -42,7 +42,9 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
     def _payload(self, **extra):
         dados = {
             "email": self.ambulante.email,
-            "cpf": self.ambulante.cpf,
+            "renda_estimada": self.ambulante.renda_estimada or "1800.00",
+            "telefone_whatsapp": self.ambulante.telefone_whatsapp,
+            "telefone_2": self.ambulante.telefone_2 or "",
             "cep": "45000-000",
             "logradouro": "Rua das Flores",
             "numero": "100",
@@ -70,7 +72,7 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("backoffice_inicio"))
 
-    def test_exibe_dados_pessoais_endereco_e_atividade(self):
+    def test_exibe_dados_pessoais_e_endereco(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(self.url)
 
@@ -82,18 +84,39 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, self.ambulante.nome_completo)
         self.assertContains(response, self.ambulante.email)
         self.assertContains(response, "Rua das Flores")
-        self.assertContains(response, "João Lanches")
-        self.assertContains(response, "Lanches e sucos")
-        self.assertContains(response, 'id="perfil-foto"')
+        self.assertContains(response, "Editar perfil")
+        self.assertNotContains(response, "Atividade e ponto")
+        self.assertContains(
+            response,
+            "Visualize seus dados cadastrais e gerencie suas informações de acesso.",
+        )
+        self.assertNotContains(response, 'id="perfil-foto"')
+        self.assertNotContains(response, "Inserir ou atualizar foto")
         self.assertNotContains(response, "alert(")
 
-    def test_atualiza_email_cpf_e_endereco(self):
+        edicao = self.client.get(f"{self.url}?editar=1")
+        self.assertContains(edicao, 'id="perfil-foto"')
+        self.assertContains(edicao, "Inserir ou atualizar foto")
+        self.assertContains(edicao, "Salvar perfil")
+        self.assertContains(edicao, "Cancelar")
+        self.assertContains(edicao, 'id="perfil-renda"')
+        self.assertContains(edicao, 'id="perfil-telefone"')
+        self.assertContains(edicao, 'id="cpf-cadastro"')
+        self.assertContains(edicao, "Trocar senha")
+        self.assertContains(edicao, 'id="perfil-senha-atual"')
+        self.assertNotContains(edicao, 'name="cpf"')
+        self.assertNotContains(response, "Trocar senha")
+
+    def test_atualiza_email_renda_telefone_e_endereco_sem_alterar_cpf(self):
+        cpf_original = self.ambulante.cpf
         self.client.force_login(self.ambulante)
         response = self.client.post(
             self.url,
             self._payload(
                 email="novo.ambulante@apal.com",
-                cpf="444.555.666-77",
+                renda_estimada="2500.50",
+                telefone_whatsapp="77988887777",
+                telefone_2="7732211000",
                 logradouro="Avenida Brasil",
                 numero="200",
                 bairro="Recreio",
@@ -108,7 +131,10 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertNotContains(response, "alert(")
         self.ambulante.refresh_from_db()
         self.assertEqual(self.ambulante.email, "novo.ambulante@apal.com")
-        self.assertEqual(self.ambulante.cpf, "44455566677")
+        self.assertEqual(self.ambulante.cpf, cpf_original)
+        self.assertEqual(str(self.ambulante.renda_estimada), "2500.50")
+        self.assertEqual(self.ambulante.telefone_whatsapp, "77988887777")
+        self.assertEqual(self.ambulante.telefone_2, "7732211000")
         endereco = self.ambulante.enderecos.order_by("id").first()
         self.assertEqual(endereco.logradouro, "Avenida Brasil")
         self.assertEqual(endereco.numero, "200")
@@ -151,6 +177,41 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.ambulante.refresh_from_db()
         self.assertEqual(self.ambulante.email, "ambulante@apal.com")
 
+    def test_troca_senha_com_senha_atual(self):
+        self.client.force_login(self.ambulante)
+        nova = "nova-senha-segura-456"
+        response = self.client.post(
+            self.url,
+            self._payload(
+                senha_atual=self.senha,
+                senha_nova=nova,
+                senha_nova_confirmacao=nova,
+            ),
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A senha foi alterada com sucesso")
+        self.ambulante.refresh_from_db()
+        self.assertTrue(self.ambulante.check_password(nova))
+        self.assertFalse(self.ambulante.check_password(self.senha))
+
+    def test_rejeita_troca_senha_sem_senha_atual_correta(self):
+        self.client.force_login(self.ambulante)
+        response = self.client.post(
+            self.url,
+            self._payload(
+                senha_atual="senha-errada",
+                senha_nova="nova-senha-segura-456",
+                senha_nova_confirmacao="nova-senha-segura-456",
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Senha atual incorreta")
+        self.ambulante.refresh_from_db()
+        self.assertTrue(self.ambulante.check_password(self.senha))
+
     def test_cadastro_nao_tem_upload_de_foto_e_aponta_para_o_perfil(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(reverse("ambulante_cadastro"))
@@ -158,4 +219,4 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertNotContains(response, 'id="req-foto"')
         self.assertNotContains(response, 'id="perfil-foto"')
         self.assertContains(response, reverse("ambulante_perfil"))
-        self.assertContains(response, "A foto 3x4 será inserida depois")
+        self.assertContains(response, "Dados Pessoais do Requerente")

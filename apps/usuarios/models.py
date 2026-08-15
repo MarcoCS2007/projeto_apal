@@ -46,7 +46,7 @@ class Genero(models.TextChoices):
     FEMININO = "feminino", "Feminino"
     MASCULINO = "masculino", "Masculino"
     OUTRO = "outro", "Outro"
-    NAO_INFORMADO = "nao_informado", "Não informado"
+    NAO_INFORMADO = "nao_informado", "Prefiro não informar"
 
 
 class UsuarioBase(AbstractBaseUser, PermissionsMixin, ModeloBase):
@@ -160,6 +160,7 @@ class Ambulante(UsuarioBase):
 
     @property
     def cadastro_completo(self):
+        extras = self.dados_complementares or {}
         estrutura = self.estruturas.order_by("id").first()
         tem_estrutura = bool(
             estrutura
@@ -167,10 +168,18 @@ class Ambulante(UsuarioBase):
             and estrutura.dimensoes_metragem
             and estrutura.dimensoes_metragem > 0
         )
+        pais = extras.get("pais_origem")
+        naturalidade_ok = bool(pais) and (
+            pais != "Brasil"
+            or (extras.get("uf_nascimento") and extras.get("cidade_nascimento"))
+        )
         return bool(
             self.data_nasc
             and self.escolaridade
             and self.tipo_atuacao
+            and self.genero
+            and self.renda_estimada is not None
+            and naturalidade_ok
             and self.enderecos.exists()
             and tem_estrutura
         )

@@ -197,7 +197,6 @@ class LoginAmbulanteForm(AuthenticationForm):
                     "autocomplete": "username",
                     "autofocus": True,
                 },
-                hint="Use o e-mail cadastrado ou o CPF com 11 dígitos.",
             )
         ),
     )
@@ -211,7 +210,6 @@ class LoginAmbulanteForm(AuthenticationForm):
                     "placeholder": "Digite sua senha",
                     "autocomplete": "current-password",
                 },
-                hint="A senha diferencia maiúsculas e minúsculas.",
             )
         ),
     )
@@ -248,29 +246,23 @@ class LoginFiscalForm(AuthenticationForm):
     username = forms.CharField(
         label="E-mail ou CPF",
         widget=forms.TextInput(
-            attrs=attrs_campo(
-                {
-                    "id": "user-login",
-                    "placeholder": "Digite seu CPF ou e-mail",
-                    "autocomplete": "username",
-                    "autofocus": True,
-                },
-                hint="Use o e-mail institucional ou o CPF com 11 dígitos.",
-            )
+            attrs={
+                "id": "user-login",
+                "placeholder": "Digite seu CPF ou e-mail",
+                "autocomplete": "username",
+                "autofocus": True,
+            }
         ),
     )
     password = forms.CharField(
         label="Senha",
         strip=False,
         widget=forms.PasswordInput(
-            attrs=attrs_campo(
-                {
-                    "id": "user-password",
-                    "placeholder": "Digite sua senha",
-                    "autocomplete": "current-password",
-                },
-                hint="A senha diferencia maiúsculas e minúsculas.",
-            )
+            attrs={
+                "id": "user-password",
+                "placeholder": "Digite sua senha",
+                "autocomplete": "current-password",
+            }
         ),
     )
 

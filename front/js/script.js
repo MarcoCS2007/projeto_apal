@@ -1993,7 +1993,8 @@ if (
             }
         }
 
-        exibirTelaSucessoCadastro();
+        localStorage.removeItem('apal_cadastro_rascunho');
+        window.location.href = 'credencial.html';
     });
 // ==========================================
     // 15. CREDENCIAL E ANIMAÇÕES EXTRAS
