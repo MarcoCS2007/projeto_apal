@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # Terceiros
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
     # Aplicativos Locais
     "apps.core",
     "apps.usuarios",
@@ -109,6 +110,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "APAL API - Prefeitura Municipal de Vitória da Conquista",
+    "DESCRIPTION": "API do Sistema de Licenciamento de Ambulantes (APAL).",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SIMPLE_JWT = {

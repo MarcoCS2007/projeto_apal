@@ -3,6 +3,9 @@
 up:
 	docker compose up --build
 
+up-prod:
+	docker compose -f docker-compose.prod.yml --env-file .envs/.env.prod up -d --build
+
 migrate:
 	docker compose exec web python manage.py migrate
 
