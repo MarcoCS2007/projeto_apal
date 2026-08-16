@@ -107,12 +107,23 @@
     Não há credencial válida para apresentar ao fiscal neste momento.
 </p>
 {% if not licenca %}
-<p style="color: #475569;">
+<div class="info-callout-box" style="margin-top: 1.5rem; border-left-color: var(--azul-vibrante); background-color: var(--azul-suave);">
+    <p style="color: var(--azul-escuro); margin-bottom: 1.25rem;">
+        {% if ambulante.cadastro_completo %}
+            Seu perfil já está preenchido. Você precisa enviar a documentação para o requerimento da licença.
+        {% else %}
+            Complete o cadastro socioeconômico e envie os documentos para solicitar sua primeira licença de atuação.
+        {% endif %}
+    </p>
     {% if ambulante.cadastro_completo %}
-        Envie os documentos para abrir o requerimento. Depois da emissão, a credencial aparece aqui.
+        <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none; align-items: center; gap: 0.5rem;">
+            <i data-lucide="file-up"></i> Enviar Documentação
+        </a>
     {% else %}
-        Complete o cadastro socioeconômico e envie os documentos para solicitar a licença.
+        <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none; align-items: center; gap: 0.5rem; background-color: var(--azul-vibrante); border-color: var(--azul-vibrante);">
+            <i data-lucide="edit-3"></i> Completar Cadastro
+        </a>
     {% endif %}
-</p>
+</div>
 {% endif %}
 {% endif %}

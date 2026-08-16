@@ -46,21 +46,6 @@
     <p class="score-resumo-descricao">{{ faixa.descricao }}</p>
 </div>
 
-<div class="form-card">
-    <div class="section-title">
-        <div class="title-accent"></div>
-        <h2>Regras de pontuação</h2>
-    </div>
-    <div class="score-regras-grid">
-        {% for regra in regras %}
-        <div class="score-regra {% if regra.pontos < 0 %}is-negativa{% else %}is-positiva{% endif %}">
-            <i data-lucide="{% if regra.pontos < 0 %}minus-circle{% else %}plus-circle{% endif %}" aria-hidden="true"></i>
-            <span>{{ regra.rotulo }}: <strong>{% if regra.pontos > 0 %}+{% endif %}{{ regra.pontos }} pts</strong></span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
 {% include "_regras_score.html" %}
 
 <div class="form-card">

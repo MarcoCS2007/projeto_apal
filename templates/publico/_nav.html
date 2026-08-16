@@ -37,6 +37,24 @@
     </details>
     {% endif %}
     {% elif user.role == "ambulante" %}
+    <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    
+    {% if active == "painel" or active == "alvara" or active == "score" or active == "perfil" %}
+    <button type="button" id="btn-notificacoes" class="btn-notificacoes" aria-label="Notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+        <div style="position: relative; display: inline-flex;">
+            <i data-lucide="bell"></i>
+            <span class="badge-notificacao">2</span>
+        </div>
+        <span class="nav-text-mobile-only">Avisos</span>
+    </button>
+    {% endif %}
+
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
     {% elif user.role == "administrador" %}
     <a href="{% url 'master_admin' %}"{% if active == "painel" or active == "admin" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
     <form action="{% url 'logout' %}" method="post" style="display: inline;">

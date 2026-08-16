@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -125,6 +125,47 @@
         {% elif user.role == "gestor" or user.role == "administrador" %}
         {% include "gestor/_assistente_widget.html" %}
         {% endif %}
+    {% endif %}
+    {% endblock %}
+
+    {% block notificacoes %}
+    {% if user.is_authenticated and user.role == "ambulante" %}
+    <div id="notificacoes-backdrop" class="modal-backdrop" aria-hidden="true" style="z-index: 1040; display: none;"></div>
+    <div id="painel-notificacoes" class="offcanvas-notificacoes" role="dialog" aria-modal="true" aria-labelledby="notificacoes-title" aria-hidden="true">
+        <div class="offcanvas-header">
+            <h3 id="notificacoes-title"><i data-lucide="bell" aria-hidden="true"></i> Notificações</h3>
+            <button type="button" id="close-notificacoes" class="close-btn" aria-label="Fechar painel de notificações"><i data-lucide="x" aria-hidden="true"></i></button>
+        </div>
+        <div class="offcanvas-body custom-scrollbar">
+            <!-- Card 1 -->
+            <div class="notificacao-card card-sucesso">
+                <div class="notificacao-icon">
+                    <i data-lucide="calendar-days"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>O Festival de Inverno está chegando!</h4>
+                    <p>As vagas internas do evento oficial são controladas por sorteio externo. Sugerimos o licenciamento temporário nas 'Rotas de Aproximação' (ex: Av. Olívia Flores), aproveitando os horários de pico de fluxo.</p>
+                    <button type="button" class="btn-submit btn-sm" id="btn-solicitar-vaga">Ver horários de pico e solicitar vaga</button>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="notificacao-card card-alerta">
+                <div class="notificacao-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>Atenção no seu ponto de venda</h4>
+                    <p id="texto-educativo-multa">Atenção: 65% das multas para vendedores de Alimentação no seu bairro são por descarte irregular de resíduos.</p>
+                    <div class="notificacao-actions">
+                        <a href="#" class="btn-link-guia">Guia rápido de adequação (1 min)</a>
+                        <button type="button" class="btn-voice" aria-label="Ouvir notificação" id="btn-ouvir-multa">
+                            <i data-lucide="volume-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
     {% endblock %}
 
