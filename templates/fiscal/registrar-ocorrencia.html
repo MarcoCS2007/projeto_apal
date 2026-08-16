@@ -25,9 +25,11 @@
     </p>
     {% endif %}
 
-    <form method="post" action="{% url 'fiscal_ocorrencia' %}" enctype="multipart/form-data">
+    <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.ambulante_id }}
+        {% if retorno_rota %}<input type="hidden" name="retorno_rota" value="{{ retorno_rota }}">{% endif %}
+        {% if parada_id %}<input type="hidden" name="parada_id" value="{{ parada_id }}">{% endif %}
 
         <div class="section-title">
             <div class="title-accent" style="background-color: #EF4444;"></div>
@@ -80,9 +82,15 @@
         {% endif %}
 
         <div class="form-actions" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            {% if retorno_rota %}
+            <a href="{% url 'fiscal_rota_execucao' retorno_rota %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar à rota
+            </a>
+            {% else %}
             <a href="{% url 'fiscal_painel' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
                 <i data-lucide="arrow-left"></i> Voltar à fiscalização
             </a>
+            {% endif %}
             <button type="submit" class="btn-submit" style="background-color: #EF4444; display: inline-flex; align-items: center; gap: 8px;">
                 <i data-lucide="file-warning"></i> Registrar ocorrência
             </button>

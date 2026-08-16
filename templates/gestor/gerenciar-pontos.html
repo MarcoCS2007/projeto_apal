@@ -11,6 +11,11 @@
     <div class="hero-container" style="text-align: center;">
         <h1>Mapa de Vagas e Pontos de Ocupação</h1>
         <p>Cadastre vagas legais com metragem máxima, localização e status de ocupação.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="{% url 'gestor_mapa_cidade' %}" class="btn-action" style="display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="map"></i> Ver no mapa da cidade
+            </a>
+        </p>
     </div>
 </section>
 {% endblock %}

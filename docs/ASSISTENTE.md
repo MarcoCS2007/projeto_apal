@@ -100,10 +100,25 @@ Não coloque segredos nem dados pessoais na base: ela é compartilhada por todos
 
 ---
 
+## Assistente do Gestor (demo de interface)
+
+Há também uma tela em `/gestor/assistente/` para o **gestor** (e administrador). Nesta etapa é só demonstração de front:
+
+- Página de chat no mesmo visual do ambulante, com chips de sugestão.
+- Respostas **hardcoded** em `static/js/assistente-gestor.js` (briefing, relatório, report dos agentes, ações Autorizar/Recusar).
+- Widget flutuante nas telas do backoffice.
+- Sem motor de matching, sem consulta ao banco, sem log persistido e sem execução real de ações.
+
+A view `AssistenteGestorView` apenas renderiza o template autenticado. Backend funcional (dados reais, auditoria, ações) fica para etapa futura.
+
+Arquivos: `templates/gestor/assistente.html`, `templates/gestor/_assistente_widget.html`, `static/js/assistente-gestor.js`.
+
+---
+
 ## Dependências
 
 - [core](CORE.md): motor RAG (`ia.py`).
-- [usuarios](USUARIOS.md): `AcessoAmbulanteMixin` na tela; `MasterLogsIAView` na auditoria. Logs antigos saem com `python manage.py purgar_retencao`.
+- [usuarios](USUARIOS.md): `AcessoAmbulanteMixin` na tela; `MasterLogsIAView` na auditoria. Logs antigos saem com `python manage.py purgar_retencao`. `AcessoBackofficeMixin` na demo do gestor.
 
 ---
 
@@ -113,9 +128,11 @@ Não coloque segredos nem dados pessoais na base: ela é compartilhada por todos
 | --- | --- |
 | `apps/assistente/models.py` | `LogAssistente` |
 | `apps/assistente/services.py` | Grava log após consultar a base |
-| `apps/assistente/views.py` | Tela do ambulante |
+| `apps/assistente/views.py` | Tela do ambulante e demo do gestor |
 | `apps/assistente/forms.py` | Validação da pergunta |
-| `apps/assistente/urls_web.py` | `/ambulante/assistente/` |
+| `apps/assistente/urls_web.py` | `/ambulante/assistente/` e `/gestor/assistente/` |
 | `apps/core/ia.py` | Trechos e pontuação |
-| `templates/ambulante/assistente.html` | Interface |
+| `templates/ambulante/assistente.html` | Interface do ambulante |
+| `templates/gestor/assistente.html` | Interface demo do gestor |
+| `static/js/assistente-gestor.js` | Roteiro hardcoded do gestor |
 | `templates/master/logs-ia.html` | Auditoria Master |

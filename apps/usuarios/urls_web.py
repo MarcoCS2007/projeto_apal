@@ -1,6 +1,12 @@
 from django.urls import path
 
-from apps.fiscalizacao.views import FiscalizacaoView, RegistrarOcorrenciaView
+from apps.fiscalizacao.views import (
+    FiscalizacaoView,
+    FiscalParadaRegistroView,
+    FiscalRotaExecucaoView,
+    FiscalRotasView,
+    RegistrarOcorrenciaView,
+)
 
 from .views import (
     BackofficeInicioView,
@@ -41,6 +47,11 @@ from .views_gestor import (
     GestorOcorrenciaDetalheView,
     GestorOcorrenciasView,
     GestorProcessarScoreView,
+    GestorRotaDetalheView,
+    GestorRotaNovaView,
+    GestorRotasResumoJsonView,
+    GestorRotasSugerirView,
+    GestorRotasView,
 )
 
 urlpatterns = [
@@ -53,6 +64,17 @@ urlpatterns = [
         "fiscal/ocorrencia/",
         RegistrarOcorrenciaView.as_view(),
         name="fiscal_ocorrencia",
+    ),
+    path("fiscal/rotas/", FiscalRotasView.as_view(), name="fiscal_rotas"),
+    path(
+        "fiscal/rotas/<int:pk>/",
+        FiscalRotaExecucaoView.as_view(),
+        name="fiscal_rota_execucao",
+    ),
+    path(
+        "fiscal/rotas/<int:pk>/parada/<int:parada_id>/",
+        FiscalParadaRegistroView.as_view(),
+        name="fiscal_parada_registro",
     ),
     path("registro/", RegistroAmbulanteView.as_view(), name="registro"),
     path("redefinir-senha/", RecuperarSenhaView.as_view(), name="redefinir_senha"),
@@ -125,6 +147,23 @@ urlpatterns = [
         "gestor/ocorrencias/<int:pk>/",
         GestorOcorrenciaDetalheView.as_view(),
         name="gestor_ocorrencia_detalhe",
+    ),
+    path("gestor/rotas/", GestorRotasView.as_view(), name="gestor_rotas"),
+    path("gestor/rotas/nova/", GestorRotaNovaView.as_view(), name="gestor_rota_nova"),
+    path(
+        "gestor/rotas/resumo-json/",
+        GestorRotasResumoJsonView.as_view(),
+        name="gestor_rotas_resumo_json",
+    ),
+    path(
+        "gestor/rotas/sugerir/",
+        GestorRotasSugerirView.as_view(),
+        name="gestor_rotas_sugerir",
+    ),
+    path(
+        "gestor/rotas/<int:pk>/",
+        GestorRotaDetalheView.as_view(),
+        name="gestor_rota_detalhe",
     ),
     path("master/", MasterAdminView.as_view(), name="master_admin"),
     path("master/backup/", MasterBackupView.as_view(), name="master_backup"),

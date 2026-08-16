@@ -54,8 +54,13 @@
     </form>
     {% elif user.role == "fiscal" %}
     <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-    {% if active == "fiscal" and pode.ocorrencias %}
+    {% if pode.rotas_fiscais %}
+    <a href="{% url 'fiscal_rotas' %}"{% if active == "fiscal_rotas" %} class="active"{% endif %}><i data-lucide="route"></i> Rotas</a>
+    {% endif %}
+    {% if active == "fiscal" or active == "fiscal_rotas" %}
+    {% if pode.ocorrencias %}
     <a href="{% url 'fiscal_ocorrencia' %}"><i data-lucide="alert-triangle"></i> Ocorrência</a>
+    {% endif %}
     {% endif %}
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}

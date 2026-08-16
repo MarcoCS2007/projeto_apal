@@ -355,10 +355,26 @@ class ConfiguracaoSeguranca(ModeloBase):
 
     @classmethod
     def carregar(cls):
-        objeto, _criado = cls.objects.get_or_create(
+        objeto, criado = cls.objects.get_or_create(
             pk=1,
             defaults={"matriz": matriz_padrao()},
         )
+        if not criado:
+            padrao = matriz_padrao()
+            matriz = dict(objeto.matriz or {})
+            alterou = False
+            for modulo, perfis in padrao.items():
+                if modulo not in matriz:
+                    matriz[modulo] = dict(perfis)
+                    alterou = True
+                else:
+                    for perfil, valor in perfis.items():
+                        if perfil not in matriz[modulo]:
+                            matriz[modulo][perfil] = valor
+                            alterou = True
+            if alterou:
+                objeto.matriz = matriz
+                objeto.save(update_fields=["matriz", "atualizado_em"])
         return objeto
 
     def perfil_pode(self, perfil, modulo):

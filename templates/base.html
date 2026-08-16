@@ -114,8 +114,12 @@
     </div>
 
     {% block assistente_widget %}
-    {% if user.is_authenticated and user.role == "ambulante" %}
-    {% include "ambulante/_assistente_widget.html" %}
+    {% if user.is_authenticated %}
+        {% if user.role == "ambulante" %}
+        {% include "ambulante/_assistente_widget.html" %}
+        {% elif user.role == "gestor" or user.role == "administrador" %}
+        {% include "gestor/_assistente_widget.html" %}
+        {% endif %}
     {% endif %}
     {% endblock %}
 

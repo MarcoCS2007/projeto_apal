@@ -1,0 +1,260 @@
+DESCRIÇÃO FUNCIONAL
+Ponto Certo Conquista
+
+================================================================================
+1. VISÃO DO PRODUTO
+================================================================================
+
+O sistema cobre o ciclo de vida da autorização de trabalho ambulante em
+Vitória da Conquista: identidade, documentos, parecer, taxa, alvará,
+ocupação do espaço, mapa da cidade, rotas de fiscalização, reputação,
+copiloto do gestor, relatórios e administração técnica.
+
+Quatro mundos no mesmo servidor e no mesmo banco:
+
+  Público      — visitante (home, sobre, FAQ, privacidade, registro)
+  Ambulante    — trabalhador (sessão web ou app JWT)
+  Fiscal       — agente de campo (sessão web ou app JWT)
+  Backoffice   — gestor e administrador (Master)
+
+Um CPF pertence a um único perfil. O login descobre o perfil e cada área
+recusa quem não deveria estar nela.
+
+================================================================================
+2. ATORES
+================================================================================
+
+2.1 Ambulante
+    Cria conta, completa o cadastro, anexa documentos, acompanha o
+    requerimento, confirma a taxa, apresenta a credencial com QR,
+    consulta o assistente educativo, vê o score e edita o perfil.
+
+2.2 Fiscal
+    Recebe rotas atribuídas pelo gestor; executa paradas no mapa da
+    cidade; identifica o ambulante por QR, CPF, nome ou alvará; registra
+    visita (encontrou / foi recebido / observações); lava auto com foto
+    vinculado à parada quando há irregularidade.
+
+2.3 Gestor
+    Triagem, parecer, emissão, dossiê, auditoria de autos, catálogo de
+    pontos e categorias, criação e análise de rotas, mapa de densidade,
+    copiloto de IA, dashboard e exportação.
+
+2.4 Administrador (Master)
+    Cadastro de gestores e fiscais, matriz de permissões, segurança e
+    retenção, logs do assistente do ambulante e backup.
+
+================================================================================
+3. CICLO OPERACIONAL
+================================================================================
+
+  1. O ambulante cria a conta (CPF, e-mail, senha e aceite LGPD).
+  2. Completa o cadastro em seis etapas (dados, endereço, atuação,
+     estrutura, ponto pretendido e revisão).
+  3. Anexa documentos e envia o requerimento (protocolo REQ-AAAA-NNNN).
+  4. O gestor tria os anexos. Rejeição exige justificativa e coloca
+     pendência documental; o reenvio reabre a análise.
+  5. Parecer: deferir, indeferir ou devolver.
+  6. No deferimento, calcula-se a taxa:
+     metragem da estrutura × fator financeiro da categoria (R$/m²).
+  7. O ambulante confirma o DAM (pagamento simulado).
+  8. Emissão do alvará (ALV-AAAA-NNNN), escala (dias e horários),
+     ocupação do ponto e QR autenticado.
+  9. O gestor monta uma rota: escolhe o fiscal, as paradas (ambulantes
+     e pontos) e, se quiser, aceita a sugestão do copiloto.
+ 10. O fiscal inicia a rota no mapa, segue a próxima parada, identifica
+     o trabalhador e registra a visita. Irregularidade vira auto
+     vinculado à parada.
+ 11. Encerramento: rota Concluída (todas as paradas) ou Incompleta
+     (paradas puladas + relato). O resumo volta ao gestor.
+ 12. Ocorrência procedente pode suspender/cancelar a licença e altera
+     o score. Licença vencida pode ser renovada (alvará até 31/12;
+     protocolar renovação com 30 dias de antecedência).
+
+Em paralelo, o gestor consulta o mapa da cidade (densidade por ponto)
+e o copiloto (briefing, relatório, autos, rotas, ações).
+
+================================================================================
+4. MÓDULOS FUNCIONAIS
+================================================================================
+
+4.1 Páginas públicas (core)
+    Home, sobre, FAQ (normas de postura e documentos), privacidade
+    (LGPD) e erros 404/500.
+
+4.2 Usuários e acessos
+    Login por CPF em canais separados. Wizard de cadastro, perfil,
+    redefinição de senha, painéis, dossiê com log de acesso e matriz
+    de módulos × perfis no Master.
+
+4.3 Licenciamento
+    Categorias (laudo sanitário/bombeiros e fator financeiro).
+    Documentos: Pendente, Aprovado, Rejeitado.
+
+    Máquina de estados da licença:
+      Em Análise → Pendência Documental → Em Análise (após reenvio)
+      Em Análise → Indeferido
+      Em Análise → Aprovado → (taxa) → emissão → Ativo
+      Ativo → Vencido | Suspenso | Cancelado
+
+    O QR só é válido com status Ativo e data ainda no futuro.
+
+4.4 Espaços e mapa da cidade
+    Endereço residencial. Estrutura de trabalho com metragem em m².
+    Pontos de ocupação (vagas) com capacidade máxima e status Livre,
+    Ocupado, Bloqueado ou Reservado. Impede dois alvarás ativos no
+    mesmo ponto e estrutura maior que o teto da vaga.
+
+    Mapa da cidade (/gestor/mapa/):
+    - Mapa Leaflet centrado em Vitória da Conquista.
+    - Cada ponto georreferenciado vira círculo + marcador cujo tamanho
+      e cor crescem com o volume de ambulantes (licença ativa e/ou
+      ponto pretendido, conforme o filtro).
+    - Filtros: bairro, situação (todos / licença ativa / sem licença),
+      tipo de atuação (fixo / itinerante).
+    - KPIs: pontos no mapa, ambulantes contados, maior concentração.
+    - JSON em /gestor/mapa/dados.json, gerado do banco (não é mock
+      estático). Pontos sem coordenadas não entram no desenho.
+
+4.5 Fiscalização pontual
+    Validação da credencial; detecção de licença suspensa, vencida,
+    adulterada ou fora do horário da escala. Tipos de ocorrência:
+    advertência, multa, apreensão, irregularidade de ponto, de horário,
+    comércio sem licença, falta de credencial e outras.
+
+    Fluxo do auto:
+      Registrada → Em análise → Procedente → Convertida em multa
+      (também Improcedente)
+
+4.6 Rotas do fiscal
+    Modelos: RotaFiscal, ParadaRota, RegistroVisita.
+
+    Status da rota:
+      Agendada → Em andamento → Concluída
+                              → Incompleta (paradas puladas + relato)
+
+    Status da parada: Pendente, Concluída, Pulada.
+
+    Gestor (/gestor/rotas/):
+    - Lista rotas, cria nova (título, fiscal, data, ambulantes,
+      observações).
+    - Painel “Sugestão do copiloto”: ambulantes com licença ativa e
+      ponto georreferenciado (protótipo de priorização).
+    - Detalhe com resumo (paradas feitas, puladas, sem ambulante,
+      ocorrências) e mapa da sequência.
+
+    Fiscal (/fiscal/rotas/ e execução):
+    - Inicia a rota; o mapa destaca a próxima parada e traça a linha
+      entre os pontos.
+    - Em cada parada: identificar por QR ou CPF/licença; registrar se
+      encontrou o ambulante e se foi recebido; observar; opcionalmente
+      abrir ocorrência já vinculada à visita.
+    - Encerrar como completa ou incompleta. O resumo vai ao gestor.
+
+    O copiloto do gestor consome /gestor/rotas/resumo-json/ (rotas
+    encerradas hoje, em andamento, agendadas, pontos sem ambulante,
+    ocorrências nas rotas).
+
+4.7 Score de reputação
+    Pontuação 0–100, inicia em 100. Eventos automáticos:
+      +10  licença ativa / alvará emitido
+      +8   renovação no prazo
+      −20  ocorrência procedente
+      −15  licença suspensa
+      −25  licença cancelada
+
+    Faixas: Diamante (90–100), Ouro (75–89), Prata (50–74), Bronze (0–49).
+    O ambulante vê faixa, histórico e dicas.
+
+4.8 Assistente educativo (ambulante)
+    Chat sobre documentos, prazos, zona, credencial, limpeza e
+    apreensão. Base local (sem API externa). Cada pergunta vira log
+    auditável pelo Master. Não emite licença e não lê dados de outros.
+
+4.9 Copiloto / IA do gestor
+    Tela /gestor/assistente/ e atalho flutuante no backoffice.
+
+    O gestor conversa em linguagem natural (chips + texto). Roteiros:
+    - Briefing do dia (fila, docs, autos, vencimentos).
+    - Relatório de ocupação e regularização (com atalho a imprimir,
+      dashboard e CSV).
+    - Resumo dos autos dos agentes.
+    - Análise de rotas concluídas (KPIs reais via JSON do sistema).
+    - Ações recomendadas com Autorizar / Recusar: o copiloto propõe;
+      a execução só segue depois da autorização do gestor (abre fila,
+      ocorrências, rotas ou recuperação de score).
+
+    Histórico de chats e “documentos” gerados fica no navegador para
+    a demo. Briefing, relatório e autos usam roteiro de interface;
+    rotas já leem dados agregados reais. Nenhuma ação crítica roda
+    sozinha: o humano autoriza.
+
+4.10 Relatórios e indicadores
+    Dashboard de inteligência governamental: ocupação, licenças,
+    retrato sociodemográfico (idade, gênero, vulnerabilidade,
+    instrução, renda por categoria). Exportação Excel/PDF/CSV.
+
+4.11 Administração técnica
+    Backup restaurável, retenção LGPD, seed de demonstração,
+    sessão, bloqueio e permissões.
+
+================================================================================
+5. CANAIS DE ACESSO
+================================================================================
+
+Site
+  /                       páginas públicas
+  /registro/              conta do ambulante
+  /entrar/                login do ambulante
+  /fiscal/entrar/         login do fiscal
+  /login/                 gestor e Master
+  /ambulante/             painel, perfil, cadastro, score, alvará,
+                          assistente
+  /fiscal/                busca e ocorrência pontual
+  /fiscal/rotas/          rotas atribuídas e execução no mapa
+  /backoffice/            fila, parecer, emissão, dossiê, pontos
+  /gestor/mapa/           mapa da cidade (densidade)
+  /gestor/rotas/          criar e auditar rotas
+  /gestor/assistente/     copiloto do gestor
+  /gestor/dashboard/      inteligência governamental
+  /master/                equipe, permissões, logs de IA, backup
+
+Aplicativo móvel (JSON + JWT)
+  Login, status da licença e QR para o ambulante.
+  Busca, validação de QR e ocorrência para o fiscal.
+  As regras são as mesmas do site.
+
+================================================================================
+6. REGRAS DE NEGÓCIO RELEVANTES
+================================================================================
+
+- Licença pessoal, precária e intransferível.
+- Cadastro completo exige nascimento, escolaridade, atuação, endereço
+  e estrutura com metragem > 0.
+- Alimentos exigem laudo sanitário quando a categoria pede.
+- Arquivos: PDF, PNG, JPG, JPEG, WEBP; download só com permissão.
+- CPF completo só no dossiê; listagens mascaram.
+- Acesso/exportação de dossiê deixa rastro.
+- Taxa simulada (DAM pago), sem gateway bancário.
+- Rota só pode ser iniciada/encerrada pelo fiscal dono.
+- Parada concluída exige registro de visita; incompleta exige relato.
+- Mapa da cidade conta volume por ponto conforme filtros; não inventa
+  coordenada.
+
+================================================================================
+7. O QUE É PRODUTO E O QUE AINDA É DEMONSTRAÇÃO
+================================================================================
+
+Produto (regras no servidor)
+  Cadastro, licença, QR HMAC, inspeção, rotas (criar, executar,
+  visitar, encerrar), mapa da cidade com dados reais, score, assistente
+  do ambulante, dashboard, LGPD, API.
+
+Demonstração de interface (pronta para ligar ao motor)
+  Parte dos cards do copiloto do gestor (briefing, relatório, autos,
+  ações) e a sugestão de paradas na criação da rota. A análise de
+  rotas no copiloto já usa resumo real.
+
+O que o sistema não faz hoje
+  Front React/Vue separado; chamada a ChatGPT/Gemini; gateway de
+  pagamento; substituir o Código de Posturas — ele executa a norma.

@@ -1,4 +1,5 @@
 ﻿{% extends "base.html" %}
+{% load static %}
 
 {% block title %}Fiscalização em campo - Ponto Certo Conquista{% endblock %}
 
@@ -58,6 +59,20 @@
                 <i data-lucide="search"></i> Consultar situação
             </button>
         </form>
+        {% if pode.rotas_fiscais %}
+        <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Rotas de fiscalização</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.2rem;">
+            {% if rotas_ativas %}Você tem {{ rotas_ativas }} rota{{ rotas_ativas|pluralize }} ativa{{ rotas_ativas|pluralize }}.{% else %}Nenhuma rota ativa no momento.{% endif %}
+        </p>
+        <a href="{% url 'fiscal_rotas' %}" class="btn-submit" style="width: 100%; background-color: #0EA5E9; text-decoration: none; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+            <i data-lucide="route"></i>
+            Minhas rotas
+        </a>
+        {% endif %}
         <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
         <div class="section-title">
             <div class="title-accent" style="background-color: #EF4444;"></div>
@@ -80,139 +95,7 @@
 
 {% block extra_js %}
 <script>
-(function () {
-    const botaoCamera = document.getElementById("btn-ativar-camera");
-    const statusQr = document.getElementById("qr-status");
-    const iconeQr = document.getElementById("qr-placeholder-icon");
-    const scannerBox = document.getElementById("qr-scanner-box");
-    const urlInspecao = "{% url 'fiscal_painel' %}";
-    const urlLeitorQr = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
-    let leitor = null;
-    let carregandoLeitor = null;
-    let cameraAtiva = false;
-
-    function restaurarBotao() {
-        botaoCamera.disabled = false;
-        botaoCamera.innerHTML = '<i data-lucide="camera"></i> Ativar câmera e leitor';
-        if (window.lucide) lucide.createIcons();
-    }
-
-    function carregarLeitorQr() {
-        if (window.Html5Qrcode) {
-            return Promise.resolve();
-        }
-        if (carregandoLeitor) {
-            return carregandoLeitor;
-        }
-        carregandoLeitor = new Promise(function (resolve, reject) {
-            const script = document.createElement("script");
-            script.src = urlLeitorQr;
-            script.async = true;
-            script.onload = function () { resolve(); };
-            script.onerror = function () {
-                carregandoLeitor = null;
-                reject(new Error("Falha ao carregar o leitor de QR."));
-            };
-            document.body.appendChild(script);
-        });
-        return carregandoLeitor;
-    }
-
-    async function escolherCameraId() {
-        const cameras = await Html5Qrcode.getCameras();
-        if (!cameras || !cameras.length) {
-            throw new Error("Nenhuma câmera encontrada neste dispositivo.");
-        }
-        const traseira = cameras.find(function (cam) {
-            return /back|rear|environment|traseira|posterior/i.test(cam.label || "");
-        });
-        return (traseira || cameras[cameras.length - 1]).id;
-    }
-
-    function aoLerQr(texto) {
-        if (!texto || !cameraAtiva) return;
-        cameraAtiva = false;
-        statusQr.textContent = "QR lido. Abrindo a ficha...";
-        statusQr.hidden = false;
-        const destino = urlInspecao + "?qr=" + encodeURIComponent(texto.trim());
-        const parar = leitor
-            ? leitor.stop().catch(function () { return null; })
-            : Promise.resolve();
-        parar.finally(function () {
-            window.location = destino;
-        });
-    }
-
-    botaoCamera?.addEventListener("click", async function () {
-        if (cameraAtiva) return;
-        if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-            statusQr.textContent = "A câmera exige HTTPS. Use o campo abaixo para colar o código.";
-            document.getElementById("qr-manual")?.focus();
-            if (typeof mostrarToast === "function") {
-                mostrarToast("A câmera só funciona em conexão segura (HTTPS).", "warning");
-            }
-            return;
-        }
-
-        botaoCamera.disabled = true;
-        botaoCamera.textContent = "Abrindo câmera...";
-        statusQr.hidden = false;
-        statusQr.textContent = "Solicitando permissão da câmera...";
-
-        try {
-            await carregarLeitorQr();
-            if (!window.Html5Qrcode) {
-                throw new Error("Biblioteca do leitor indisponível.");
-            }
-
-            if (leitor) {
-                try {
-                    await leitor.stop();
-                } catch (_e) {
-                    /* leitor ainda não estava ativo */
-                }
-                leitor = null;
-            }
-            leitor = new Html5Qrcode("qr-reader", { verbose: false });
-
-            const cameraId = await escolherCameraId();
-            if (iconeQr) iconeQr.style.display = "none";
-            scannerBox?.classList.add("is-scanning");
-            statusQr.textContent = "Aponte a câmera para o QR da credencial...";
-
-            await leitor.start(
-                cameraId,
-                {
-                    fps: 10,
-                    qrbox: function (viewWidth, viewHeight) {
-                        const lado = Math.min(220, Math.floor(Math.min(viewWidth, viewHeight) * 0.75));
-                        return { width: lado, height: lado };
-                    },
-                    aspectRatio: 1,
-                },
-                aoLerQr
-            );
-
-            cameraAtiva = true;
-            statusQr.hidden = true;
-            botaoCamera.textContent = "Câmera ativa";
-            botaoCamera.disabled = true;
-        } catch (erro) {
-            cameraAtiva = false;
-            scannerBox?.classList.remove("is-scanning");
-            if (iconeQr) iconeQr.style.display = "";
-            statusQr.hidden = false;
-            statusQr.textContent = "Não foi possível abrir a câmera. Cole o código da credencial abaixo.";
-            restaurarBotao();
-            document.getElementById("qr-manual")?.focus();
-            if (typeof mostrarToast === "function") {
-                mostrarToast(
-                    (erro && erro.message) || "Não foi possível abrir a câmera. Cole o código da credencial.",
-                    "warning"
-                );
-            }
-        }
-    });
-})();
+    window.APAL_QR_REDIRECT = "{% url 'fiscal_painel' %}";
 </script>
+<script src="{% static 'js/fiscal-qr-leitor.js' %}"></script>
 {% endblock %}

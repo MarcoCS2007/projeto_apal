@@ -57,11 +57,18 @@
         <small class="text-muted">Registros de fiscalização</small>
     </a>
     {% endif %}
+    {% if pode.rotas_fiscais %}
+    <a href="{% url 'gestor_rotas' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Rotas</span>
+        <strong class="stat-value">{{ rotas_pendentes_analise }}</strong>
+        <small class="text-muted">Concluídas / incompletas</small>
+    </a>
+    {% endif %}
     {% if pode.mapa_vagas %}
-    <a href="{% url 'gestor_pontos' %}" class="form-card form-card-link">
-        <span class="stat-kicker">Vagas</span>
+    <a href="{% url 'gestor_mapa_cidade' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Mapa</span>
         <strong class="stat-value">{{ total_vagas }}</strong>
-        <small class="text-muted">Pontos de ocupação</small>
+        <small class="text-muted">Pontos de ocupação na cidade</small>
     </a>
     {% endif %}
     {% if pode.relatorios %}
@@ -71,6 +78,11 @@
         <small class="text-muted">Indicadores e ocupação</small>
     </a>
     {% endif %}
+    <a href="{% url 'gestor_assistente' %}" class="form-card form-card-link">
+        <span class="stat-kicker">Assistente</span>
+        <strong class="stat-value"><i data-lucide="bot"></i></strong>
+        <small class="text-muted">Relatórios, autos e ações sugeridas</small>
+    </a>
     {% if pode.solicitacao_licenca %}
     <a href="{% url 'gestor_triagem' %}" class="form-card form-card-link">
         <span class="stat-kicker">Triagem</span>

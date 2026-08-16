@@ -1,15 +1,20 @@
 <nav id="header-nav" class="header-nav" aria-label="Principal">
     <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-    {% if active == "painel" %}
+    <a href="{% url 'gestor_assistente' %}"{% if active == "assistente" %} class="active"{% endif %}><i data-lucide="bot"></i> Assistente</a>
+    {% if active == "painel" or active == "rotas" or active == "ocorrencias" or active == "mapa" or active == "pontos" %}
         {% if pode.relatorios %}
         <a href="{% url 'relatorios:dashboard' %}"><i data-lucide="bar-chart-3"></i> Relatórios</a>
         {% endif %}
         {% if pode.ocorrencias %}
-        <a href="{% url 'gestor_ocorrencias' %}"><i data-lucide="clipboard-list"></i> Ocorrências</a>
+        <a href="{% url 'gestor_ocorrencias' %}"{% if active == "ocorrencias" %} class="active"{% endif %}><i data-lucide="clipboard-list"></i> Ocorrências</a>
         <a href="{% url 'gestor_infracoes' %}"><i data-lucide="alert-triangle"></i> Infrações</a>
         {% endif %}
+        {% if pode.rotas_fiscais %}
+        <a href="{% url 'gestor_rotas' %}"{% if active == "rotas" %} class="active"{% endif %}><i data-lucide="route"></i> Rotas</a>
+        {% endif %}
         {% if pode.mapa_vagas %}
-        <a href="{% url 'gestor_pontos' %}"><i data-lucide="map"></i> Vagas</a>
+        <a href="{% url 'gestor_mapa_cidade' %}"{% if active == "mapa" %} class="active"{% endif %}><i data-lucide="map"></i> Mapa</a>
+        <a href="{% url 'gestor_pontos' %}"{% if active == "pontos" %} class="active"{% endif %}><i data-lucide="map-pin"></i> Vagas</a>
         {% endif %}
     {% endif %}
     <form action="{% url 'logout' %}" method="post" style="display: inline;">

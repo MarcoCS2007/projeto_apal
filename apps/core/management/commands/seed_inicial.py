@@ -37,6 +37,11 @@ CPF_CARLOS_AMB = "10203040570"
 CPF_FATIMA = "20304050601"
 CPF_LUCIANA = "30405060726"
 CPF_PEDRO = "70080090036"
+# Ambulantes extras só para densidade do mapa demo (VC-BA).
+CPF_MAPA_1 = "40506070859"
+CPF_MAPA_2 = "50607080981"
+CPF_MAPA_3 = "60708090176"
+CPF_MAPA_4 = "70809010224"
 
 CATEGORIAS = (
     {
@@ -230,6 +235,8 @@ class Command(BaseCommand):
         ConfiguracaoSeguranca.carregar()
         self.stdout.write("Configuração global de segurança disponível.")
         self._abrir_fila_analise()
+        self._licencas_mapa_demo(pontos)
+        self._rota_demo()
         self._resumo()
         self.stdout.write(
             self.style.SUCCESS("Carga inicial (seeds) finalizada com sucesso!")
@@ -338,6 +345,20 @@ class Command(BaseCommand):
                 nome_identificacao=dados["nome_identificacao"],
                 defaults=dados,
             )
+            if not created and (
+                not obj.coordenadas or obj.coordenadas != dados.get("coordenadas")
+            ):
+                obj.coordenadas = dados.get("coordenadas") or ""
+                obj.logradouro = dados["logradouro"]
+                obj.bairro = dados["bairro"]
+                obj.save(
+                    update_fields=[
+                        "coordenadas",
+                        "logradouro",
+                        "bairro",
+                        "atualizado_em",
+                    ]
+                )
             pontos[dados["nome_identificacao"]] = obj
             nome = dados["nome_identificacao"]
             if created:
@@ -512,6 +533,10 @@ class Command(BaseCommand):
             sobrenome="Rocha",
             telefone="77991001006",
         )
+        luciana = Ambulante.objects.filter(cpf=CPF_LUCIANA).first()
+        if luciana and not luciana.ponto_pretendido_id:
+            luciana.ponto_pretendido = pontos["Calçadão Comercial"]
+            luciana.save(update_fields=["ponto_pretendido", "atualizado_em"])
         self._ambulante_parcial(
             cpf=CPF_PEDRO,
             email="pedro.nunes@email.com",
@@ -750,6 +775,188 @@ class Command(BaseCommand):
                     f"Requerimento {licenca.protocolo} já estava na fila."
                 )
 
+    def _licencas_mapa_demo(self, pontos):
+        """Licenças ATIVAS extras para auras com volumes distintos no mapa demo.
+
+        Vários alvarás no mesmo ponto são intencionais só para a demonstração
+        visual (Praça Central “quente”); o fluxo real de emissão segue 1:1.
+        """
+        from datetime import timedelta
+
+        from apps.core.qrcode import gerar_codigo_qr
+        from apps.licenciamento.models import (
+            CategoriaProduto,
+            LicencaAlvara,
+            StatusLicenca,
+        )
+
+        hoje = timezone.localdate()
+        categoria = CategoriaProduto.objects.filter(ativo=True).first()
+        extras = (
+            {
+                "cpf": CPF_MAPA_1,
+                "email": "jose.mapa@email.com",
+                "nome": "José",
+                "sobrenome": "Santana",
+                "telefone": "77991002001",
+                "apelido": "Milho do Zé",
+                "tipo_atuacao": "fixo",
+                "ponto": pontos["Praça Central"],
+                "categoria": "Lanches e Salgados",
+            },
+            {
+                "cpf": CPF_MAPA_2,
+                "email": "ana.mapa@email.com",
+                "nome": "Ana",
+                "sobrenome": "Pires",
+                "telefone": "77991002002",
+                "apelido": "Bijuterias da Ana",
+                "tipo_atuacao": "fixo",
+                "ponto": pontos["Praça Central"],
+                "categoria": "Vestuário e Acessórios",
+            },
+            {
+                "cpf": CPF_MAPA_3,
+                "email": "bruno.mapa@email.com",
+                "nome": "Bruno",
+                "sobrenome": "Costa",
+                "telefone": "77991002003",
+                "apelido": "Sucos do Bruno",
+                "tipo_atuacao": "fixo",
+                "ponto": pontos["Praça Central"],
+                "categoria": "Bebidas e Água de Coco",
+            },
+            {
+                "cpf": CPF_MAPA_4,
+                "email": "helena.mapa@email.com",
+                "nome": "Helena",
+                "sobrenome": "Dias",
+                "telefone": "77991002004",
+                "apelido": "Food Truck da Helena",
+                "tipo_atuacao": "movel",
+                "ponto": pontos["Terminal Lauro de Freitas"],
+                "categoria": "Alimentos Manipulados",
+            },
+        )
+        for item in extras:
+            ponto = item["ponto"]
+            amb = Ambulante.objects.filter(cpf=item["cpf"]).first()
+            if amb is None:
+                amb = Ambulante.objects.create_user(
+                    cpf=item["cpf"],
+                    email=item["email"],
+                    password=SENHA_AMBULANTE,
+                    nome=item["nome"],
+                    sobrenome=item["sobrenome"],
+                    telefone_whatsapp=item["telefone"],
+                    apelido_nome_fantasia=item["apelido"],
+                    tipo_atuacao=item["tipo_atuacao"],
+                    escolaridade="medio_completo",
+                    data_nasc=datetime.date(1985, 6, 15),
+                    genero="nao_informado",
+                    renda_mensal_estimada=Decimal("1500.00"),
+                    ponto_pretendido=ponto,
+                    pontuacao=100,
+                    **self._dados_lgpd(),
+                )
+                Endereco.objects.create(
+                    ambulante=amb,
+                    cep="45000-000",
+                    logradouro="Rua Demo Mapa",
+                    numero="1",
+                    bairro=ponto.bairro,
+                    cidade="Vitória da Conquista",
+                    estado_uf="BA",
+                )
+                EstruturaTrabalho.objects.create(
+                    ambulante=amb,
+                    tipo_estrutura="carrinho",
+                    dimensoes_metragem=Decimal("2.00"),
+                    descricao="Estrutura seed mapa demo.",
+                )
+                self.stdout.write(
+                    self.style.SUCCESS(f"Ambulante mapa demo {item['nome']} criado.")
+                )
+            else:
+                if amb.ponto_pretendido_id != ponto.pk:
+                    amb.ponto_pretendido = ponto
+                    amb.save(update_fields=["ponto_pretendido", "atualizado_em"])
+
+            if LicencaAlvara.objects.filter(
+                ambulante=amb, status=StatusLicenca.ATIVO, ponto_ocupacao=ponto
+            ).exists():
+                continue
+
+            cat = CategoriaProduto.objects.filter(
+                nome_categoria=item["categoria"]
+            ).first() or categoria
+            estrutura = amb.estruturas.order_by("id").first()
+            licenca = LicencaAlvara.objects.create(
+                ambulante=amb,
+                estrutura_trabalho=estrutura,
+                ponto_ocupacao=ponto,
+                categoria_produto=cat,
+                status=StatusLicenca.ATIVO,
+                data_emissao=hoje,
+                data_vencimento=hoje + timedelta(days=365),
+                numero_licenca=f"ALV-MAPA-{amb.pk}",
+                taxa_paga=True,
+            )
+            ponto.ocupar()
+            if not amb.codigo_qr_code:
+                amb.codigo_qr_code = gerar_codigo_qr(licenca)
+                amb.save(update_fields=["codigo_qr_code", "atualizado_em"])
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Licença ATIVA mapa demo {licenca.numero_licenca} "
+                    f"em {ponto.nome_identificacao}."
+                )
+            )
+
+        # Ceasa fica sem alvará ativo (só Pedro pretendido) para aura azul no filtro.
+        ceasa = pontos["Região do Ceasa"]
+        if not LicencaAlvara.objects.filter(
+            ponto_ocupacao=ceasa, status=StatusLicenca.ATIVO
+        ).exists():
+            if ceasa.status_ocupacao != "Livre":
+                ceasa.status_ocupacao = "Livre"
+                ceasa.save(update_fields=["status_ocupacao", "atualizado_em"])
+
+    def _rota_demo(self):
+        from apps.fiscalizacao.models import RotaFiscal
+        from apps.fiscalizacao.services_rotas import criar_rota
+
+        fiscal = Fiscal.objects.filter(cpf=CPF_FISCAL).first()
+        gestor = Gestor.objects.filter(cpf=CPF_GESTOR).first()
+        if fiscal is None:
+            self.stdout.write("Fiscal seed não encontrado; rota demo ignorada.")
+            return
+        if RotaFiscal.objects.filter(titulo="Ronda Centro — demonstração").exists():
+            self.stdout.write("Rota demo já existe.")
+            return
+        cpfs = (CPF_MARIA, CPF_ANTONIO, CPF_RAIMUNDA, CPF_CARLOS_AMB)
+        ids = list(
+            Ambulante.objects.filter(cpf__in=cpfs, ativo=True).values_list(
+                "pk", flat=True
+            )
+        )
+        if len(ids) < 2:
+            self.stdout.write("Ambulantes insuficientes para rota demo.")
+            return
+        rota = criar_rota(
+            gestor,
+            fiscal,
+            "Ronda Centro — demonstração",
+            ids[:4],
+            data_prevista=timezone.localdate(),
+            observacoes="Rota seed para demonstração: visite os pontos do Centro e registre cada parada.",
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Rota demo #{rota.pk} criada com {rota.total_paradas} paradas."
+            )
+        )
+
     def _resumo(self):
         self.stdout.write("")
         self.stdout.write("Contas para teste (todas idempotentes):")
@@ -765,7 +972,15 @@ class Command(BaseCommand):
             "  Completos: Maria das Dores, Antônio Bispo, Raimunda Alves, Carlos Ferreira."
         )
         self.stdout.write(
-            "  Só conta: Luciana Rocha. Parcial: Pedro Nunes. Inativa: Fátima Oliveira."
+            "  Só conta: Luciana Rocha (pretendido Calçadão). "
+            "Parcial: Pedro Nunes (Ceasa). Inativa: Fátima Oliveira."
+        )
+        self.stdout.write(
+            "  Mapa demo: 3 alvaras na Praca Central + 1 no Terminal "
+            "(filtro ativos -> aura vermelha no Centro)."
+        )
+        self.stdout.write(
+            "  Rota demo: fiscal@apal.com -> /fiscal/rotas/ (Ronda Centro)."
         )
 
     def _catalogo_infracoes(self):
