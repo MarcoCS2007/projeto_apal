@@ -918,12 +918,14 @@ class Command(BaseCommand):
 
         # Ceasa fica sem alvará ativo (só Pedro pretendido) para aura azul no filtro.
         ceasa = pontos["Região do Ceasa"]
-        if not LicencaAlvara.objects.filter(
-            ponto_ocupacao=ceasa, status=StatusLicenca.ATIVO
-        ).exists():
-            if ceasa.status_ocupacao != "Livre":
-                ceasa.status_ocupacao = "Livre"
-                ceasa.save(update_fields=["status_ocupacao", "atualizado_em"])
+        if (
+            not LicencaAlvara.objects.filter(
+                ponto_ocupacao=ceasa, status=StatusLicenca.ATIVO
+            ).exists()
+            and ceasa.status_ocupacao != "Livre"
+        ):
+            ceasa.status_ocupacao = "Livre"
+            ceasa.save(update_fields=["status_ocupacao", "atualizado_em"])
 
     def _rota_demo(self):
         from apps.fiscalizacao.models import RotaFiscal
