@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Painel do Gestor - Ponto Certo Conquista{% endblock %}
 
@@ -16,6 +16,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #10B981;"></div>
+        <h2>Ações Globais</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
+        Processa a recuperação de score (+2 pontos) para todos os ambulantes sem infrações no período configurado.
+    </p>
+    <form method="post" action="{% url 'gestor_processar_score' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i> Rodar Recuperação Mensal de Score
+        </button>
+    </form>
+</div>
+
 <div class="shortcut-grid">
     {% if pode.solicitacao_licenca %}
     <a href="{% url 'gestor_fila' %}" class="form-card form-card-link">

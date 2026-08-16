@@ -33,9 +33,14 @@ from .views_gestor import (
     GestorDossieView,
     GestorEmitirAlvaraView,
     GestorFilaView,
+    GestorInfracaoCreateView,
+    GestorInfracaoDeleteView,
+    GestorInfracaoUpdateView,
+    GestorInfracoesView,
     GestorLicencasAtivasView,
     GestorOcorrenciaDetalheView,
     GestorOcorrenciasView,
+    GestorProcessarScoreView,
 )
 
 urlpatterns = [
@@ -65,6 +70,11 @@ urlpatterns = [
         name="ambulante_cadastro",
     ),
     path("backoffice/", BackofficeInicioView.as_view(), name="backoffice_inicio"),
+    path(
+        "gestor/score/processar/",
+        GestorProcessarScoreView.as_view(),
+        name="gestor_processar_score",
+    ),
     path("gestor/fila/", GestorFilaView.as_view(), name="gestor_fila"),
     path(
         "gestor/ambulantes/",
@@ -136,4 +146,25 @@ urlpatterns = [
         name="master_permissoes",
     ),
     path("master/logs-ia/", MasterLogsIAView.as_view(), name="master_logs_ia"),
+    # Infracoes
+    path(
+        "gestor/infracoes/",
+        GestorInfracoesView.as_view(),
+        name="gestor_infracoes",
+    ),
+    path(
+        "gestor/infracoes/nova/",
+        GestorInfracaoCreateView.as_view(),
+        name="gestor_infracao_nova",
+    ),
+    path(
+        "gestor/infracoes/<int:pk>/editar/",
+        GestorInfracaoUpdateView.as_view(),
+        name="gestor_infracao_editar",
+    ),
+    path(
+        "gestor/infracoes/<int:pk>/apagar/",
+        GestorInfracaoDeleteView.as_view(),
+        name="gestor_infracao_apagar",
+    ),
 ]

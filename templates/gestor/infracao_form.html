@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Editar{% else %}Nova{% endif %} Infração - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ocorrencias" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>{% if object %}Editar Infração{% else %}Nova Infração{% endif %}</h1>
+        <p>Defina a descrição, a gravidade e o peso da pontuação.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #EF4444;"></div>
+        <h2>Preencha os dados</h2>
+    </div>
+
+    <form method="post" class="form-content" style="margin-top: 1.5rem;">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.descricao.id_for_label }}">Descrição da Infração *</label>
+                {{ form.descricao }}
+                {{ form.descricao.errors }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.gravidade.id_for_label }}">Gravidade *</label>
+                {{ form.gravidade }}
+                {{ form.gravidade.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.pontos_desconto.id_for_label }}">Pontos de Desconto *</label>
+                {{ form.pontos_desconto }}
+                {{ form.pontos_desconto.errors }}
+                <div class="input-hint" style="margin-top: 0.2rem; font-size: 0.8rem; color: #64748B;">Quantos pontos serão subtraídos do Score se aprovada.</div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <a href="{% url 'gestor_infracoes' %}" class="btn-action" style="background-color: transparent; color: #1E293B; border: 1px solid #CBD5E1; text-decoration: none;">Cancelar</a>
+            <button type="submit" class="btn-action">Salvar Infração</button>
+        </div>
+    </form>
+</div>
+
+{% include "_regras_score.html" %}
+
+{% endblock %}

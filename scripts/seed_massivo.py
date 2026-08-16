@@ -283,7 +283,12 @@ def run():
 
         amb.save(update_fields=["pontuacao"])
 
+        from apps.fiscalizacao.models import CatalogoInfracao
+
+        catalogo = list(CatalogoInfracao.objects.all())
+
         for _ in range(qtd_ocorrencias):
+            infracao_escolhida = random.choice(catalogo) if catalogo else None
             ocorrencias_objs.append(
                 OcorrenciaInspecao(
                     fiscal=fiscal,
@@ -295,6 +300,9 @@ def run():
                         if licenca.ponto_ocupacao
                         else "Rua"
                     ),
+                    infracao=infracao_escolhida,
+                    status_gestor="Aprovada",
+                    data_ocorrencia=hoje - timedelta(days=random.randint(1, 300)),
                 )
             )
 

@@ -106,6 +106,8 @@ class RegistrarOcorrenciaView(
             form.cleaned_data["descricao"],
             local_ocorrencia=form.cleaned_data.get("local_ocorrencia") or "",
             evidencia_foto=form.cleaned_data.get("evidencia_foto"),
+            infracao=form.cleaned_data.get("infracao"),
+            data_ocorrencia=form.cleaned_data.get("data_ocorrencia"),
         )
         alvo = (
             ocorrencia.ambulante.nome_completo
@@ -139,3 +141,31 @@ class RegistrarOcorrenciaView(
         if ambulante is None:
             return None
         return consultar_campo(ambulante.cpf)
+
+
+from django.shortcuts import get_object_or_404
+
+from .models import OcorrenciaInspecao
+
+
+class AprovarOcorrenciaGestorView(LoginRequiredMixin, RequerModuloMixin, View):
+    """
+    View de Gestor para Aprovação: altera o status_gestor para 'Aprovada'
+    e invoca imediatamente a função processar_ocorrencia.
+    """
+
+    modulo_permissao = "ocorrencias"
+
+    def post(self, request, *args, **kwargs):
+        from apps.usuarios.score import processar_ocorrencia
+
+        ocorrencia_id = kwargs.get("pk")
+        ocorrencia = get_object_or_404(OcorrenciaInspecao, pk=ocorrencia_id)
+
+        ocorrencia.status_gestor = "APROVADA"
+        ocorrencia.save(update_fields=["status_gestor"])
+
+        processar_ocorrencia(ocorrencia.id)
+
+        messages.success(request, "Ocorrência aprovada com sucesso.")
+        return redirect("fiscal_painel")

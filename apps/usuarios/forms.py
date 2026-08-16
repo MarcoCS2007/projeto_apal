@@ -691,6 +691,7 @@ class ConfiguracaoSegurancaForm(forms.ModelForm):
             "tentativas_bloqueio",
             "exigencia_2fa",
             "retencao_logs_meses",
+            "dias_recuperacao_score",
         )
 
     def __init__(self, *args, **kwargs):
@@ -699,6 +700,9 @@ class ConfiguracaoSegurancaForm(forms.ModelForm):
         self.fields["tentativas_bloqueio"].widget.attrs["id"] = "tentativas-login"
         self.fields["exigencia_2fa"].widget.attrs["id"] = "autenticacao-2fa"
         self.fields["retencao_logs_meses"].widget.attrs["id"] = "retencao-logs"
+        self.fields["dias_recuperacao_score"].widget.attrs[
+            "id"
+        ] = "dias-recuperacao-score"
         matriz = self.instance.matriz or matriz_padrao()
         for modulo, perfis in CELULAS_EDITAVEIS.items():
             for perfil in perfis:

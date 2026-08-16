@@ -1,9 +1,10 @@
 from django import forms
+from django.utils import timezone
 
 from apps.usuarios.forms import normalizar_cpf
 from apps.usuarios.models import Ambulante
 
-from .models import StatusOcorrencia, TipoOcorrencia
+from .models import CatalogoInfracao, StatusOcorrencia, TipoOcorrencia
 from .services import transicoes_permitidas
 
 
@@ -63,6 +64,20 @@ class OcorrenciaForm(forms.Form):
             attrs={"accept": "image/*", "capture": "environment"}
         ),
     )
+    infracao = forms.ModelChoiceField(
+        queryset=CatalogoInfracao.objects.all(),
+        required=False,
+        label="Catálogo de Infração",
+        empty_label="Selecione a infração (opcional)",
+    )
+    data_ocorrencia = forms.DateTimeField(
+        label="Data e Hora da Ocorrência",
+        required=False,
+        initial=timezone.now,
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
+    )
 
     def clean(self):
         dados = super().clean()
@@ -119,14 +134,11 @@ class AuditoriaOcorrenciaForm(forms.Form):
         label="Status do auto",
         widget=forms.Select(attrs={"class": "styled-select"}),
     )
-    acao_licenca = forms.ChoiceField(
+    infracao = forms.ModelChoiceField(
+        queryset=CatalogoInfracao.objects.all(),
         required=False,
-        label="Efeito na licença",
-        choices=[
-            ("", "Seguir a regra do status (suspender se procedente)"),
-            ("suspender", "Suspender licença ativa"),
-            ("cancelar", "Cancelar licença"),
-        ],
+        label="Penalidade Aplicada",
+        empty_label="Nenhuma (ou manter a original)",
         widget=forms.Select(attrs={"class": "styled-select"}),
     )
 
@@ -140,5 +152,23 @@ class AuditoriaOcorrenciaForm(forms.Form):
             if status != atual:
                 opcoes.append((status, status))
         self.fields["status_ocorrencia"].choices = opcoes
-        if ocorrencia and not ocorrencia.ambulante:
-            self.fields["acao_licenca"].disabled = True
+        if ocorrencia and ocorrencia.infracao:
+            self.fields["infracao"].initial = ocorrencia.infracao
+
+
+class CatalogoInfracaoForm(forms.ModelForm):
+    class Meta:
+        model = CatalogoInfracao
+        fields = ("descricao", "gravidade", "pontos_desconto")
+        widgets = {  # noqa: RUF012
+            "descricao": forms.TextInput(
+                attrs={
+                    "placeholder": "Ex: Venda fora do horário regulamentado",
+                    "class": "form-control",
+                }
+            ),
+            "gravidade": forms.Select(attrs={"class": "styled-select"}),
+            "pontos_desconto": forms.NumberInput(
+                attrs={"min": 0, "class": "form-control"}
+            ),
+        }

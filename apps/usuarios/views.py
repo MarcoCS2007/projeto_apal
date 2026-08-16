@@ -346,15 +346,24 @@ class PainelAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, TemplateView
 
             context.update(resumo_score(ambulante))
             ativa = licenca_ativa(ambulante)
+            licenca_suspensa = (
+                ambulante.licencas.filter(status="Suspenso")
+                .order_by("-data_emissao")
+                .first()
+            )
+            licenca_cred = ativa or licenca_suspensa
+
             qr_liberado = bool(
-                ativa
-                and ativa.qr_valido
+                licenca_cred
+                and licenca_cred.qr_valido
                 and ambulante.codigo_qr_code
                 and validar_codigo_qr(ambulante.codigo_qr_code) is not None
             )
             context["qr_liberado"] = qr_liberado
             context["licenca_ativa"] = ativa
-            context["licenca_credencial"] = ativa if qr_liberado else context["licenca"]
+            context["licenca_credencial"] = (
+                licenca_cred if qr_liberado else context["licenca"]
+            )
             context["historico_licencas"] = list(
                 ambulante.licencas.order_by("-criado_em")
             )

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Gestão de Permissões - Ponto Certo Conquista{% endblock %}
 
@@ -89,6 +89,14 @@
             <div class="input-group">
                 <label for="retencao-logs">Período de Retenção de Logs de Auditoria</label>
                 {{ form.retencao_logs_meses }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="dias-recuperacao-score">Dias Sem Infração Para Recuperar Score</label>
+                {{ form.dias_recuperacao_score }}
+                <small style="color: var(--texto-cinza); display: block; margin-top: 4px;">{{ form.dias_recuperacao_score.help_text }}</small>
             </div>
         </div>
     </div>

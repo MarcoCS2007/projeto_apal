@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from apps.core.models import ModeloBase
 
@@ -31,7 +32,32 @@ TIPO_POR_MOTIVO = {
 }
 
 
+class CatalogoInfracao(ModeloBase):
+    GRAVIDADE_CHOICES = (
+        ("LEVE", "Leve"),
+        ("MEDIA", "Média"),
+        ("GRAVE", "Grave"),
+        ("GRAVISSIMA", "Gravíssima"),
+    )
+    descricao = models.CharField(max_length=255)
+    gravidade = models.CharField(max_length=20, choices=GRAVIDADE_CHOICES)
+    pontos_desconto = models.IntegerField()
+
+    class Meta:
+        verbose_name = "Catálogo de Infração"
+        verbose_name_plural = "Catálogos de Infrações"
+
+    def __str__(self):
+        return f"{self.descricao} - {self.get_gravidade_display()}"
+
+
 class OcorrenciaInspecao(ModeloBase):
+    STATUS_GESTOR_CHOICES = (
+        ("PENDENTE", "Pendente"),
+        ("APROVADA", "Aprovada"),
+        ("REJEITADA", "Rejeitada"),
+    )
+
     fiscal = models.ForeignKey(
         "usuarios.Fiscal",
         on_delete=models.CASCADE,
@@ -54,6 +80,15 @@ class OcorrenciaInspecao(ModeloBase):
         max_length=50,
         choices=StatusOcorrencia.choices,
         default=StatusOcorrencia.REGISTRADA,
+    )
+    infracao = models.ForeignKey(
+        "CatalogoInfracao", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    status_gestor = models.CharField(
+        max_length=20, choices=STATUS_GESTOR_CHOICES, default="PENDENTE"
+    )
+    data_ocorrencia = models.DateTimeField(
+        "Data e Hora da Ocorrência", default=timezone.now
     )
 
     class Meta:

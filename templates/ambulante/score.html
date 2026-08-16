@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Score do Ambulante - Ponto Certo Conquista{% endblock %}
 
@@ -59,24 +59,9 @@
     </div>
 </div>
 
-<div class="form-card" style="margin-bottom: 2rem;">
-    <div class="section-title">
-        <div class="title-accent" style="background-color: #F59E0B;"></div>
-        <h2>Níveis de classificação</h2>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
-        {% for item in faixas %}
-        <div style="background: {{ item.fundo }}; border: {% if item.nome == faixa.nome %}2px{% else %}1px{% endif %} solid {{ item.cor }}; padding: 1.2rem; border-radius: 8px; text-align: center; position: relative;">
-            {% if item.nome == faixa.nome %}
-            <span style="position: absolute; top: -10px; right: 10px; background: {{ item.cor }}; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">SEU NÍVEL</span>
-            {% endif %}
-            <h3 style="color: {{ item.cor }}; margin: 0 0 0.3rem;">{{ item.nome }}</h3>
-            <span style="font-size: 0.85rem; font-weight: 700; color: {{ item.cor }};">{{ item.minimo }} a {{ item.maximo }} pts</span>
-            <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.6rem;">{{ item.descricao }}</p>
-        </div>
-        {% endfor %}
-    </div>
 </div>
+
+{% include "_regras_score.html" %}
 
 <div class="form-card" style="margin-bottom: 2rem;">
     <div class="section-title">

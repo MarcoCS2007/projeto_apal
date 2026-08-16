@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import OcorrenciaInspecao
+from .models import CatalogoInfracao, OcorrenciaInspecao
+
+
+@admin.register(CatalogoInfracao)
+class CatalogoInfracaoAdmin(admin.ModelAdmin):
+    list_display = ("descricao", "gravidade", "pontos_desconto")
+    search_fields = ("descricao",)
+    list_filter = ("gravidade",)
 
 
 @admin.register(OcorrenciaInspecao)

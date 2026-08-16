@@ -221,6 +221,19 @@ class Ambulante(UsuarioBase):
             ]
         )
 
+    @property
+    def nivel_score(self):
+        if self.pontuacao >= 90:
+            return "Diamante"
+        elif self.pontuacao >= 70:
+            return "Ouro"
+        elif self.pontuacao >= 40:
+            return "Prata"
+        elif self.pontuacao >= 1:
+            return "Bronze"
+        else:
+            return "Cassado"
+
 
 class TipoEventoScore(models.TextChoices):
     LICENCA_ATIVA = "licenca_ativa", "Licença em dia"
@@ -325,6 +338,11 @@ class ConfiguracaoSeguranca(ModeloBase):
     retencao_logs_meses = models.PositiveSmallIntegerField(
         default=12,
         choices=RETENCAO_LOGS_CHOICES,
+    )
+    dias_recuperacao_score = models.PositiveSmallIntegerField(
+        default=30,
+        verbose_name="Dias sem infração para recuperar score",
+        help_text="Tempo necessário (em dias) sem infrações para ganhar pontos de recuperação.",
     )
     matriz = models.JSONField(default=matriz_padrao, blank=True)
 

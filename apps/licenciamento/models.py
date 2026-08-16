@@ -289,7 +289,7 @@ class LicencaAlvara(ModeloBase):
     def qr_valido(self):
         from django.utils import timezone
 
-        if self.status != StatusLicenca.ATIVO:
+        if self.status not in (StatusLicenca.ATIVO, StatusLicenca.SUSPENSO):
             return False
         return not (
             self.data_vencimento and self.data_vencimento < timezone.localdate()

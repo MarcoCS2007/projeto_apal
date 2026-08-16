@@ -6,6 +6,7 @@
         {% endif %}
         {% if pode.ocorrencias %}
         <a href="{% url 'gestor_ocorrencias' %}"><i data-lucide="clipboard-list"></i> Ocorrências</a>
+        <a href="{% url 'gestor_infracoes' %}"><i data-lucide="alert-triangle"></i> Infrações</a>
         {% endif %}
         {% if pode.mapa_vagas %}
         <a href="{% url 'gestor_pontos' %}"><i data-lucide="map"></i> Vagas</a>

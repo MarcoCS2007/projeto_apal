@@ -534,25 +534,19 @@ class GestorOcorrenciaDetalheView(PainelGestorMixin, View):
         if not form.is_valid():
             return render(request, self.template_name, self._contexto(ocorrencia, form))
         try:
-            ocorrencia, efeito = auditar_ocorrencia(
+            ocorrencia, _ = auditar_ocorrencia(
                 ocorrencia,
                 form.cleaned_data["status_ocorrencia"],
-                form.cleaned_data.get("acao_licenca") or "",
+                form.cleaned_data.get("infracao"),
             )
         except ValueError as erro:
             messages.error(request, str(erro))
             return render(request, self.template_name, self._contexto(ocorrencia, form))
+
         mensagem = f"Ocorrência #{ocorrencia.pk} atualizada para {ocorrencia.status_ocorrencia}."
-        if efeito == "suspenso":
-            mensagem = (
-                f"Ocorrência #{ocorrencia.pk} marcada como {ocorrencia.status_ocorrencia}. "
-                "A licença do ambulante passou a Suspenso."
-            )
-        elif efeito == "cancelado":
-            mensagem = (
-                f"Ocorrência #{ocorrencia.pk} atualizada. "
-                "A licença do ambulante foi cancelada."
-            )
+        if ocorrencia.status_ocorrencia == "Procedente":
+            mensagem += " O auto foi deferido e a pontuação/licença do ambulante foi recalculada segundo as regras de Score."
+
         messages.success(request, mensagem)
         return redirect("gestor_ocorrencia_detalhe", pk=ocorrencia.pk)
 
@@ -599,3 +593,65 @@ class GestorDossieExportPDFView(PainelGestorMixin, View):
             f'attachment; filename="dossie_{ambulante.cpf}.pdf"'
         )
         return response
+
+
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView
+
+from apps.fiscalizacao.forms import CatalogoInfracaoForm
+from apps.fiscalizacao.models import CatalogoInfracao
+
+
+class GestorProcessarScoreView(PainelGestorMixin, View):
+    modulo_permissao = "solicitacao_licenca"
+
+    def post(self, request):
+        from apps.usuarios.score import verificar_recuperacao_mensal
+
+        afetados = verificar_recuperacao_mensal()
+        messages.success(
+            request,
+            f"Processamento concluído: o score de {afetados} ambulante(s) foi recuperado com base nas regras de tempo sem infração.",
+        )
+        return redirect("backoffice_inicio")
+
+
+class GestorInfracoesView(PainelGestorMixin, ListView):
+    model = CatalogoInfracao
+    template_name = "gestor/infracoes.html"
+    context_object_name = "infracoes"
+    modulo_permissao = "ocorrencias"
+
+
+class GestorInfracaoCreateView(PainelGestorMixin, CreateView):
+    model = CatalogoInfracao
+    form_class = CatalogoInfracaoForm
+    template_name = "gestor/infracao_form.html"
+    success_url = reverse_lazy("gestor_infracoes")
+    modulo_permissao = "ocorrencias"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de infração criado com sucesso!")
+        return super().form_valid(form)
+
+
+class GestorInfracaoUpdateView(PainelGestorMixin, UpdateView):
+    model = CatalogoInfracao
+    form_class = CatalogoInfracaoForm
+    template_name = "gestor/infracao_form.html"
+    success_url = reverse_lazy("gestor_infracoes")
+    modulo_permissao = "ocorrencias"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de infração atualizado com sucesso!")
+        return super().form_valid(form)
+
+
+class GestorInfracaoDeleteView(PainelGestorMixin, View):
+    modulo_permissao = "ocorrencias"
+
+    def post(self, request, pk):
+        infracao = get_object_or_404(CatalogoInfracao, pk=pk)
+        infracao.delete()
+        messages.success(request, "Infração removida com sucesso!")
+        return redirect("gestor_infracoes")

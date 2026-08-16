@@ -207,3 +207,57 @@ def resumo_score(ambulante):
             },
         ],
     }
+
+
+def processar_ocorrencia(ocorrencia_id):
+    try:
+        from apps.fiscalizacao.models import OcorrenciaInspecao
+
+        ocorrencia = OcorrenciaInspecao.objects.select_related(
+            "infracao", "ambulante"
+        ).get(id=ocorrencia_id)
+
+        if (
+            ocorrencia.status_gestor == "APROVADA"
+            and ocorrencia.infracao
+            and ocorrencia.ambulante
+        ):
+            ambulante = ocorrencia.ambulante
+            novo_score = ambulante.pontuacao - ocorrencia.infracao.pontos_desconto
+
+            ambulante.pontuacao = max(0, novo_score)
+            ambulante.save(update_fields=["pontuacao"])
+
+    except Exception as e:  # noqa: BLE001
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao processar ocorrência no score: {e}")
+
+
+def verificar_recuperacao_mensal():
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.fiscalizacao.models import OcorrenciaInspecao
+    from apps.usuarios.models import Ambulante, ConfiguracaoSeguranca
+
+    config = ConfiguracaoSeguranca.carregar()
+    dias = config.dias_recuperacao_score
+    limite_dias = timezone.now() - timedelta(days=dias)
+
+    ambulantes_elegiveis = Ambulante.objects.filter(pontuacao__lt=100)
+    afetados = 0
+
+    for ambulante in ambulantes_elegiveis:
+        teve_ocorrencia_recente = OcorrenciaInspecao.objects.filter(
+            ambulante=ambulante, status_gestor="APROVADA", criado_em__gte=limite_dias
+        ).exists()
+
+        if not teve_ocorrencia_recente:
+            ambulante.pontuacao = min(100, ambulante.pontuacao + 2)
+            ambulante.save(update_fields=["pontuacao"])
+            afetados += 1
+
+    return afetados

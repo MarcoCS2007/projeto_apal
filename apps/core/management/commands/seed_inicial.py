@@ -225,6 +225,7 @@ class Command(BaseCommand):
         self._fiscais()
         pontos = self._pontos()
         self._categorias()
+        self._catalogo_infracoes()
         self._ambulantes(pontos)
         ConfiguracaoSeguranca.carregar()
         self.stdout.write("Configuração global de segurança disponível.")
@@ -766,3 +767,21 @@ class Command(BaseCommand):
         self.stdout.write(
             "  Só conta: Luciana Rocha. Parcial: Pedro Nunes. Inativa: Fátima Oliveira."
         )
+
+    def _catalogo_infracoes(self):
+        from apps.fiscalizacao.models import CatalogoInfracao
+
+        infracoes = [
+            ("Venda fora do horário regulamentado", "Leve", 5),
+            ("Ausência de identificação (Crachá)", "Leve", 5),
+            ("Metragem acima do permitido", "Media", 20),
+            ("Sujeira no local de trabalho", "Media", 20),
+            ("Falta de laudo sanitário", "Grave", 50),
+            ("Venda de produto ilícito", "Gravissima", 100),
+        ]
+        for desc, gravidade, pontos in infracoes:
+            CatalogoInfracao.objects.get_or_create(
+                descricao=desc,
+                defaults={"gravidade": gravidade, "pontos_desconto": pontos},
+            )
+        self.stdout.write(self.style.SUCCESS("Catálogo de Infrações criado."))
