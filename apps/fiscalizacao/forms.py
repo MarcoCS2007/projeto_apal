@@ -227,7 +227,9 @@ class RotaFiscalForm(forms.Form):
             .distinct()
         )
         self.fields["ambulantes"].queryset = (
-            Ambulante.objects.filter(Q(pk__in=ids_ativos) | Q(ponto_pretendido__isnull=False), ativo=True)
+            Ambulante.objects.filter(
+                Q(pk__in=ids_ativos) | Q(ponto_pretendido__isnull=False), ativo=True
+            )
             .select_related("ponto_pretendido")
             .order_by("nome", "sobrenome")
             .distinct()

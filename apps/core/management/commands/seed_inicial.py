@@ -887,9 +887,12 @@ class Command(BaseCommand):
             ).exists():
                 continue
 
-            cat = CategoriaProduto.objects.filter(
-                nome_categoria=item["categoria"]
-            ).first() or categoria
+            cat = (
+                CategoriaProduto.objects.filter(
+                    nome_categoria=item["categoria"]
+                ).first()
+                or categoria
+            )
             estrutura = amb.estruturas.order_by("id").first()
             licenca = LicencaAlvara.objects.create(
                 ambulante=amb,

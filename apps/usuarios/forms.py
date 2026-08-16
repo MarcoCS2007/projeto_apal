@@ -139,7 +139,6 @@ class LoginBackofficeForm(AuthenticationForm):
                     "autocomplete": "username",
                     "autofocus": True,
                 },
-                hint="Use o e-mail institucional ou o CPF com 11 dígitos.",
             )
         ),
     )
@@ -153,7 +152,6 @@ class LoginBackofficeForm(AuthenticationForm):
                     "placeholder": "Digite sua senha",
                     "autocomplete": "current-password",
                 },
-                hint="A senha diferencia maiúsculas e minúsculas.",
             )
         ),
     )

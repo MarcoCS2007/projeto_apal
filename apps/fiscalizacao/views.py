@@ -158,9 +158,7 @@ class RegistrarOcorrenciaView(
                     )
                 except (ValueError, TypeError):
                     try:
-                        vincular_ocorrencia_a_parada(
-                            int(parada_id), ocorrencia, fiscal
-                        )
+                        vincular_ocorrencia_a_parada(int(parada_id), ocorrencia, fiscal)
                     except (ValueError, TypeError):
                         pass
         if retorno_rota:
@@ -190,7 +188,9 @@ class RegistrarOcorrenciaView(
         return consultar_campo(ambulante.cpf)
 
 
-class FiscalRotasView(LoginRequiredMixin, AcessoFiscalMixin, RequerModuloMixin, TemplateView):
+class FiscalRotasView(
+    LoginRequiredMixin, AcessoFiscalMixin, RequerModuloMixin, TemplateView
+):
     template_name = "fiscal/rotas.html"
     login_url = reverse_lazy("fiscal_entrar")
     modulo_permissao = "rotas_fiscais"
@@ -250,7 +250,9 @@ class FiscalRotaExecucaoView(
         try:
             if acao == "iniciar":
                 iniciar_rota(fiscal, pk)
-                messages.success(request, "Rota iniciada. Siga a próxima parada no mapa.")
+                messages.success(
+                    request, "Rota iniciada. Siga a próxima parada no mapa."
+                )
             elif acao == "encerrar":
                 form = EncerrarRotaForm(request.POST)
                 if not form.is_valid():

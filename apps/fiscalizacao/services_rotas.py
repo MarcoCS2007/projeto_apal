@@ -34,7 +34,9 @@ def _ponto_do_ambulante(ambulante):
 
 
 @transaction.atomic
-def criar_rota(gestor, fiscal, titulo, ambulante_ids, data_prevista=None, observacoes=""):
+def criar_rota(
+    gestor, fiscal, titulo, ambulante_ids, data_prevista=None, observacoes=""
+):
     if not isinstance(fiscal, Fiscal):
         fiscal = Fiscal.objects.filter(pk=getattr(fiscal, "pk", None)).first()
     if fiscal is None:
@@ -200,9 +202,7 @@ def resumir_rota(rota):
     sem_ambulante = [
         p
         for p in concluidas
-        if hasattr(p, "visita")
-        and p.visita
-        and not p.visita.encontrou_ambulante
+        if hasattr(p, "visita") and p.visita and not p.visita.encontrou_ambulante
     ]
     com_ocorrencia = [
         p
@@ -238,9 +238,9 @@ def resumo_rotas_agregado(limite=10):
         "paradas__visita", "paradas__ponto", "paradas__ambulante"
     )
     recentes = list(
-        qs.filter(
-            status__in=(StatusRota.CONCLUIDA, StatusRota.INCOMPLETA)
-        ).order_by("-concluida_em", "-criado_em")[:limite]
+        qs.filter(status__in=(StatusRota.CONCLUIDA, StatusRota.INCOMPLETA)).order_by(
+            "-concluida_em", "-criado_em"
+        )[:limite]
     )
     resumos = [resumir_rota(r) for r in recentes]
     concluidas_hoje = qs.filter(

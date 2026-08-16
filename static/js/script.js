@@ -438,7 +438,73 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.header-nav a.active').forEach((link) => {
         link.setAttribute('aria-current', 'page');
     });
-    document.querySelectorAll('#conteudo-principal > .form-success, #conteudo-principal > .login-error').forEach((el) => {
+
+    const navToggle = document.getElementById('nav-toggle');
+    const navBackdrop = document.getElementById('nav-backdrop');
+    const headerNav = document.getElementById('header-nav');
+
+    // Menu mobile configurado no base.html (script dedicado).
+    if (navToggle && navToggle.dataset.menuReady === '1') {
+        // já inicializado
+    } else if (navToggle) {
+    function fecharMenuMobile() {
+        document.documentElement.classList.remove('nav-open');
+        document.body.classList.remove('nav-open');
+        if (navToggle) {
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Abrir menu de navegação');
+        }
+        if (navBackdrop) {
+            navBackdrop.hidden = true;
+            navBackdrop.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function abrirMenuMobile() {
+        document.documentElement.classList.add('nav-open');
+        document.body.classList.add('nav-open');
+        if (navToggle) {
+            navToggle.setAttribute('aria-expanded', 'true');
+            navToggle.setAttribute('aria-label', 'Fechar menu de navegação');
+        }
+        if (navBackdrop) {
+            navBackdrop.hidden = false;
+            navBackdrop.setAttribute('aria-hidden', 'false');
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function alternarMenuMobile() {
+        if (document.body.classList.contains('nav-open')) {
+            fecharMenuMobile();
+        } else {
+            abrirMenuMobile();
+        }
+    }
+
+    navToggle?.addEventListener('click', (e) => {
+        e.preventDefault();
+        alternarMenuMobile();
+    });
+    navBackdrop?.addEventListener('click', fecharMenuMobile);
+    headerNav?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                fecharMenuMobile();
+            }
+        });
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+            fecharMenuMobile();
+        }
+    });
+    window.addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 769px)').matches) {
+            fecharMenuMobile();
+        }
+    });
+    }    document.querySelectorAll('#conteudo-principal > .form-success, #conteudo-principal > .login-error').forEach((el) => {
         const texto = (el.textContent || '').replace(/\s+/g, ' ').trim();
         if (!texto || typeof mostrarToast !== 'function') return;
         mostrarToast(texto, el.classList.contains('form-success') ? 'success' : 'error');

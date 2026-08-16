@@ -1,10 +1,11 @@
 <nav id="header-nav" class="header-nav{% if nav_extra_class %} {{ nav_extra_class }}{% endif %}" aria-label="Principal">
     {% if not user.is_authenticated %}
-    {% if active != "fiscal_login" %}
+    {% if active == "fiscal_login" or active == "gestor_login" or active == "ambulante_login" %}
+    <a href="{% url 'index' %}"><i data-lucide="home"></i> Início</a>
+    {% else %}
     <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
     <a href="{% url 'sobre' %}"{% if active == "sobre" %} class="active"{% endif %}><i data-lucide="info"></i> Sobre</a>
     <a href="{% url 'faq' %}"{% if active == "faq" %} class="active"{% endif %}><i data-lucide="help-circle"></i> Dúvidas</a>
-    <a href="{% url 'entrar' %}"{% if active == "entrar" %} class="active"{% endif %}><i data-lucide="log-in"></i> Entrar</a>
     <details class="nav-inst-menu">
         <summary class="nav-inst-toggle{% if active == 'login' or active == 'fiscal' %} active{% endif %}">
             <i data-lucide="building-2"></i> Área institucional

@@ -8,13 +8,28 @@
 {% endblock %}
 
 {% block hero %}
-<section class="modern-hero">
+<section class="modern-hero home-hero-split" aria-label="Apresentação Ponto Certo Conquista">
+    <div class="home-hero-visual">
+        <div class="home-hero-photo">
+            <img
+                src="{% static 'img/home-ambulante.png' %}"
+                alt="Ambulante vendendo frutas em feira livre"
+                class="home-hero-img"
+                width="1920"
+                height="1080"
+                decoding="async"
+                fetchpriority="high"
+            >
+        </div>
+        <div class="home-hero-fade" aria-hidden="true"></div>
+    </div>
+
     <div class="hero-content-wrapper">
         <h1 class="hero-title">
             O comércio ambulante organizado e <span class="text-highlight-pink">legalizado</span>.
         </h1>
         <p class="hero-description">
-            O sistema Ponto Certo Conquista facilita a solicitação da sua licença, a emissão do seu alvará digital e garante a sua segurança para trabalhar nas ruas de Vitória da Conquista.
+            Solicite a licença, acompanhe o alvará digital e trabalhe com segurança nas ruas de Vitória da Conquista.
         </p>
 
         <div class="hero-buttons">

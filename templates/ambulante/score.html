@@ -16,20 +16,21 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-card" style="margin-bottom: 2rem; border-top: 4px solid {{ faixa.cor }};">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+<div class="form-card score-resumo-card" style="border-top-color: {{ faixa.cor }};">
+    <div class="score-resumo-topo">
         <div>
-            <span style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">Sua pontuação atual</span>
-            <h2 style="font-size: 2.2rem; font-weight: 800; color: #0F172A; margin-top: 2px; display: flex; align-items: baseline; gap: 6px;">
-                {{ pontuacao }} <span style="font-size: 1rem; color: #64748B; font-weight: 600;">/ {{ maximo }} pts</span>
+            <span class="score-resumo-rotulo">Sua pontuação atual</span>
+            <h2 class="score-resumo-pontos">
+                {{ pontuacao }} <span>/ {{ maximo }} pts</span>
             </h2>
         </div>
-        <div style="background: {{ faixa.fundo }}; border: 1.5px solid {{ faixa.cor }}; color: {{ faixa.cor }}; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 800; font-size: 1.05rem;">
+        <div class="score-nivel-badge" style="background: {{ faixa.fundo }}; border-color: {{ faixa.borda|default:faixa.cor }}; color: {{ faixa.cor }};">
+            <i data-lucide="{{ faixa.icone|default:'award' }}" aria-hidden="true"></i>
             Nível {{ faixa.nome }}
         </div>
     </div>
-    <div style="margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">
+    <div class="score-progresso">
+        <div class="score-progresso-meta">
             {% if faixa.proxima %}
             <span>Progresso para o nível {{ faixa.proxima }}</span>
             <span>Faltam {{ faixa.faltam }} pts</span>
@@ -38,40 +39,39 @@
             <span>{{ pontuacao }} / {{ maximo }}</span>
             {% endif %}
         </div>
-        <div style="width: 100%; height: 14px; background-color: #E2E8F0; border-radius: 999px; overflow: hidden; padding: 2px;">
-            <div style="width: {{ faixa.percentual }}%; height: 100%; background: linear-gradient(90deg, {{ faixa.cor }} 0%, #1D4ED8 100%); border-radius: 999px;"></div>
+        <div class="score-progresso-trilha">
+            <div class="score-progresso-barra" style="width: {{ faixa.percentual }}%; background: linear-gradient(90deg, {{ faixa.cor }} 0%, {{ faixa.borda|default:faixa.cor }} 100%);"></div>
         </div>
     </div>
-    <p style="margin: 0; color: #475569;">{{ faixa.descricao }}</p>
+    <p class="score-resumo-descricao">{{ faixa.descricao }}</p>
 </div>
 
-<div class="form-card" style="margin-bottom: 2rem;">
+<div class="form-card">
     <div class="section-title">
         <div class="title-accent"></div>
         <h2>Regras de pontuação</h2>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+    <div class="score-regras-grid">
         {% for regra in regras %}
-        <div style="display: flex; align-items: center; gap: 8px; color: {% if regra.pontos < 0 %}#B42318{% else %}#166534{% endif %};">
+        <div class="score-regra {% if regra.pontos < 0 %}is-negativa{% else %}is-positiva{% endif %}">
+            <i data-lucide="{% if regra.pontos < 0 %}minus-circle{% else %}plus-circle{% endif %}" aria-hidden="true"></i>
             <span>{{ regra.rotulo }}: <strong>{% if regra.pontos > 0 %}+{% endif %}{{ regra.pontos }} pts</strong></span>
         </div>
         {% endfor %}
     </div>
 </div>
 
-</div>
-
 {% include "_regras_score.html" %}
 
-<div class="form-card" style="margin-bottom: 2rem;">
+<div class="form-card">
     <div class="section-title">
-        <div class="title-accent" style="background-color: #8B5CF6;"></div>
+        <div class="title-accent" style="background-color: #0D9488;"></div>
         <h2>Como regularizar</h2>
     </div>
-    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.8rem;">
+    <ul class="score-dicas">
         {% for dica in dicas %}
-        <li style="display: flex; align-items: flex-start; gap: 0.8rem;">
-            <i data-lucide="check-circle-2" style="color: #10B981; width: 20px; height: 20px; margin-top: 2px;"></i>
+        <li>
+            <i data-lucide="check-circle-2" aria-hidden="true"></i>
             <span>{{ dica }}</span>
         </li>
         {% endfor %}
@@ -80,7 +80,7 @@
 
 <div class="form-card">
     <div class="section-title">
-        <div class="title-accent" style="background-color: #2563EB;"></div>
+        <div class="title-accent"></div>
         <h2>Histórico de pontuação</h2>
     </div>
     <div class="table-responsive">
@@ -98,7 +98,7 @@
                 <tr>
                     <td>{{ evento.criado_em|date:"d/m/Y H:i" }}</td>
                     <td>{{ evento.descricao }}</td>
-                    <td style="color: {% if evento.pontos < 0 %}#B42318{% else %}#166534{% endif %}; font-weight: 700;">
+                    <td class="{% if evento.pontos < 0 %}score-pts-neg{% else %}score-pts-pos{% endif %}">
                         {% if evento.pontos > 0 %}+{% endif %}{{ evento.pontos }}
                     </td>
                     <td>{{ evento.saldo_apos }}</td>
