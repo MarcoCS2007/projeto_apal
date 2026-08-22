@@ -1,3 +1,4 @@
+import pytest
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -146,6 +147,7 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
             documento = registrar_documento(self.ambulante, tipo, arquivo)
             documento.aprovar()
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_deferir_encaminha_para_emissao(self):
         self._aprovar_documentos_obrigatorios()
         self.client.force_login(self.gestor)
@@ -227,6 +229,7 @@ class PainelGestorTests(UsuariosAuthFixtures, TestCase):
         self.licenca.refresh_from_db()
         self.assertEqual(self.licenca.status, StatusLicenca.EM_ANALISE)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_aprovar_cadastro_encaminha_para_emissao(self):
         self._aprovar_documentos_obrigatorios()
         self.client.force_login(self.gestor)

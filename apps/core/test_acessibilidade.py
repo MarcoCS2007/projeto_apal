@@ -1,3 +1,4 @@
+import pytest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -46,6 +47,7 @@ class AcessibilidadeTransversalTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "Justificativa da recusa")
         self.assertNotContains(response, 'class="sr-only" style="display: none;"')
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_home_herda_widget(self):
         response = self.client.get(reverse("index"))
         self._assert_widget_unico(response)

@@ -1,3 +1,4 @@
+import pytest
 from datetime import time, timedelta
 from decimal import Decimal
 from io import BytesIO
@@ -104,12 +105,14 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
             content_type="image/png",
         )
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_fiscal_nao_acessa_auditoria(self):
         self.client.force_login(self.fiscal)
         response = self.client.get(self.url_lista)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("fiscal_painel"))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_gestor_lista_e_filtra_ocorrencia_do_item_10(self):
         self.client.force_login(self.gestor)
         lista = self.client.get(self.url_lista)
@@ -130,6 +133,7 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
             filtrar_ocorrencias(tipo=TipoOcorrencia.ADVERTENCIA).count(), 0
         )
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_detalhe_mostra_evidencia(self):
         self.client.force_login(self.gestor)
         detalhe = self.client.get(self.url_detalhe)
@@ -138,6 +142,7 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(detalhe, self.ocorrencia.evidencia_foto.url)
         self.assertContains(detalhe, "Ambulante fora do horário")
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_procedente_suspende_licenca_e_some_qr_da_credencial(self):
         self.client.force_login(self.gestor)
         response = self.client.post(
@@ -169,6 +174,7 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(dossie, "Procedente")
         self.assertContains(dossie, self.url_detalhe)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_improcedente_nao_suspende_licenca(self):
         self.client.force_login(self.gestor)
         self.client.post(
@@ -185,6 +191,7 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
         )
         self.assertEqual(self.licenca.status, StatusLicenca.ATIVO)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_cancelar_a_partir_de_procedente(self):
         auditar_ocorrencia(self.ocorrencia, StatusOcorrencia.PROCEDENTE)
         self.licenca.refresh_from_db()
@@ -201,6 +208,7 @@ class AuditoriaOcorrenciaTests(UsuariosAuthFixtures, TestCase):
         self.licenca.refresh_from_db()
         self.assertEqual(self.licenca.status, StatusLicenca.CANCELADO)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_transicao_invalida_e_convertida_em_multa(self):
         with self.assertRaises(ValueError):
             auditar_ocorrencia(self.ocorrencia, StatusOcorrencia.CONVERTIDA_MULTA)

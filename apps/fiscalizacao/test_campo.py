@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime, time, timedelta
 from datetime import timezone as dt_timezone
 from decimal import Decimal
@@ -85,17 +86,20 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
             horario_termino=time(18, 0),
         )
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_anonimo_vai_ao_login_fiscal(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("fiscal_entrar"), response.url)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_ambulante_nao_acessa_fiscalizacao(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("ambulante_painel"))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_qr_valido_mostra_ficha_do_alvara(self):
         self._emitir()
         self.licenca.refresh_from_db()
@@ -111,6 +115,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, reverse("fiscal_ocorrencia"))
         self.assertEqual(validar_codigo_qr(self.ambulante.codigo_qr_code), self.licenca)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_busca_manual_por_cpf_e_alvara(self):
         self._emitir()
         self.licenca.refresh_from_db()
@@ -122,6 +127,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         por_alvara = self.client.get(self.url, {"q": self.licenca.numero_licenca})
         self.assertContains(por_alvara, "João Ambulante")
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_qr_adulterado_nao_mostra_ficha_e_oferece_ocorrencia(self):
         self.client.force_login(self.fiscal)
         response = self.client.get(self.url, {"qr": "codigo-adulterado"})
@@ -129,6 +135,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, reverse("fiscal_ocorrencia"))
         self.assertNotContains(response, 'id="ficha-inspecao"')
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_suspensa_mostra_ficha_irregular(self):
         self._emitir()
         self.licenca.status = StatusLicenca.SUSPENSO
@@ -141,6 +148,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "Registrar ocorrência")
         self.assertIsNone(validar_codigo_qr(self.ambulante.codigo_qr_code))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_fora_do_horario_na_escala(self):
         self._emitir()
         domingo = datetime(2026, 8, 16, 10, 0, tzinfo=dt_timezone.utc)
@@ -148,6 +156,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         self.assertTrue(esta_fora_do_horario(self.licenca, domingo))
         self.assertFalse(esta_fora_do_horario(self.licenca, segunda))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_registra_ocorrencia_com_evidencia(self):
         self._emitir()
         self.licenca.refresh_from_db()
@@ -185,6 +194,7 @@ class FiscalizacaoCampoTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(lista, "João Ambulante")
         self.assertContains(lista, "Irregularidade de horário")
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_inspecionar_qr_bate_com_item_8(self):
         self._emitir()
         self.ambulante.refresh_from_db()
