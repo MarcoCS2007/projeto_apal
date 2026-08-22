@@ -4,7 +4,11 @@
     <div class="credential-print-stack" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; width: 100%;">
 
         <div class="apal-id-front" style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0;">
+            {% if licenca.status == 'Suspenso' %}
+            <div style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #991B1B 0%, #DC2626 72%, rgba(220,38,38,0.55) 100%); z-index: 1; pointer-events: none;"></div>
+            {% else %}
             <div style="position: absolute; top: -92px; left: -86px; width: 220px; height: 220px; border-radius: 50%; background: linear-gradient(145deg, #1D4ED8 0%, #2563EB 72%, rgba(37,99,235,0.55) 100%); z-index: 1; pointer-events: none;"></div>
+            {% endif %}
             <div style="position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 36px 28px 0 28px;">
                 <div style="font-size: 1.15rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px;">
                     <span style="color: #FF007F;">Ponto Certo</span> <span style="color: #1E3A8A;">Conquista</span>
@@ -22,28 +26,39 @@
                 {% endif %}
             </div>
 
-            <div style="position: absolute; left: 34px; right: 34px; bottom: 66px; z-index: 3; border-left: 4px solid #2563EB; padding-left: 14px;">
+            <div style="position: absolute; left: 34px; right: 34px; bottom: 66px; z-index: 3; border-left: 4px solid {% if licenca.status == 'Suspenso' %}#DC2626{% else %}#2563EB{% endif %}; padding-left: 14px;">
                 <h2 class="id-name" style="margin: 0; font-size: 1.1rem; line-height: 1.12; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
                 {% if ambulante.apelido_nome_fantasia %}
                 <p style="margin: 6px 0 0 0; font-size: 0.82rem; font-weight: 600; color: #475569;">{{ ambulante.apelido_nome_fantasia }}</p>
                 {% endif %}
                 <p class="id-cpf" style="margin: 8px 0 0 0; font-size: 0.88rem; font-weight: 600; color: #0F172A;">
-                    <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_mascarado }}
+                    <strong style="color: {% if licenca.status == 'Suspenso' %}#DC2626{% else %}#2563EB{% endif %}; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_mascarado }}
                 </p>
             </div>
+            
+            {% if licenca.status == 'Suspenso' %}
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: #991B1B; z-index: 3;"></div>
+            <div style="position: absolute; left: 0; right: 0; bottom: 36px; height: 4px; background: #F87171; z-index: 3;"></div>
+            {% else %}
             <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: #1D4ED8; z-index: 3;"></div>
             <div style="position: absolute; left: 0; right: 0; bottom: 36px; height: 4px; background: #FF007F; z-index: 3;"></div>
+            {% endif %}
         </div>
 
         <div class="apal-id-back" style="position: relative; width: 100%; max-width: 330px; height: 500px; border-radius: 24px; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12); overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0;">
+            {% if licenca.status == 'Suspenso' %}
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: linear-gradient(135deg, #991B1B 0%, #DC2626 100%); z-index: 1;"></div>
+            <div style="position: absolute; top: 56px; left: -18px; right: -18px; height: 36px; background: #FFFFFF; border-top: 4px solid #F87171; border-radius: 50% 50% 0 0 / 38% 38% 0 0; z-index: 2;"></div>
+            {% else %}
             <div style="position: absolute; top: 0; left: 0; right: 0; height: 72px; background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%); z-index: 1;"></div>
             <div style="position: absolute; top: 56px; left: -18px; right: -18px; height: 36px; background: #FFFFFF; border-top: 4px solid #FF007F; border-radius: 50% 50% 0 0 / 38% 38% 0 0; z-index: 2;"></div>
+            {% endif %}
 
             <div class="id-back-content id-back-content--qr">
                 <div>
                     <h2 class="id-name" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ ambulante.nome_completo }}</h2>
                     <p class="id-cpf" style="margin: 8px 0 0 0; font-size: 0.88rem; font-weight: 600; color: #0F172A;">
-                        <strong style="color: #2563EB; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_mascarado }}
+                        <strong style="color: {% if licenca.status == 'Suspenso' %}#DC2626{% else %}#2563EB{% endif %}; font-weight: 800;">CPF:</strong> {{ ambulante.cpf_mascarado }}
                     </p>
                 </div>
                 <div class="id-qr-box id-qr-box--large">
@@ -56,10 +71,17 @@
                 </div>
             </div>
 
+            {% if licenca.status == 'Suspenso' %}
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; min-height: 48px; background: #991B1B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 8px 18px; text-align: center; font-size: 0.62rem; line-height: 1.35; font-weight: 600; z-index: 4;">
+                LICENÇA SUSPENSA<br>PROIBIDO OPERAR
+            </div>
+            <div style="position: absolute; left: 0; right: 0; bottom: 48px; height: 4px; background: #F87171; z-index: 4;"></div>
+            {% else %}
             <div style="position: absolute; left: 0; right: 0; bottom: 0; min-height: 48px; background: #1D4ED8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 8px 18px; text-align: center; font-size: 0.62rem; line-height: 1.35; font-weight: 600; z-index: 4;">
                 Prefeitura Municipal<br>Vitória da Conquista
             </div>
             <div style="position: absolute; left: 0; right: 0; bottom: 48px; height: 4px; background: #FF007F; z-index: 4;"></div>
+            {% endif %}
         </div>
     </div>
 
@@ -85,12 +107,23 @@
     Não há credencial válida para apresentar ao fiscal neste momento.
 </p>
 {% if not licenca %}
-<p style="color: #475569;">
+<div class="info-callout-box" style="margin-top: 1.5rem; border-left-color: var(--azul-vibrante); background-color: var(--azul-suave);">
+    <p style="color: var(--azul-escuro); margin-bottom: 1.25rem;">
+        {% if ambulante.cadastro_completo %}
+            Seu perfil já está preenchido. Você precisa enviar a documentação para o requerimento da licença.
+        {% else %}
+            Complete o cadastro socioeconômico e envie os documentos para solicitar sua primeira licença de atuação.
+        {% endif %}
+    </p>
     {% if ambulante.cadastro_completo %}
-        Envie os documentos para abrir o requerimento. Depois da emissão, a credencial aparece aqui.
+        <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none; align-items: center; gap: 0.5rem;">
+            <i data-lucide="file-up"></i> Enviar Documentação
+        </a>
     {% else %}
-        Complete o cadastro socioeconômico e envie os documentos para solicitar a licença.
+        <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none; align-items: center; gap: 0.5rem; background-color: var(--azul-vibrante); border-color: var(--azul-vibrante);">
+            <i data-lucide="edit-3"></i> Completar Cadastro
+        </a>
     {% endif %}
-</p>
+</div>
 {% endif %}
 {% endif %}

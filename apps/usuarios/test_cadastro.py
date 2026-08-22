@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import pytest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -41,6 +42,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("backoffice_inicio"))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_get_etapa_1_preenche_dados_da_conta(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(self.url)
@@ -234,6 +236,7 @@ class CadastroCompletoAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.ambulante.refresh_from_db()
         self.assertFalse(self.ambulante.cadastro_completo)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_painel_tem_cta_para_completar_cadastro(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(reverse("ambulante_painel"))

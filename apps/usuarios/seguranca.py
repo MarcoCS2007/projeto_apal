@@ -13,6 +13,7 @@ MODULOS_PERMISSAO = (
     ("emissao_alvara", "Emissão Direta e Validação de Alvará"),
     ("leitura_qr", "Leitura de QR Code / Validação de Campo"),
     ("ocorrencias", "Lavratura de Autos de Ocorrência / Apreensão"),
+    ("rotas_fiscais", "Criação e Execução de Rotas de Fiscalização"),
     ("relatorios", "Exportação de Relatórios Gerenciais (.CSV / .PDF)"),
 )
 
@@ -22,6 +23,7 @@ CELULAS_EDITAVEIS = {
     "emissao_alvara": frozenset({"gestor"}),
     "leitura_qr": frozenset({"fiscal", "gestor", "cidadao"}),
     "ocorrencias": frozenset({"fiscal", "gestor"}),
+    "rotas_fiscais": frozenset({"fiscal", "gestor"}),
     "relatorios": frozenset({"gestor"}),
 }
 

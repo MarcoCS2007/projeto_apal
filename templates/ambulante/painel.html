@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Painel do Ambulante - Ponto Certo Conquista{% endblock %}
@@ -18,6 +18,22 @@
 
 {% block content %}
 <div class="form-card" style="max-width: 960px; margin: 0 auto;">
+    {% if ambulante.nivel_score == "Prata" %}
+    <div class="info-callout-box" style="background-color: #FEF2F2; border-left-color: #EF4444; margin-bottom: 1.5rem;">
+        <p style="color: #991B1B; margin: 0;">
+            <i data-lucide="alert-triangle" style="vertical-align: middle; margin-right: 5px;"></i>
+            <strong>Atenção (Score Prata):</strong> Sua licença está em observação. Evite novas infrações para não perder o direito de atuar.
+        </p>
+    </div>
+    {% elif ambulante.nivel_score == "Bronze" or ambulante.nivel_score == "Cassado" %}
+    <div class="info-callout-box" style="background-color: #FEF2F2; border-left-color: #DC2626; margin-bottom: 1.5rem;">
+        <p style="color: #991B1B; margin: 0;">
+            <i data-lucide="x-octagon" style="vertical-align: middle; margin-right: 5px;"></i>
+            <strong>Atenção (Score {{ ambulante.nivel_score }}):</strong> Sua licença está <strong>Inválida/Suspensa</strong> devido à sua pontuação. Você não pode operar na rua.
+        </p>
+    </div>
+    {% endif %}
+
     <div class="credential-tabs-nav painel-tabs-grid" role="tablist" aria-label="Seções do painel">
         <a href="{% url 'ambulante_perfil' %}" class="tab-btn" style="text-decoration: none;">
             <i data-lucide="user"></i> Meu perfil

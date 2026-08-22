@@ -438,7 +438,73 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.header-nav a.active').forEach((link) => {
         link.setAttribute('aria-current', 'page');
     });
-    document.querySelectorAll('#conteudo-principal > .form-success, #conteudo-principal > .login-error').forEach((el) => {
+
+    const navToggle = document.getElementById('nav-toggle');
+    const navBackdrop = document.getElementById('nav-backdrop');
+    const headerNav = document.getElementById('header-nav');
+
+    // Menu mobile configurado no base.html (script dedicado).
+    if (navToggle && navToggle.dataset.menuReady === '1') {
+        // já inicializado
+    } else if (navToggle) {
+    function fecharMenuMobile() {
+        document.documentElement.classList.remove('nav-open');
+        document.body.classList.remove('nav-open');
+        if (navToggle) {
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Abrir menu de navegação');
+        }
+        if (navBackdrop) {
+            navBackdrop.hidden = true;
+            navBackdrop.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function abrirMenuMobile() {
+        document.documentElement.classList.add('nav-open');
+        document.body.classList.add('nav-open');
+        if (navToggle) {
+            navToggle.setAttribute('aria-expanded', 'true');
+            navToggle.setAttribute('aria-label', 'Fechar menu de navegação');
+        }
+        if (navBackdrop) {
+            navBackdrop.hidden = false;
+            navBackdrop.setAttribute('aria-hidden', 'false');
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function alternarMenuMobile() {
+        if (document.body.classList.contains('nav-open')) {
+            fecharMenuMobile();
+        } else {
+            abrirMenuMobile();
+        }
+    }
+
+    navToggle?.addEventListener('click', (e) => {
+        e.preventDefault();
+        alternarMenuMobile();
+    });
+    navBackdrop?.addEventListener('click', fecharMenuMobile);
+    headerNav?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                fecharMenuMobile();
+            }
+        });
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+            fecharMenuMobile();
+        }
+    });
+    window.addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 769px)').matches) {
+            fecharMenuMobile();
+        }
+    });
+    }    document.querySelectorAll('#conteudo-principal > .form-success, #conteudo-principal > .login-error').forEach((el) => {
         const texto = (el.textContent || '').replace(/\s+/g, ' ').trim();
         if (!texto || typeof mostrarToast !== 'function') return;
         mostrarToast(texto, el.classList.contains('form-success') ? 'success' : 'error');
@@ -2901,6 +2967,127 @@ if (
         htmx.config.globalViewTransitions = true; 
     }
 
+    // ==========================================
+    // PUBLIC AI WIDGET LOGIC
+    // ==========================================
+    const publicAiFab = document.getElementById('public-ai-fab');
+    const publicAiChat = document.getElementById('public-ai-chat');
+    const publicAiChatClose = document.getElementById('public-ai-chat-close');
+    const publicAiChatForm = document.getElementById('public-ai-chat-form');
+    const publicAiTooltip = document.getElementById('public-ai-tooltip');
+    
+    if (publicAiFab && publicAiChat) {
+        if (publicAiTooltip) {
+            setTimeout(() => {
+                if (publicAiChat.classList.contains('hidden')) {
+                    publicAiTooltip.classList.add('show');
+                    setTimeout(() => {
+                        publicAiTooltip.classList.remove('show');
+                    }, 3000);
+                }
+            }, 1000);
+        }
+
+        publicAiFab.addEventListener('click', () => {
+            if (publicAiTooltip) publicAiTooltip.classList.remove('show');
+            const isHidden = publicAiChat.classList.contains('hidden');
+            publicAiChat.classList.toggle('hidden');
+            publicAiChat.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
+            if (isHidden) {
+                setTimeout(() => {
+                    document.getElementById('public-ai-chat-input')?.focus();
+                }, 300);
+            }
+        });
+        
+        publicAiChatClose?.addEventListener('click', () => {
+            publicAiChat.classList.add('hidden');
+            publicAiChat.setAttribute('aria-hidden', 'true');
+        });
+        
+        if (publicAiChatForm) {
+            publicAiChatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const input = publicAiChatForm.querySelector('#public-ai-chat-input');
+                const body = document.getElementById('public-ai-chat-body');
+                const submitBtn = publicAiChatForm.querySelector('#public-ai-chat-submit');
+                const val = input.value.trim();
+                
+                if (!val) return;
+                
+                input.value = '';
+                // Do not disable input to keep keyboard open on mobile
+                // if (submitBtn) submitBtn.disabled = true;
+                
+                const userMsg = document.createElement('div');
+                userMsg.className = 'assistente-turno';
+                userMsg.innerHTML = `
+                    <div class="assistente-balao pergunta">
+                        <span class="assistente-rotulo">Você</span>
+                        <p>${val.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
+                    </div>
+                `;
+                body.appendChild(userMsg);
+                body.scrollTop = body.scrollHeight;
+                
+                const thinkingMsg = document.createElement('div');
+                thinkingMsg.className = 'assistente-turno';
+                thinkingMsg.id = 'public-ai-thinking';
+                thinkingMsg.innerHTML = `
+                    <div class="assistente-balao resposta assistente-balao-pensando">
+                        <span class="assistente-rotulo">Analisando...</span>
+                        <div class="assistente-pensando"><span></span><span></span><span></span></div>
+                    </div>
+                `;
+                body.appendChild(thinkingMsg);
+                body.scrollTop = body.scrollHeight;
+                
+                let resposta = "Olá! Sou o Assistente Consultor da APAL. Posso te orientar sobre quais bairros possuem maior demanda para o seu produto ou tirar dúvidas sobre a legislação municipal. Como posso te ajudar hoje?";
+                const p = val.toLowerCase();
+                
+                if ((p.includes('onde') || p.includes('melhor lugar') || p.includes('local')) && (p.includes('espetinho') || p.includes('lanche') || p.includes('comida') || p.includes('vender'))) {
+                    resposta = "Analisando os registros do município: Os bairros **Candeias** e **Patagônia** possuem atualmente a menor densidade de vendedores de alimentação cadastrados, representando uma excelente oportunidade de faturamento. Evite o **Centro**, que já conta com alta saturação.";
+                } else if ((p.includes('olivia flores') || p.includes('olívia flores') || p.includes('candeias') || p.includes('centro')) && (p.includes('o que vender') || p.includes('produto'))) {
+                    resposta = "Na **Av. Olívia Flores**, já temos alta concentração de barracas de alimentação e bebidas. Recomendamos investir em segmentos com demanda reprimida no local, como **Artesanato** e **Artigos Sazonais**.";
+                } else if (p.includes('taxa') || p.includes('alvara') || p.includes('alvará') || p.includes('documento') || p.includes('atestado')) {
+                    resposta = "Para obter o alvará provisório, você precisará apresentar RG/CPF, comprovante de residência e laudo sanitário (apenas para comércio de alimentos). O processo pode ser iniciado 100% online pela nossa aba de cadastro.";
+                }
+                
+                resposta = resposta.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                
+                setTimeout(() => {
+                    const thinking = document.getElementById('public-ai-thinking');
+                    if (thinking) thinking.remove();
+                    
+                    const sysMsg = document.createElement('div');
+                    sysMsg.className = 'assistente-turno';
+                    sysMsg.innerHTML = `
+                        <div class="assistente-balao resposta">
+                            <span class="assistente-rotulo">Assistente Consultor APAL</span>
+                            <p>${resposta}</p>
+                        </div>
+                    `;
+                    body.appendChild(sysMsg);
+                    body.scrollTop = body.scrollHeight;
+                    
+                    // input.disabled = false;
+                    // if (submitBtn) submitBtn.disabled = false;
+                    input.focus();
+                }, 1200 + Math.random() * 600);
+            });
+            
+            const chatInput = publicAiChatForm.querySelector('#public-ai-chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        publicAiChatForm.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
+                    }
+                });
+            }
+        }
+    }
+
 // ==========================================
 // FIM DO DOMContentLoaded (ÚNICO)
 // ==========================================
@@ -3091,3 +3278,378 @@ function preencherDocumentoOficial() {
 
 });
 
+// ==========================================
+// NOTIFICAÇÕES INTELIGENTES (OFFCANVAS)
+// ==========================================
+(function () {
+    const btnNavBells = document.querySelectorAll('.btn-notificacoes, .btn-notificacoes-trigger');
+    const panelNotif = document.getElementById('painel-notificacoes');
+    const btnCloseNotif = document.getElementById('close-notificacoes');
+    const backdropNotif = document.getElementById('notificacoes-backdrop');
+
+    if (btnNavBells.length > 0 && panelNotif && btnCloseNotif && backdropNotif) {
+        function openNotif() {
+            panelNotif.classList.add('open');
+            backdropNotif.style.display = 'block';
+            setTimeout(() => { 
+                backdropNotif.hidden = false; 
+                backdropNotif.setAttribute('aria-hidden', 'false'); 
+            }, 10);
+            btnNavBells.forEach(btn => btn.setAttribute('aria-expanded', 'true'));
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeNotif() {
+            panelNotif.classList.remove('open');
+            backdropNotif.hidden = true;
+            backdropNotif.setAttribute('aria-hidden', 'true');
+            setTimeout(() => { backdropNotif.style.display = 'none'; }, 300);
+            btnNavBells.forEach(btn => btn.setAttribute('aria-expanded', 'false'));
+        }
+
+        btnNavBells.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (panelNotif.classList.contains('open')) {
+                    closeNotif();
+                } else {
+                    openNotif();
+                }
+            });
+        });
+
+        btnCloseNotif.addEventListener('click', closeNotif);
+        backdropNotif.addEventListener('click', closeNotif);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && panelNotif.classList.contains('open')) {
+                closeNotif();
+            }
+        });
+    }
+
+    // Funcionalidades dos botões dentro da notificação
+    const btnSolicitarVaga = document.getElementById('btn-solicitar-vaga');
+    if (btnSolicitarVaga) {
+        btnSolicitarVaga.addEventListener('click', function() {
+            this.textContent = 'Solicitação enviada';
+            this.disabled = true;
+            this.style.backgroundColor = 'var(--sucesso)';
+            this.style.borderColor = 'var(--sucesso)';
+            this.style.color = 'var(--branco)';
+        });
+    }
+
+    // Leitura do texto educativo (Acessibilidade)
+    const btnOuvirMulta = document.getElementById('btn-ouvir-multa');
+    const txtEduca = document.getElementById('texto-educativo-multa');
+    if (btnOuvirMulta && txtEduca) {
+        btnOuvirMulta.addEventListener('click', function(e) {
+            e.preventDefault();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Para qualquer leitura anterior
+                const utterThis = new SpeechSynthesisUtterance(txtEduca.innerText || txtEduca.textContent);
+                utterThis.lang = 'pt-BR';
+                utterThis.rate = 1.0;
+                window.speechSynthesis.speak(utterThis);
+            } else {
+                alert('Seu navegador não suporta a funcionalidade de leitura em voz alta.');
+            }
+        });
+    }
+
+    // ==========================================
+    // RADAR DE OPORTUNIDADES & ZONEAMENTO INTELIGENTE
+    // ==========================================
+    const catSelect = document.getElementById('categoria-pretendida');
+    const pontoSelect = document.getElementById('ponto-pretendido');
+    
+    if (catSelect && pontoSelect) {
+        // 1. Armazena o texto original de cada opção do select de Ponto/Bairro
+        Array.from(pontoSelect.options).forEach(opt => {
+            if (opt.value) {
+                opt.dataset.originalText = opt.text;
+            }
+        });
+
+        // 2. Cria dinamicamente o card de Feedback (Fast-Track)
+        const fastTrackBox = document.createElement('div');
+        fastTrackBox.className = 'info-callout-box fast-track-badge';
+        fastTrackBox.style.display = 'none';
+        fastTrackBox.style.marginTop = '0.75rem';
+        fastTrackBox.style.backgroundColor = '#ECFDF5'; // Fundo verde claro
+        fastTrackBox.style.borderLeftColor = '#10B981'; // Borda esmeralda
+        fastTrackBox.style.color = '#065F46'; // Texto verde escuro
+        fastTrackBox.style.fontSize = '0.85rem';
+        fastTrackBox.style.animation = 'fadeInDown 0.4s ease';
+        fastTrackBox.innerHTML = `<strong>🚀 Vantagem Econômica:</strong> Optar por áreas de baixa concorrência qualifica seu pedido para a Triagem Prioritária da prefeitura.`;
+        
+        pontoSelect.parentElement.appendChild(fastTrackBox);
+
+        // 3. Ouve as mudanças na Categoria para aplicar o Semáforo de Mercado
+        catSelect.addEventListener('change', () => {
+            const catName = catSelect.options[catSelect.selectedIndex].text.toLowerCase();
+            
+            Array.from(pontoSelect.options).forEach(opt => {
+                if (!opt.value) return; // ignora o 'Selecione...'
+                
+                const orig = opt.dataset.originalText;
+                const lowerOrig = orig.toLowerCase();
+                
+                // Reseta o texto
+                opt.text = orig;
+                
+                // Simulação MOCK baseada no pedido
+                if (catName.includes('vestuário') || catName.includes('confecç')) {
+                    if (lowerOrig.includes('candeias') || lowerOrig.includes('patagônia')) {
+                        opt.text = `🟢 ${orig} (Recomendado - Alta Demanda)`;
+                    } else if (lowerOrig.includes('brasil')) {
+                        opt.text = `🟡 ${orig} (Atenção - Mercado Estável)`;
+                    } else if (lowerOrig.includes('centro') || lowerOrig.includes('comercial') || lowerOrig.includes('praça')) {
+                        opt.text = `🔴 ${orig} (Saturado - Fila de Espera)`;
+                    } else {
+                        opt.text = `🟡 ${orig} (Atenção)`;
+                    }
+                } else if (catName.includes('alimentação') || catName.includes('lanche')) {
+                    if (lowerOrig.includes('brasil')) {
+                        opt.text = `🟢 ${orig} (Recomendado - Poucos Vendedores)`;
+                    } else if (lowerOrig.includes('candeias')) {
+                        opt.text = `🟡 ${orig} (Atenção - Concorrência Média)`;
+                    } else if (lowerOrig.includes('olívia') || lowerOrig.includes('centro') || lowerOrig.includes('praça')) {
+                        opt.text = `🔴 ${orig} (Saturado - Alta Concorrência)`;
+                    } else {
+                        opt.text = `🟡 ${orig} (Atenção)`;
+                    }
+                } else {
+                    // Para outras categorias genéricas, simula randomicamente baseado no ID
+                    const idVal = parseInt(opt.value, 10);
+                    if (idVal % 3 === 0) {
+                        opt.text = `🟢 ${orig} (Recomendado - Baixa Concorrência)`;
+                    } else if (idVal % 2 === 0) {
+                        opt.text = `🔴 ${orig} (Saturado - Alta Concorrência)`;
+                    } else {
+                        opt.text = `🟡 ${orig} (Mercado Estável)`;
+                    }
+                }
+            });
+            
+            // Re-avalia se a opção atualmente selecionada ganha o badge
+            pontoSelect.dispatchEvent(new Event('change'));
+        });
+
+        // 4. Ouve as mudanças no Ponto/Bairro para mostrar o card Fast-Track
+        pontoSelect.addEventListener('change', () => {
+            const selectedOpt = pontoSelect.options[pontoSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.text.includes('🟢')) {
+                fastTrackBox.style.display = 'block';
+            } else {
+                fastTrackBox.style.display = 'none';
+            }
+        });
+        
+        // Executa uma vez no carregamento para colorir opções se já tiver categoria selecionada
+        if (catSelect.value) {
+            catSelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+})();
+
+// ==========================================
+// PREENCHIMENTO ASSISTIDO POR IA (MOCK)
+// ==========================================
+(function() {
+    const txtAssistente = document.getElementById('texto-ia-assistente');
+    const btnAplicarIA = document.getElementById('btn-aplicar-ia');
+    const btnVozIA = document.getElementById('btn-voz-ia');
+
+    if (!txtAssistente) return;
+
+    // Base de Mapeamento Semântico
+    const dicCategorias = {
+        'fixo': ['fixo', 'parado', 'praça', 'esquina', 'quiosque'],
+        'movel': ['andando', 'caminhando', 'rua', 'praia', 'carrinho', 'bicicleta', 'itinerante'],
+        'eventual': ['festa', 'show', 'evento', 'festival', 'parque', 'temporário', 'eventual']
+    };
+
+    const dicEstruturas = {
+        'carrinho': ['carrinho', 'carroça', 'bike', 'bicicleta', 'triciclo'],
+        'banca': ['banca', 'barraca', 'lona', 'desmontável', 'mesa', 'tenda', 'chão', 'toldo'],
+        'tabuleiro': ['tabuleiro', 'caixa', 'isopor', 'bacia'],
+        'veiculo': ['food truck', 'carro', 'kombi', 'van', 'fiorino', 'porta-mala', 'veículo', 'reboque']
+    };
+
+    const dicBairros = ['candeias', 'centro', 'patagônia', 'olívia flores', 'brasil', 'alto maron', 'ibirapuera', 'recreio'];
+
+    function preencherCampo(seletor, valorDesejado) {
+        let campo = document.querySelector(`select[name="${seletor}"]`) || document.querySelector(`input[name="${seletor}"]`) || document.querySelector(`textarea[name="${seletor}"]`);
+        if (!campo) return false;
+
+        let alterado = false;
+
+        if (campo.tagName.toLowerCase() === 'select') {
+            for (let i = 0; i < campo.options.length; i++) {
+                if (campo.options[i].text.toLowerCase().includes(valorDesejado.toLowerCase()) || campo.options[i].value.toLowerCase() === valorDesejado.toLowerCase()) {
+                    campo.selectedIndex = i;
+                    alterado = true;
+                    break;
+                }
+            }
+        } else {
+            campo.value = valorDesejado;
+            alterado = true;
+        }
+
+        if (alterado) {
+            campo.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            // Adiciona classe de destaque visual (CSS)
+            campo.classList.add('campo-ia-destaque');
+            
+            const parent = campo.parentElement;
+            if (parent && !parent.querySelector('.badge-ia')) {
+                parent.style.position = 'relative';
+                const badge = document.createElement('span');
+                badge.className = 'badge-ia';
+                badge.innerHTML = '<i data-lucide="sparkles" style="width: 12px; height: 12px;"></i> Sugerido pela IA';
+                parent.appendChild(badge);
+                if (window.lucide) lucide.createIcons();
+            }
+
+            // Remove o destaque após 4 segundos para focar na UX fluida
+            setTimeout(() => {
+                campo.classList.remove('campo-ia-destaque');
+                const badge = parent.querySelector('.badge-ia');
+                if (badge) badge.remove();
+            }, 4000);
+            
+            return true;
+        }
+        return false;
+    }
+
+    function processarTextoIA() {
+        const texto = txtAssistente.value.toLowerCase();
+        if (!texto.trim()) return;
+
+        btnAplicarIA.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Processando...';
+        btnAplicarIA.disabled = true;
+        if (window.lucide) lucide.createIcons();
+
+        // Simulando delay síncrono para UX de carregamento da IA
+        setTimeout(() => {
+            // Processa e preenche Categoria (Tipo de Comércio)
+            for (const [categoria, keywords] of Object.entries(dicCategorias)) {
+                if (keywords.some(kw => texto.includes(kw))) {
+                    preencherCampo('tipo_atuacao', categoria);
+                    break;
+                }
+            }
+
+            // Processa e preenche Estrutura
+            for (const [estrutura, keywords] of Object.entries(dicEstruturas)) {
+                if (keywords.some(kw => texto.includes(kw))) {
+                    preencherCampo('tipo_estrutura', estrutura);
+                    break;
+                }
+            }
+            
+            // Processa Metragem
+            let matchMetragem = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:metros quadrados|metros|m²|m2|m)/);
+            if (matchMetragem) {
+                preencherCampo('dimensoes_metragem', matchMetragem[1].replace(',', '.'));
+            } else if (texto.length > 5) {
+                // Se não encontrar metragem mas tiver texto, chuta um padrão pequeno
+                preencherCampo('dimensoes_metragem', '2.00');
+            }
+
+            // Processa Bairro (mesmo estando em etapas anteriores, simulamos no localStorage)
+            let bairroEncontrado = dicBairros.find(b => texto.includes(b));
+            if (bairroEncontrado) {
+                let bairroFormatado = bairroEncontrado.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                // Tenta preencher no DOM, se disponível
+                preencherCampo('bairro', bairroFormatado);
+                
+                // Grava no Rascunho para refletir no backend ou stepper caso não esteja no DOM
+                try {
+                    const salvo = JSON.parse(localStorage.getItem('apal_cadastro_rascunho') || '{}');
+                    salvo['id_bairro'] = bairroFormatado; 
+                    localStorage.setItem('apal_cadastro_rascunho', JSON.stringify(salvo));
+                } catch(e) {}
+            }
+
+            // Preenche sempre o campo de descrição
+            preencherCampo('descricao', txtAssistente.value);
+
+            // Restaura o botão
+            btnAplicarIA.innerHTML = '<i data-lucide="check" style="color: var(--sucesso);"></i> Sucesso';
+            btnAplicarIA.style.borderColor = 'var(--sucesso)';
+            btnAplicarIA.style.color = 'var(--sucesso)';
+            if (window.lucide) lucide.createIcons();
+            
+            setTimeout(() => {
+                btnAplicarIA.disabled = false;
+                btnAplicarIA.innerHTML = '<i data-lucide="wand-2"></i> Aplicar à proposta';
+                btnAplicarIA.style.borderColor = 'var(--azul-vibrante)';
+                btnAplicarIA.style.color = 'var(--azul-vibrante)';
+                if (window.lucide) lucide.createIcons();
+            }, 3000);
+
+        }, 800); 
+    }
+
+    // Escuta evento de desfoque
+    txtAssistente.addEventListener('blur', () => {
+        if (txtAssistente.value.trim().length > 10) {
+            processarTextoIA();
+        }
+    });
+
+    // Escuta clique no botão
+    btnAplicarIA.addEventListener('click', processarTextoIA);
+
+    // Integração Web Speech API (Voz)
+    if (btnVozIA) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                btnVozIA.innerHTML = '<i data-lucide="mic" style="color: #EF4444;"></i> Ouvindo...';
+                btnVozIA.style.borderColor = '#EF4444';
+                if (window.lucide) lucide.createIcons();
+            };
+
+            recognition.onresult = function(event) {
+                const transcricao = event.results[0][0].transcript;
+                txtAssistente.value = transcricao;
+                processarTextoIA(); // Auto-aplica após falar
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Erro de reconhecimento de voz:', event.error);
+                restaurarBotaoVoz();
+            };
+
+            recognition.onend = function() {
+                restaurarBotaoVoz();
+            };
+
+            function restaurarBotaoVoz() {
+                btnVozIA.innerHTML = '<i data-lucide="mic"></i> Falar por voz';
+                btnVozIA.style.borderColor = 'var(--borda-cinza)';
+                if (window.lucide) lucide.createIcons();
+            }
+
+            btnVozIA.addEventListener('click', () => {
+                recognition.start();
+            });
+        } else {
+            // Ocultar se o browser não suportar
+            btnVozIA.style.display = 'none';
+        }
+    }
+})();

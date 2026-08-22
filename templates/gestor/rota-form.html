@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nova rota - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="rotas" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Criar rota de fiscalização</h1>
+        <p>Escolha o fiscal, as paradas e, se quiser, aceite a sugestão do copiloto.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="fiscal-grid">
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Dados da rota</h2>
+        </div>
+        <p style="margin: 0 0 1rem;">
+            <a href="{% url 'gestor_rotas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar às rotas
+            </a>
+        </p>
+        <form method="post" class="registration-form" id="form-nova-rota">
+            {% csrf_token %}
+            <div class="input-group full-width">
+                <label for="id_titulo">{{ form.titulo.label }}</label>
+                {{ form.titulo }}
+                {% if form.titulo.errors %}<small class="form-error">{{ form.titulo.errors.0 }}</small>{% endif %}
+            </div>
+            <div class="input-group full-width">
+                <label for="id_fiscal">{{ form.fiscal.label }}</label>
+                {{ form.fiscal }}
+                {% if form.fiscal.errors %}<small class="form-error">{{ form.fiscal.errors.0 }}</small>{% endif %}
+            </div>
+            <div class="input-group full-width">
+                <label for="id_data_prevista">{{ form.data_prevista.label }}</label>
+                {{ form.data_prevista }}
+            </div>
+            <div class="input-group full-width">
+                <label>{{ form.ambulantes.label }}</label>
+                <div class="rota-ambulantes-lista custom-scrollbar" id="lista-ambulantes">
+                    {% for choice in form.ambulantes %}
+                    <label class="rota-ambulante-opcao">{{ choice.tag }} <span>{{ choice.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+                {% if form.ambulantes.errors %}<small class="form-error">{{ form.ambulantes.errors.0 }}</small>{% endif %}
+            </div>
+            <div class="input-group full-width">
+                <label for="id_observacoes_gestor">{{ form.observacoes_gestor.label }}</label>
+                {{ form.observacoes_gestor }}
+            </div>
+            <button type="submit" class="btn-submit" style="width: 100%; margin-top: 1rem;">
+                <i data-lucide="send"></i> Atribuir rota ao fiscal
+            </button>
+        </form>
+    </div>
+
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #10B981;"></div>
+            <h2>Sugestão do copiloto</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1rem;">
+            Mock de demonstração: ambulantes com licença ativa e ponto georreferenciado em Conquista.
+        </p>
+        <button type="button" class="btn-action" id="btn-sugerir-copiloto" style="width: 100%; margin-bottom: 1.25rem; display: inline-flex; justify-content: center; gap: 8px;">
+            <i data-lucide="bot"></i> Atualizar sugestão
+        </button>
+        <ul class="rota-sugestoes" id="lista-sugestoes">
+            {% for item in sugestoes %}
+            <li>
+                <button type="button" class="rota-sugestao-item" data-ambulante-id="{{ item.ambulante_id }}">
+                    <strong>{{ item.nome }}</strong>
+                    <small>{{ item.ponto }} · {{ item.bairro }}</small>
+                    <span>{{ item.motivo }}</span>
+                </button>
+            </li>
+            {% empty %}
+            <li style="color: var(--texto-cinza);">Nenhuma sugestão disponível. Cadastre ambulantes com alvará ativo.</li>
+            {% endfor %}
+        </ul>
+        <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 1rem;">
+            Clique em uma sugestão para marcar o ambulante na lista ao lado.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const lista = document.getElementById("lista-ambulantes");
+    const sugestoes = document.getElementById("lista-sugestoes");
+    const btn = document.getElementById("btn-sugerir-copiloto");
+
+    function marcarAmbulante(id) {
+        if (!lista) return;
+        const input = lista.querySelector('input[value="' + id + '"]');
+        if (input) {
+            input.checked = true;
+            input.closest("label")?.classList.add("selecionado");
+        }
+    }
+
+    sugestoes?.addEventListener("click", function (ev) {
+        const btnItem = ev.target.closest("[data-ambulante-id]");
+        if (!btnItem) return;
+        marcarAmbulante(btnItem.dataset.ambulanteId);
+    });
+
+    btn?.addEventListener("click", function () {
+        btn.disabled = true;
+        fetch("{% url 'gestor_rotas_sugerir' %}")
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                sugestoes.innerHTML = "";
+                (data.sugeridos || []).forEach(function (item) {
+                    const li = document.createElement("li");
+                    li.innerHTML =
+                        '<button type="button" class="rota-sugestao-item" data-ambulante-id="' +
+                        item.ambulante_id +
+                        '"><strong>' +
+                        item.nome +
+                        "</strong><small>" +
+                        (item.ponto || "") +
+                        " · " +
+                        (item.bairro || "") +
+                        "</small><span>" +
+                        (item.motivo || "") +
+                        "</span></button>";
+                    sugestoes.appendChild(li);
+                    marcarAmbulante(item.ambulante_id);
+                });
+                if (window.lucide) window.lucide.createIcons();
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
+    });
+})();
+</script>
+{% endblock %}

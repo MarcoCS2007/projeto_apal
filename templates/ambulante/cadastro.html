@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Cadastro e Regularização de Ambulante - Ponto Certo Conquista{% endblock %}
@@ -313,6 +313,30 @@
                 <div class="title-accent"></div>
                 <h2>4. Forma de Atuação e Equipamento</h2>
             </div>
+            
+            <!-- Bloco de Entrada Assistida (IA) -->
+            <div class="info-callout-box" style="background-color: var(--azul-suave); border-left: 4px solid var(--azul-vibrante); padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-sm);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i data-lucide="sparkles" style="color: var(--azul-vibrante);"></i>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--azul-escuro); font-weight: 700;">Assistente de Cadastro Inteligente</h3>
+                </div>
+                <p style="color: var(--texto-cinza); font-size: 0.9rem; margin-bottom: 1rem;">
+                    Descreva com suas palavras o que você vai vender e como pretende trabalhar. Nós preenchemos o formulário para você.
+                </p>
+                <div class="input-group full-width" style="margin-bottom: 1rem;">
+                    <textarea id="texto-ia-assistente" rows="3" placeholder="Ex: Vou vender espetinho de carne numa barraquinha de lona na Praça do Candeias..." style="resize: vertical; border-color: var(--borda-cinza);"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button type="button" id="btn-aplicar-ia" class="btn-action" style="background-color: var(--branco); border-color: var(--azul-vibrante); color: var(--azul-vibrante);">
+                        <i data-lucide="wand-2"></i> Aplicar à proposta
+                    </button>
+                    <button type="button" id="btn-voz-ia" class="btn-action" style="background-color: var(--branco); border-color: var(--borda-cinza); color: var(--texto-cinza);">
+                        <i data-lucide="mic"></i> Falar por voz
+                    </button>
+                </div>
+            </div>
+            <!-- Fim do Bloco IA -->
+
             <div class="form-row">
                 <div class="input-group">
                     <label for="tipo-comercio">Tipo de Comércio <span class="required-marker">*</span></label>

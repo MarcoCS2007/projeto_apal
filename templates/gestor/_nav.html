@@ -1,16 +1,6 @@
 <nav id="header-nav" class="header-nav" aria-label="Principal">
     <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
-    {% if active == "painel" %}
-        {% if pode.relatorios %}
-        <a href="{% url 'relatorios:dashboard' %}"><i data-lucide="bar-chart-3"></i> Relatórios</a>
-        {% endif %}
-        {% if pode.ocorrencias %}
-        <a href="{% url 'gestor_ocorrencias' %}"><i data-lucide="clipboard-list"></i> Ocorrências</a>
-        {% endif %}
-        {% if pode.mapa_vagas %}
-        <a href="{% url 'gestor_pontos' %}"><i data-lucide="map"></i> Vagas</a>
-        {% endif %}
-    {% endif %}
+    <a href="{% url 'gestor_assistente' %}"{% if active == "assistente" %} class="active"{% endif %}><i data-lucide="bot"></i> Assistente</a>
     <form action="{% url 'logout' %}" method="post" style="display: inline;">
         {% csrf_token %}
         <button type="submit" class="btn-logout">

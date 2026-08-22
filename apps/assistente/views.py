@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from apps.usuarios.models import Ambulante
-from apps.usuarios.views import AcessoAmbulanteMixin
+from apps.usuarios.views import AcessoAmbulanteMixin, AcessoBackofficeMixin
 
 from .forms import PerguntaAssistenteForm
 from .models import LogAssistente
@@ -34,3 +34,10 @@ class AssistenteAmbulanteView(LoginRequiredMixin, AcessoAmbulanteMixin, FormView
         context["historico"] = historico
         context["sugestoes"] = SUGESTOES_ASSISTENTE
         return context
+
+
+class AssistenteGestorView(LoginRequiredMixin, AcessoBackofficeMixin, TemplateView):
+    """Demo de interface do copiloto do gestor (respostas hardcoded no front)."""
+
+    template_name = "gestor/assistente.html"
+    login_url = reverse_lazy("login")

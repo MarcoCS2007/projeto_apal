@@ -1,9 +1,11 @@
 from django import forms
+from django.db.models import Q
+from django.utils import timezone
 
 from apps.usuarios.forms import normalizar_cpf
 from apps.usuarios.models import Ambulante
 
-from .models import StatusOcorrencia, TipoOcorrencia
+from .models import CatalogoInfracao, StatusOcorrencia, TipoOcorrencia
 from .services import transicoes_permitidas
 
 
@@ -63,6 +65,20 @@ class OcorrenciaForm(forms.Form):
             attrs={"accept": "image/*", "capture": "environment"}
         ),
     )
+    infracao = forms.ModelChoiceField(
+        queryset=CatalogoInfracao.objects.all(),
+        required=False,
+        label="Catálogo de Infração",
+        empty_label="Selecione a infração (opcional)",
+    )
+    data_ocorrencia = forms.DateTimeField(
+        label="Data e Hora da Ocorrência",
+        required=False,
+        initial=timezone.now,
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
+    )
 
     def clean(self):
         dados = super().clean()
@@ -119,14 +135,11 @@ class AuditoriaOcorrenciaForm(forms.Form):
         label="Status do auto",
         widget=forms.Select(attrs={"class": "styled-select"}),
     )
-    acao_licenca = forms.ChoiceField(
+    infracao = forms.ModelChoiceField(
+        queryset=CatalogoInfracao.objects.all(),
         required=False,
-        label="Efeito na licença",
-        choices=[
-            ("", "Seguir a regra do status (suspender se procedente)"),
-            ("suspender", "Suspender licença ativa"),
-            ("cancelar", "Cancelar licença"),
-        ],
+        label="Penalidade Aplicada",
+        empty_label="Nenhuma (ou manter a original)",
         widget=forms.Select(attrs={"class": "styled-select"}),
     )
 
@@ -140,5 +153,145 @@ class AuditoriaOcorrenciaForm(forms.Form):
             if status != atual:
                 opcoes.append((status, status))
         self.fields["status_ocorrencia"].choices = opcoes
-        if ocorrencia and not ocorrencia.ambulante:
-            self.fields["acao_licenca"].disabled = True
+        if ocorrencia and ocorrencia.infracao:
+            self.fields["infracao"].initial = ocorrencia.infracao
+
+
+class CatalogoInfracaoForm(forms.ModelForm):
+    class Meta:
+        model = CatalogoInfracao
+        fields = ("descricao", "gravidade", "pontos_desconto")
+        widgets = {  # noqa: RUF012
+            "descricao": forms.TextInput(
+                attrs={
+                    "placeholder": "Ex: Venda fora do horário regulamentado",
+                    "class": "form-control",
+                }
+            ),
+            "gravidade": forms.Select(attrs={"class": "styled-select"}),
+            "pontos_desconto": forms.NumberInput(
+                attrs={"min": 0, "class": "form-control"}
+            ),
+        }
+
+
+class RotaFiscalForm(forms.Form):
+    titulo = forms.CharField(
+        label="Título da rota",
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Ex: Ronda Centro — manhã",
+                "class": "form-control",
+            }
+        ),
+    )
+    fiscal = forms.ModelChoiceField(
+        label="Fiscal responsável",
+        queryset=None,
+        widget=forms.Select(attrs={"class": "styled-select"}),
+    )
+    data_prevista = forms.DateField(
+        label="Data prevista",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+    )
+    ambulantes = forms.ModelMultipleChoiceField(
+        label="Ambulantes / paradas",
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    observacoes_gestor = forms.CharField(
+        label="Observações para o fiscal",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": "Orientações de prioridade, horários ou pontos críticos.",
+                "class": "form-control",
+            }
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        from apps.licenciamento.models import LicencaAlvara, StatusLicenca
+        from apps.usuarios.models import Fiscal
+
+        super().__init__(*args, **kwargs)
+        self.fields["fiscal"].queryset = Fiscal.objects.filter(ativo=True).order_by(
+            "nome", "sobrenome"
+        )
+        ids_ativos = (
+            LicencaAlvara.objects.filter(status=StatusLicenca.ATIVO)
+            .values_list("ambulante_id", flat=True)
+            .distinct()
+        )
+        self.fields["ambulantes"].queryset = (
+            Ambulante.objects.filter(
+                Q(pk__in=ids_ativos) | Q(ponto_pretendido__isnull=False), ativo=True
+            )
+            .select_related("ponto_pretendido")
+            .order_by("nome", "sobrenome")
+            .distinct()
+        )
+
+
+class RegistroVisitaForm(forms.Form):
+    encontrou_ambulante = forms.TypedChoiceField(
+        label="Encontrou o ambulante?",
+        choices=((True, "Sim"), (False, "Não")),
+        coerce=lambda v: str(v).lower() in ("true", "1", "sim"),
+        widget=forms.RadioSelect(attrs={"class": "rota-radio-opcao"}),
+    )
+    foi_recebido = forms.TypedChoiceField(
+        label="Foi recebido?",
+        choices=((True, "Sim"), (False, "Não")),
+        coerce=lambda v: str(v).lower() in ("true", "1", "sim"),
+        required=False,
+        widget=forms.RadioSelect(attrs={"class": "rota-radio-opcao"}),
+    )
+    houve_ocorrencia = forms.TypedChoiceField(
+        label="Houve ocorrência?",
+        choices=((False, "Não"), (True, "Sim")),
+        coerce=lambda v: str(v).lower() in ("true", "1", "sim"),
+        initial=False,
+        widget=forms.RadioSelect(attrs={"class": "rota-radio-opcao"}),
+    )
+    observacoes = forms.CharField(
+        label="Observações",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": "Anotações da visita (opcional).",
+                "class": "form-control rota-input-touch",
+            }
+        ),
+    )
+
+
+class EncerrarRotaForm(forms.Form):
+    incompleta = forms.BooleanField(
+        label="Não foi possível concluir totalmente a rota",
+        required=False,
+    )
+    relato = forms.CharField(
+        label="Relato (obrigatório se incompleta)",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": "Explique o motivo (chuva, ausência, tempo insuficiente…).",
+                "class": "form-control",
+            }
+        ),
+    )
+
+    def clean(self):
+        dados = super().clean()
+        if dados.get("incompleta") and not (dados.get("relato") or "").strip():
+            self.add_error(
+                "relato",
+                "Informe o motivo quando a rota não for concluída por completo.",
+            )
+        return dados

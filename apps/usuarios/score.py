@@ -19,29 +19,37 @@ FAIXAS = (
         "nome": "Diamante",
         "minimo": 90,
         "descricao": "Ambulante modelo: licença em dia e sem infração procedente.",
-        "cor": "#2563EB",
-        "fundo": "#EFF6FF",
+        "cor": "#0369A1",
+        "fundo": "#E0F2FE",
+        "borda": "#38BDF8",
+        "icone": "gem",
     },
     {
         "nome": "Ouro",
         "minimo": 75,
         "descricao": "Bom histórico de pagamentos e poucas pendências.",
-        "cor": "#D97706",
-        "fundo": "#FEF3C7",
+        "cor": "#CA8A04",
+        "fundo": "#FEF9C3",
+        "borda": "#FACC15",
+        "icone": "award",
     },
     {
         "nome": "Prata",
         "minimo": 50,
         "descricao": "Cadastro em dia, com espaço para regularizar infrações.",
-        "cor": "#4B5563",
+        "cor": "#6B7280",
         "fundo": "#F3F4F6",
+        "borda": "#C0C0C0",
+        "icone": "shield",
     },
     {
         "nome": "Bronze",
         "minimo": 0,
         "descricao": "Iniciante ou com pendências de licença/ocorrência.",
-        "cor": "#92400E",
-        "fundo": "#FFF8F0",
+        "cor": "#9A3412",
+        "fundo": "#FED7AA",
+        "borda": "#EA580C",
+        "icone": "alert-triangle",
     },
 )
 
@@ -207,3 +215,57 @@ def resumo_score(ambulante):
             },
         ],
     }
+
+
+def processar_ocorrencia(ocorrencia_id):
+    try:
+        from apps.fiscalizacao.models import OcorrenciaInspecao
+
+        ocorrencia = OcorrenciaInspecao.objects.select_related(
+            "infracao", "ambulante"
+        ).get(id=ocorrencia_id)
+
+        if (
+            ocorrencia.status_gestor == "APROVADA"
+            and ocorrencia.infracao
+            and ocorrencia.ambulante
+        ):
+            ambulante = ocorrencia.ambulante
+            novo_score = ambulante.pontuacao - ocorrencia.infracao.pontos_desconto
+
+            ambulante.pontuacao = max(0, novo_score)
+            ambulante.save(update_fields=["pontuacao"])
+
+    except Exception as e:  # noqa: BLE001
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao processar ocorrência no score: {e}")
+
+
+def verificar_recuperacao_mensal():
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.fiscalizacao.models import OcorrenciaInspecao
+    from apps.usuarios.models import Ambulante, ConfiguracaoSeguranca
+
+    config = ConfiguracaoSeguranca.carregar()
+    dias = config.dias_recuperacao_score
+    limite_dias = timezone.now() - timedelta(days=dias)
+
+    ambulantes_elegiveis = Ambulante.objects.filter(pontuacao__lt=100)
+    afetados = 0
+
+    for ambulante in ambulantes_elegiveis:
+        teve_ocorrencia_recente = OcorrenciaInspecao.objects.filter(
+            ambulante=ambulante, status_gestor="APROVADA", criado_em__gte=limite_dias
+        ).exists()
+
+        if not teve_ocorrencia_recente:
+            ambulante.pontuacao = min(100, ambulante.pontuacao + 2)
+            ambulante.save(update_fields=["pontuacao"])
+            afetados += 1
+
+    return afetados

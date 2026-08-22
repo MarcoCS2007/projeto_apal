@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 ARG REQUIREMENTS_FILE=base.txt
 COPY requirements/ /app/requirements/
-RUN pip install --no-cache-dir -r requirements/${REQUIREMENTS_FILE}
+RUN pip install --no-cache-dir uv && uv pip install --system -r requirements/${REQUIREMENTS_FILE}
 
 COPY . /app/
 

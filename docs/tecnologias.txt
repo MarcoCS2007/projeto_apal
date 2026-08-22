@@ -1,0 +1,199 @@
+TECNOLOGIAS
+Ponto Certo Conquista
+
+================================================================================
+1. RESUMO DA PILHA
+================================================================================
+
+Aplicação web monolítica em Python/Django. HTML e JSON saem do mesmo
+processo: o site usa sessão (cookie) e o aplicativo móvel usa JWT.
+Não há servidor Node separado nem SPA (React/Vue) em produção.
+
+  Linguagem ........ Python 3.12
+  Framework ........ Django 5+
+  API .............. Django REST Framework + SimpleJWT
+  Banco ............ PostgreSQL 16
+  Front-end ........ Django Templates + HTML/CSS/JavaScript
+  Interatividade ... django-htmx (HTMX)
+  Mapas ............ Leaflet 1.9 + tiles OpenStreetMap
+  Arquivos ......... Pillow (imagens) + pasta media/
+  QR Code .......... qrcode[pil] + HMAC-SHA256 (SECRET_KEY)
+  Relatórios ....... openpyxl (Excel) e xhtml2pdf (PDF)
+  Gráficos ......... Chart.js (dashboard de inteligência)
+  Servidor prod .... Gunicorn + WhiteNoise
+  Containers ....... Docker e Docker Compose
+  CI ............... GitHub Actions (lint, formatação, testes)
+  Qualidade ........ ruff, black, pytest, pytest-django
+
+================================================================================
+2. BACK-END
+================================================================================
+
+2.1 Python e Django
+    Processam HTTP, leem o PostgreSQL pelo ORM e renderizam HTML.
+    Settings em config/settings/ (base, dev, prod), estilo 12-Factor.
+
+    Idioma e fuso: pt-br e America/Bahia.
+
+2.2 Apps Django (módulos de domínio)
+    core            fundação: modelo base, QR HMAC, IA local do
+                    ambulante, seed, backup, páginas públicas,
+                    permissões da API
+    usuarios        identidade, login, cadastro, perfil, score, Master,
+                    telas do gestor (fila, rotas, dossiê)
+    licenciamento   documentos, alvará, taxa, regras de parecer/emissão
+    espacos         endereço, estrutura, ponto de ocupação, mapa da
+                    cidade (agregação de volume + JSON)
+    fiscalizacao    inspeção, ocorrência, rotas (RotaFiscal, ParadaRota,
+                    RegistroVisita) e serviços de ronda
+    assistente      chat educativo do ambulante + tela do copiloto do
+                    gestor
+    relatorios      indicadores e exportações do dashboard
+
+2.3 API REST
+    djangorestframework
+    djangorestframework-simplejwt
+    drf-spectacular (OpenAPI)
+
+    O token carrega o perfil (role). Perfil errado → 403; sem token → 401.
+
+2.4 Onde mora a regra
+    services.py (e services_rotas.py) concentram o domínio. Views HTML
+    e APIs chamam as mesmas funções. O mapa da cidade agrega volume em
+    apps/espacos/views.py (pontos_para_mapa_cidade). O copiloto do
+    gestor, na etapa atual, vive no front (static/js/assistente-gestor.js)
+    e consome JSON real de rotas em /gestor/rotas/resumo-json/.
+
+================================================================================
+3. BANCO DE DADOS E ARQUIVOS
+================================================================================
+
+- PostgreSQL 16 (postgres:16-alpine).
+- Driver: psycopg2-binary.
+- Arquivos (foto, PDF, evidência) em media/; o banco guarda o caminho.
+- Download de documentos exige autenticação e permissão.
+- UsuarioBase com herança em tabelas (Ambulante, Fiscal, Gestor,
+  Administrador). Login pelo CPF.
+- Pontos de ocupação guardam coordenadas em texto (lat,lng), parseadas
+  na hora de desenhar o mapa e as rotas.
+- Rotas: RotaFiscal → ParadaRota (ordem, ambulante, ponto) →
+  RegistroVisita (encontrou, recebido, ocorrência opcional).
+
+================================================================================
+4. FRONT-END
+================================================================================
+
+- Django Templates (templates/), herança em base.html.
+- CSS, scripts e imagens em static/.
+- django-htmx para atualizações parciais.
+- Ícones Lucide. Widget de acessibilidade e VLibras no layout.
+- Leaflet nos mapas:
+    static/js/gestor-mapa-cidade.js   densidade por ponto
+    static/js/fiscal-rota-mapa.js     sequência de paradas + próxima
+- Copiloto: static/js/assistente-gestor.js (roteiros, histórico local,
+  fetch do resumo de rotas).
+- A pasta front/ é protótipo antigo; o que roda em localhost:8000 é
+  templates/ + static/.
+
+Autenticação web: cookie de sessão + CSRF.
+Autenticação do app: Authorization Bearer, sem CSRF de sessão.
+
+================================================================================
+5. MAPAS (CIDADE E ROTAS)
+================================================================================
+
+Biblioteca: Leaflet 1.9.4 (CSS/JS via CDN, integridade SHA-256).
+Base cartográfica: OpenStreetMap.
+Centro padrão: Vitória da Conquista (−14.8661, −40.839).
+
+Mapa da cidade
+  GET /gestor/mapa/           HTML
+  GET /gestor/mapa/dados.json bairro, situacao, origem
+  Círculo cujo raio e cor interpolam o volume (azul → vermelho-escuro).
+  Popup: nome do ponto, logradouro, bairro, status, volume no filtro.
+
+Mapa da rota
+  Paradas serializadas no HTML (json_script) para o JS do fiscal/gestor.
+  Marcadores numerados; a próxima parada destaca-se; polyline une a
+  sequência. Sem lat/lng, a parada não entra no desenho.
+
+================================================================================
+6. CREDENCIAL, ROTAS E SEGURANÇA
+================================================================================
+
+- QR: HMAC-SHA256 (pk da licença + número oficial) com SECRET_KEY.
+- PNG gerado na emissão. Validação exige Ativo + prazo + hash íntegro.
+- CSRF no site; JWT no app.
+- Mixins por perfil nas views HTML; permissões DRF na API.
+- Módulos na matriz do Master incluem mapa_vagas e rotas_fiscais.
+- LGPD: aceite, base legal, CPF mascarado, log de dossiê,
+  purgar_retencao.
+- Rota: só o fiscal atribuído inicia, registra visita e encerra.
+- Copiloto do gestor não executa ação crítica sozinho: Autorizar /
+  Recusar na interface.
+
+================================================================================
+7. INTELIGÊNCIA (DOIS MOTORES)
+================================================================================
+
+7.1 Ambulante — RAG local
+    consultar_conhecimento (apps/core/ia.py): pontua a pergunta contra
+    trechos fixos (documentos, prazos, zona, QR, limpeza, apreensão).
+    Sem OpenAI/Gemini. Funciona offline e em teste.
+
+7.2 Gestor — copiloto de operação
+    Interface de chat com cinco roteiros (briefing, relatório, autos,
+    rotas, ações). A análise de rotas busca resumo_rotas_agregado no
+    servidor. Demais roteiros, nesta etapa, são demonstração de
+    produto (números e cards de interface), desenhados para plugar
+    nos mesmos serviços do dashboard.
+
+================================================================================
+8. INFRAESTRUTURA E ENTREGA
+================================================================================
+
+8.1 Desenvolvimento
+    Docker Compose: db (PostgreSQL 16) + web (Django :8000).
+    Makefile / dev.sh. Variáveis em .envs/.env.dev.
+
+8.2 Produção
+    docker-compose.prod.yml, Gunicorn, WhiteNoise, collectstatic,
+    .envs/.env.prod. Dockerfile Python 3.12-slim, usuário não-root.
+
+8.3 Qualidade e CI
+    ruff, black, pytest. GitHub Actions sobe o Compose, valida lint,
+    migra e testa.
+
+8.4 Controle de versão
+    Git / GitHub, Git Flow (develop), commits semânticos.
+
+================================================================================
+9. BIBLIOTECAS PRINCIPAIS (requirements/base.txt)
+================================================================================
+
+  Django>=5.0.6
+  psycopg2-binary>=2.9.10
+  python-dotenv
+  Pillow>=10.0.0
+  qrcode[pil]>=7.4.2
+  djangorestframework>=3.16.0
+  djangorestframework-simplejwt>=5.5.0
+  whitenoise>=6.6.0
+  gunicorn>=21.2.0
+  openpyxl>=3.1.0
+  xhtml2pdf>=0.2.11
+  faker>=22.0.0
+  django-htmx
+  drf-spectacular>=0.27.1
+
+  Leaflet e Chart.js entram pelo front (CDN), não pelo pip.
+
+  Dev: pytest, pytest-django, ruff, black.
+
+================================================================================
+10. ARQUITETURA EM UMA LINHA
+================================================================================
+
+Browser ou app → Django (view + service) → PostgreSQL / media
+                      ↘ HTML  |  JSON (DRF, mapa, resumo de rotas)
+                      ↘ Leaflet desenha cidade e ronda

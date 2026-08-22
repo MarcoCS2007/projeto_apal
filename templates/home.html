@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Ponto Certo Conquista - Vitória da Conquista{% endblock %}
@@ -8,13 +8,28 @@
 {% endblock %}
 
 {% block hero %}
-<section class="modern-hero">
+<section class="modern-hero home-hero-split" aria-label="Apresentação Ponto Certo Conquista">
+    <div class="home-hero-visual">
+        <div class="home-hero-photo">
+            <img
+                src="{% static 'img/home-ambulante.png' %}"
+                alt="Ambulante vendendo frutas em feira livre"
+                class="home-hero-img"
+                width="1920"
+                height="1080"
+                decoding="async"
+                fetchpriority="high"
+            >
+        </div>
+        <div class="home-hero-fade" aria-hidden="true"></div>
+    </div>
+
     <div class="hero-content-wrapper">
         <h1 class="hero-title">
             O comércio ambulante organizado e <span class="text-highlight-pink">legalizado</span>.
         </h1>
         <p class="hero-description">
-            O sistema Ponto Certo Conquista facilita a solicitação da sua licença, a emissão do seu alvará digital e garante a sua segurança para trabalhar nas ruas de Vitória da Conquista.
+            Solicite a licença, acompanhe o alvará digital e trabalhe com segurança nas ruas de Vitória da Conquista.
         </p>
 
         <div class="hero-buttons">
@@ -130,5 +145,39 @@
             </a>
         </div>
     </div>
+</div>
+
+<div id="public-ai-chat" class="public-ai-chat hidden" aria-hidden="true">
+    <div class="public-ai-chat-header">
+        <h3>Consultor APAL</h3>
+        <button id="public-ai-chat-close" class="assistente-icon-btn-sm assistente-icon-btn" aria-label="Fechar janela de chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+    </div>
+    <div id="public-ai-chat-body" class="public-ai-chat-body" aria-live="polite">
+        <div class="assistente-turno">
+            <div class="assistente-balao resposta">
+                <span class="assistente-rotulo">Assistente Consultor APAL</span>
+                <p>Olá! Sou o Assistente Consultor da APAL. Posso te orientar sobre quais bairros possuem maior demanda para o seu produto ou tirar dúvidas sobre a legislação municipal. Como posso te ajudar hoje?</p>
+            </div>
+        </div>
+    </div>
+    <div class="public-ai-chat-footer">
+        <form id="public-ai-chat-form" class="assistente-form-composer">
+            <div class="assistente-composer">
+                <textarea id="public-ai-chat-input" placeholder="Digite sua dúvida..." required rows="1"></textarea>
+                <button type="submit" class="assistente-composer-enviar" id="public-ai-chat-submit" aria-label="Enviar mensagem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="public-ai-widget-container">
+    <div id="public-ai-tooltip" class="public-ai-tooltip">Precisa de ajuda?</div>
+    <button id="public-ai-fab" class="public-ai-fab" aria-label="Dúvidas sobre onde vender? Fale com a IA" title="Dúvidas sobre onde vender? Fale com a IA">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+    </button>
 </div>
 {% endblock %}

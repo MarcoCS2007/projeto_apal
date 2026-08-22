@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Ocorrência #{{ ocorrencia.pk }} - Ponto Certo Conquista{% endblock %}
 
@@ -84,7 +84,7 @@
         <h2>Decisão do gestor</h2>
     </div>
     <p style="color: var(--texto-cinza); margin-bottom: 1.2rem;">
-        Procedente suspende a licença ativa. Use cancelar para cassar o alvará. Improcedente encerra o auto sem efeito na credencial.
+        Ao marcar uma ocorrência como <strong>Procedente</strong>, a infração será processada e a penalidade (pontos) será descontada automaticamente do Score do ambulante, podendo suspender ou cassar a licença de acordo com a pontuação restante.
     </p>
     <form method="post" class="registration-form">
         {% csrf_token %}
@@ -94,8 +94,8 @@
                 {{ form.status_ocorrencia }}
             </div>
             <div class="input-group">
-                <label for="{{ form.acao_licenca.id_for_label }}">{{ form.acao_licenca.label }}</label>
-                {{ form.acao_licenca }}
+                <label for="{{ form.infracao.id_for_label }}">{{ form.infracao.label }}</label>
+                {{ form.infracao }}
             </div>
         </div>
         {% if form.errors %}
@@ -107,4 +107,7 @@
         </div>
     </form>
 </div>
+
+{% include "_regras_score.html" %}
+
 {% endblock %}

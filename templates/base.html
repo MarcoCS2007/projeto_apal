@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -37,11 +37,16 @@
                     </a>
                 </div>
                 {% endblock %}
+                <button type="button" id="nav-toggle" class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="header-nav">
+                    <i data-lucide="menu" class="nav-toggle-icon-open" aria-hidden="true"></i>
+                    <i data-lucide="x" class="nav-toggle-icon-close" aria-hidden="true"></i>
+                </button>
                 {% block header_nav %}
                 {% include "publico/_nav.html" %}
                 {% endblock %}
             </div>
         </header>
+        <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
     </div>
 
     <div id="access-widget-container" class="access-widget-container">
@@ -114,8 +119,53 @@
     </div>
 
     {% block assistente_widget %}
+    {% if user.is_authenticated %}
+        {% if user.role == "ambulante" %}
+        {% include "ambulante/_assistente_widget.html" %}
+        {% elif user.role == "gestor" or user.role == "administrador" %}
+        {% include "gestor/_assistente_widget.html" %}
+        {% endif %}
+    {% endif %}
+    {% endblock %}
+
+    {% block notificacoes %}
     {% if user.is_authenticated and user.role == "ambulante" %}
-    {% include "ambulante/_assistente_widget.html" %}
+    <div id="notificacoes-backdrop" class="modal-backdrop" aria-hidden="true" style="z-index: 1040; display: none;"></div>
+    <div id="painel-notificacoes" class="offcanvas-notificacoes" role="dialog" aria-modal="true" aria-labelledby="notificacoes-title" aria-hidden="true">
+        <div class="offcanvas-header">
+            <h3 id="notificacoes-title"><i data-lucide="bell" aria-hidden="true"></i> Notificações</h3>
+            <button type="button" id="close-notificacoes" class="close-btn" aria-label="Fechar painel de notificações"><i data-lucide="x" aria-hidden="true"></i></button>
+        </div>
+        <div class="offcanvas-body custom-scrollbar">
+            <!-- Card 1 -->
+            <div class="notificacao-card card-sucesso">
+                <div class="notificacao-icon">
+                    <i data-lucide="calendar-days"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>O Festival de Inverno está chegando!</h4>
+                    <p>As vagas internas do evento oficial são controladas por sorteio externo. Sugerimos o licenciamento temporário nas 'Rotas de Aproximação' (ex: Av. Olívia Flores), aproveitando os horários de pico de fluxo.</p>
+                    <button type="button" class="btn-submit btn-sm" id="btn-solicitar-vaga">Ver horários de pico e solicitar vaga</button>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="notificacao-card card-alerta">
+                <div class="notificacao-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>Atenção no seu ponto de venda</h4>
+                    <p id="texto-educativo-multa">Atenção: 65% das multas para vendedores de Alimentação no seu bairro são por descarte irregular de resíduos.</p>
+                    <div class="notificacao-actions">
+                        <a href="#" class="btn-link-guia">Guia rápido de adequação (1 min)</a>
+                        <button type="button" class="btn-voice" aria-label="Ouvir notificação" id="btn-ouvir-multa">
+                            <i data-lucide="volume-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
     {% endblock %}
 
@@ -132,7 +182,72 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
-    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
+    <script>
+        (function () {
+            function configurarMenuMobile() {
+                var toggle = document.getElementById("nav-toggle");
+                var backdrop = document.getElementById("nav-backdrop");
+                var nav = document.getElementById("header-nav");
+                if (!toggle || !nav || toggle.dataset.menuReady === "1") return;
+                toggle.dataset.menuReady = "1";
+
+                function fechar() {
+                    document.documentElement.classList.remove("nav-open");
+                    document.body.classList.remove("nav-open");
+                    toggle.setAttribute("aria-expanded", "false");
+                    toggle.setAttribute("aria-label", "Abrir menu de navegação");
+                    if (backdrop) {
+                        backdrop.hidden = true;
+                        backdrop.setAttribute("aria-hidden", "true");
+                    }
+                }
+
+                function abrir() {
+                    document.documentElement.classList.add("nav-open");
+                    document.body.classList.add("nav-open");
+                    toggle.setAttribute("aria-expanded", "true");
+                    toggle.setAttribute("aria-label", "Fechar menu de navegação");
+                    if (backdrop) {
+                        backdrop.hidden = false;
+                        backdrop.setAttribute("aria-hidden", "false");
+                    }
+                    if (window.lucide && typeof window.lucide.createIcons === "function") {
+                        window.lucide.createIcons();
+                    }
+                }
+
+                toggle.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (document.body.classList.contains("nav-open")) fechar();
+                    else abrir();
+                });
+
+                if (backdrop) backdrop.addEventListener("click", fechar);
+
+                nav.querySelectorAll("a").forEach(function (link) {
+                    link.addEventListener("click", function () {
+                        if (window.matchMedia("(max-width: 768px)").matches) fechar();
+                    });
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") fechar();
+                });
+
+                window.addEventListener("resize", function () {
+                    if (window.matchMedia("(min-width: 769px)").matches) fechar();
+                });
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", configurarMenuMobile);
+            } else {
+                configurarMenuMobile();
+            }
+        })();
+    </script>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         (function () {

@@ -244,6 +244,8 @@ def registrar_ocorrencia(
     descricao,
     local_ocorrencia="",
     evidencia_foto=None,
+    infracao=None,
+    data_ocorrencia=None,
 ):
     fiscal = Fiscal.objects.filter(pk=fiscal_user.pk).first()
     if fiscal is None:
@@ -255,6 +257,8 @@ def registrar_ocorrencia(
         descricao=descricao,
         local_ocorrencia=local_ocorrencia or "",
         status_ocorrencia=StatusOcorrencia.REGISTRADA,
+        infracao=infracao,
+        data_ocorrencia=data_ocorrencia or timezone.now(),
     )
     if evidencia_foto:
         ocorrencia.evidencia_foto = evidencia_foto
@@ -342,41 +346,39 @@ def aplicar_efeito_licenca(ambulante, acao):
     raise ValueError("Ação sobre a licença inválida.")
 
 
-def auditar_ocorrencia(ocorrencia, novo_status, acao_licenca=""):
-    """Atualiza o auto e, se procedente, suspende (ou cancela) a licença ativa."""
+def auditar_ocorrencia(ocorrencia, novo_status, infracao=None):
+    """Atualiza o auto e aciona o novo fluxo de gamificação se procedente."""
     atual = ocorrencia.status_ocorrencia
     destino = (novo_status or atual).strip() or atual
-    acao = (acao_licenca or "").strip()
     mudou_status = destino != atual
 
     if mudou_status:
         if destino not in transicoes_permitidas(atual):
             raise ValueError(f"Não é possível mudar de {atual} para {destino}.")
         ocorrencia.status_ocorrencia = destino
-        ocorrencia.save(update_fields=["status_ocorrencia", "atualizado_em"])
-        if destino == StatusOcorrencia.PROCEDENTE:
-            from apps.usuarios.score import pontuar_ocorrencia_procedente
 
-            pontuar_ocorrencia_procedente(ocorrencia.ambulante, ocorrencia)
+    if infracao:
+        ocorrencia.infracao = infracao
 
-    if acao and acao not in ("suspender", "cancelar"):
-        raise ValueError("Ação sobre a licença inválida.")
+    if destino == StatusOcorrencia.PROCEDENTE:
+        ocorrencia.status_gestor = "APROVADA"
+    elif destino == StatusOcorrencia.IMPROCEDENTE:
+        ocorrencia.status_gestor = "REJEITADA"
+    else:
+        ocorrencia.status_gestor = "PENDENTE"
 
-    if acao == "cancelar":
-        if ocorrencia.status_ocorrencia not in STATUS_QUE_AFETAM_LICENCA:
-            raise ValueError(
-                "Só é possível cancelar a licença a partir de ocorrência procedente."
-            )
-        return ocorrencia, aplicar_efeito_licenca(ocorrencia.ambulante, "cancelar")
-
-    deve_suspender = acao == "suspender" or (
-        mudou_status and destino == StatusOcorrencia.PROCEDENTE and not acao
+    ocorrencia.save(
+        update_fields=[
+            "status_ocorrencia",
+            "status_gestor",
+            "infracao",
+            "atualizado_em",
+        ]
     )
-    if deve_suspender:
-        if ocorrencia.status_ocorrencia not in STATUS_QUE_AFETAM_LICENCA:
-            raise ValueError(
-                "Só é possível suspender a licença a partir de ocorrência procedente."
-            )
-        return ocorrencia, aplicar_efeito_licenca(ocorrencia.ambulante, "suspender")
+
+    if mudou_status and destino == StatusOcorrencia.PROCEDENTE:
+        from apps.usuarios.score import processar_ocorrencia
+
+        processar_ocorrencia(ocorrencia.id)
 
     return ocorrencia, None

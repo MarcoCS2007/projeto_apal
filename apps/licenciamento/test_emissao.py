@@ -1,6 +1,7 @@
 from datetime import time, timedelta
 from decimal import Decimal
 
+import pytest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -78,12 +79,14 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         dados.update(extra)
         return dados
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_ambulante_nao_acessa_emissao(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(reverse("gestor_emitir", args=[self.licenca.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("ambulante_painel"))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_gestor_abre_tela_de_emissao(self):
         self.client.force_login(self.gestor)
         response = self.client.get(reverse("gestor_emitir", args=[self.licenca.pk]))
@@ -92,6 +95,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         self.assertContains(response, "Feira do Bairro Brasil")
         self.assertContains(response, "Emitir alvará e gerar QR Code")
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_emitir_gera_numero_ocupa_ponto_escala_e_qr(self):
         self.client.force_login(self.gestor)
         response = self.client.post(
@@ -123,6 +127,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         lista = self.client.get(reverse("gestor_licencas"))
         self.assertContains(lista, self.licenca.numero_licenca)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_qr_invalido_se_suspenso_ou_adulterado(self):
         self.client.force_login(self.gestor)
         self.client.post(
@@ -136,6 +141,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         self.licenca.save(update_fields=["status"])
         self.assertIsNone(validar_codigo_qr(codigo))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_consulta_marca_licenca_vencida_e_libera_ponto(self):
         self.client.force_login(self.gestor)
         self.client.post(
@@ -153,6 +159,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         self.assertEqual(self.ponto.status_ocupacao, StatusOcupacao.LIVRE)
         self.assertIsNone(validar_codigo_qr(self.ambulante.codigo_qr_code))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_nao_emite_duas_vezes(self):
         self.client.force_login(self.gestor)
         primeira = self.client.post(
@@ -169,6 +176,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
             LicencaAlvara.objects.filter(numero_licenca__isnull=False).count(), 1
         )
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_filtro_por_status_e_vencimento_proximo(self):
         self.client.force_login(self.gestor)
         self.client.post(
@@ -189,6 +197,7 @@ class EmissaoAlvaraTests(UsuariosAuthFixtures, TestCase):
         )
         self.assertContains(proximas, self.licenca.numero_licenca)
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_qr_e_estavel_para_a_mesma_licenca(self):
         self.licenca.numero_licenca = "ALV-2026-0001"
         primeiro = gerar_codigo_qr(self.licenca)

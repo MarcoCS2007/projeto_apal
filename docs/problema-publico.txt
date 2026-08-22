@@ -1,0 +1,144 @@
+PROBLEMA PÚBLICO
+Ponto Certo Conquista
+Município: Vitória da Conquista (BA)
+
+================================================================================
+1. O PROBLEMA EM UMA FRASE
+================================================================================
+
+O comércio ambulante é renda e ocupação do espaço público, mas o
+licenciamento ainda é fragmentado, a fiscalização é reativa e a cidade
+não enxerga no mapa onde está saturada, vaga ou irregular.
+
+================================================================================
+2. CONTEXTO
+================================================================================
+
+Nas cidades brasileiras, o comércio de rua alimenta famílias e gera
+conflito: calçadas precisam permanecer transitáveis; alimentos exigem
+controle sanitário; o ponto não é propriedade privada; o fiscal precisa
+saber, na hora, se aquela pessoa está autorizada.
+
+Sem sistema único, o licenciamento vive no papel e no balcão. O
+trabalhador enfrenta fila. A gestão não vê quantas vagas existem, quais
+estão ocupadas e quem está irregular. A ronda do fiscal é “sair à rua
+e ver o que aparece”, sem rota, sem registro de visita e sem volta
+analítica para o gestor. O cidadão percebe saturação em uns trechos e
+vazio em outros.
+
+O Código de Posturas já existe. Falta um instrumento que execute a
+norma no território: credencial verificável, ronda planejada, mapa de
+ocupação e decisão rastreável.
+
+================================================================================
+3. QUEM SOFRE O PROBLEMA
+================================================================================
+
+3.1 Trabalhador ambulante
+    Dúvida sobre documentos, prazos e locais. Medo de apreensão mesmo
+    regular, porque a prova da licença não é reconhecida na hora.
+    Deslocamento até a secretaria só para perguntar. Risco de perder o
+    ponto para ocupação informal.
+
+3.2 Fiscal de campo
+    Sem roteiro do dia: não sabe a sequência de pontos a visitar.
+    Sem mapa operacional. Sem registro padronizado de “fui, não
+    encontrei, não fui recebido”. Sem vínculo entre a ronda e o auto.
+
+3.3 Gestão municipal
+    Cadastros incompletos. Fila sem visão única. Taxa sem fórmula
+    padronizada. Impossibilidade de responder: onde está a densidade?
+    Quais rotas voltaram incompletas? Quais pontos ficaram sem
+    ambulante? Decisão no escuro, em planilha.
+
+3.4 Cidadão e espaço público
+    Calçadas obstruídas, concorrência desleal com o comércio fixo,
+    incerteza sanitária e percepção de regra desigual.
+
+3.5 Estado de Direito e LGPD
+    Licença precária e intransferível deixa de ser cumprida sem
+    rastreio. Sem dossiê, log, QR autenticado e mapa, a decisão
+    administrativa é opaca e o dado pessoal circula sem controle.
+
+================================================================================
+4. CAUSAS (NÃO SINTOMAS)
+================================================================================
+
+- Processo presencial, com anexos e parecer sem padronização.
+- Identidade do trabalhador não ligada de forma estável a ponto,
+  estrutura e categoria.
+- Credencial de papel: perde, copia, não bate com a escala de horário.
+- Vagas não catalogadas: sem status e sem teto de metragem.
+- Fiscalização reativa, sem rota, sem visita e sem georreferência.
+- Cidade invisível: não há mapa de concentração por ponto, bairro ou
+  situação de licença.
+- Gestão sem copiloto: o gestor abre dez telas para montar o “o que
+  precisa da minha atenção hoje”.
+- Pouco dado sociodemográfico e operacional (gênero, renda, atuação,
+  renovação, ausência na ronda).
+- Informação institucional espalhada: o ambulante não sabe onde é
+  proibido parar nem o que acontece depois do auto.
+
+================================================================================
+5. CONSEQUÊNCIAS SE NADA MUDAR
+================================================================================
+
+- Informalidade: quem quer se regularizar desiste da fila.
+- Insegurança jurídica para trabalhador e fiscal.
+- Saturação de trechos centrais e vazio em outros, sem política de
+  redistribuição.
+- Apreensões e conflitos sem prova.
+- Taxa injusta ou inaplicável.
+- Rondas ineficientes (deslocamento sem prioridade).
+- Decisão no escuro: alvarás, vencidos, autos, pontos sem ambulante.
+- Risco LGPD no tratamento de identidade, foto e endereço.
+
+================================================================================
+6. O QUE A SOLUÇÃO PÚBLICA PRECISA ENTREGAR
+================================================================================
+
+Não basta um cadastro online. O problema público pede:
+
+  a) Porta digital para o ambulante (cadastro e documentos).
+  b) Fila e parecer rastreáveis (protocolo, status, justificativa).
+  c) Autorização visível na rua: alvará + QR que o fiscal confira.
+  d) Catálogo de vagas com metragem e status.
+  e) Mapa da cidade: densidade por ponto, filtros de bairro, licença
+     e tipo de atuação — a ocupação vira território, não lista.
+  f) Rotas de fiscalização: o gestor planeja a ronda; o fiscal
+     executa no mapa; a visita (encontrou / não encontrou / auto)
+     volta para análise.
+  g) Ocorrência com evidência e auditoria, com efeito na licença.
+  h) Incentivo à regularidade (score), não só punição.
+  i) Copiloto do gestor: briefing, relatório, autos, rotas e ações
+     para autorizar — a IA propõe, o humano decide.
+  j) Assistente educativo para o ambulante, para não ir à secretaria
+     só tirar dúvida.
+  k) Painel sociodemográfico e exportações.
+  l) LGPD: aceite, dossiê controlado, retenção de logs.
+
+O Ponto Certo Conquista foi desenhado nesse recorte: modernizar o
+licenciamento e a gestão do comércio ambulante com organização urbana,
+controle legal e acesso digno e transparente.
+
+================================================================================
+7. VALOR PÚBLICO ESPERADO
+================================================================================
+
+Para o trabalhador
+  Regularizar-se sem fila, trabalhar com credencial no celular e
+  saber o que a prefeitura espera.
+
+Para o fiscal
+  Ronda com destino, mapa e registro. Menos improviso, mais prova.
+
+Para a prefeitura
+  Processo único, território visível, fiscalização planejada e
+  decisão com copiloto, mapa e indicadores.
+
+Para a cidade
+  Comércio de rua legal, previsível e compatível com o ir e vir e
+  com as normas sanitárias.
+
+O resultado desejado não é “mais sistema”. É política urbana
+executável no mapa: o ponto certo, o comércio legal.

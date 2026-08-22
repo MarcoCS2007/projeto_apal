@@ -4,7 +4,7 @@ from io import BytesIO
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -534,30 +534,26 @@ class GestorOcorrenciaDetalheView(PainelGestorMixin, View):
         if not form.is_valid():
             return render(request, self.template_name, self._contexto(ocorrencia, form))
         try:
-            ocorrencia, efeito = auditar_ocorrencia(
+            ocorrencia, _ = auditar_ocorrencia(
                 ocorrencia,
                 form.cleaned_data["status_ocorrencia"],
-                form.cleaned_data.get("acao_licenca") or "",
+                form.cleaned_data.get("infracao"),
             )
         except ValueError as erro:
             messages.error(request, str(erro))
             return render(request, self.template_name, self._contexto(ocorrencia, form))
+
         mensagem = f"Ocorrência #{ocorrencia.pk} atualizada para {ocorrencia.status_ocorrencia}."
-        if efeito == "suspenso":
-            mensagem = (
-                f"Ocorrência #{ocorrencia.pk} marcada como {ocorrencia.status_ocorrencia}. "
-                "A licença do ambulante passou a Suspenso."
-            )
-        elif efeito == "cancelado":
-            mensagem = (
-                f"Ocorrência #{ocorrencia.pk} atualizada. "
-                "A licença do ambulante foi cancelada."
-            )
+        if ocorrencia.status_ocorrencia == "Procedente":
+            mensagem += " O auto foi deferido e a pontuação/licença do ambulante foi recalculada segundo as regras de Score."
+
         messages.success(request, mensagem)
         return redirect("gestor_ocorrencia_detalhe", pk=ocorrencia.pk)
 
 
 def contexto_inicio_gestor(user):
+    from apps.fiscalizacao.services_rotas import rotas_pendentes_analise
+
     return {
         "fila_analise": LicencaAlvara.objects.filter(status__in=STATUS_FILA).count(),
         "total_ambulantes": Ambulante.objects.count(),
@@ -570,6 +566,7 @@ def contexto_inicio_gestor(user):
         "total_categorias": CategoriaProduto.objects.count(),
         "total_ocorrencias": OcorrenciaInspecao.objects.count(),
         "total_vagas": PontoOcupacao.objects.count(),
+        "rotas_pendentes_analise": rotas_pendentes_analise(),
         "eh_gestor": Gestor.objects.filter(pk=user.pk).exists(),
     }
 
@@ -599,3 +596,186 @@ class GestorDossieExportPDFView(PainelGestorMixin, View):
             f'attachment; filename="dossie_{ambulante.cpf}.pdf"'
         )
         return response
+
+
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView
+
+from apps.fiscalizacao.forms import CatalogoInfracaoForm
+from apps.fiscalizacao.models import CatalogoInfracao
+
+
+class GestorProcessarScoreView(PainelGestorMixin, View):
+    modulo_permissao = "solicitacao_licenca"
+
+    def post(self, request):
+        from apps.usuarios.score import verificar_recuperacao_mensal
+
+        afetados = verificar_recuperacao_mensal()
+        messages.success(
+            request,
+            f"Processamento concluído: o score de {afetados} ambulante(s) foi recuperado com base nas regras de tempo sem infração.",
+        )
+        return redirect("backoffice_inicio")
+
+
+class GestorInfracoesView(PainelGestorMixin, ListView):
+    model = CatalogoInfracao
+    template_name = "gestor/infracoes.html"
+    context_object_name = "infracoes"
+    modulo_permissao = "ocorrencias"
+
+
+class GestorInfracaoCreateView(PainelGestorMixin, CreateView):
+    model = CatalogoInfracao
+    form_class = CatalogoInfracaoForm
+    template_name = "gestor/infracao_form.html"
+    success_url = reverse_lazy("gestor_infracoes")
+    modulo_permissao = "ocorrencias"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de infração criado com sucesso!")
+        return super().form_valid(form)
+
+
+class GestorInfracaoUpdateView(PainelGestorMixin, UpdateView):
+    model = CatalogoInfracao
+    form_class = CatalogoInfracaoForm
+    template_name = "gestor/infracao_form.html"
+    success_url = reverse_lazy("gestor_infracoes")
+    modulo_permissao = "ocorrencias"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de infração atualizado com sucesso!")
+        return super().form_valid(form)
+
+
+class GestorInfracaoDeleteView(PainelGestorMixin, View):
+    modulo_permissao = "ocorrencias"
+
+    def post(self, request, pk):
+        infracao = get_object_or_404(CatalogoInfracao, pk=pk)
+        infracao.delete()
+        messages.success(request, "Infração removida com sucesso!")
+        return redirect("gestor_infracoes")
+
+
+class GestorRotasView(PainelGestorMixin, TemplateView):
+    template_name = "gestor/rotas.html"
+    modulo_permissao = "rotas_fiscais"
+
+    def get_context_data(self, **kwargs):
+        from apps.fiscalizacao.models import RotaFiscal
+
+        context = super().get_context_data(**kwargs)
+        context["rotas"] = (
+            RotaFiscal.objects.select_related("fiscal", "criado_por")
+            .annotate(num_paradas=Count("paradas"))
+            .order_by("-criado_em")
+        )
+        return context
+
+
+class GestorRotaNovaView(PainelGestorMixin, View):
+    template_name = "gestor/rota-form.html"
+    modulo_permissao = "rotas_fiscais"
+
+    def get(self, request):
+        from apps.fiscalizacao.forms import RotaFiscalForm
+        from apps.fiscalizacao.services_rotas import sugerir_ambulantes_rota_mock
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "form": RotaFiscalForm(),
+                "sugestoes": sugerir_ambulantes_rota_mock(),
+            },
+        )
+
+    def post(self, request):
+        from apps.fiscalizacao.forms import RotaFiscalForm
+        from apps.fiscalizacao.services_rotas import (
+            criar_rota,
+            sugerir_ambulantes_rota_mock,
+        )
+
+        form = RotaFiscalForm(request.POST)
+        if not form.is_valid():
+            return render(
+                request,
+                self.template_name,
+                {
+                    "form": form,
+                    "sugestoes": sugerir_ambulantes_rota_mock(),
+                },
+            )
+        try:
+            rota = criar_rota(
+                request.user,
+                form.cleaned_data["fiscal"],
+                form.cleaned_data["titulo"],
+                [a.pk for a in form.cleaned_data["ambulantes"]],
+                data_prevista=form.cleaned_data.get("data_prevista"),
+                observacoes=form.cleaned_data.get("observacoes_gestor") or "",
+            )
+        except ValueError as erro:
+            messages.error(request, str(erro))
+            return render(
+                request,
+                self.template_name,
+                {
+                    "form": form,
+                    "sugestoes": sugerir_ambulantes_rota_mock(),
+                },
+            )
+        messages.success(
+            request,
+            f"Rota «{rota.titulo}» criada e atribuída a {rota.fiscal.nome_completo}.",
+        )
+        return redirect("gestor_rota_detalhe", pk=rota.pk)
+
+
+class GestorRotaDetalheView(PainelGestorMixin, TemplateView):
+    template_name = "gestor/rota-detalhe.html"
+    modulo_permissao = "rotas_fiscais"
+
+    def get_context_data(self, **kwargs):
+        from apps.fiscalizacao.models import RotaFiscal
+        from apps.fiscalizacao.services_rotas import paradas_para_mapa, resumir_rota
+
+        context = super().get_context_data(**kwargs)
+        rota = get_object_or_404(
+            RotaFiscal.objects.select_related("fiscal", "criado_por").prefetch_related(
+                "paradas__ambulante",
+                "paradas__ponto",
+                "paradas__visita__ocorrencia",
+            ),
+            pk=kwargs["pk"],
+        )
+        context["rota"] = rota
+        context["resumo"] = resumir_rota(rota)
+        context["paradas_mapa"] = paradas_para_mapa(rota)
+        return context
+
+
+class GestorRotasResumoJsonView(PainelGestorMixin, View):
+    modulo_permissao = "rotas_fiscais"
+
+    def get(self, request):
+        from django.http import JsonResponse
+
+        from apps.fiscalizacao.services_rotas import resumo_rotas_agregado
+
+        return JsonResponse(resumo_rotas_agregado())
+
+
+class GestorRotasSugerirView(PainelGestorMixin, View):
+    modulo_permissao = "rotas_fiscais"
+
+    def get(self, request):
+        from django.http import JsonResponse
+
+        from apps.fiscalizacao.services_rotas import sugerir_ambulantes_rota_mock
+
+        return JsonResponse({"sugeridos": sugerir_ambulantes_rota_mock()})

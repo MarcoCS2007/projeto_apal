@@ -1,0 +1,50 @@
+{% if resultado.ambulante %}
+<div class="form-card rota-ficha-parada" id="ficha-inspecao" style="margin-top: 0; box-shadow: none; border: 1px solid var(--borda-cinza);">
+    <div class="rota-ficha-cabecalho">
+        <div class="rota-ficha-identidade">
+            {% if resultado.ambulante.foto %}
+            <img src="{{ resultado.ambulante.foto.url }}" alt="Foto de {{ resultado.ambulante.nome_completo }}" width="64" height="64" decoding="async" class="rota-ficha-foto">
+            {% else %}
+            <div class="rota-ficha-iniciais">{{ resultado.ambulante.iniciais }}</div>
+            {% endif %}
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem;">{{ resultado.ambulante.nome_completo }}</h3>
+                {% if resultado.ambulante.apelido_nome_fantasia %}
+                <p style="margin: 4px 0 0; color: #475569;">{{ resultado.ambulante.apelido_nome_fantasia }}</p>
+                {% endif %}
+                <p style="margin: 4px 0 0; color: #475569;">CPF {{ resultado.ambulante.cpf_formatado }}</p>
+            </div>
+        </div>
+        {% if resultado.valido %}
+        <span class="badge success"><i data-lucide="check-circle-2"></i> Válida</span>
+        {% else %}
+        <span class="badge danger"><i data-lucide="alert-triangle"></i> {{ resultado.licenca.status|default:"Irregular" }}</span>
+        {% endif %}
+    </div>
+
+    <p style="margin: 0 0 12px; color: {% if resultado.valido %}#027A48{% else %}#B42318{% endif %};">{{ resultado.mensagem }}</p>
+
+    <div class="rota-ficha-grid">
+        <div>
+            <strong>Alvará</strong>
+            {{ resultado.licenca.numero_licenca|default:"Não emitido" }}
+        </div>
+        <div>
+            <strong>Status</strong>
+            {{ resultado.licenca.status|default:"—" }}
+        </div>
+        <div>
+            <strong>Ponto</strong>
+            {% if resultado.licenca.ponto_ocupacao %}
+                {{ resultado.licenca.ponto_ocupacao.nome_identificacao }}
+            {% else %}
+                Não informado
+            {% endif %}
+        </div>
+        <div>
+            <strong>Horário</strong>
+            {{ resultado.licenca.texto_horario_autorizado|default:"Não informado" }}
+        </div>
+    </div>
+</div>
+{% endif %}

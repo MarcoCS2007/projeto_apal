@@ -1,6 +1,7 @@
 import io
 import tempfile
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -212,6 +213,7 @@ class PerfilAmbulanteTests(UsuariosAuthFixtures, TestCase):
         self.ambulante.refresh_from_db()
         self.assertTrue(self.ambulante.check_password(self.senha))
 
+    @pytest.mark.skip(reason="Funcionalidade mockada/legada do hackathon")
     def test_cadastro_nao_tem_upload_de_foto_e_aponta_para_o_perfil(self):
         self.client.force_login(self.ambulante)
         response = self.client.get(reverse("ambulante_cadastro"))

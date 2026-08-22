@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Minhas rotas - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="fiscal_rotas" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Minhas rotas</h1>
+        <p>
+            {% if fiscal %}{{ fiscal.nome }}{% else %}{{ user.nome }}{% endif %}.
+            Execute as paradas atribuídas pelo gestor.
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <p style="margin: 0 0 1.25rem;">
+        <a href="{% url 'fiscal_painel' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao painel
+        </a>
+    </p>
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #0EA5E9;"></div>
+        <h2>Rotas atribuídas</h2>
+    </div>
+
+    <div class="shortcut-grid" style="margin-top: 0.5rem;">
+        {% for rota in rotas %}
+        <a href="{% url 'fiscal_rota_execucao' rota.pk %}" class="form-card form-card-link" style="margin-bottom: 0; box-shadow: none;">
+            <span class="stat-kicker">{{ rota.get_status_display }}</span>
+            <strong style="font-size: 1.1rem; display: block; margin: 0.4rem 0;">{{ rota.titulo }}</strong>
+            <small class="text-muted">
+                {{ rota.paradas_concluidas }}/{{ rota.total_paradas }} paradas
+                {% if rota.data_prevista %} · {{ rota.data_prevista|date:"d/m/Y" }}{% endif %}
+            </small>
+            <span class="badge {{ rota.classe_badge }}" style="margin-top: 0.75rem; display: inline-block;">
+                {% if rota.status == "AGENDADA" %}Iniciar{% elif rota.status == "EM_ANDAMENTO" %}Continuar{% else %}Ver resumo{% endif %}
+            </span>
+        </a>
+        {% empty %}
+        <p style="color: var(--texto-cinza); margin: 0; grid-column: 1 / -1;">Nenhuma rota atribuída no momento.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

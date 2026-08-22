@@ -1,0 +1,114 @@
+RESUMO EXECUTIVO
+Ponto Certo Conquista
+Município: Vitória da Conquista (BA)
+
+================================================================================
+1. O QUE É
+================================================================================
+
+O Ponto Certo Conquista é o sistema municipal de licenciamento, ocupação
+do espaço público e fiscalização do comércio ambulante.
+
+Substitui cadastro em papel, fila no balcão e ronda sem rastreio por um
+fluxo digital único: o trabalhador se cadastra, a gestão analisa documentos
+e emite um alvará com credencial QR autenticada, o fiscal executa rotas no
+mapa da cidade e valida a credencial na rua, e o gestor vê densidade de
+ocupação, indicadores e um copiloto de decisões.
+
+Não é um site institucional. É uma aplicação web com quatro áreas no mesmo
+sistema e no mesmo banco: público, ambulante, fiscal e backoffice (gestor
+e administrador).
+
+================================================================================
+2. PARA QUEM EXISTE
+================================================================================
+
+- Trabalhador ambulante: pede licença pela internet, acompanha o processo,
+  confirma a taxa, apresenta a credencial no celular e consulta o
+  assistente educativo sem ir à secretaria.
+- Fiscal de campo: recebe rotas com paradas no mapa, valida QR/CPF/alvará,
+  registra visita e lava auto com foto.
+- Gestor municipal: triagem, parecer, emissão, dossiê, auditoria de autos,
+  criação de rotas, mapa de densidade da cidade, copiloto de IA e
+  relatórios.
+- Administrador (Master): cadastra equipe, define permissões, audita o
+  assistente do ambulante e gera backup.
+- Cidade e prefeitura: organização urbana, transparência e comércio de
+  rua regularizado.
+
+================================================================================
+3. O PROBLEMA QUE RESOLVE
+================================================================================
+
+O comércio ambulante em Vitória da Conquista historicamente depende de
+processos fragmentados: papel, atendimento presencial, pouca rastreabilidade
+da licença e dificuldade de saber, na rua, quem está autorizado e onde a
+cidade está saturada. Isso gera insegurança para o trabalhador, fiscalização
+desigual e falta de dados para planejar o uso do espaço público.
+
+O Ponto Certo Conquista digitaliza o ciclo completo — do cadastro à ronda
+georreferenciada — e deixa mapa, rotas, score e copiloto à disposição da
+gestão.
+
+================================================================================
+4. COMO FUNCIONA (EM UMA FRASE)
+================================================================================
+
+O ambulante envia documentos; o gestor emite o alvará com QR; o fiscal
+percorre uma rota no mapa e valida a credencial; o gestor vê a densidade
+da cidade, audita autos e consulta o copiloto.
+
+================================================================================
+5. DIFERENCIAIS (O QUE NÃO É CRUD)
+================================================================================
+
+- Credencial digital com QR autenticado (HMAC-SHA256). Não é um código
+  genérico: só vale com licença Ativa, dentro do prazo e hash íntegro.
+- Máquina de estados da licença e do auto (parecer, taxa, emissão,
+  suspensão, cancelamento) com efeito automático no score.
+- Catálogo de vagas municipais com metragem, status e impedimento de
+  dois alvarás ativos no mesmo ponto.
+- Mapa da cidade (Leaflet + OpenStreetMap): círculos de densidade por
+  ponto, filtros de bairro, licença ativa/sem licença e atuação
+  fixo/itinerante. Dados reais do banco.
+- Rotas de fiscalização: o gestor atribui paradas a um fiscal; o fiscal
+  executa no mapa (próxima parada, visita, QR na parada, ocorrência
+  vinculada); o resumo volta para análise (concluída ou incompleta).
+- Copiloto do gestor: briefing do dia, relatório, resumo de autos,
+  análise de rotas (com dados reais agregados) e ações para autorizar
+  antes de executar. Assistente educativo do ambulante em base local,
+  auditável pelo Master.
+- Score de reputação (0–100) que premia regularidade e desconta infração.
+- Taxa municipal calculada (metragem × fator da categoria), não valor
+  único genérico.
+- API JWT para app de ambulante e fiscal, com as mesmas regras do site.
+- LGPD de produto: aceite, CPF mascarado, dossiê auditado, retenção de
+  logs.
+
+================================================================================
+6. SITUAÇÃO ATUAL
+================================================================================
+
+Ciclo operacional implementado: cadastro, fila, parecer, taxa, emissão,
+credencial, inspeção, rotas de campo, mapa da cidade, auditoria,
+dashboard, score, assistente do ambulante, copiloto do gestor, backup
+e API móvel.
+
+O pagamento da taxa é simulado (DAM confirmado), sem gateway bancário.
+O assistente do ambulante responde por base local, sem API de IA na
+nuvem. O copiloto do gestor já opera na interface (roteiros de briefing,
+relatório, autos e ações); a análise de rotas consome JSON real do
+sistema. Sugestão de paradas na criação da rota e parte dos cards do
+copiloto ainda são demonstração de produto, prontas para ligar ao
+motor de dados.
+
+================================================================================
+7. IMPACTO ESPERADO
+================================================================================
+
+- Dignidade e previsibilidade para quem trabalha na rua.
+- Menos filas e menos papel no licenciamento.
+- Fiscalização planejada (rota), não só reativa.
+- Visão espacial da ocupação: onde há saturação, vaga e irregularidade.
+- Decisão do gestor apoiada por copiloto, mapa e indicadores.
+- Cidade com comércio ambulante organizado, legal e transparente.

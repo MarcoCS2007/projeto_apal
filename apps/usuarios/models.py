@@ -221,6 +221,19 @@ class Ambulante(UsuarioBase):
             ]
         )
 
+    @property
+    def nivel_score(self):
+        if self.pontuacao >= 90:
+            return "Diamante"
+        elif self.pontuacao >= 70:
+            return "Ouro"
+        elif self.pontuacao >= 40:
+            return "Prata"
+        elif self.pontuacao >= 1:
+            return "Bronze"
+        else:
+            return "Cassado"
+
 
 class TipoEventoScore(models.TextChoices):
     LICENCA_ATIVA = "licenca_ativa", "Licença em dia"
@@ -326,6 +339,11 @@ class ConfiguracaoSeguranca(ModeloBase):
         default=12,
         choices=RETENCAO_LOGS_CHOICES,
     )
+    dias_recuperacao_score = models.PositiveSmallIntegerField(
+        default=30,
+        verbose_name="Dias sem infração para recuperar score",
+        help_text="Tempo necessário (em dias) sem infrações para ganhar pontos de recuperação.",
+    )
     matriz = models.JSONField(default=matriz_padrao, blank=True)
 
     class Meta:
@@ -337,10 +355,26 @@ class ConfiguracaoSeguranca(ModeloBase):
 
     @classmethod
     def carregar(cls):
-        objeto, _criado = cls.objects.get_or_create(
+        objeto, criado = cls.objects.get_or_create(
             pk=1,
             defaults={"matriz": matriz_padrao()},
         )
+        if not criado:
+            padrao = matriz_padrao()
+            matriz = dict(objeto.matriz or {})
+            alterou = False
+            for modulo, perfis in padrao.items():
+                if modulo not in matriz:
+                    matriz[modulo] = dict(perfis)
+                    alterou = True
+                else:
+                    for perfil, valor in perfis.items():
+                        if perfil not in matriz[modulo]:
+                            matriz[modulo][perfil] = valor
+                            alterou = True
+            if alterou:
+                objeto.matriz = matriz
+                objeto.save(update_fields=["matriz", "atualizado_em"])
         return objeto
 
     def perfil_pode(self, perfil, modulo):
