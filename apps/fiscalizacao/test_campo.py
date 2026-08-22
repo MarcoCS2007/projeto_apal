@@ -1,9 +1,9 @@
-import pytest
 from datetime import datetime, time, timedelta
 from datetime import timezone as dt_timezone
 from decimal import Decimal
 from io import BytesIO
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse

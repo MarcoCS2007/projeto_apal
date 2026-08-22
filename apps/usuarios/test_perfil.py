@@ -1,7 +1,7 @@
-import pytest
 import io
 import tempfile
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse

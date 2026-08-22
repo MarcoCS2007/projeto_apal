@@ -1,9 +1,9 @@
-import pytest
 import tempfile
 from datetime import time, timedelta
 from decimal import Decimal
 from io import BytesIO
 
+import pytest
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, override_settings

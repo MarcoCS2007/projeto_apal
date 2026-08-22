@@ -1,8 +1,8 @@
-import pytest
 from datetime import time, timedelta
 from decimal import Decimal
 from io import BytesIO
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
