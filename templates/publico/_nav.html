@@ -1,0 +1,99 @@
+<nav id="header-nav" class="header-nav{% if nav_extra_class %} {{ nav_extra_class }}{% endif %}" aria-label="Principal">
+    {% if not user.is_authenticated %}
+    {% if active == "fiscal_login" or active == "gestor_login" or active == "ambulante_login" %}
+    <a href="{% url 'index' %}"><i data-lucide="home"></i> Início</a>
+    {% else %}
+    <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
+    <a href="{% url 'sobre' %}"{% if active == "sobre" %} class="active"{% endif %}><i data-lucide="info"></i> Sobre</a>
+    <a href="{% url 'faq' %}"{% if active == "faq" %} class="active"{% endif %}><i data-lucide="help-circle"></i> Dúvidas</a>
+    <details class="nav-inst-menu">
+        <summary class="nav-inst-toggle{% if active == 'login' or active == 'fiscal' %} active{% endif %}">
+            <i data-lucide="building-2"></i> Área institucional
+        </summary>
+        <div class="nav-inst-dropdown">
+            <p class="nav-inst-hint">Selecione seu perfil</p>
+            <a href="{% url 'login' %}">
+                <i data-lucide="briefcase"></i>
+                <span>
+                    <strong>Gestor</strong>
+                    <small>Análise, pontos e emissão de alvará</small>
+                </span>
+            </a>
+            <a href="{% url 'fiscal_entrar' %}">
+                <i data-lucide="scan-line"></i>
+                <span>
+                    <strong>Fiscal</strong>
+                    <small>Validação em campo e ocorrências</small>
+                </span>
+            </a>
+            <a href="{% url 'login' %}">
+                <i data-lucide="shield"></i>
+                <span>
+                    <strong>Administrador</strong>
+                    <small>Painel Master da prefeitura</small>
+                </span>
+            </a>
+        </div>
+    </details>
+    {% endif %}
+    {% elif user.role == "ambulante" %}
+    <a href="{% url 'ambulante_painel' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    
+    {% if active == "painel" or active == "alvara" or active == "score" or active == "perfil" %}
+    <button type="button" id="btn-notificacoes" class="btn-notificacoes" aria-label="Notificações" aria-expanded="false" aria-controls="painel-notificacoes">
+        <div style="position: relative; display: inline-flex;">
+            <i data-lucide="bell"></i>
+            <span class="badge-notificacao">2</span>
+        </div>
+        <span class="nav-text-mobile-only">Avisos</span>
+    </button>
+    {% endif %}
+
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "administrador" %}
+    <a href="{% url 'master_admin' %}"{% if active == "painel" or active == "admin" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "gestor" %}
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% elif user.role == "fiscal" %}
+    <a href="{% url 'fiscal_painel' %}"{% if active == "fiscal" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    {% if pode.rotas_fiscais %}
+    <a href="{% url 'fiscal_rotas' %}"{% if active == "fiscal_rotas" %} class="active"{% endif %}><i data-lucide="route"></i> Rotas</a>
+    {% endif %}
+    {% if active == "fiscal" or active == "fiscal_rotas" %}
+    {% if pode.ocorrencias %}
+    <a href="{% url 'fiscal_ocorrencia' %}"><i data-lucide="alert-triangle"></i> Ocorrência</a>
+    {% endif %}
+    {% endif %}
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% else %}
+    <a href="{% url 'index' %}"{% if active == "inicio" %} class="active"{% endif %}><i data-lucide="home"></i> Início</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+    {% endif %}
+</nav>

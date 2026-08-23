@@ -1,0 +1,10 @@
+<nav id="header-nav" class="header-nav" aria-label="Principal">
+    <a href="{% url 'backoffice_inicio' %}"{% if active == "painel" %} class="active"{% endif %}><i data-lucide="layout-dashboard"></i> Painel</a>
+    <a href="{% url 'gestor_assistente' %}"{% if active == "assistente" %} class="active"{% endif %}><i data-lucide="bot"></i> Assistente</a>
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-logout">
+            <i data-lucide="log-out"></i> Sair
+        </button>
+    </form>
+</nav>

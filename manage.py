@@ -7,14 +7,12 @@ from dotenv import load_dotenv
 
 
 def main():
-    # 1. Encontra o caminho da pasta raiz do projeto
     base_dir = Path(__file__).resolve().parent
-    # 2. Aponta para o seu arquivo dentro da pasta .envs
-    env_path = base_dir / ".envs" / ".env.dev"
-    # 3. Carrega as variáveis para dentro do os.environ
+    settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
+    env_file = ".env.prod" if settings_module.endswith(".prod") else ".env.dev"
+    env_path = base_dir / ".envs" / env_file
     if env_path.exists():
         load_dotenv(env_path)
-    # 4. Define o ambiente padrão
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
     try:

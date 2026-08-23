@@ -1,13 +1,17 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Acesso Backoffice - APAL | Aqui Pode, Aqui é Legal{% endblock %}
+{% block title %}Acesso Backoffice - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="gestor_login" %}
+{% endblock %}
 
 {% block hero %}
 <section class="hero-section">
     <div class="hero-container" style="text-align: center;">
         <h1>Acesso ao Backoffice</h1>
-        <p>Área restrita para Gestores e Administradores da plataforma APAL<br> de Vitória da Conquista.</p>
+        <p>Área restrita para Gestores e Administradores da plataforma Ponto Certo Conquista<br> de Vitória da Conquista.</p>
     </div>
 </section>
 {% endblock %}
@@ -18,6 +22,12 @@
         <div class="title-accent"></div>
         <h2>Acesso ao Sistema</h2>
     </div>
+
+    {% if request.GET.encerrado %}
+    <div class="form-success" role="status" style="margin-bottom: 1.25rem;">
+        Sessão encerrada com segurança. Faça login para iniciar um novo expediente.
+    </div>
+    {% endif %}
 
     <form id="login-form" method="post" action="{% url 'login' %}">
         {% csrf_token %}
@@ -43,7 +53,7 @@
                 <label for="user-password">Senha</label>
                 <div class="input-password-wrapper">
                     {{ form.password }}
-                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar/Ocultar Senha">
+                    <button type="button" id="btn-toggle-password" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
                         <i data-lucide="eye"></i>
                     </button>
                 </div>
@@ -62,6 +72,9 @@
                 <i data-lucide="log-in"></i> Entrar na Plataforma
             </button>
         </div>
+        <p style="text-align: center; margin-top: 1.25rem;">
+            <a href="{% url 'redefinir_senha' %}" class="forgot-password">Esqueci minha senha</a>
+        </p>
     </form>
 </div>
 {% endblock %}

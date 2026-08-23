@@ -16,6 +16,9 @@ case "$1" in
     seed)
         docker compose exec web python manage.py seed_inicial
         ;;
+    seed_massivo)
+        docker compose exec web python manage.py seed_massivo
+        ;;
     precommit)
             docker compose exec -T web ruff check --fix .
             docker compose exec -T web black .

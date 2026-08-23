@@ -1,0 +1,78 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Processos em Análise - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="fila" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Fila de Processos em Análise</h1>
+        <p>Analise a documentação, conferências de ponto e emita os pareceres das solicitações pendentes.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="table-toolbar">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent" style="background-color: #F59E0B;"></div>
+            <h2>Processos na fila ({{ total_processos }})</h2>
+        </div>
+        <form method="get" class="input-group" style="flex: 1 1 280px; margin-bottom: 0;">
+            <label for="search-fila" class="sr-only">Buscar processo</label>
+            <input type="text" id="search-fila" name="q" value="{{ busca }}" placeholder="Buscar por protocolo, nome ou CPF...">
+        </form>
+    </div>
+
+    <div class="table-responsive table-stack">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>PROTOCOLO</th>
+                    <th>REQUERENTE</th>
+                    <th>TIPO DE PEDIDO</th>
+                    <th>FASE ATUAL</th>
+                    <th>TEMPO NA FILA</th>
+                    <th>AÇÃO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for processo in processos %}
+                <tr>
+                    <td data-label="Protocolo">{{ processo.protocolo }}</td>
+                    <td data-label="Requerente">{{ processo.ambulante.nome_completo }}</td>
+                    <td data-label="Tipo de pedido">{{ processo.tipo_pedido }}</td>
+                    <td data-label="Fase atual">
+                        {% if processo.status == "Pendência Documental" %}
+                        <span class="badge purple"><i data-lucide="alert-circle"></i> {{ processo.status }}</span>
+                        {% else %}
+                        <span class="badge warning"><i data-lucide="file-search"></i> {{ processo.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Tempo na fila">{{ processo.criado_em|timesince }}</td>
+                    <td data-label="Ação">
+                        <a href="{% url 'gestor_analisar' processo.pk %}" class="btn-action" style="text-decoration: none;">
+                            <i data-lucide="eye"></i> Revisar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum requerimento em análise ou com pendência no momento.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+</div>
+{% endblock %}

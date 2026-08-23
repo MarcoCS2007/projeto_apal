@@ -1,0 +1,101 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fiscalização em campo - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="fiscal" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Inspeção e Fiscalização de Campo</h1>
+        <p>
+            {% if fiscal %}{{ fiscal.nome }}{% else %}{{ user.nome }}{% endif %}{% if fiscal.matricula_funcional %} · matrícula {{ fiscal.matricula_funcional }}{% endif %}.
+            Leia o QR Code da credencial ou busque por CPF, nome ou número do alvará.
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="fiscal-grid">
+    <div class="form-card text-center fiscal-qr-card">
+        <div class="section-title" style="justify-content: center;">
+            <h2>Validação por QR Code</h2>
+        </div>
+        <div class="qr-scanner-box" id="qr-scanner-box">
+            <div id="qr-reader"></div>
+            <i data-lucide="scan" class="camera-icon" id="qr-placeholder-icon"></i>
+            <p class="scanner-text" id="qr-status" style="font-weight: 500; color: var(--texto-cinza);">Aguardando ativação da câmera...</p>
+        </div>
+        <div class="form-actions" style="justify-content: center; margin-top: 1.5rem;">
+            <button type="button" class="btn-submit" id="btn-ativar-camera" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+                <i data-lucide="camera"></i>
+                Ativar câmera e leitor
+            </button>
+        </div>
+        <form method="get" action="{% url 'fiscal_painel' %}" style="margin-top: 1rem;">
+            <div class="input-group full-width">
+                <label for="qr-manual">Ou cole o código da credencial</label>
+                <input type="text" id="qr-manual" name="qr" placeholder="Hash da credencial" value="" class="qr-manual-input" autocomplete="off" spellcheck="false">
+            </div>
+            <button type="submit" class="btn-action" style="width: 100%; margin-top: 0.75rem;">Validar código</button>
+        </form>
+    </div>
+
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Busca manual de licença</h2>
+        </div>
+        <form method="get" action="{% url 'fiscal_painel' %}" class="registration-form">
+            <div class="input-group full-width" style="margin-bottom: 1.5rem;">
+                <label for="busca-fiscal">CPF, nome ou código do alvará</label>
+                <input type="text" id="busca-fiscal" name="q" placeholder="Ex: 123.456.789-00 ou ALV-2026-0001" value="{{ termo }}">
+            </div>
+            <button type="submit" class="btn-action" style="width: 100%; padding: 0.8rem; font-size: 1rem; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
+                <i data-lucide="search"></i> Consultar situação
+            </button>
+        </form>
+        {% if pode.rotas_fiscais %}
+        <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Rotas de fiscalização</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.2rem;">
+            {% if rotas_ativas %}Você tem {{ rotas_ativas }} rota{{ rotas_ativas|pluralize }} ativa{{ rotas_ativas|pluralize }}.{% else %}Nenhuma rota ativa no momento.{% endif %}
+        </p>
+        <a href="{% url 'fiscal_rotas' %}" class="btn-submit" style="width: 100%; background-color: #0EA5E9; text-decoration: none; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+            <i data-lucide="route"></i>
+            Minhas rotas
+        </a>
+        {% endif %}
+        <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #EF4444;"></div>
+            <h2>Módulo de ocorrências</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.2rem;">
+            Registre advertência, multa, apreensão ou irregularidade de ponto/horário.
+        </p>
+        <a href="{% url 'fiscal_ocorrencia' %}" class="btn-submit" style="width: 100%; background-color: #EF4444; text-decoration: none; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+            <i data-lucide="alert-triangle"></i>
+            Registrar nova ocorrência
+        </a>
+    </div>
+</div>
+
+{% if resultado %}
+{% include "fiscal/_ficha.html" %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    window.APAL_QR_REDIRECT = "{% url 'fiscal_painel' %}";
+</script>
+<script src="{% static 'js/fiscal-qr-leitor.js' %}"></script>
+{% endblock %}

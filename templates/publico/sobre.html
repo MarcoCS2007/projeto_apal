@@ -1,0 +1,82 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sobre o Projeto - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="sobre" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Sobre o Projeto</h1>
+        <p>Plataforma da Prefeitura de Vitória da Conquista para o comércio ambulante regularizado.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Nossa Missão e Impacto Social</h2>
+    </div>
+
+    <div class="stack">
+        <div class="about-text">
+            <p>O sistema <strong>Ponto Certo Conquista</strong> nasceu para modernizar o licenciamento e a gestão de trabalhadores ambulantes em Vitória da Conquista. Nosso objetivo é transformar um processo fragmentado em uma solução digital unificada, garantindo organização urbana, controle legal e acesso a oportunidades de forma digna e transparente.</p>
+            <p>A plataforma resolve os desafios da gestão municipal, substituindo cadastros manuais e a falta de rastreabilidade por tecnologia de ponta, beneficiando o comerciante, a prefeitura e o cidadão.</p>
+        </div>
+
+        <div class="about-features">
+            <h3>
+                <i data-lucide="users"></i> Para quem foi feito?
+            </h3>
+            <ul>
+                <li>
+                    <i data-lucide="store"></i>
+                    <div><strong>Trabalhadores Ambulantes:</strong> <span>Acesso simplificado a cadastro, licenciamento e emissão de credencial digital com QR Code.</span></div>
+                </li>
+                <li>
+                    <i data-lucide="shield-check"></i>
+                    <div><strong>Prefeitura e Fiscais:</strong> <span>Painel gerencial, controle inteligente de ocupação e aplicativo exclusivo para fiscalização em campo.</span></div>
+                </li>
+                <li>
+                    <i data-lucide="user-search"></i>
+                    <div><strong>Cidadãos:</strong> <span>Consultar ambulantes autorizados, ver localizações e fazer denúncias de forma transparente.</span></div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="about-features">
+            <h3>
+                <i data-lucide="rocket"></i> Principais Inovações
+            </h3>
+            <ul>
+                <li>
+                    <i data-lucide="map"></i>
+                    <div><strong>Mapa da Cidade Integrado:</strong> <span>Controle visual de vagas livres, áreas saturadas e zoneamento de ambulantes autorizados.</span></div>
+                </li>
+                <li>
+                    <i data-lucide="cpu"></i>
+                    <div><strong>Inteligência Artificial (IA):</strong> <span>Validação automática de documentos, triagem de fotos e sugestões inteligentes de novos locais.</span></div>
+                </li>
+                <li>
+                    <i data-lucide="gavel"></i>
+                    <div><strong>Fiscalização em Tempo Real:</strong> <span>Leitura de QR Code, histórico de infrações e registro de ocorrências georreferenciadas.</span></div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="about-team">
+            <h4>
+                <i data-lucide="code"></i> Equipe Desenvolvedora
+            </h4>
+            <p>
+                Henrique Sousa Oliveira &bull; Luan Libarino Santos &bull; Marco Antônio Chaves de Souza<br>Marlon Santos Carvalho &bull; Wendel Dos Santos Neres
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

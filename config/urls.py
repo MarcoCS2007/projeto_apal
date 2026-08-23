@@ -15,12 +15,36 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Swagger UI
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    # APIs
     path("api/", include("apps.usuarios.urls")),
+    path("api/", include("apps.licenciamento.urls")),
+    path("api/", include("apps.fiscalizacao.urls")),
+    path("api/", include("apps.assistente.urls")),
     path("", include("apps.core.urls")),
     path("", include("apps.usuarios.urls_web")),
+    path("", include("apps.licenciamento.urls_web")),
+    path("", include("apps.espacos.urls_web")),
+    path("", include("apps.assistente.urls_web")),
+    path("relatorios/", include("apps.relatorios.urls")),
 ]
+
+handler404 = "apps.core.views.pagina_nao_encontrada"
+handler500 = "apps.core.views.erro_servidor"
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

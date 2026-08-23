@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Assistente do Gestor - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="assistente" %}
+{% endblock %}
+
+{% block assistente_widget %}{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Assistente do Gestor</h1>
+        <p>Relatórios sob demanda, resumo dos autos dos agentes e ações com a sua autorização.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div
+    class="form-card assistente-card assistente-gestor-card"
+    id="assistente-gestor"
+    data-url-dashboard="{% url 'relatorios:dashboard' %}"
+    data-url-exportacao="{% url 'relatorios:exportacao' %}"
+    data-url-ocorrencias="{% url 'gestor_ocorrencias' %}"
+    data-url-fila="{% url 'gestor_fila' %}"
+    data-url-triagem="{% url 'gestor_triagem' %}"
+    data-url-score="{% url 'backoffice_inicio' %}"
+    data-url-rotas="{% url 'gestor_rotas' %}"
+    data-url-rotas-resumo="{% url 'gestor_rotas_resumo_json' %}"
+>
+    <p style="margin: 0 0 1.25rem;">
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao painel
+        </a>
+    </p>
+    <div class="section-title assistente-gestor-titulo">
+        <div class="assistente-gestor-titulo-texto">
+            <div class="title-accent" style="background-color: #10B981;"></div>
+            <h2>Copiloto do Gestor</h2>
+        </div>
+        <div class="assistente-chat-acoes">
+            <button type="button" class="assistente-icon-btn" id="assistente-gestor-historico-btn" aria-label="Histórico dos chats" title="Histórico dos chats">
+                <i data-lucide="history"></i>
+            </button>
+            <button type="button" class="assistente-icon-btn" id="assistente-gestor-limpar" aria-label="Limpar conversa" title="Limpar conversa">
+                <i data-lucide="trash-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="assistente-gestor-corpo">
+        <div id="assistente-gestor-historico-panel" class="assistente-historico-panel hidden" aria-hidden="true">
+            <div class="assistente-historico-panel-header">
+                <h3>Histórico dos chats</h3>
+                <button type="button" class="assistente-icon-btn assistente-icon-btn-sm" id="assistente-gestor-historico-fechar" aria-label="Fechar histórico">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="assistente-historico-panel-body custom-scrollbar">
+                <section class="assistente-historico-secao">
+                    <h4><i data-lucide="file-text"></i> Documentos gerados</h4>
+                    <ul class="assistente-historico-lista" id="assistente-gestor-lista-documentos"></ul>
+                </section>
+                <section class="assistente-historico-secao">
+                    <h4><i data-lucide="messages-square"></i> Conversas recentes</h4>
+                    <ul class="assistente-historico-lista" id="assistente-gestor-lista-conversas"></ul>
+                </section>
+            </div>
+        </div>
+
+        <div class="assistente-historico assistente-historico-scroll" id="assistente-gestor-historico" aria-live="polite">
+        <div class="assistente-turno assistente-turno-boas-vindas">
+            <div class="assistente-balao resposta">
+                <span class="assistente-rotulo">Assistente do Gestor</span>
+                <p>Olá. Posso montar um briefing do dia, gerar um relatório personalizado, resumir os autos lavrados pelos agentes ou sugerir ações para você autorizar. Escolha uma sugestão ou descreva o que precisa.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="assistente-sugestoes" id="assistente-gestor-sugestoes">
+        <button type="button" class="assistente-sugestao" data-roteiro="briefing">O que precisa da minha atenção hoje?</button>
+        <button type="button" class="assistente-sugestao" data-roteiro="relatorio">Monte um relatório de ocupação e regularização</button>
+        <button type="button" class="assistente-sugestao" data-roteiro="agentes">Resuma os autos lavrados pelos agentes</button>
+        <button type="button" class="assistente-sugestao" data-roteiro="rotas">Analisar rotas de fiscalização concluídas</button>
+        <button type="button" class="assistente-sugestao" data-roteiro="acoes">O que você recomenda que eu autorize agora?</button>
+    </div>
+
+    <form id="assistente-gestor-form" class="assistente-form assistente-form-composer" action="#" method="post" novalidate>
+        <div class="input-group full-width">
+            <label for="assistente-gestor-pergunta">Sua solicitação</label>
+            <div class="assistente-composer">
+                <textarea id="assistente-gestor-pergunta" name="pergunta" rows="1" maxlength="500" placeholder="Ex.: priorize a fila de análise ou resuma os autos da semana"></textarea>
+                <button type="button" class="assistente-composer-enviar" id="assistente-gestor-enviar" aria-label="Enviar mensagem" title="Enviar">
+                    <i data-lucide="send"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/assistente-gestor.js' %}"></script>
+{% endblock %}

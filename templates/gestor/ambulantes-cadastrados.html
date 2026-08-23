@@ -1,0 +1,156 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Ambulantes Cadastrados - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ambulantes" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Ambulantes Cadastrados</h1>
+        <p>Consultar, aprovar cadastro para gerar credencial, editar dados e gerenciar a conta.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="table-toolbar">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent"></div>
+            <h2>Base de Dados ({{ total_ambulantes }} registro{{ total_ambulantes|pluralize }})</h2>
+        </div>
+        <form method="get" class="input-group" style="flex: 1 1 280px; margin-bottom: 0;">
+            <label for="search-ambulante" class="sr-only">Buscar ambulante</label>
+            <input type="text" id="search-ambulante" name="q" value="{{ busca }}" placeholder="Buscar por nome ou CPF..." style="padding: 0.6rem 1rem;">
+        </form>
+    </div>
+
+    <div class="table-responsive table-stack">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NOME COMPLETO</th>
+                    <th>CPF</th>
+                    <th>DATA DE CADASTRO</th>
+                    <th>SITUAÇÃO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ambulante in ambulantes %}
+                <tr>
+                    <td data-label="ID">#{{ ambulante.pk }}</td>
+                    <td data-label="Nome completo">{{ ambulante.nome_completo }}</td>
+                    <td data-label="CPF">{{ ambulante.cpf_mascarado }}</td>
+                    <td data-label="Data de cadastro">{{ ambulante.criado_em|date:"d/m/Y" }}</td>
+                    <td data-label="Situação">
+                        <div class="ambulante-status-stack">
+                            {% if ambulante.situacao_conta == "cancelada" %}
+                            <span class="badge danger"><i data-lucide="ban"></i> Cancelado</span>
+                            {% elif ambulante.situacao_conta == "suspensa" %}
+                            <span class="badge danger"><i data-lucide="lock"></i> Suspenso</span>
+                            {% elif ambulante.situacao_conta == "completa" %}
+                            <span class="badge success"><i data-lucide="check-circle"></i> Cadastro completo</span>
+                            {% else %}
+                            <span class="badge"><i data-lucide="clock"></i> Cadastro pendente</span>
+                            {% endif %}
+                            {% if ambulante.credencial_ativa %}
+                            <span class="badge success"><i data-lucide="id-card"></i> Credencial ativa</span>
+                            {% elif ambulante.licenca_atual %}
+                            <span class="badge warning"><i data-lucide="file-badge"></i> {{ ambulante.licenca_atual.status }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td data-label="Ações">
+                        <details class="acoes-menu">
+                            <summary class="btn-action acoes-menu-toggle">
+                                <i data-lucide="list"></i> Ações
+                            </summary>
+                            <div class="acoes-menu-lista" role="menu">
+                                <a href="{% url 'gestor_dossie' ambulante.pk %}" class="acoes-menu-item" role="menuitem">
+                                    <i data-lucide="folder-open"></i> Dossiê
+                                </a>
+                                <a href="{% url 'gestor_ambulante_editar' ambulante.pk %}" class="acoes-menu-item" role="menuitem">
+                                    <i data-lucide="pencil"></i> Editar
+                                </a>
+
+                                {% if ambulante.situacao_conta != "cancelada" and ambulante.situacao_conta != "suspensa" %}
+                                    {% if ambulante.credencial_ativa %}
+                                    <span class="acoes-menu-item acoes-menu-item-muted" aria-disabled="true">
+                                        <i data-lucide="badge-check"></i> Credencial ok
+                                    </span>
+                                    {% elif ambulante.licenca_atual and ambulante.licenca_atual.pode_emitir %}
+                                    <a href="{% url 'gestor_emitir' ambulante.licenca_atual.pk %}" class="acoes-menu-item acoes-menu-item-success" role="menuitem">
+                                        <i data-lucide="id-card"></i> Emitir credencial
+                                    </a>
+                                    {% else %}
+                                    <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="acao" value="aprovar_cadastro">
+                                        <button type="submit" class="acoes-menu-item acoes-menu-item-success" role="menuitem">
+                                            <i data-lucide="check-circle-2"></i> Aprovar cadastro
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    {% if ambulante.licenca_atual %}
+                                    <a href="{% url 'gestor_analisar' ambulante.licenca_atual.pk %}" class="acoes-menu-item" role="menuitem">
+                                        <i data-lucide="file-search"></i> Analisar
+                                    </a>
+                                    {% else %}
+                                    <span class="acoes-menu-item acoes-menu-item-muted" aria-disabled="true">
+                                        <i data-lucide="file-search"></i> Sem requerimento
+                                    </span>
+                                    {% endif %}
+                                {% endif %}
+
+                                <div class="acoes-menu-separador" aria-hidden="true"></div>
+
+                                {% if ambulante.situacao_conta == "suspensa" or ambulante.situacao_conta == "cancelada" %}
+                                <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="acao" value="ativar">
+                                    <button type="submit" class="acoes-menu-item" role="menuitem">
+                                        <i data-lucide="unlock"></i> Ativar
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="acao" value="suspender">
+                                    <button type="submit" class="acoes-menu-item" role="menuitem">
+                                        <i data-lucide="pause-circle"></i> Suspender
+                                    </button>
+                                </form>
+                                <form action="{% url 'gestor_ambulante_acao' ambulante.pk %}" method="post" data-confirm="Cancelar a conta e as licenças deste ambulante? Esta ação não pode ser desfeita." data-confirm-title="Cancelar conta" data-confirm-ok="Cancelar conta">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="acao" value="cancelar">
+                                    <button type="submit" class="acoes-menu-item acoes-menu-item-danger" role="menuitem">
+                                        <i data-lucide="ban"></i> Cancelar
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum ambulante cadastrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+</div>
+{% endblock %}

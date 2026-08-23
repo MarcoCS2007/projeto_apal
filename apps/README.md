@@ -2,30 +2,35 @@
 
 O sistema foi desenhado de forma modular, dividindo as responsabilidades em aplicativos focados em domínios específicos. Essa abordagem centraliza regras de negócio, evita duplicação de código e facilita a manutenção.
 
+Os apps instalados estão em `config/settings/base.py`: `core`, `usuarios`, `licenciamento`, `espacos`, `fiscalizacao` e `assistente`. Não há apps separados de financeiro, notificações, analytics ou relatórios.
+
 Abaixo estão os módulos que compõem o projeto:
 
 ### ⚙️ `core` (Fundação do Sistema)
 Atua como o alicerce do projeto, abrigando recursos globais que são importados e reutilizados por diversas *views* e APIs de outros aplicativos.
-- **Modelos Abstratos:** Classes base, como um `TimeStampedModel` (contendo campos de auditoria como `criado_em` e `atualizado_em`), que servem de herança para quase todas as entidades do sistema.
-- **Utilitários Compartilhados (Utils):** Funções globais, incluindo o gerador de hash único para o QR Code das credenciais, funções de formatação de CPF/CNPJ e scripts de integração com a API da Inteligência Artificial (RAG).
-- **Permissões Customizadas:** Centralização das classes de permissão (ex: `IsFiscal`, `IsGestor`) que gerenciam a herança complexa de perfis de usuário (Master, Gestor, Fiscal, Ambulante).
+- **Modelos Abstratos:** `ModeloBase` (campos `criado_em`, `atualizado_em` e `ativo`) herdado pela maioria das entidades.
+- **Utilitários Compartilhados:** gerador/validador HMAC do QR Code, PNG da credencial, base local do assistente (`ia.py`), backup JSON e seeds (`seed_inicial`, `seed_massivo`).
+- **Permissões Customizadas:** `IsAmbulante`, `IsFiscal`, `IsGestor`, `IsAdministrador` para a API JWT.
+- **Páginas públicas:** home, sobre, FAQ, privacidade; handlers 404/500.
 
 ### 👥 `usuarios` (Autenticação e Perfis)
-Gerencia o núcleo de autenticação, o controle de acesso e a relação de dados residenciais e comerciais.
-- **Modelos associados:** Usuário Base, Ambulante, Fiscal, Gestor, Administrador e Endereço.
+Gerencia o núcleo de autenticação, o controle de acesso e os painéis por perfil.
+- **Modelos associados:** `UsuarioBase`, `Ambulante`, `Fiscal`, `Gestor`, `Administrador`, `EventoScore`, `ConfiguracaoSeguranca`, `LogAcessoDossie`.
+- **Telas:** login por canal, wizard de cadastro, perfil do ambulante, score, Master, dossiê e exportações do gestor.
 
 ### 📄 `licenciamento` (Gestão Legal)
-Responsável por todo o ciclo de vida da autorização de trabalho, auditoria de documentos comprobatórios e cadastro detalhado dos equipamentos utilizados.
-- **Modelos associados:** Licença / Alvará, Estrutura de Trabalho, Categoria de Produto, Documento Anexo e Escala de Trabalho.
+Responsável pelo ciclo de vida da autorização de trabalho, documentos comprobatórios, taxa e relatórios gerenciais.
+- **Modelos associados:** `LicencaAlvara`, `CategoriaProduto`, `DocumentoAnexo`, `EscalaTrabalho`.
+- **Regras:** requerimento, parecer, cálculo da taxa (`metragem × fator financeiro`), emissão, renovação e indicadores.
 
 ### 📍 `espacos` (Mapeamento Geográfico)
-Isola toda a lógica de organização espacial, mapeamento geográfico, zoneamento urbano e o controle da capacidade máxima das vias.
-- **Modelos associados:** Ponto de Ocupação, Vagas e Coordenadas.
+Isola a lógica espacial: endereço residencial, equipamento de trabalho e vagas municipais.
+- **Modelos associados:** `Endereco`, `EstruturaTrabalho`, `PontoOcupacao`.
 
 ### 🚨 `fiscalizacao` (Operações de Rua)
-Módulo dedicado à rotina operacional dos agentes de campo, facilitando o registro de ações fiscalizatórias, notificações e vistorias de forma ágil.
-- **Modelos associados:** Ocorrência / Inspeção e Multas.
+Módulo dedicado à rotina dos agentes de campo: inspeção de QR/CPF/alvará e lavratura de autos.
+- **Modelos associados:** `OcorrenciaInspecao` (tipos, status e evidência fotográfica).
 
 ### 🤖 `assistente` (IA Educativa)
-Focado no principal diferencial do projeto, gerenciando e armazenando o histórico de interações do chatbot educativo inteligente.
-- **Modelos associados:** Log Assistente.
+Gerencia o chatbot educativo (base local, sem API externa) e o histórico auditável pelo Master.
+- **Modelos associados:** `LogAssistente`.

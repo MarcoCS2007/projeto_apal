@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Rotas de Fiscalização - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="rotas" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Rotas de Fiscalização</h1>
+        <p>Crie e delegue rotas aos fiscais. O resumo das visitas volta para análise.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Rotas atribuídas</h2>
+        </div>
+        <a href="{% url 'gestor_rota_nova' %}" class="btn-submit" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="plus"></i> Nova rota
+        </a>
+    </div>
+
+    <div class="table-responsive table-stack">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>TÍTULO</th>
+                    <th>FISCAL</th>
+                    <th>DATA</th>
+                    <th>PARADAS</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rota in rotas %}
+                <tr>
+                    <td data-label="Título">{{ rota.titulo }}</td>
+                    <td data-label="Fiscal">{{ rota.fiscal.nome_completo }}</td>
+                    <td data-label="Data">{% if rota.data_prevista %}{{ rota.data_prevista|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                    <td data-label="Paradas">{{ rota.num_paradas }}</td>
+                    <td data-label="Status"><span class="badge {{ rota.classe_badge }}">{{ rota.get_status_display }}</span></td>
+                    <td data-label="Ações">
+                        <a href="{% url 'gestor_rota_detalhe' rota.pk %}" class="btn-action" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Ver</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--texto-cinza);">
+                        Nenhuma rota criada. Use o copiloto para sugerir ambulantes e criar a primeira.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

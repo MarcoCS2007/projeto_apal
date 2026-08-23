@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # Terceiros
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
     # Aplicativos Locais
     "apps.core",
     "apps.usuarios",
@@ -32,10 +33,12 @@ INSTALLED_APPS = [
     "apps.espacos",
     "apps.fiscalizacao",
     "apps.assistente",
+    "apps.relatorios",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -57,6 +60,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.usuarios.permissoes.permissoes_context",
             ],
         },
     },
@@ -80,6 +84,7 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = "usuarios.UsuarioBase"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 AUTHENTICATION_BACKENDS = [
     "apps.usuarios.backends.CPFOuEmailBackend",
@@ -88,6 +93,13 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "backoffice_inicio"
 LOGOUT_REDIRECT_URL = "login"
+
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "APAL <nao-responda@apal.pmvc.ba.gov.br>"
+)
 
 # Autenticação da API: JWT (stateless, app móvel) + sessão por cookie (backoffice web).
 REST_FRAMEWORK = {
@@ -98,6 +110,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "APAL API - Prefeitura Municipal de Vitória da Conquista",
+    "DESCRIPTION": "API do Sistema de Licenciamento de Ambulantes (APAL).",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SIMPLE_JWT = {
@@ -131,9 +151,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Bahia"
 
 USE_I18N = True
 
@@ -145,3 +165,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+FILE_UPLOAD_PERMISSIONS = 0o640
+BACKUP_ROOT = Path(os.environ.get("BACKUP_ROOT", BASE_DIR / "backups"))

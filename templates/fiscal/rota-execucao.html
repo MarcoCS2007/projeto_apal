@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ rota.titulo }} - Execução{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="fiscal_rotas" %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>{{ rota.titulo }}</h1>
+        <p>
+            <span class="badge {{ rota.classe_badge }}">{{ rota.get_status_display }}</span>
+            · {{ rota.paradas_concluidas }}/{{ rota.total_paradas }} paradas
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <p style="margin: 0 0 1rem;">
+        <a href="{% url 'fiscal_rotas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar às minhas rotas
+        </a>
+    </p>
+    {% if pode_iniciar %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="iniciar">
+        <button type="submit" class="btn-submit" style="display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="play"></i> Iniciar rota
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="rota-execucao-layout">
+    <div class="form-card rota-mapa-card">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Mapa da cidade</h2>
+        </div>
+        <div
+            id="rota-mapa"
+            class="rota-mapa"
+            data-modo="fiscal"
+            {% if proxima_parada %}data-proxima-id="{{ proxima_parada.pk }}"{% endif %}
+        ></div>
+        {{ paradas_mapa|json_script:"rota-paradas-data" }}
+
+        {% if proxima_parada and rota_em_campo %}
+        <div class="rota-proxima-parada">
+            <div class="rota-proxima-parada-cabecalho">
+                <span class="rota-proxima-etiqueta">Próxima parada · #{{ proxima_parada.ordem }}</span>
+                <span class="badge warning">Pendente</span>
+            </div>
+            <h3 class="rota-proxima-titulo">{{ proxima_parada.ambulante.nome_completo }}</h3>
+            {% if proxima_parada.ponto %}
+            <p class="rota-proxima-ponto">
+                <i data-lucide="map-pin" aria-hidden="true"></i>
+                {{ proxima_parada.ponto.nome_identificacao }}
+            </p>
+            {% endif %}
+            <p class="rota-proxima-endereco">
+                <i data-lucide="navigation" aria-hidden="true"></i>
+                <span>{{ proxima_parada.endereco_completo }}</span>
+            </p>
+            <div class="rota-proxima-acoes">
+                <a href="{% url 'fiscal_parada_registro' rota.pk proxima_parada.pk %}" class="btn-submit rota-btn-touch" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
+                    <i data-lucide="clipboard-check"></i>
+                    Registrar · QR ou CPF/licença
+                </a>
+            </div>
+        </div>
+        {% elif not rota_em_campo %}
+        <p class="rota-proxima-vazia">Esta rota já foi encerrada.</p>
+        {% else %}
+        <div class="rota-proxima-parada rota-proxima-parada--concluida">
+            <p class="rota-proxima-titulo" style="margin: 0;">Todas as paradas foram registradas.</p>
+            <p style="margin: 0.5rem 0 0; color: var(--texto-cinza); font-size: 0.9rem;">
+                Você pode encerrar a rota abaixo e enviar o resumo ao gestor.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if rota.observacoes_gestor %}
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--texto-cinza);">
+            <strong>Orientações do gestor:</strong> {{ rota.observacoes_gestor }}
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Ordem das paradas</h2>
+        </div>
+        <ol class="rota-paradas-lista">
+            {% for parada in rota.paradas.all %}
+            <li class="rota-parada-item status-{{ parada.status|lower }}{% if proxima_parada and parada.pk == proxima_parada.pk %} is-proxima{% endif %}">
+                <div>
+                    <strong>#{{ parada.ordem }} — {{ parada.ambulante.nome_completo }}</strong>
+                    <small>
+                        {% if parada.ponto %}{{ parada.ponto.nome_identificacao }}{% else %}Sem ponto{% endif %}
+                        · {{ parada.endereco_completo }}
+                        · {{ parada.get_status_display }}
+                    </small>
+                </div>
+                {% if rota_em_campo and parada.status == "PENDENTE" and proxima_parada and parada.pk == proxima_parada.pk %}
+                <a href="{% url 'fiscal_parada_registro' rota.pk parada.pk %}" class="btn-action" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; text-decoration: none;">
+                    Registrar
+                </a>
+                {% elif rota_em_campo and parada.status == "PENDENTE" %}
+                <span class="rota-parada-aguarda">Aguardando ordem</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+
+        {% if pode_encerrar %}
+        <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 1.5rem 0;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #EF4444;"></div>
+            <h2>Encerrar rota</h2>
+        </div>
+        <form method="post" class="registration-form">
+            {% csrf_token %}
+            <input type="hidden" name="acao" value="encerrar">
+            <label class="rota-ambulante-opcao" style="margin-bottom: 1rem;">
+                {{ form_encerrar.incompleta }}
+                <span>{{ form_encerrar.incompleta.label }}</span>
+            </label>
+            <div class="input-group full-width">
+                <label for="id_relato">{{ form_encerrar.relato.label }}</label>
+                {{ form_encerrar.relato }}
+                {% if form_encerrar.relato.errors %}
+                <small class="form-error">{{ form_encerrar.relato.errors.0 }}</small>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-submit" style="width: 100%; background-color: #EF4444;">
+                Encerrar e enviar resumo ao gestor
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'js/fiscal-rota-mapa.js' %}"></script>
+{% endblock %}

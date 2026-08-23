@@ -1,0 +1,58 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Recuperação de Senha - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="entrar" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Recuperação de Senha</h1>
+        <p>Informe o e-mail ou o CPF cadastrado para receber as instruções de redefinição.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Redefinir Acesso</h2>
+    </div>
+
+    <form id="recovery-form" method="post" action="{% url 'redefinir_senha' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="recovery-email">E-mail ou CPF</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="login-error" role="alert">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-callout-box">
+            <p>
+                Enviaremos um link seguro para o e-mail da conta para que você possa cadastrar uma nova senha de acesso ao sistema.
+            </p>
+        </div>
+
+        <div class="form-actions" style="flex-direction: column; gap: 1rem;">
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                <i data-lucide="send"></i> Enviar Link de Recuperação
+            </button>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.5rem;">
+                <i data-lucide="arrow-left"></i> Voltar para o Login
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

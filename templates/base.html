@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}APAL | Aqui Pode, Aqui é Legal{% endblock %}</title>
+    <title>{% block title %}Ponto Certo Conquista{% endblock %}</title>
 
     <link rel="icon" type="image/png" href="{% static 'img/logo-apal-simbolo.png' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    </noscript>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/htmx.org@2"></script>
@@ -19,81 +23,157 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="top-header">
-        <div class="header-container">
-            <div class="logo-area">
-                <a href="{% url 'index' %}" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
-                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
-                </a>
+    <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo</a>
+    <div class="site-top">
+        <header class="top-header{% block header_extra_class %}{% endblock %}">
+            <div class="header-container{% block header_container_extra %}{% endblock %}">
+                {% block logo %}
+                <div class="logo-area">
+                    <a href="{% url 'index' %}" class="brand-link" aria-label="Ponto Certo Conquista — página inicial">
+                        <img src="{% static 'img/logo-apal-simbolo.png' %}" alt="" class="brand-mark" width="36" height="47" decoding="async">
+                        <span class="brand-lockup">
+                            <span class="logo-text">Ponto Certo <span class="brand-conquista">Conquista</span></span>
+                        </span>
+                    </a>
+                </div>
+                {% endblock %}
+                <button type="button" id="nav-toggle" class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="header-nav">
+                    <i data-lucide="menu" class="nav-toggle-icon-open" aria-hidden="true"></i>
+                    <i data-lucide="x" class="nav-toggle-icon-close" aria-hidden="true"></i>
+                </button>
+                {% block header_nav %}
+                {% include "publico/_nav.html" %}
+                {% endblock %}
             </div>
-            <nav class="header-nav">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'backoffice_inicio' %}" class="{% block nav_inicio_class %}{% endblock %}"><i data-lucide="layout-dashboard"></i> Painel</a>
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-logout" style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: inherit;">
-                            <i data-lucide="log-out" style="color: #EF4444;"></i> Sair
-                        </button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'login' %}" class="active"><i data-lucide="log-in"></i> Entrar</a>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
+        </header>
+        <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
+    </div>
 
     <div id="access-widget-container" class="access-widget-container">
-        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+        <button type="button" id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade" aria-label="Abrir ferramentas de acessibilidade" aria-expanded="false" aria-controls="accessibility-panel">
             <span class="access-text">Acessibilidade</span>
-            <i data-lucide="eye-off"></i>
+            <i data-lucide="eye-off" aria-hidden="true"></i>
         </button>
     </div>
 
-    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden" role="dialog" aria-labelledby="access-panel-title" aria-modal="true" aria-hidden="true">
         <div class="access-header">
-            <h3>Acessibilidade</h3>
-            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+            <h3 id="access-panel-title">Acessibilidade</h3>
+            <button type="button" id="close-access" class="close-btn" aria-label="Fechar painel de acessibilidade"><i data-lucide="x" aria-hidden="true"></i></button>
         </div>
         <div class="access-grid">
-            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
-            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
-            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
-            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
-            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
-            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
-            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
-            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
-            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
-            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
-            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
-            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+            <button type="button" id="btn-aumentar" class="access-option"><i data-lucide="zoom-in" aria-hidden="true"></i> Aumentar Texto</button>
+            <button type="button" id="btn-diminuir" class="access-option"><i data-lucide="zoom-out" aria-hidden="true"></i> Diminuir Texto</button>
+            <button type="button" id="btn-escuro" class="access-option"><i data-lucide="moon" aria-hidden="true"></i> Contraste Escuro</button>
+            <button type="button" id="btn-claro" class="access-option"><i data-lucide="sun" aria-hidden="true"></i> Contraste Claro</button>
+            <button type="button" id="btn-ler-texto" class="access-option"><i data-lucide="volume-2" aria-hidden="true"></i> Ouvir Todo o Conteúdo</button>
+            <button type="button" id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer" aria-hidden="true"></i> Ouvir Trecho ao Clicar</button>
+            <button type="button" id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop" aria-hidden="true"></i> Parar Leitura</button>
+            <button type="button" id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles" aria-hidden="true"></i> Simplificar com IA</button>
+            <button type="button" id="btn-significado-ia" class="access-option"><i data-lucide="book-open" aria-hidden="true"></i> Significado de Termos</button>
+            <button type="button" id="btn-zoom" class="access-option"><i data-lucide="search" aria-hidden="true"></i> Zoom na Tela</button>
+            <button type="button" id="btn-sat-alta" class="access-option"><i data-lucide="palette" aria-hidden="true"></i> Saturação Alta</button>
+            <button type="button" id="btn-sat-baixa" class="access-option"><i data-lucide="droplet" aria-hidden="true"></i> Saturação Baixa</button>
         </div>
     </div>
 
     {% block hero %}{% endblock %}
 
-    <main class="main-container">
+    <main id="conteudo-principal" class="{% block main_class %}main-container{% endblock %}" tabindex="-1">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}form-success{% else %}login-error{% endif %}" role="status" style="max-width: 600px; margin: 0 auto 1.25rem;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
 
-    <div id="modal-backdrop" class="modal-backdrop"></div>
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+    <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true"></div>
+
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title" aria-hidden="true">
         <div class="access-header">
-            <h3 style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            <h3 id="ai-modal-title">
+                <i data-lucide="sparkles" aria-hidden="true"></i> Assistente de Acessibilidade
             </h3>
-            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+            <button type="button" id="close-ai-modal" class="close-btn" aria-label="Fechar assistente de acessibilidade"><i data-lucide="x" aria-hidden="true"></i></button>
         </div>
         <div id="ai-response-content" class="custom-scrollbar">
             Aguardando seleção...
         </div>
     </div>
 
+    <div id="confirm-dialog" class="access-panel hidden" role="alertdialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" style="top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); width: 90%; max-width: 420px; position: fixed; max-height: none;">
+        <div class="access-header">
+            <h3 id="confirm-dialog-title">Confirmar ação</h3>
+            <button type="button" id="confirm-dialog-cancel" class="close-btn" aria-label="Cancelar"><i data-lucide="x" aria-hidden="true"></i></button>
+        </div>
+        <p id="confirm-dialog-message" class="field-hint" style="font-size: 0.94rem; color: var(--texto-escuro); margin: 0.75rem 0 1.25rem;">Deseja continuar?</p>
+        <div class="form-actions" style="margin: 0; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" id="confirm-dialog-voltar" class="btn-action">Voltar</button>
+            <button type="button" id="confirm-dialog-ok" class="btn-submit">Confirmar</button>
+        </div>
+    </div>
+
+    {% block assistente_widget %}
+    {% if user.is_authenticated %}
+        {% if user.role == "ambulante" %}
+        {% include "ambulante/_assistente_widget.html" %}
+        {% elif user.role == "gestor" or user.role == "administrador" %}
+        {% include "gestor/_assistente_widget.html" %}
+        {% endif %}
+    {% endif %}
+    {% endblock %}
+
+    {% block notificacoes %}
+    {% if user.is_authenticated and user.role == "ambulante" %}
+    <div id="notificacoes-backdrop" class="modal-backdrop" aria-hidden="true" style="z-index: 1040; display: none;"></div>
+    <div id="painel-notificacoes" class="offcanvas-notificacoes" role="dialog" aria-modal="true" aria-labelledby="notificacoes-title" aria-hidden="true">
+        <div class="offcanvas-header">
+            <h3 id="notificacoes-title"><i data-lucide="bell" aria-hidden="true"></i> Notificações</h3>
+            <button type="button" id="close-notificacoes" class="close-btn" aria-label="Fechar painel de notificações"><i data-lucide="x" aria-hidden="true"></i></button>
+        </div>
+        <div class="offcanvas-body custom-scrollbar">
+            <!-- Card 1 -->
+            <div class="notificacao-card card-sucesso">
+                <div class="notificacao-icon">
+                    <i data-lucide="calendar-days"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>O Festival de Inverno está chegando!</h4>
+                    <p>As vagas internas do evento oficial são controladas por sorteio externo. Sugerimos o licenciamento temporário nas 'Rotas de Aproximação' (ex: Av. Olívia Flores), aproveitando os horários de pico de fluxo.</p>
+                    <button type="button" class="btn-submit btn-sm" id="btn-solicitar-vaga">Ver horários de pico e solicitar vaga</button>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="notificacao-card card-alerta">
+                <div class="notificacao-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <div class="notificacao-content">
+                    <h4>Atenção no seu ponto de venda</h4>
+                    <p id="texto-educativo-multa">Atenção: 65% das multas para vendedores de Alimentação no seu bairro são por descarte irregular de resíduos.</p>
+                    <div class="notificacao-actions">
+                        <a href="#" class="btn-link-guia">Guia rápido de adequação (1 min)</a>
+                        <button type="button" class="btn-voice" aria-label="Ouvir notificação" id="btn-ouvir-multa">
+                            <i data-lucide="volume-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    {% block footer %}
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">Ponto Certo</span> <span class="footer-conquista">Conquista</span></p>
     </footer>
+    {% endblock %}
 
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
@@ -101,14 +181,93 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
+    <script>
+        (function () {
+            function configurarMenuMobile() {
+                var toggle = document.getElementById("nav-toggle");
+                var backdrop = document.getElementById("nav-backdrop");
+                var nav = document.getElementById("header-nav");
+                if (!toggle || !nav || toggle.dataset.menuReady === "1") return;
+                toggle.dataset.menuReady = "1";
+
+                function fechar() {
+                    document.documentElement.classList.remove("nav-open");
+                    document.body.classList.remove("nav-open");
+                    toggle.setAttribute("aria-expanded", "false");
+                    toggle.setAttribute("aria-label", "Abrir menu de navegação");
+                    if (backdrop) {
+                        backdrop.hidden = true;
+                        backdrop.setAttribute("aria-hidden", "true");
+                    }
+                }
+
+                function abrir() {
+                    document.documentElement.classList.add("nav-open");
+                    document.body.classList.add("nav-open");
+                    toggle.setAttribute("aria-expanded", "true");
+                    toggle.setAttribute("aria-label", "Fechar menu de navegação");
+                    if (backdrop) {
+                        backdrop.hidden = false;
+                        backdrop.setAttribute("aria-hidden", "false");
+                    }
+                    if (window.lucide && typeof window.lucide.createIcons === "function") {
+                        window.lucide.createIcons();
+                    }
+                }
+
+                toggle.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (document.body.classList.contains("nav-open")) fechar();
+                    else abrir();
+                });
+
+                if (backdrop) backdrop.addEventListener("click", fechar);
+
+                nav.querySelectorAll("a").forEach(function (link) {
+                    link.addEventListener("click", function () {
+                        if (window.matchMedia("(max-width: 768px)").matches) fechar();
+                    });
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") fechar();
+                });
+
+                window.addEventListener("resize", function () {
+                    if (window.matchMedia("(min-width: 769px)").matches) fechar();
+                });
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", configurarMenuMobile);
+            } else {
+                configurarMenuMobile();
+            }
+        })();
+    </script>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
+        (function () {
+            function iniciarVLibras() {
+                var raiz = document.querySelector("[vw]");
+                if (!raiz || !window.VLibras || !window.VLibras.Widget) return;
+                if (raiz.dataset.vlibrasReady === "1") return;
+                raiz.dataset.vlibrasReady = "1";
+                new window.VLibras.Widget("https://vlibras.gov.br/app");
+            }
 
-    <script src="{% static 'js/script.js' %}"></script>
-    <script>
-        lucide.createIcons();
+            iniciarVLibras();
+            window.addEventListener("load", iniciarVLibras);
+            window.addEventListener("pageshow", function (evento) {
+                if (!evento.persisted) return;
+                var raiz = document.querySelector("[vw]");
+                if (raiz) raiz.dataset.vlibrasReady = "";
+                iniciarVLibras();
+            });
+        })();
     </script>
     {% block extra_js %}{% endblock %}
 </body>

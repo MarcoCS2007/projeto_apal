@@ -1,0 +1,255 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Dossiê do Trabalhador - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ambulantes" %}
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A; margin: 0;">Dossiê do Ambulante</h1>
+        <p style="color: #475569; margin: 4px 0 0 0;">Ficha única: dados, documentos, licenças, ocorrências e score.</p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{% url 'gestor_ambulante_editar' ambulante.pk %}" class="btn-action" style="text-decoration: none;">
+            <i data-lucide="pencil"></i> Editar cadastro
+        </a>
+        {% if requerimento_aberto %}
+        <a href="{% url 'gestor_analisar' requerimento_aberto.pk %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="file-search"></i> Analisar requerimento
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="form-card" style="margin-bottom: 24px;">
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        {% if ambulante.foto %}
+        <img src="{{ ambulante.foto.url }}" alt="Foto de {{ ambulante.nome_completo }}" width="80" height="80" decoding="async" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #2563EB;">
+        {% else %}
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid #2563EB;">
+            {{ ambulante.iniciais }}
+        </div>
+        {% endif %}
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin: 0;">{{ ambulante.nome_completo }}</h2>
+                {% if ambulante.situacao_conta == "cancelada" %}
+                <span class="badge danger">Conta cancelada</span>
+                {% elif ambulante.situacao_conta == "suspensa" %}
+                <span class="badge danger">Conta suspensa</span>
+                {% elif ambulante.situacao_conta == "completa" %}
+                <span class="badge success">Cadastrado</span>
+                {% else %}
+                <span class="badge">Cadastro pendente</span>
+                {% endif %}
+            </div>
+            <p style="color: #475569; margin: 6px 0 0 0; font-size: 0.95rem;">
+                <strong>CPF:</strong> {{ ambulante.cpf_formatado }}
+                {% if ambulante.apelido_nome_fantasia %} &bull; <strong>Fantasia:</strong> {{ ambulante.apelido_nome_fantasia }}{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;">
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Score de Conformidade</span>
+            <strong style="display: block; font-size: 1.6rem; color: {{ faixa.cor }}; margin-top: 4px;">{{ ambulante.pontuacao }} / {{ maximo }}</strong>
+            <small style="color: {{ faixa.cor }}; font-weight: 700;">Nível {{ faixa.nome }}</small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ponto</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">
+                {% if licenca_atual and licenca_atual.ponto_ocupacao %}
+                {{ licenca_atual.ponto_ocupacao.nome_identificacao }}
+                {% elif ambulante.ponto_pretendido %}
+                {{ ambulante.ponto_pretendido.nome_identificacao }}
+                {% else %}
+                Não informado
+                {% endif %}
+            </strong>
+            <small style="color: #475569;">
+                {% if licenca_atual and licenca_atual.ponto_ocupacao %}{{ licenca_atual.ponto_ocupacao.bairro }}{% elif ambulante.ponto_pretendido %}{{ ambulante.ponto_pretendido.bairro }}{% endif %}
+            </small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Gênero</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{{ ambulante.get_genero_display }}</strong>
+            <small style="color: #475569;">{% if ambulante.data_nasc %}Nasc. {{ ambulante.data_nasc|date:"d/m/Y" }}{% else %}Idade não informada{% endif %}</small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Escolaridade / NIS</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{{ ambulante.escolaridade|default:"Não informado" }}</strong>
+            <small style="color: #475569;">{% if ambulante.nis %}CadÚnico {{ ambulante.nis }}{% else %}Sem NIS informado{% endif %}</small>
+        </div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Renda estimada</span>
+            <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">{% if ambulante.renda_mensal_estimada %}R$ {{ ambulante.renda_mensal_estimada }}{% else %}Não informado{% endif %}</strong>
+            <small style="color: #475569;">{{ ambulante.num_funcionarios }} auxiliar{{ ambulante.num_funcionarios|pluralize }}</small>
+        </div>
+    </div>
+</div>
+
+{% if endereco %}
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Endereço</h3>
+    <p style="color: #475569; margin: 0;">
+        {{ endereco.logradouro }}, {{ endereco.numero }}{% if endereco.complemento %} — {{ endereco.complemento }}{% endif %}<br>
+        {{ endereco.bairro }} · {{ endereco.cidade }}/{{ endereco.estado_uf }} · CEP {{ endereco.cep }}
+    </p>
+</div>
+{% endif %}
+
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Documentos</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>TIPO</th>
+                    <th>STATUS</th>
+                    <th>ENVIO</th>
+                    <th>ARQUIVO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documentos %}
+                <tr>
+                    <td>{{ doc.get_tipo_documento_display }}</td>
+                    <td>{{ doc.status_aprovacao }}</td>
+                    <td>{{ doc.data_upload|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if doc.arquivo %}
+                        <a href="{% url 'documento_arquivo' doc.pk %}" target="_blank">Visualizar</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum documento anexado ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Licenças e requerimentos</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>PROTOCOLO</th>
+                    <th>Nº ALVARÁ</th>
+                    <th>STATUS</th>
+                    <th>CATEGORIA</th>
+                    <th>AÇÃO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for licenca in licencas %}
+                <tr>
+                    <td>{{ licenca.protocolo }}</td>
+                    <td>{{ licenca.numero_licenca|default:"—" }}</td>
+                    <td>{{ licenca.status }}</td>
+                    <td>{% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}—{% endif %}</td>
+                    <td>
+                        {% if licenca.na_fila %}
+                        <a href="{% url 'gestor_analisar' licenca.pk %}">Analisar</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Nenhum requerimento ou alvará para este trabalhador.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Histórico de Fiscalização</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>OCORRÊNCIA</th>
+                    <th>AGENTE FISCAL</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ocorrencia in ocorrencias %}
+                <tr>
+                    <td>{{ ocorrencia.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {{ ocorrencia.tipo_ocorrencia }}
+                        {% if ocorrencia.evidencia_foto %}
+                        <br><a href="{{ ocorrencia.evidencia_foto.url }}" target="_blank" rel="noopener">Ver evidência</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ ocorrencia.fiscal.nome_completo }}</td>
+                    <td><span class="badge {{ ocorrencia.classe_badge }}">{{ ocorrencia.status_ocorrencia }}</span></td>
+                    <td>
+                        <a href="{% url 'gestor_ocorrencia_detalhe' ocorrencia.pk %}">Auditar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Nenhuma ocorrência registrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-top: 0;">Histórico de score</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>EVENTO</th>
+                    <th>PONTOS</th>
+                    <th>SALDO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{{ evento.descricao }}</td>
+                    <td>{% if evento.pontos > 0 %}+{% endif %}{{ evento.pontos }}</td>
+                    <td>{{ evento.saldo_apos }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Sem eventos ainda. Pontuação inicial: {{ ambulante.pontuacao }}.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 1.5rem;">
+    <a href="{% url 'gestor_ambulantes' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="arrow-left"></i> Voltar à listagem
+    </a>
+</div>
+{% endblock %}

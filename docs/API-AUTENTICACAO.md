@@ -44,7 +44,7 @@ Gera o par de tokens. **Não cria cookie `sessionid`.**
 
 ```json
 {
-  "cpf": "33333333333",
+  "cpf": "10020030088",
   "password": "amb123"
 }
 ```
@@ -73,17 +73,27 @@ Exemplo:
 ```bash
 curl -X POST http://localhost:8000/api/login/ \
   -H "Content-Type: application/json" \
-  -d "{\"cpf\": \"33333333333\", \"password\": \"amb123\"}"
+  -d "{\"cpf\": \"10020030088\", \"password\": \"amb123\"}"
 ```
 
 Usuários do seed local (`python manage.py seed_inicial`):
 
-| Perfil | CPF | Senha |
-| --- | --- | --- |
-| Administrador | `00000000000` | `admin123` |
-| Gestor | `11111111111` | `gestor123` |
-| Fiscal | `22222222222` | `fiscal123` |
-| Ambulante | `33333333333` | `amb123` |
+| Perfil | CPF | Senha | Observação |
+| --- | --- | --- | --- |
+| Administrador | `52998224725` | `admin123` | Painel Master |
+| Gestor | `11144477735` | `gestor123` | Posturas |
+| Gestor | `20030040094` | `gestor123` | Vigilância Sanitária |
+| Gestor | `30040050009` | `gestor123` | SEFIN |
+| Fiscal | `12345678909` | `fiscal123` | Centro |
+| Fiscal | `40050060007` | `fiscal123` | Feira do Bairro Brasil |
+| Fiscal | `50060070013` | `fiscal123` | Terminal |
+| Fiscal | `60070080020` | `fiscal123` | Itinerante |
+| Ambulante | `10020030088` | `amb123` | Cadastro pendente |
+| Ambulante | `39053344705` | `amb123` | Cadastro completo (MEI) |
+| Ambulante | `30405060726` | `amb123` | Só a conta |
+| Ambulante | `20304050601` | `amb123` | Completo e inativo |
+
+Há outros ambulantes fictícios (Antônio, Raimunda, Carlos, Pedro) com a mesma senha `amb123`, em situações de cadastro completo ou parcial.
 
 ### 2.2 Refresh — `POST /api/token/refresh/`
 
@@ -119,7 +129,7 @@ curl http://localhost:8000/api/me/ \
 ```json
 {
   "id": 1,
-  "cpf": "33333333333",
+  "cpf": "10020030088",
   "nome": "João",
   "sobrenome": "Ambulante",
   "email": "ambulante@apal.com",
@@ -177,11 +187,13 @@ Elas já exigem usuário autenticado. Combine com `|` do DRF se a rota aceitar m
 
 ## 5. Relação com o backoffice
 
-O login web (`POST /login/`, template `login.html`) usa sessão Django e cookie `sessionid`. Só **Gestor** e **Administrador** entram. Ambulante e Fiscal recebem erro de formulário e **não** ganham sessão.
+O login web usa sessão Django e cookie `sessionid`, em canais separados: `/login/` (Gestor/Master), `/entrar/` (Ambulante) e `/fiscal/entrar/` (Fiscal). No backoffice, ambulante e fiscal recebem erro de formulário e **não** ganham sessão.
+
+O encerramento do expediente é `POST /logout/` (CSRF obrigatório). A view invalida a sessão, apaga o cookie `sessionid` e redireciona Gestor/Administrador para `/login/?encerrado=1`. Ambulante autenticado na web volta para `/entrar/`. `GET /logout/` não encerra a sessão (405).
 
 Não misture os fluxos no cliente:
 
-- App móvel → `/api/login/` → guardar `access`/`refresh` → header Bearer.
+- App móvel → `/api/login/` → guardar `access`/`refresh` → header Bearer. Casos de uso em [API-MOVEL.md](API-MOVEL.md).
 - Navegador backoffice → `/login/` → cookie gerenciado pelo Django.
 
 ---
@@ -190,7 +202,7 @@ Não misture os fluxos no cliente:
 
 | Arquivo | Papel |
 | --- | --- |
-| `apps/usuarios/urls.py` | Rotas `/api/login/`, `/api/token/refresh/`, `/api/me/` |
+| `apps/usuarios/urls.py` | Rotas `/api/login/`, `/api/token/refresh/`, `/api/me/`, cadastro e score |
 | `apps/usuarios/serializers.py` | `LoginSerializer` (claim `role`) |
 | `apps/usuarios/authentication.py` | JWT com `select_related` dos perfis |
 | `apps/usuarios/urls_web.py` | Login/logout por cookie |

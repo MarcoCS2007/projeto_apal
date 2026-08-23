@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Gestão de Permissões - Ponto Certo Conquista{% endblock %}
+
+{% block header_extra_class %} header-master{% endblock %}
+
+{% block header_nav %}
+{% include "master/_nav.html" with active="permissoes" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section" style="background-color: var(--texto-escuro);">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Gestão de Permissões Globais e Segurança</h1>
+        <p>Configure privilégios de acesso por perfil, políticas de autenticação e regras de segurança do sistema.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'master_permissoes' %}">
+    {% csrf_token %}
+
+    <div class="form-card" style="margin-bottom: 2rem;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+            <h2>Matriz de Acessos por Perfil de Usuário</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.5rem;">
+            Marque os módulos e recursos que cada perfil tem autorização para acessar na plataforma.
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <caption class="sr-only">Módulos liberados para ambulante, fiscal, gestor e cidadão</caption>
+                <thead>
+                    <tr>
+                        <th>MÓDULO / RECURSO DO SISTEMA</th>
+                        <th style="text-align: center;">AMBULANTE</th>
+                        <th style="text-align: center;">FISCAL DE RUA</th>
+                        <th style="text-align: center;">GESTOR MUNICIPAL</th>
+                        <th style="text-align: center;">CIDADÃO / PÚBLICO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for linha in form.linhas_matriz %}
+                    <tr>
+                        <td><strong>{{ linha.rotulo }}</strong></td>
+                        {% for celula in linha.celulas %}
+                        <td style="text-align: center;">
+                            {% if celula.editavel %}
+                            {{ celula.campo }}
+                            {% else %}
+                            <input type="checkbox" disabled title="Não aplicável a este perfil" aria-label="Não aplicável">
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-card" style="margin-bottom: 2rem;">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #F59E0B;"></div>
+            <h2>Políticas de Autenticação e Sessão</h2>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="tempo-sessao">Tempo Limite de Sessão por Inatividade</label>
+                {{ form.tempo_sessao_minutos }}
+            </div>
+
+            <div class="input-group">
+                <label for="tentativas-login">Tentativas Incorretas para Bloqueio</label>
+                {{ form.tentativas_bloqueio }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="autenticacao-2fa">Exigência de 2FA (Dois Fatores)</label>
+                {{ form.exigencia_2fa }}
+            </div>
+
+            <div class="input-group">
+                <label for="retencao-logs">Período de Retenção de Logs de Auditoria</label>
+                {{ form.retencao_logs_meses }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="dias-recuperacao-score">Dias Sem Infração Para Recuperar Score</label>
+                {{ form.dias_recuperacao_score }}
+                <small style="color: var(--texto-cinza); display: block; margin-top: 4px;">{{ form.dias_recuperacao_score.help_text }}</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <a href="{% url 'master_admin' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar ao Painel da TI
+            </a>
+
+            <button type="submit" class="btn-submit" style="background-color: var(--azul-vibrante); display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="save" aria-hidden="true"></i> Salvar Configurações Globais
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

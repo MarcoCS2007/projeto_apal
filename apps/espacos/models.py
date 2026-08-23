@@ -3,6 +3,18 @@ from django.db import models
 from apps.core.models import ModeloBase
 
 
+class StatusOcupacao(models.TextChoices):
+    LIVRE = "Livre", "Livre"
+    OCUPADO = "Ocupado", "Ocupado"
+    BLOQUEADO = "Bloqueado", "Bloqueado"
+    RESERVADO = "Reservado", "Reservado"
+
+
+class PontoOcupacaoQuerySet(models.QuerySet):
+    def livres(self):
+        return self.filter(ativo=True, status_ocupacao=StatusOcupacao.LIVRE)
+
+
 class Endereco(ModeloBase):
     ambulante = models.ForeignKey(
         "usuarios.Ambulante", on_delete=models.CASCADE, related_name="enderecos"
@@ -52,7 +64,14 @@ class PontoOcupacao(ModeloBase):
     metragem_maxima = models.DecimalField(
         "Metragem Máxima (m²)", max_digits=5, decimal_places=2
     )
-    status_ocupacao = models.CharField("Status de Ocupação", max_length=50)
+    status_ocupacao = models.CharField(
+        "Status de Ocupação",
+        max_length=50,
+        choices=StatusOcupacao.choices,
+        default=StatusOcupacao.LIVRE,
+    )
+
+    objects = PontoOcupacaoQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Ponto de Ocupação"
@@ -60,3 +79,34 @@ class PontoOcupacao(ModeloBase):
 
     def __str__(self):
         return self.nome_identificacao
+
+    def tem_licenca_ativa(self):
+        from apps.licenciamento.models import StatusLicenca
+
+        return self.licencas.filter(
+            ativo=True,
+            status=StatusLicenca.ATIVO,
+        ).exists()
+
+    def disponivel_para_nova_atribuicao(self):
+        if not self.ativo or self.status_ocupacao != StatusOcupacao.LIVRE:
+            return False
+        return not self.tem_licenca_ativa()
+
+    def ocupar(self):
+        self.status_ocupacao = StatusOcupacao.OCUPADO
+        self.save(update_fields=["status_ocupacao", "atualizado_em"])
+
+    def liberar_se_livre(self):
+        if self.tem_licenca_ativa():
+            return False
+        if self.status_ocupacao != StatusOcupacao.OCUPADO:
+            return False
+        self.status_ocupacao = StatusOcupacao.LIVRE
+        self.save(update_fields=["status_ocupacao", "atualizado_em"])
+        return True
+
+    def metragem_compativel(self, metragem):
+        if metragem is None:
+            return True
+        return metragem <= self.metragem_maxima

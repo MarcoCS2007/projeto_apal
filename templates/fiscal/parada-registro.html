@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrar parada - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="fiscal_rotas" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section hero-section--compact">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Parada #{{ parada.ordem }}</h1>
+        <p>{{ parada.ambulante.nome_completo }}{% if parada.ponto %} · {{ parada.ponto.nome_identificacao }}{% endif %}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card rota-parada-registro-card">
+    <p style="margin: 0 0 1rem;">
+        <a href="{% url 'fiscal_rota_execucao' rota.pk %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar à rota
+        </a>
+    </p>
+
+    <div class="rota-proxima-parada" style="margin-bottom: 1.5rem; border-radius: 12px;">
+        <span class="rota-proxima-etiqueta">Destino esperado</span>
+        <h3 class="rota-proxima-titulo" style="margin-top: 0.35rem;">{{ parada.ambulante.nome_completo }}</h3>
+        {% if parada.ponto %}
+        <p class="rota-proxima-ponto">
+            <i data-lucide="map-pin" aria-hidden="true"></i>
+            {{ parada.ponto.nome_identificacao }}
+        </p>
+        {% endif %}
+        <p class="rota-proxima-endereco" style="margin-bottom: 0;">
+            <i data-lucide="navigation" aria-hidden="true"></i>
+            <span>{{ parada.endereco_completo }}</span>
+        </p>
+    </div>
+
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #0EA5E9;"></div>
+        <h2>1. Identificar o ambulante</h2>
+    </div>
+    <p class="rota-mobile-hint">
+        No celular: leia o QR da credencial ou digite o CPF / número da licença.
+    </p>
+
+    <div class="qr-scanner-box" id="qr-scanner-box">
+        <div id="qr-reader"></div>
+        <i data-lucide="scan" class="camera-icon" id="qr-placeholder-icon"></i>
+        <p class="scanner-text" id="qr-status" style="font-weight: 500; color: var(--texto-cinza);">
+            Aguardando ativação da câmera...
+        </p>
+    </div>
+    <div class="form-actions" style="justify-content: center; margin-top: 1rem;">
+        <button
+            type="button"
+            class="btn-submit rota-btn-touch"
+            id="btn-ativar-camera"
+            data-redirect-base="{% url 'fiscal_parada_registro' rota.pk parada.pk %}"
+            style="width: 100%; display: flex; justify-content: center; gap: 0.5rem; align-items: center;"
+        >
+            <i data-lucide="camera"></i>
+            Ativar câmera e leitor
+        </button>
+    </div>
+
+    <form method="get" action="{% url 'fiscal_parada_registro' rota.pk parada.pk %}" class="registration-form" style="margin-top: 1.25rem;">
+        <div class="input-group full-width">
+            <label for="busca-parada">CPF, nº da licença ou código do QR</label>
+            <input
+                type="text"
+                id="busca-parada"
+                name="q"
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+                placeholder="Ex: 123.456.789-00 ou ALV-2026-0001"
+                value="{{ termo }}"
+                class="rota-input-touch"
+            >
+        </div>
+        <div class="input-group full-width" style="margin-top: 0.75rem;">
+            <label for="qr-manual">Ou cole o hash da credencial</label>
+            <input type="text" id="qr-manual" name="qr" placeholder="Hash do QR" value="" class="qr-manual-input rota-input-touch" autocomplete="off" spellcheck="false">
+        </div>
+        <button type="submit" class="btn-action rota-btn-touch" style="width: 100%; margin-top: 0.75rem; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
+            <i data-lucide="search"></i> Validar identificação
+        </button>
+    </form>
+
+    {% if resultado %}
+    <div class="rota-identificacao-resultado" style="margin-top: 1.5rem;">
+        {% if resultado.ambulante %}
+            {% if identificacao_bate %}
+            <div class="form-success" role="status">
+                Credencial confere com o ambulante esperado nesta parada.
+            </div>
+            {% else %}
+            <div class="login-error" role="alert">
+                Atenção: a credencial lida é de
+                <strong>{{ resultado.ambulante.nome_completo }}</strong>,
+                mas a parada espera <strong>{{ parada.ambulante.nome_completo }}</strong>.
+            </div>
+            {% endif %}
+            {% include "fiscal/_ficha_parada.html" %}
+        {% elif resultado.candidatos %}
+            <div class="form-card" style="margin: 0; box-shadow: none; border: 1px solid var(--borda-cinza);">
+                <p>{{ resultado.mensagem }}</p>
+                <ul style="list-style: none; padding: 0; margin: 1rem 0 0;">
+                    {% for candidato in resultado.candidatos %}
+                    <li style="margin-bottom: 0.5rem;">
+                        <a class="rota-btn-touch" style="display: block; padding: 0.75rem; border: 1px solid var(--borda-cinza); border-radius: 10px; text-decoration: none;" href="{% url 'fiscal_parada_registro' rota.pk parada.pk %}?q={{ candidato.cpf }}">
+                            {{ candidato.nome_completo }} — CPF {{ candidato.cpf_formatado }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="login-error" role="alert">{{ resultado.mensagem }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <hr style="border: 0; border-top: 1px solid var(--borda-cinza); margin: 2rem 0;">
+
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #10B981;"></div>
+        <h2>2. Resultado da visita</h2>
+    </div>
+    <form method="post" class="registration-form" id="form-visita-parada">
+        {% csrf_token %}
+        <fieldset class="input-group full-width rota-radio-touch">
+            <legend>{{ form.encontrou_ambulante.label }}</legend>
+            {{ form.encontrou_ambulante }}
+            {% if form.encontrou_ambulante.errors %}<small class="form-error">{{ form.encontrou_ambulante.errors.0 }}</small>{% endif %}
+        </fieldset>
+        <fieldset class="input-group full-width rota-radio-touch">
+            <legend>{{ form.foi_recebido.label }}</legend>
+            {{ form.foi_recebido }}
+        </fieldset>
+        <fieldset class="input-group full-width rota-radio-touch">
+            <legend>{{ form.houve_ocorrencia.label }}</legend>
+            {{ form.houve_ocorrencia }}
+            <small style="color: var(--texto-cinza); display: block; margin-top: 0.35rem;">
+                Se sim, você será direcionado ao módulo de ocorrências (com foto e tipificação).
+            </small>
+        </fieldset>
+        <div class="input-group full-width">
+            <label for="id_observacoes">{{ form.observacoes.label }}</label>
+            {{ form.observacoes }}
+        </div>
+        <button type="submit" class="btn-submit rota-btn-touch" style="width: 100%; margin-top: 1rem; min-height: 52px;">
+            Salvar registro da parada
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/fiscal-qr-leitor.js' %}"></script>
+{% endblock %}
