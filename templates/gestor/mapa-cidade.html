@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mapa da Cidade - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="mapa" %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Mapa da Cidade — Vitória da Conquista</h1>
+        <p>Concentração de ambulantes por ponto de ocupação (demonstração).</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card mapa-cidade-filtros relatorio-filtros">
+    <form id="mapa-cidade-filtros" class="relatorio-filtros-grid" data-url="{{ mapa_dados_url }}">
+        <div class="input-group">
+            <label for="mapa-bairro">Bairro do ponto</label>
+            <select id="mapa-bairro" name="bairro" class="styled-select">
+                <option value="">Todos os bairros</option>
+                {% for bairro in bairros_disponiveis %}
+                <option value="{{ bairro }}">{{ bairro }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="mapa-situacao">Situação</label>
+            <select id="mapa-situacao" name="situacao" class="styled-select">
+                <option value="todos" selected>Todos</option>
+                <option value="ativos">Licença ativa</option>
+                <option value="sem_licenca">Sem licença</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="mapa-origem">Tipo de atuação</label>
+            <select id="mapa-origem" name="origem" class="styled-select">
+                <option value="">Todos</option>
+                <option value="fixo">Fixo</option>
+                <option value="movel">Itinerante (móvel)</option>
+            </select>
+        </div>
+        <div class="input-group relatorio-filtros-acao" style="display: flex; gap: 10px; align-items: flex-end;">
+            <button type="submit" class="btn-action">
+                <i data-lucide="filter"></i> Aplicar filtros
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="assistente-kpi-grid mapa-cidade-kpis" style="margin: 1.25rem 0;">
+    <div class="assistente-kpi"><strong id="mapa-kpi-pontos">—</strong><span>Pontos no mapa</span></div>
+    <div class="assistente-kpi"><strong id="mapa-kpi-ambulantes">—</strong><span>Ambulantes contados</span></div>
+    <div class="assistente-kpi"><strong id="mapa-kpi-max">—</strong><span>Maior concentração</span></div>
+</div>
+
+<div class="form-card rota-mapa-card mapa-cidade-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+        <h2>Ocupação por ponto</h2>
+    </div>
+    <p class="mapa-cidade-dica">Clique em um ponto para ver os ambulantes filtrados naquele local.</p>
+    <div class="mapa-cidade-shell">
+        <div
+            id="mapa-cidade"
+            class="rota-mapa mapa-cidade-mapa"
+            data-url="{{ mapa_dados_url }}"
+        ></div>
+        <aside
+            id="mapa-cidade-painel"
+            class="mapa-cidade-painel"
+            hidden
+            aria-hidden="true"
+            aria-labelledby="mapa-painel-titulo"
+        >
+            <div class="mapa-cidade-painel-cabecalho">
+                <div>
+                    <p class="mapa-cidade-painel-kicker">Ponto selecionado</p>
+                    <h3 id="mapa-painel-titulo">—</h3>
+                    <p id="mapa-painel-endereco" class="mapa-cidade-painel-meta"></p>
+                </div>
+                <button type="button" id="mapa-painel-fechar" class="mapa-cidade-painel-fechar" aria-label="Fechar painel">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="mapa-cidade-painel-status">
+                <span id="mapa-painel-badge" class="badge"></span>
+                <span id="mapa-painel-count" class="mapa-cidade-painel-count"></span>
+            </div>
+            <div id="mapa-painel-lista" class="mapa-cidade-painel-lista" role="list"></div>
+            <p id="mapa-painel-vazio" class="mapa-cidade-painel-vazio" hidden>
+                Nenhum ambulante neste ponto com o filtro atual.
+            </p>
+        </aside>
+    </div>
+    <div class="mapa-cidade-legenda" aria-label="Legenda de densidade">
+        <span>Poucos</span>
+        <div class="mapa-cidade-legenda-barra"></div>
+        <span>Muitos</span>
+    </div>
+    <div class="mapa-cidade-rodape">
+        <a href="{% url 'gestor_pontos' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="map-pin"></i> Gerenciar pontos
+        </a>
+        <a href="{% url 'backoffice_inicio' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao painel
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'js/gestor-mapa-cidade.js' %}"></script>
+{% endblock %}

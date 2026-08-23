@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Painel do Gestor - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="painel" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Painel do Gestor</h1>
+        <p>Fila de análise, dossiês e gestão dos trabalhadores ambulantes.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #10B981;"></div>
+        <h2>Ações Globais</h2>
+    </div>
+    <p style="color: var(--texto-cinza); margin-bottom: 1rem;">
+        Processa a recuperação de score (+2 pontos) para todos os ambulantes sem infrações no período configurado.
+    </p>
+    <form method="post" action="{% url 'gestor_processar_score' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i> Rodar Recuperação Mensal de Score
+        </button>
+    </form>
+</div>
+
+<section class="gestor-painel-dash" aria-label="Indicadores e atalhos">
+    <div class="gestor-acesso-rapido">
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Acesso rápido</h2>
+        </div>
+        <div class="gestor-atalhos">
+            {% if pode.relatorios %}
+            <a href="{% url 'relatorios:dashboard' %}" class="form-card form-card-link gestor-atalho">
+                <span class="stat-kicker">Relatórios</span>
+                <strong class="stat-value"><i data-lucide="bar-chart-3"></i></strong>
+                <small class="text-muted">Indicadores e ocupação</small>
+            </a>
+            {% endif %}
+            {% if pode.rotas_fiscais %}
+            <a href="{% url 'gestor_rotas' %}" class="form-card form-card-link gestor-atalho">
+                <span class="stat-kicker">Rotas</span>
+                <strong class="stat-value">{{ rotas_pendentes_analise }}</strong>
+                <small class="text-muted">Concluídas / incompletas</small>
+            </a>
+            {% endif %}
+            {% if pode.mapa_vagas %}
+            <a href="{% url 'gestor_pontos' %}" class="form-card form-card-link gestor-atalho">
+                <span class="stat-kicker">Vagas</span>
+                <strong class="stat-value"><i data-lucide="map-pin"></i></strong>
+                <small class="text-muted">Gerenciar pontos de ocupação</small>
+            </a>
+            <a href="{% url 'gestor_mapa_cidade' %}" class="form-card form-card-link gestor-atalho">
+                <span class="stat-kicker">Mapa</span>
+                <strong class="stat-value">{{ total_vagas }}</strong>
+                <small class="text-muted">Pontos de ocupação na cidade</small>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="gestor-operacoes">
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Operações</h2>
+        </div>
+        <div class="gestor-indicadores">
+        {% if pode.solicitacao_licenca %}
+        <a href="{% url 'gestor_fila' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Fila em análise</span>
+            <strong class="stat-value">{{ fila_analise }}</strong>
+            <small class="text-muted">Requerimentos pendentes</small>
+        </a>
+        <a href="{% url 'gestor_ambulantes' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Ambulantes</span>
+            <strong class="stat-value">{{ total_ambulantes }}</strong>
+            <small class="text-muted">Cadastros no município</small>
+        </a>
+        <a href="{% url 'gestor_categorias' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Categorias</span>
+            <strong class="stat-value">{{ total_categorias }}</strong>
+            <small class="text-muted">Tipos de produto</small>
+        </a>
+        {% endif %}
+        {% if pode.ocorrencias %}
+        <a href="{% url 'gestor_ocorrencias' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Ocorrências</span>
+            <strong class="stat-value">{{ total_ocorrencias }}</strong>
+            <small class="text-muted">Registros de fiscalização</small>
+        </a>
+        {% endif %}
+        {% if pode.rotas_fiscais %}
+        <a href="{% url 'gestor_rotas' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Rotas</span>
+            <strong class="stat-value">{{ rotas_pendentes_analise }}</strong>
+            <small class="text-muted">Concluídas / incompletas</small>
+        </a>
+        {% endif %}
+        {% if pode.mapa_vagas %}
+        <a href="{% url 'gestor_mapa_cidade' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Mapa</span>
+            <strong class="stat-value">{{ total_vagas }}</strong>
+            <small class="text-muted">Pontos de ocupação na cidade</small>
+        </a>
+        {% endif %}
+        {% if pode.solicitacao_licenca %}
+        <a href="{% url 'gestor_triagem' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Triagem</span>
+            <strong class="stat-value">{{ docs_pendentes }}</strong>
+            <small class="text-muted">Documentos pendentes</small>
+        </a>
+        {% endif %}
+        {% if pode.emissao_alvara %}
+        <a href="{% url 'gestor_licencas' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Licenças</span>
+            <strong class="stat-value">{{ licencas_aprovadas }}</strong>
+            <small class="text-muted">Prontas para emissão</small>
+        </a>
+        {% endif %}
+        {% if pode.mapa_vagas %}
+        <a href="{% url 'gestor_pontos' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Vagas</span>
+            <strong class="stat-value"><i data-lucide="map-pin"></i></strong>
+            <small class="text-muted">Gerenciar pontos de ocupação</small>
+        </a>
+        {% endif %}
+        {% if pode.ocorrencias %}
+        <a href="{% url 'gestor_infracoes' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Infrações</span>
+            <strong class="stat-value"><i data-lucide="alert-triangle"></i></strong>
+            <small class="text-muted">Catálogo e tipificações</small>
+        </a>
+        {% endif %}
+        {% if pode.relatorios %}
+        <a href="{% url 'relatorios:dashboard' %}" class="form-card form-card-link gestor-indicador">
+            <span class="stat-kicker">Relatórios</span>
+            <strong class="stat-value"><i data-lucide="bar-chart-3"></i></strong>
+            <small class="text-muted">Indicadores e ocupação</small>
+        </a>
+        {% endif %}
+        </div>
+    </div>
+</section>
+
+{% if user.role == "administrador" %}
+<p>
+    <a href="{% url 'master_admin' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        Abrir painel Master
+    </a>
+</p>
+{% endif %}
+{% endblock %}

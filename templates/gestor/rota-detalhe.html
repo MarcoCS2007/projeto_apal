@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ rota.titulo }} - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="rotas" %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>{{ rota.titulo }}</h1>
+        <p>
+            Fiscal {{ rota.fiscal.nome_completo }} ·
+            <span class="badge {{ rota.classe_badge }}">{{ rota.get_status_display }}</span>
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 1.5rem;">
+    <p style="margin: 0 0 1.25rem;">
+        <a href="{% url 'gestor_rotas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar às rotas
+        </a>
+    </p>
+    <div class="assistente-kpi-grid" style="margin-bottom: 0;">
+        <div class="assistente-kpi"><strong>{{ resumo.total_paradas }}</strong><span>Paradas</span></div>
+        <div class="assistente-kpi"><strong>{{ resumo.paradas_concluidas }}</strong><span>Concluídas</span></div>
+        <div class="assistente-kpi"><strong>{{ resumo.sem_ambulante }}</strong><span>Sem ambulante</span></div>
+        <div class="assistente-kpi"><strong>{{ resumo.com_ocorrencia }}</strong><span>Com ocorrência</span></div>
+    </div>
+</div>
+
+<div class="rota-execucao-layout">
+    <div class="form-card rota-mapa-card">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: #0EA5E9;"></div>
+            <h2>Mapa das paradas</h2>
+        </div>
+        <div
+            id="rota-mapa"
+            class="rota-mapa"
+            data-modo="gestor"
+        ></div>
+        {{ paradas_mapa|json_script:"rota-paradas-data" }}
+        {% if rota.observacoes_gestor %}
+        <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Orientações:</strong> {{ rota.observacoes_gestor }}</p>
+        {% endif %}
+        {% if rota.relato_incompleta %}
+        <p style="margin-top: 0.75rem; font-size: 0.9rem; color: #B54708;">
+            <strong>Relato de incompletude:</strong> {{ rota.relato_incompleta }}
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent"></div>
+            <h2>Registros das visitas</h2>
+        </div>
+        <div class="table-responsive table-stack">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>AMBULANTE</th>
+                        <th>PONTO</th>
+                        <th>STATUS</th>
+                        <th>VISITA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parada in rota.paradas.all %}
+                    <tr>
+                        <td data-label="#">{{ parada.ordem }}</td>
+                        <td data-label="Ambulante">
+                            <a href="{% url 'gestor_dossie' parada.ambulante_id %}">{{ parada.ambulante.nome_completo }}</a>
+                        </td>
+                        <td data-label="Ponto">{% if parada.ponto %}{{ parada.ponto.nome_identificacao }}{% else %}—{% endif %}</td>
+                        <td data-label="Status">{{ parada.get_status_display }}</td>
+                        <td data-label="Visita">
+                            {% if parada.visita %}
+                            Encontrou: {% if parada.visita.encontrou_ambulante %}Sim{% else %}Não{% endif %}<br>
+                            Recebido: {% if parada.visita.foi_recebido %}Sim{% else %}Não{% endif %}
+                            {% if parada.visita.ocorrencia_id %}
+                            <br><a href="{% url 'gestor_ocorrencia_detalhe' parada.visita.ocorrencia_id %}">Ocorrência #{{ parada.visita.ocorrencia_id }}</a>
+                            {% endif %}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'js/fiscal-rota-mapa.js' %}"></script>
+{% endblock %}

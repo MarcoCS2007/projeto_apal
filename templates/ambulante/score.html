@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Score do Ambulante - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="score" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Score do Ambulante</h1>
+        <p>Pontuação de 0 a 100 conforme licença, renovação e ocorrências procedentes.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card score-resumo-card" style="border-top-color: {{ faixa.cor }};">
+    <div class="score-resumo-topo">
+        <div>
+            <span class="score-resumo-rotulo">Sua pontuação atual</span>
+            <h2 class="score-resumo-pontos">
+                {{ pontuacao }} <span>/ {{ maximo }} pts</span>
+            </h2>
+        </div>
+        <div class="score-nivel-badge" style="background: {{ faixa.fundo }}; border-color: {{ faixa.borda|default:faixa.cor }}; color: {{ faixa.cor }};">
+            <i data-lucide="{{ faixa.icone|default:'award' }}" aria-hidden="true"></i>
+            Nível {{ faixa.nome }}
+        </div>
+    </div>
+    <div class="score-progresso">
+        <div class="score-progresso-meta">
+            {% if faixa.proxima %}
+            <span>Progresso para o nível {{ faixa.proxima }}</span>
+            <span>Faltam {{ faixa.faltam }} pts</span>
+            {% else %}
+            <span>Faixa máxima</span>
+            <span>{{ pontuacao }} / {{ maximo }}</span>
+            {% endif %}
+        </div>
+        <div class="score-progresso-trilha">
+            <div class="score-progresso-barra" style="width: {{ faixa.percentual }}%; background: linear-gradient(90deg, {{ faixa.cor }} 0%, {{ faixa.borda|default:faixa.cor }} 100%);"></div>
+        </div>
+    </div>
+    <p class="score-resumo-descricao">{{ faixa.descricao }}</p>
+</div>
+
+{% include "_regras_score.html" %}
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #0D9488;"></div>
+        <h2>Como regularizar</h2>
+    </div>
+    <ul class="score-dicas">
+        {% for dica in dicas %}
+        <li>
+            <i data-lucide="check-circle-2" aria-hidden="true"></i>
+            <span>{{ dica }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Histórico de pontuação</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>EVENTO</th>
+                    <th>PONTOS</th>
+                    <th>SALDO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{{ evento.descricao }}</td>
+                    <td class="{% if evento.pontos < 0 %}score-pts-neg{% else %}score-pts-pos{% endif %}">
+                        {% if evento.pontos > 0 %}+{% endif %}{{ evento.pontos }}
+                    </td>
+                    <td>{{ evento.saldo_apos }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Ainda não há eventos. A pontuação inicial é {{ maximo }}.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "ambulante/_voltar_painel.html" %}
+</div>
+{% endblock %}

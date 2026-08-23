@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Ocorrência - APAL</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Administrativo do Fiscal -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">APAL</a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="fiscalizacao.html"><i data-lucide="scan"></i> Leitor QR Code</a>
+                <a href="#" style="cursor: default;"><i data-lucide="id-card"></i> Fiscal: #4598</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Auto de Ocorrência e Infração</h1>
+            <p>Registro oficial de notificações, irregularidades e apreensões na via pública.</p>
+        </div>
+    </section>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-container">
+        <div class="form-card" style="max-width: 800px; margin: 0 auto;">
+            
+            <form onsubmit="event.preventDefault(); alert('Ocorrência registrada com sucesso! Auto enviado para a central.'); window.location.href='fiscalizacao.html';">
+                
+                <!-- 1. IDENTIFICAÇÃO E LOCALIZAÇÃO -->
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: #EF4444;"></div>
+                    <h2>1. Identificação do Local e Envolvido</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="identificacao-infrator">CPF / CNPJ ou Nº da Licença</label>
+                        <input type="text" id="identificacao-infrator" placeholder="Ex: ALV-2026/8842 ou Deixe em branco se não identificado">
+                    </div>
+                    <div class="input-group">
+                        <label for="nome-infrator">Nome do Condutor / Infrator</label>
+                        <input type="text" id="nome-infrator" placeholder="Nome informado ou identificado">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="local-ocorrencia">Local da Infração (Endereço / Ponto de Referência)</label>
+                        <input type="text" id="local-ocorrencia" placeholder="Ex: Praça 9 de Novembro, em frente ao banco..." required>
+                    </div>
+                </div>
+
+                <!-- 2. CLASSIFICAÇÃO DA INFRAÇÃO -->
+                <div class="section-title" style="margin-top: 2.5rem;">
+                    <div class="title-accent" style="background-color: #EF4444;"></div>
+                    <h2>2. Tipificação e Medida Adotada</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="tipo-infracao">Tipo de Infração</label>
+                        <select id="tipo-infracao" required>
+                            <option value="" disabled selected>Selecione a infração...</option>
+                            <option value="clandestino">Comércio Clandestino / Sem Licença</option>
+                            <option value="obstrucao">Obstrução de Via ou Calçada</option>
+                            <option value="vidro">Venda de Bebidas em Garrafa de Vidro</option>
+                            <option value="fora_ponto">Atuação Fora do Ponto Autorizado</option>
+                            <option value="equipamento_inadequado">Equipamento Fora do Padrão Concedido</option>
+                            <option value="sem_credencial">Falta de Exibição da Credencial Digital</option>
+                            <option value="outro">Outra Irregularidade</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="medida-adotada">Medida Cautelar Aplicada</label>
+                        <select id="medida-adotada" required>
+                            <option value="" disabled selected>Selecione a ação...</option>
+                            <option value="advertencia">Advertência Verbal / Orientação</option>
+                            <option value="notificacao">Notificação por Escrito (Prazo de Adequação)</option>
+                            <option value="multa">Lavratura de Auto de Infração (Multa)</option>
+                            <option value="apreensao">Apreensão de Mercadorias / Equipamentos</option>
+                            <option value="interdicao">Interdição do Ponto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3. RELATÓRIO E EVIDÊNCIAS -->
+                <div class="section-title" style="margin-top: 2.5rem;">
+                    <div class="title-accent" style="background-color: #EF4444;"></div>
+                    <h2>3. Evidências e Detalhamento</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="foto-evidencia">Foto da Evidência / Local (Câmera do Dispositivo)</label>
+                        <input type="file" id="foto-evidencia" accept="image/*" capture="environment">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="relatorio-fiscal">Relatório da Fiscalização (Observações)</label>
+                        <textarea id="relatorio-fiscal" rows="4" placeholder="Descreva os fatos constatados pelo agente de fiscalização..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- Ações do Formulário -->
+                <div class="form-actions" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="fiscalizacao.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="arrow-left"></i> Voltar à Fiscalização
+                    </a>
+                    <button type="submit" class="btn-submit" style="background-color: #EF4444; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="file-warning"></i> Registrar Ocorrência
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- JS GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

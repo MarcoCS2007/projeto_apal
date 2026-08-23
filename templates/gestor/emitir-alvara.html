@@ -1,0 +1,161 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Emissão de Alvará - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="licencas" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Emissão de Alvará Definitivo</h1>
+        <p>Revise os dados do requerente aprovado, defina a escala e libere a credencial digital.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #10B981;"></div>
+        <h2>
+            {% if licenca.numero_licenca %}
+            Alvará {{ licenca.numero_licenca }}
+            {% else %}
+            Aprovação final: protocolo {{ licenca.protocolo }}
+            {% endif %}
+        </h2>
+    </div>
+
+    <div style="background: var(--fundo-cinza); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--borda-cinza); margin-bottom: 2rem;">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--azul-vibrante); border-bottom: 1px solid var(--borda-cinza); padding-bottom: 0.5rem;">Resumo dos dados validados</h3>
+        <div class="resumo-grid">
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">Requerente</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">
+                    <a href="{% url 'gestor_dossie' ambulante.pk %}">{{ ambulante.nome_completo }}</a>
+                </p>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">CPF / CNPJ</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">{{ ambulante.cpf_formatado }}{% if ambulante.cnpj %} / {{ ambulante.cnpj }}{% endif %}</p>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">Categoria</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">{% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}Não informada{% endif %}</p>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">Ponto</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">{% if licenca.ponto_ocupacao %}{{ licenca.ponto_ocupacao.nome_identificacao }} — {{ licenca.ponto_ocupacao.bairro }}{% else %}Não informado{% endif %}</p>
+            </div>
+            {% if estrutura %}
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">Estrutura</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">{{ estrutura.tipo_estrutura }} ({{ estrutura.dimensoes_metragem }} m²)</p>
+            </div>
+            {% endif %}
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--texto-cinza); text-transform: uppercase;">Status</span>
+                <p style="font-weight: 600; color: var(--texto-escuro);">{{ licenca.status }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if licenca.status == "Ativo" and licenca.numero_licenca %}
+    <div class="info-callout-box" style="margin-bottom: 1.5rem;">
+        <p><strong>Alvará já emitido.</strong> Número {{ licenca.numero_licenca }}, válido até {{ licenca.data_vencimento|date:"d/m/Y" }}.</p>
+        {% if ambulante.codigo_qr_code %}
+        <p style="margin-top: 0.5rem; word-break: break-all; font-size: 0.85rem; color: var(--texto-cinza);">QR: {{ ambulante.codigo_qr_code }}</p>
+        {% endif %}
+    </div>
+    {% if escalas %}
+    <p style="font-weight: 600; margin-bottom: 0.5rem;">Escala autorizada</p>
+    <ul style="color: var(--texto-cinza); margin-bottom: 1.5rem;">
+        {% for escala in escalas %}
+        <li>{{ escala.get_dia_semana_display }} — {{ escala.horario_inicio|time:"H:i" }} às {{ escala.horario_termino|time:"H:i" }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <a href="{% url 'gestor_licencas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="arrow-left"></i> Voltar às licenças
+    </a>
+
+    {% elif not pode_emitir %}
+    <p style="color: var(--texto-cinza);">Este processo não está pronto para emissão (status: {{ licenca.status }}).</p>
+    <a href="{% url 'gestor_licencas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="arrow-left"></i> Voltar às licenças
+    </a>
+
+    {% else %}
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.data_emissao.id_for_label }}">{{ form.data_emissao.label }}</label>
+                {{ form.data_emissao }}
+                {% if form.data_emissao.errors %}<div class="login-error">{{ form.data_emissao.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.data_vencimento.id_for_label }}">{{ form.data_vencimento.label }}</label>
+                {{ form.data_vencimento }}
+                {% if form.data_vencimento.errors %}<div class="login-error">{{ form.data_vencimento.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="{{ form.ponto_ocupacao.id_for_label }}">{{ form.ponto_ocupacao.label }}</label>
+                {{ form.ponto_ocupacao }}
+                {% if form.ponto_ocupacao.errors %}<div class="login-error">{{ form.ponto_ocupacao.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label>{{ form.dias_semana.label }}</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 0.5rem;">
+                    {% for check in form.dias_semana %}
+                    <label class="checkbox-label" style="display: inline-flex; align-items: center; gap: 6px;">{{ check.tag }} {{ check.choice_label }}</label>
+                    {% endfor %}
+                </div>
+                {% if form.dias_semana.errors %}<div class="login-error">{{ form.dias_semana.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.horario_inicio.id_for_label }}">{{ form.horario_inicio.label }}</label>
+                {{ form.horario_inicio }}
+                {% if form.horario_inicio.errors %}<div class="login-error">{{ form.horario_inicio.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.horario_termino.id_for_label }}">{{ form.horario_termino.label }}</label>
+                {{ form.horario_termino }}
+                {% if form.horario_termino.errors %}<div class="login-error">{{ form.horario_termino.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+                {{ form.observacoes }}
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <a href="{% url 'gestor_licencas' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Cancelar / Voltar
+            </a>
+            <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="check-square"></i> Emitir alvará e gerar QR Code
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

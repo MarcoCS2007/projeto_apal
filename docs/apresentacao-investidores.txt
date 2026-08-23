@@ -1,0 +1,294 @@
+APRESENTAÇÃO A INVESTIDORES — 10 MINUTOS
+Ponto Certo Conquista
+Vitória da Conquista (BA)
+
+Este arquivo é o roteiro. Não leia os outros TXTs no palco: use este.
+Os quatro documentos (resumo, funcional, tecnologias, problema) existem
+para o investidor levar depois.
+
+================================================================================
+1. O QUE INTERPRETAMOS COMO DIFERENCIAL
+================================================================================
+
+Um CRUD municipal cadastra gente, ponto e alvará. Qualquer prefeitura
+pode pagar isso. O Ponto Certo Conquista só vira tese de investimento
+quando a regra de negócio, o território e a decisão entram no produto.
+
+Diferenciais reais (já no sistema, não no slide):
+
+1) Credencial que é prova, não enfeite
+   QR com HMAC-SHA256. Só vale com licença Ativa, prazo válido e hash
+   íntegro. O fiscal não “acredita no papel”: o sistema recusa suspenso,
+   vencido, adulterado e fora da escala de horário.
+
+2) Máquina de estados, não formulário
+   Licença (análise → pendência → deferimento → taxa → ativo →
+   vencido/suspenso/cancelado) e auto (registrada → auditoria →
+   procedente/improcedente) mudam score, QR e direito de operar.
+   Cadastrar um status à mão é CRUD. Encadear efeito jurídico é produto.
+
+3) Ocupação com restrição física
+   Vaga tem metragem máxima, status e exclusividade de alvará ativo.
+   A cidade deixa de ser uma lista de nomes e vira estoque de espaço
+   público.
+
+4) Mapa da cidade (densidade)
+   Leaflet sobre dados reais: volume por ponto, filtros de bairro,
+   licença ativa vs. sem licença, fixo vs. itinerante. A pergunta
+   “onde está saturado?” deixa o relatório e entra no território.
+
+5) Rotas de fiscalização (operação de campo)
+   O gestor planeja a ronda (quem, quais paradas, quando). O fiscal
+   executa no mapa, registra visita (encontrou / não encontrou / foi
+   recebido) e vincula auto à parada. Rota incompleta exige relato.
+   Isso é logística pública, não “tela de busca”.
+
+6) Copiloto do gestor (IA de decisão, não chatbot de FAQ)
+   Briefing, relatório, autos, análise de rotas e ações para AUTORIZAR
+   antes de executar. A tese: a prefeitura não precisa de mais telas;
+   precisa de um operador que priorize o dia. A análise de rotas já
+   lê JSON real. O restante da interface já demonstra o produto que
+   se liga aos mesmos serviços.
+
+7) Assistente do ambulante em base local
+   Tira dúvida de documento, prazo, zona e QR sem API paga e sem
+   vazar dossiê. Auditável pelo Master. Inclusão digital com custo
+   previsível.
+
+8) Score como política, não gamificação de marketing
+   Pontos sobem com alvará/renovação e descem com auto procedente.
+   A reputação altera o direito de operar. Comportamento vira dado
+   de gestão.
+
+9) Um cérebro, dois canais
+   Site e app JWT chamam as mesmas funções. Não há “regra do celular”
+   diferente da “regra do computador”.
+
+10) LGPD de produto
+    Aceite, CPF mascarado, dossiê com log, retenção. Em governo, isso
+    não é anexo jurídico: é condição de venda.
+
+O que NÃO vender como diferencial (é higiene, todo mundo tem):
+login, CRUD de usuário, upload de PDF, tabela no admin, Docker, CI.
+Cite só se perguntarem “está pronto para operar?”.
+
+================================================================================
+2. O QUE VAI ALÉM DE UM MERO CRUD
+================================================================================
+
+CRUD          gravar ambulante, ponto, arquivo, status.
+Este sistema  o status dispara taxa, QR, ocupação da vaga, validade
+              do hash, score, credencial vermelha e bloqueio de ponto.
+
+CRUD          listar fiscais.
+Este sistema  atribuir rota ordenada, desenhar no mapa, exigir visita
+              por parada e devolver resumo (ausência, auto, incompleta).
+
+CRUD          “campo coordenadas”.
+Este sistema  densidade da cidade com filtro de política (quem tem
+              licença vs. quem só pretende o ponto).
+
+CRUD          um chatbot.
+Este sistema  copiloto que propõe ação e espera o gestor autorizar;
+              assistente do trabalhador que não inventa e deixa log.
+
+CRUD          relatório estático.
+Este sistema  inteligência governamental (perfil sociodemográfico +
+              ocupação) e exportação para o gabinete.
+
+A frase de corte, se alguém disser “isso é um cadastro”:
+
+  “Cadastro guarda o ambulante. Nós guardamos o direito de estar
+   naquela calçada, neste horário, com esta metragem — e provamos
+   isso na rua, no mapa e no auto.”
+
+================================================================================
+3. O QUE FOCAR PARA CAUSAR IMPACTO
+================================================================================
+
+O investidor (e o secretário) compra VISÃO + PROVA EM 3 MINUTOS DE TELA.
+Não compra wizard de seis etapas.
+
+Foque em quatro imagens, nesta ordem mental:
+
+  A. A credencial no celular     → confiança e dignidade
+  B. O fiscal no mapa da rota    → operação que o Estado não tem
+  C. O mapa vermelho da cidade   → “eu vejo Conquista”
+  D. O copiloto pedindo autorização → o futuro da gestão (e o upsell)
+
+Tudo o que for cadastro, senha, FAQ e “campo obrigatório” fica fora
+do palco, a menos que perguntem.
+
+Números da demo (seed) valem mais que adjetivos. Fale “ponto ocupado”,
+“rota incompleta”, “QR inválido fora do horário”, não “plataforma
+robusta e escalável”.
+
+Seja honesto em uma frase, se perguntarem da IA do gestor:
+  “O copiloto já está na operação; a análise de rotas já lê o banco.
+   Briefing e relatório estão no desenho de produto, prontos para
+   plugar nos mesmos indicadores do dashboard.”
+Isso aumenta credibilidade. Esconder o protótipo destrói a sala.
+
+================================================================================
+4. ROTEIRO DE 10 MINUTOS (ORDEM E O QUE ABRIR)
+================================================================================
+
+Pré-requisito (antes da sala)
+  Sistema no ar, seed carregado, três abas já logadas:
+    1. Ambulante
+    2. Fiscal (rota em execução, se possível já iniciada)
+    3. Gestor (mapa + assistente)
+  NÃO faça login ao vivo. Login come minuto e quebra o ritmo.
+
+------------------------------------------------
+0:00 – 1:00    O PROBLEMA (sem tela)
+------------------------------------------------
+Uma calçada de Conquista. De um lado, renda de família. Do outro,
+trânsito, vigilância sanitária e o fiscal sem saber se aquele QR
+é verdadeiro. A prefeitura tem a lei e não tem o território.
+
+Frase: “O problema não é falta de cadastro. É falta de prova, de
+rota e de mapa.”
+
+------------------------------------------------
+1:00 – 1:30    A TESE (ainda sem tela)
+------------------------------------------------
+Ponto Certo Conquista = licença + espaço + fiscalização no mesmo
+sistema. Quatro atores, um banco. Não vendemos um site: vendemos
+o direito de operar o comércio de rua com rastreio.
+
+------------------------------------------------
+1:30 – 3:00    TELA A — CREDENCIAL (ambulante)
+------------------------------------------------
+Abrir o painel do ambulante, aba Credencial.
+Mostrar o crachá, o QR, o status Ativo.
+Dizer: “Isso não é um PDF bonito. É um hash. Se a licença cair,
+o QR cai com ela.”
+
+Se der tempo (20 s): score Diamante/Ouro na mesma aba.
+Não abrir o wizard de cadastro.
+
+------------------------------------------------
+3:00 – 5:30    TELA B — ROTA DO FISCAL (o “wow” operacional)
+------------------------------------------------
+Abrir /fiscal/rotas/ → execução.
+Mapa com paradas numeradas, próxima destacada, linha da ronda.
+Clicar em Registrar. Mostrar identificação por QR ou CPF.
+Dizer o ciclo em voz alta:
+  gestor planeja → fiscal percorre → visita volta → auto nasce
+  na parada, não numa planilha.
+
+Se a rota de demo tiver “não encontrou ambulante”, mostre: isso
+é ouro para o investidor (ausência vira dado).
+
+Não perder tempo na busca avulsa se a rota já prova a inspeção.
+
+------------------------------------------------
+5:30 – 7:00    TELA C — MAPA DA CIDADE (gestor)
+------------------------------------------------
+Abrir /gestor/mapa/.
+Aplicar filtro “licença ativa”, depois “sem licença”.
+Mostrar o círculo crescendo (saturação).
+Frase: “A secretaria deixa de perguntar ‘quantos cadastros?’ e
+passa a perguntar ‘qual calçada estou saturando?’.”
+
+Um clique em popup de ponto basta. Não explicar Leaflet.
+
+------------------------------------------------
+7:00 – 8:30    TELA D — COPILOTO DO GESTOR
+------------------------------------------------
+Abrir /gestor/assistente/.
+Clicar, nesta ordem:
+  1. “O que precisa da minha atenção hoje?”     (briefing)
+  2. “Analisar rotas de fiscalização concluídas” (dados reais)
+  3. “O que você recomenda que eu autorize agora?”
+     → Autorizar UMA ação (mostra o princípio: IA propõe,
+        humano decide)
+
+Frase: “Não substituímos o gestor. Colocamos a fila, o auto e a
+rota na frente dele, às 8 da manhã.”
+
+------------------------------------------------
+8:30 – 9:15    O QUE ISSO PERMITE (fechar a tese)
+------------------------------------------------
+Três frases, no máximo:
+
+  Trabalhador — dignidade e prova no bolso.
+  Prefeitura  — ronda planejada + cidade visível.
+  Investidor  — núcleo replicável: qualquer município com Código
+                de Posturas e comércio de rua.
+
+Uma linha de honestidade técnica, se couber:
+  ciclo de licença, QR, rotas, mapa e API já no servidor;
+  copiloto em expansão para os mesmos dados do dashboard;
+  taxa ainda simulada (próximo passo: DAM real).
+
+------------------------------------------------
+9:15 – 10:00   O PEDIDO E A PERGUNTA
+------------------------------------------------
+O que vocês querem da sala (escolha UM, não três):
+  - piloto em secretaria / convênio municipal
+  - capital para app nativo + gateway + motor de IA no servidor
+  - parceria de expansão para outros municípios da Bahia / Nordeste
+
+Pergunta de fechamento:
+  “Se a gente mostrar, na próxima reunião, a ronda de um dia real
+   de Conquista neste mapa — o que precisaria ser verdade para
+   vocês toparem o piloto?”
+
+Depois dos 10 min: só perguntas. Não volte ao cadastro.
+
+================================================================================
+5. O QUE NÃO MOSTRAR (A MENOS QUE PERGUNTEM)
+================================================================================
+
+- Wizard de 6 etapas do cadastro
+- Tela de permissões do Master
+- Backup, seed, Docker, CI
+- FAQ, privacidade, 404
+- Código, admin Django, testes
+- Relatório Excel (cite; não abra a planilha)
+
+Se perguntarem “está pronto?”:
+  Sim para o ciclo licença–QR–rota–mapa–score.
+  Copiloto: interface viva; parte já no banco (rotas).
+  Pagamento: simulado.
+  App nativo: API pronta, loja ainda não é o foco da demo.
+
+================================================================================
+6. PLANO B (SE A INTERNET CAIR OU O MAPA NÃO CARREGAR)
+================================================================================
+
+Tiles do OpenStreetMap precisam de rede. Se o mapa falhar:
+  1. Credencial + score (local)
+  2. Lista de rotas / detalhe com paradas (HTML)
+  3. Copiloto (JS local; análise de rotas precisa do servidor)
+  4. Volte ao problema público e ao pedido
+
+Não improvise login. Não debugue Docker na frente do investidor.
+
+================================================================================
+7. FRASES PRONTAS
+================================================================================
+
+Abertura
+  “Cadastro todo mundo tem. Nós provamos quem pode estar naquela
+   calçada, neste horário, e mostramos isso no mapa.”
+
+No QR
+  “Se a licença cai, o código cai. Não tem crachá ‘para inglês ver’.”
+
+Na rota
+  “O fiscal deixa de caçar irregularidade. Ele cumpre uma ronda
+   que a gestão desenhou.”
+
+No mapa
+  “Isso é política urbana: densidade, não planilha.”
+
+No copiloto
+  “A IA não assina alvará. Ela coloca o que importa hoje na mesa
+   e espera o gestor autorizar.”
+
+Fecho
+  “O ponto certo. O comércio legal. Replicável em qualquer cidade
+   que ainda gere alvará de ambulante no balcão.”

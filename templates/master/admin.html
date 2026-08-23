@@ -1,0 +1,122 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Painel de TI - Ponto Certo Conquista{% endblock %}
+
+{% block header_extra_class %} header-master{% endblock %}
+
+{% block header_nav %}
+{% include "master/_nav.html" with active="admin" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section" style="background-color: var(--texto-escuro);">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Administração do Sistema e Infraestrutura</h1>
+        <p>Monitoramento de banco de dados, logs de segurança e gestão de permissões globais.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card" style="border-top-color: #10B981;">
+        <div class="stat-icon" style="background: #D1FAE5; color: #10B981;">
+            <i data-lucide="hard-drive" aria-hidden="true"></i>
+        </div>
+        <div class="stat-info">
+            <label>BANCO DE DADOS (BKP)</label>
+            <p style="font-size: 1.2rem; color: #10B981;">
+                {% if ultimo_backup %}{{ ultimo_backup.modificado|date:"d/m/Y H:i" }}{% else %}Sem dump ainda{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: var(--azul-vibrante);">
+        <div class="stat-icon" style="background: #E0E7FF; color: var(--azul-vibrante);">
+            <i data-lucide="store" aria-hidden="true"></i>
+        </div>
+        <div class="stat-info">
+            <label>AMBULANTES CADASTRADOS</label>
+            <p style="font-size: 1.2rem;">{{ total_ambulantes }}</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+        <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);">
+            <i data-lucide="user-check" aria-hidden="true"></i>
+        </div>
+        <div class="stat-info">
+            <label>GESTORES ATIVOS</label>
+            <p>{{ total_gestores_ativos }}</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: var(--texto-escuro);">
+        <div class="stat-icon" style="background: #F3F4F6; color: var(--texto-escuro);">
+            <i data-lucide="badge" aria-hidden="true"></i>
+        </div>
+        <div class="stat-info">
+            <label>FISCAIS CADASTRADOS</label>
+            <p>{{ total_fiscais }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="fiscal-grid" style="margin-top: 2rem;">
+    <div class="form-card">
+        <div class="section-title">
+            <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+            <h2>Controle de Acessos</h2>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.5rem;">
+            O Administrador Master é responsável pela criação dos perfis institucionais de Fiscais e Gestores da Secretaria.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <a href="{% url 'master_cadastrar_gestor' %}" class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro); text-decoration: none;">
+                <i data-lucide="user-plus" style="color: var(--azul-vibrante);" aria-hidden="true"></i> Cadastrar Novo Gestor (Secretaria)
+            </a>
+
+            <a href="{% url 'master_cadastrar_fiscal' %}" class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro); text-decoration: none;">
+                <i data-lucide="id-card" style="color: #10B981;" aria-hidden="true"></i> Cadastrar Novo Fiscal de Rua
+            </a>
+
+            <a href="{% url 'master_permissoes' %}" class="btn-action" style="text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro); text-decoration: none;">
+                <i data-lucide="key" style="color: #F59E0B;" aria-hidden="true"></i> Gerenciar Permissões Globais
+            </a>
+            {% if pode_backup %}
+            <form action="{% url 'master_backup' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-action" style="width: 100%; text-align: left; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-color: var(--borda-cinza); color: var(--texto-escuro); cursor: pointer; background: #fff;">
+                    <i data-lucide="hard-drive" style="color: #10B981;" aria-hidden="true"></i> Gerar backup restaurável
+                </button>
+            </form>
+            {% endif %}
+            {% if backups %}
+            <p style="font-size: 0.85rem; color: var(--texto-cinza); margin: 0;">
+                Últimos dumps:
+                {% for item in backups %}
+                {{ item.nome }}{% if not forloop.last %}; {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-card" style="background-color: #111827; color: #10B981; border: none;">
+        <div class="section-title" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="terminal" style="color: #10B981;" aria-hidden="true"></i>
+            <h2 style="color: #fff; font-family: monospace;">Logs Técnicos &amp; Segurança</h2>
+        </div>
+
+        <div class="terminal-box custom-scrollbar" style="font-family: monospace; font-size: 0.85rem; line-height: 1.6; height: 200px; overflow-y: auto; background: #000; padding: 1rem; border-radius: 6px; border: 1px solid #374151;" tabindex="0" aria-label="Atividade recente de login">
+            {% for usuario in atividade_recente %}
+            <p>[{{ usuario.last_login|date:"d/m/Y H:i:s" }}] AUTH: {{ usuario.nome }} {{ usuario.sobrenome }} ({{ usuario.role }})</p>
+            {% empty %}
+            <p>Nenhum acesso registrado ainda.</p>
+            {% endfor %}
+            <p class="blink" style="color: #10B981;">_</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,30 +15,16 @@ Para o deploy, precisaremos de três ajustes principais:
 
 ## 2. Preparando o Código para Produção
 
-Antes de ir para o servidor, adicione as seguintes bibliotecas ao seu `requirements/base.txt`:
-```text
-gunicorn>=21.2.0
-whitenoise>=6.6.0
+`gunicorn` e `whitenoise` já estão em `requirements/base.txt` (Django 5+). O `STATIC_ROOT` (`staticfiles/`) e o middleware do WhiteNoise já estão em `config/settings/base.py`. Os apps instalados são só `core`, `usuarios`, `licenciamento`, `espacos`, `fiscalizacao` e `assistente`.
 
+Com `DEBUG=False` o Django **não** serve CSS/JS pelo `runserver`. Depois de `pip install -r requirements/base.txt`:
+
+```bash
+python3 manage.py collectstatic --noinput
+gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 ```
 
-### Configurando o WhiteNoise (Arquivos Estáticos)
-
-No seu arquivo `config/settings/base.py`, adicione o WhiteNoise logo após o `SecurityMiddleware`:
-
-```python
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware", # <-- Adicione esta linha
-    # ... resto dos middlewares ...
-]
-
-# No final do arquivo base.py, defina onde os estáticos serão coletados:
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-```
-
-*Por que fazer isso?* O WhiteNoise permite que o Gunicorn sirva os arquivos estáticos da sua aplicação de forma incrivelmente rápida sem precisar configurar um servidor Nginx apenas para isso.
+O WhiteNoise passa a servir `/static/` a partir de `STATIC_ROOT`. Não use `runserver` em produção.
 
 ---
 
@@ -169,7 +155,5 @@ Como a variável `COMPOSE_FILE` já está ativa na sessão do seu servidor, os c
 `docker compose restart web`
 * **Derrubar o ambiente completamente:**
 `docker compose down`
-
-```
-
-```
+* **Backup e restauração:** ver `docs/BACKUP.md` (`manage.py backup_banco` e `loaddata` / `pg_restore`).
+* **Dados de demonstração (não use em produção real):** `python manage.py seed_inicial`. Volume extra para gráficos: `seed_massivo`.

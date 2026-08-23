@@ -1,360 +1,692 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro e Regularização de Ambulante - Ponto VCA</title>
-    
+    <title>Cadastro e Regularização de Ambulante - APAL</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
-    <!-- CAMINHO CORRIGIDO PARA O CSS -->
+
+    <!-- LUCIDE ICONS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS GLOBAL -->
     <link rel="stylesheet" href="../css/style.css">
+
 </head>
+
 <body>
 
     <!-- Cabeçalho Institucional -->
     <header class="top-header">
         <div class="header-container">
             <div class="logo-area">
-                <span class="material-icons logo-icon">campaign</span>
-                <!-- CAMINHO CORRIGIDO PARA O INDEX -->
-                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto <strong>VCA</strong></a></span>
+                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <i data-lucide="map-pin"
+                        style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
+                    <span class="logo-text"
+                        style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                </a>
             </div>
-            <nav class="header-nav">
-                <!-- CAMINHOS CORRIGIDOS PARA INDEX E SOBRE -->
-                <a href="../index.html"><span class="material-icons">home</span> Início</a>
-                <a href="../publico/sobre.html"><span class="material-icons">info</span> Sobre o Projeto</a>
-            </nav>
-        </div>
     </header>
 
-    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE (Esquerda) -->
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
     <div id="access-widget-container" class="access-widget-container">
         <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
-            <span class="material-icons">visibility_off</span>
-            <span class="access-text">+ Acessibilidade</span>
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
         </button>
     </div>
 
     <!-- PAINEL DE ACESSIBILIDADE -->
-    <div id="accessibility-panel" class="access-panel hidden">
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
         <div class="access-header">
             <h3>Acessibilidade</h3>
-            <button id="close-access" class="close-btn"><span class="material-icons">close</span></button>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
         </div>
         <div class="access-grid">
-            <button id="btn-aumentar" class="access-option"><span class="material-icons">text_increase</span> Aumentar Texto</button>
-            <button id="btn-diminuir" class="access-option"><span class="material-icons">text_decrease</span> Diminuir Texto</button>
-            <button id="btn-escuro" class="access-option"><span class="material-icons">dark_mode</span> Contraste Escuro</button>
-            <button id="btn-claro" class="access-option"><span class="material-icons">light_mode</span> Contraste Claro</button>
-            <button id="btn-sat-alta" class="access-option"><span class="material-icons">tonality</span> Saturação Alta</button>
-            <button id="btn-sat-baixa" class="access-option"><span class="material-icons">invert_colors_off</span> Saturação Baixa</button>
-            <button id="btn-zoom" class="access-option"><span class="material-icons">zoom_in</span> Zoom na Tela</button>
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
         </div>
     </div>
 
+    <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-container" style="text-align: center;">
-            <h1>Cadastro e Regularização de Ambulante</h1>
-            <p>Preencha o formulário oficial para solicitação e licenciamento de comércio ambulante ou eventual.</p>
+            <h1 id="hero-title">Cadastro e Regularização de Ambulante</h1>
+            <p id="hero-subtitle">Preencha o formulário oficial para solicitação e licenciamento de comércio ambulante
+                ou eventual.</p>
         </div>
     </section>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-container">
         <div class="form-card">
-            
-            <!-- AÇÃO MANTIDA PARA CREDENCIAL.HTML DA MESMA PASTA -->
-            <form action="credencial.html" method="GET">
-                
-                <!-- 1. DADOS DO REQUERENTE -->
-                <div class="section-title">
-                    <div class="title-accent"></div>
-                    <h2>1. Dados do Requerente</h2>
+
+            <!-- RASTREADOR VISUAL DE ETAPAS -->
+            <div class="stepper-container" id="stepper">
+                <div class="stepper-line">
+                    <div class="stepper-line-progress" id="stepper-progress" style="width: 0%;"></div>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group full-width">
-                        <label>Nome Completo</label>
-                        <input type="text" placeholder="Nome completo do requerente" required>
-                    </div>
+                <div class="stepper-step active" data-step="1">
+                    <div class="stepper-circle">1</div><span class="stepper-label">Dados Pessoais</span>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>CPF</label>
-                        <input type="text" id="cpf-cadastro" placeholder="000.000.000-00" maxlength="14" required>
-                    </div>
-                    <div class="input-group">
-                        <label>RG</label>
-                        <input type="text" placeholder="Número do RG" required>
-                    </div>
+                <div class="stepper-step" data-step="2">
+                    <div class="stepper-circle">2</div><span class="stepper-label">Endereço</span>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>E-mail</label>
-                        <input type="email" placeholder="seu-email@dominio.com">
-                    </div>
-                    <div class="input-group">
-                        <label>Telefone / WhatsApp</label>
-                        <input type="text" placeholder="(77) 90000-0000" required>
-                    </div>
+                <div class="stepper-step" data-step="3">
+                    <div class="stepper-circle">3</div><span class="stepper-label">Empresa</span>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Estado Civil</label>
-                        <select style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);">
-                            <option value="" disabled selected>Selecione...</option>
-                            <option value="solteiro">Solteiro(a)</option>
-                            <option value="casado">Casado(a)</option>
-                            <option value="divorciado">Divorciado(a)</option>
-                            <option value="viuvo">Viúvo(a)</option>
-                            <option value="uniao_estavel">União Estável</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Nacionalidade (País)</label>
-                        <select id="nacionalidade-select" style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);" required>
-                            <option value="" disabled selected>Carregando países...</option>
-                        </select>
-                    </div>
+                <div class="stepper-step" data-step="4">
+                    <div class="stepper-circle">4</div><span class="stepper-label">Estrutura</span>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Estado de Nascimento (Naturalidade)</label>
-                        <select id="estado-nascimento" style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);" required>
-                            <option value="" disabled selected>Selecione o Estado...</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Cidade de Nascimento (Naturalidade)</label>
-                        <select id="cidade-nascimento" style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);" required disabled>
-                            <option value="" disabled selected>Primeiro selecione o Estado...</option>
-                        </select>
-                    </div>
+                <div class="stepper-step" data-step="5">
+                    <div class="stepper-circle">5</div><span class="stepper-label">Ponto</span>
                 </div>
-
-
-                <!-- 2. ENDEREÇO RESIDENCIAL (COM BUSCA POR CEP) -->
-                <div class="section-title" style="margin-top: 2.5rem;">
-                    <div class="title-accent"></div>
-                    <h2>2. Endereço Residencial</h2>
+                <div class="stepper-step" data-step="6">
+                    <div class="stepper-circle">6</div><span class="stepper-label">Anexos</span>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>CEP</label>
-                        <input type="text" id="cep-input" placeholder="00000-000" maxlength="9" required>
-                    </div>
-                    <div class="input-group" style="flex: 3;">
-                        <label>Endereço (Rua, Avenida, etc.)</label>
-                        <input type="text" id="endereco-input" placeholder="Nome da rua" required>
-                    </div>
+            <!-- CARD DE ERRO DE VALIDAÇÃO -->
+            <div id="error-card" class="error-card">
+                <i data-lucide="alert-octagon"></i>
+                <div>
+                    <strong>Atenção! Existem erros no preenchimento.</strong><br>
+                    <span id="error-message">Por favor, preencha corretamente todos os campos marcados com asterisco
+                        vermelho (*) antes de continuar.</span>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group" style="flex: 1;">
-                        <label>Número</label>
-                        <input type="text" id="numero-input" placeholder="Nº" required>
-                    </div>
-                    <div class="input-group" style="flex: 2;">
-                        <label>Complemento</label>
-                        <input type="text" id="complemento-input" placeholder="Apto, Bloco, Casa 2...">
-                    </div>
-                    <div class="input-group" style="flex: 2;">
-                        <label>Bairro</label>
-                        <input type="text" id="bairro-input" placeholder="Nome do bairro" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Cidade</label>
-                        <input type="text" id="cidade-input" placeholder="Preenchimento automático pelo CEP" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Estado (UF)</label>
-                        <input type="text" id="estado-input" placeholder="UF" maxlength="2" required>
-                    </div>
-                </div>
+            </div>
 
 
-                <!-- 3. INFORMAÇÕES PESSOA JURÍDICA (Opcional) -->
-                <div class="section-title" style="margin-top: 2.5rem;">
-                    <div class="title-accent"></div>
-                    <h2>3. Informações de Pessoa Jurídica (Se houver MEI / Empresa)</h2>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>CNPJ</label>
-                        <input type="text" placeholder="00.000.000/0001-00">
-                    </div>
-                    <div class="input-group">
-                        <label>Inscrição Municipal</label>
-                        <input type="text" placeholder="Nº da Inscrição Municipal">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Razão Social</label>
-                        <input type="text" placeholder="Nome da empresa">
-                    </div>
-                    <div class="input-group">
-                        <label>Nome Fantasia</label>
-                        <input type="text" placeholder="Nome fantasia">
-                    </div>
-                </div>
 
 
-                <!-- 4. FORMA DE ATUAÇÃO ATUAL -->
-                <div class="section-title" style="margin-top: 2.5rem;">
-                    <div class="title-accent"></div>
-                    <h2>4. Forma de Atuação Atual</h2>
-                </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Tipo de Comércio</label>
-                        <select style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);">
-                            <option value="ambulante">Ambulante</option>
-                            <option value="eventual">Eventual</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Categoria do Equipamento</label>
-                        <select style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);">
-                            <option value="A">Categoria A (Veículo automotor / Reboque)</option>
-                            <option value="B">Categoria B (Carrinho tracionado por força humana)</option>
-                            <option value="C">Categoria C (Barraca desmontável)</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="input-group full-width">
-                        <label>Espécie de Mercadoria Comercializada</label>
-                        <input type="text" placeholder="Ex: Lanches, artesanato, bebidas não alcoólicas...">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Logradouro / Área Pública Atual</label>
-                        <input type="text" placeholder="Local onde atua atualmente">
+
+
+
+
+            <!-- FORMULÁRIO -->
+            <form id="cadastro-form" novalidate>
+
+                <!-- ETAPA 1: DADOS DO REQUERENTE -->
+                <div class="form-step active" id="step-1">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>1. Dados Pessoais do Requerente</h2>
                     </div>
-                    <div class="input-group">
-                        <label>Área Utilizada (Metragem)</label>
-                        <input type="text" placeholder="Ex: 2x2 metros">
+
+                    <div class="form-row">
+                        <div class="input-group full-width">
+                            <label for="req-nome">Nome Completo <span class="required-marker">*</span></label>
+                            <input type="text" id="req-nome" placeholder="Nome completo do requerente" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="cpf-cadastro">CPF <span class="required-marker">*</span></label>
+                            <input type="text" id="cpf-cadastro" placeholder="000.000.000-00" maxlength="14"
+                                inputmode="numeric" required>
+                            <span id="cpf-erro-texto"
+                                style="display: none; color: #EF4444; font-size: 0.78rem; margin-top: 4px;">CPF
+                                inválido. Verifique os números digitados.</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="req-rg">RG (Identidade) <span
+                                    style="font-size: 0.8rem; color: #9CA3AF; font-weight: normal;">(Opcional)</span></label>
+                            <input type="text" id="req-rg" placeholder="Número do RG">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="req-data-nasc">Data de Nascimento <span class="required-marker">*</span></label>
+                            <input type="date" id="req-data-nasc" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="req-estado-civil">Estado Civil <span class="required-marker">*</span></label>
+                            <select id="req-estado-civil" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="solteiro">Solteiro(a)</option>
+                                <option value="casado">Casado(a)</option>
+                                <option value="divorciado">Divorciado(a)</option>
+                                <option value="viuvo">Viúvo(a)</option>
+                                <option value="uniao_estavel">União Estável</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="req-email">E-mail <span class="required-marker">*</span></label>
+                            <input type="email" id="req-email" placeholder="seu-email@dominio.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="req-tel">Telefone Principal (WhatsApp) <span
+                                    class="required-marker">*</span></label>
+                            <input type="text" id="req-tel" placeholder="(77) 90000-0000" maxlength="15" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="req-tel-2">Telefone Secundário / Recado</label>
+                            <input type="text" id="req-tel-2" placeholder="(77) 90000-0000" maxlength="15">
+                        </div>
+                        <div class="input-group">
+                            <label for="pais-origem">País de Origem <span class="required-marker">*</span></label>
+                            <select id="pais-origem" name="pais_origem" class="styled-select" required>
+                                <option value="Brasil" selected>Brasil</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="estado-nascimento">Estado de Nascimento (UF) <span
+                                    class="required-marker">*</span></label>
+                            <select id="estado-nascimento" name="uf_nascimento" class="styled-select" required>
+                                <option value="" disabled selected>Carregando Estados...</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="cidade-nascimento">Cidade de Nascimento <span
+                                    class="required-marker">*</span></label>
+                            <select id="cidade-nascimento" name="cidade_nascimento" class="styled-select" required
+                                disabled>
+                                <option value="" disabled selected>Selecione o Estado primeiro...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="req-escolaridade">Grau de Escolaridade <span
+                                    class="required-marker">*</span></label>
+                            <select id="req-escolaridade" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="fundamental_incompleto">Ensino Fundamental Incompleto</option>
+                                <option value="fundamental_completo">Ensino Fundamental Completo</option>
+                                <option value="medio_incompleto">Ensino Médio Incompleto</option>
+                                <option value="medio_completo">Ensino Médio Completo</option>
+                                <option value="superior">Ensino Superior (Incompleto / Completo)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="req-num-funcionarios">Qtd de Auxiliares <span
+                                    class="required-marker">*</span></label>
+                            <input type="number" id="req-num-funcionarios" min="0" max="2" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="req-nis">NIS (CadÚnico)</label>
+                            <input type="text" id="req-nis" placeholder="Digite o número do NIS">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="check-no-nis"> Não possuo NIS
+                            </label>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-actions" style="justify-content: flex-end; margin-top: 1rem;">
+                        <button type="button" class="btn-submit" id="btn-next-1">Próxima Etapa <i
+                                data-lucide="arrow-right"></i></button>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Dias de Atuação</label>
-                        <select style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);">
-                            <option value="seg_a_sab">Segunda a Sábado</option>
-                            <option value="seg_a_sex">Segunda a Sexta-feira</option>
-                            <option value="fins_de_semana">Finais de Semana (Sábado e Domingo)</option>
-                            <option value="todos_os_dias">Todos os dias da semana</option>
-                            <option value="personalizado">Dias alternados / Eventual</option>
-                        </select>
+                <!-- ETAPA 2: ENDEREÇO RESIDENCIAL -->
+                <div class="form-step" id="step-2">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>2. Endereço Residencial</h2>
                     </div>
-                    <div class="input-group">
-                        <label>Horário de Atuação</label>
-                        <select style="padding: 0.8rem 1rem; border: 1px solid var(--borda-cinza); border-radius: 6px; font-size: 0.95rem; background: var(--branco);">
-                            <option value="comercial">Comercial (08:00 às 18:00)</option>
-                            <option value="manha">Turno Matutino (06:00 às 12:00)</option>
-                            <option value="tarde">Turno Vespertino (12:00 às 18:00)</option>
-                            <option value="noite">Turno Noturno (18:00 às 00:00)</option>
-                            <option value="integral">Horário Integral (24h / Cobertura total)</option>
-                        </select>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="cep-input">CEP <span class="required-marker">*</span></label>
+                            <input type="text" id="cep-input" placeholder="00000-000" maxlength="9" required>
+                        </div>
+                        <div class="input-group" style="flex: 3;">
+                            <label for="endereco-input">Endereço (Rua, Avenida, Praça) <span
+                                    class="required-marker">*</span></label>
+                            <input type="text" id="endereco-input" placeholder="Nome da rua ou avenida" required>
+                        </div>
                     </div>
-                </div>
 
-
-                <!-- 5. FORMA DE ATUAÇÃO PRETENDIDA -->
-                <div class="section-title" style="margin-top: 2.5rem;">
-                    <div class="title-accent"></div>
-                    <h2>5. Forma de Atuação Pretendida (Solicitação de Vaga)</h2>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Opção 1 de Logradouro / Local Desejado</label>
-                        <input type="text" placeholder="Ex: Praça 9 de Novembro (1ª Opção)" required>
+                    <div class="form-row">
+                        <div class="input-group" style="flex: 1;">
+                            <label for="numero-input">Número <span class="required-marker">*</span></label>
+                            <input type="text" id="numero-input" placeholder="Nº" required>
+                        </div>
+                        <div class="input-group" style="flex: 2;">
+                            <label for="complemento-input">Complemento</label>
+                            <input type="text" id="complemento-input" placeholder="Apto, Bloco, Casa 2...">
+                        </div>
+                        <div class="input-group" style="flex: 2;">
+                            <label for="bairro-input">Bairro <span class="required-marker">*</span></label>
+                            <input type="text" id="bairro-input" placeholder="Nome do bairro" required>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Opção 2 de Logradouro / Local Desejado</label>
-                        <input type="text" placeholder="Ex: Alameda Flávio Ramos (2ª Opção)">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Opção 3 de Logradouro / Local Desejado</label>
-                        <input type="text" placeholder="Ex: Praça Barão do Rio Branco (3ª Opção)">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="estado-input">Estado Atual (UF) <span class="required-marker">*</span></label>
+                            <select id="estado-input" name="estado_atual" class="styled-select" required>
+                                <option value="" disabled selected>Carregando Estados...</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="cidade-input">Cidade Atual <span class="required-marker">*</span></label>
+                            <select id="cidade-input" name="cidade_atual" class="styled-select" required disabled>
+                                <option value="" disabled selected>Aguardando UF...</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Espécie de Mercadoria a ser Comercializada</label>
-                        <input type="text" placeholder="Mercadoria pretendida">
-                    </div>
-                </div>
 
-
-                <!-- 6. DOCUMENTAÇÃO OBRIGATÓRIA -->
-                <div class="section-title" style="margin-top: 2.5rem;">
-                    <div class="title-accent"></div>
-                    <h2>6. Documentação Obrigatória (Anexos)</h2>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Cópia da Identidade (RG)</label>
-                        <input type="file" required style="padding: 0.5rem; background: #FAFAFA;">
-                    </div>
-                    <div class="input-group">
-                        <label>Cópia do CPF</label>
-                        <input type="file" required style="padding: 0.5rem; background: #FAFAFA;">
+                    <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
+                        <button type="button" class="btn-action" id="btn-prev-2"><i data-lucide="arrow-left"></i>
+                            Voltar</button>
+                        <button type="button" class="btn-submit" id="btn-next-2">Próxima Etapa <i
+                                data-lucide="arrow-right"></i></button>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Comprovante de Residência</label>
-                        <input type="file" required style="padding: 0.5rem; background: #FAFAFA;">
+                <!-- ETAPA 3: PESSOA JURÍDICA -->
+                <div class="form-step" id="step-3">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>3. Informações de Pessoa Jurídica</h2>
                     </div>
-                    <div class="input-group">
-                        <label>Documento do Veículo (Se Categoria A)</label>
-                        <input type="file" style="padding: 0.5rem; background: #FAFAFA;">
+
+                    <label class="checkbox-label"
+                        style="margin-bottom: 1.5rem; font-size: 1rem; color: #1F2937; font-weight: 500;">
+                        <input type="checkbox" id="check-no-cnpj">
+                        Não possuo empresa aberta / Não sou MEI (Pular etapa)
+                    </label>
+
+                    <div id="cnpj-container">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="pj-cnpj">CNPJ <span class="required-marker">*</span></label>
+                                <input type="text" id="pj-cnpj" placeholder="00.000.000/0001-00" maxlength="18"
+                                    inputmode="numeric" required>
+                                <span id="cnpj-erro-texto"
+                                    style="display: none; color: #EF4444; font-size: 0.78rem; margin-top: 4px;">CNPJ
+                                    inválido. Verifique os números digitados.</span>
+                            </div>
+                            <div class="input-group">
+                                <label for="pj-inscricao">Inscrição Municipal</label>
+                                <input type="text" id="pj-inscricao" placeholder="Nº da Inscrição">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="pj-razao">Razão Social <span class="required-marker">*</span></label>
+                                <input type="text" id="pj-razao" placeholder="Nome empresarial" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="pj-fantasia">Nome Fantasia</label>
+                                <input type="text" id="pj-fantasia" placeholder="Nome do ponto/comércio">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
+                        <button type="button" class="btn-action" id="btn-prev-3"><i data-lucide="arrow-left"></i>
+                            Voltar</button>
+                        <button type="button" class="btn-submit" id="btn-next-3">Próxima Etapa <i
+                                data-lucide="arrow-right"></i></button>
                     </div>
                 </div>
 
-                <div style="background-color: #FEF3C7; border-left: 4px solid #D97706; padding: 1rem; border-radius: 4px; margin-top: 2rem;">
-                    <p style="font-size: 0.85rem; color: #92400E; line-height: 1.5;">
-                        <strong>Aviso Importante:</strong> O presente requerimento <strong>NÃO AUTORIZA O IMEDIATO EXERCÍCIO DA ATIVIDADE</strong>. O pedido será analisado pela fiscalização e, somente após a aprovação, você será comunicado para montar o equipamento. É terminantemente proibida a venda de bebidas em embalagens de vidro (Lei Complementar).
-                    </p>
+                <!-- ETAPA 4: ESTRUTURA -->
+                <div class="form-step" id="step-4">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>4. Forma de Atuação e Equipamento</h2>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="tipo-comercio">Tipo de Comércio <span class="required-marker">*</span></label>
+                            <select id="tipo-comercio" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="fixo">Ambulante Fixo (Ponto Autorizado)</option>
+                                <option value="movel">Ambulante Móvel (Itinerante)</option>
+                                <option value="eventual">Eventual / Temporário (Festas)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="categoria-equipamento">Tipo de Estrutura <span
+                                    class="required-marker">*</span></label>
+                            <select id="categoria-equipamento" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="A">Cat. A - Veículo / Reboque / Food Truck</option>
+                                <option value="B">Cat. B - Carrinho humano</option>
+                                <option value="C">Cat. C - Barraca / Mesa / Isopor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="especie-mercadoria">Categoria da Mercadoria <span
+                                    class="required-marker">*</span></label>
+                            <input type="text" id="especie-mercadoria" placeholder="Lanches, vestuário..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="metragem-utilizada">Metragem Utilizada (m²) <span
+                                    class="required-marker">*</span></label>
+                            <input type="text" id="metragem-utilizada" placeholder="Ex: 2,0m x 1,5m" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="dias-atuacao">Dias de Atuação <span class="required-marker">*</span></label>
+                            <select id="dias-atuacao" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="seg_a_sab">Segunda a Sábado</option>
+                                <option value="seg_a_sex">Segunda a Sexta-feira</option>
+                                <option value="fins_de_semana">Sábado e Domingo</option>
+                                <option value="todos_os_dias">Todos os dias da semana</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="horario-atuacao">Turno de Atuação <span class="required-marker">*</span></label>
+                            <select id="horario-atuacao" class="styled-select" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="comercial">Comercial (08h às 18h)</option>
+                                <option value="manha">Matutino (06h às 12h)</option>
+                                <option value="tarde">Vespertino (12h às 18h)</option>
+                                <option value="noite">Noturno (18h às 00h)</option>
+                                <option value="integral">Integral / 24 horas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
+                        <button type="button" class="btn-action" id="btn-prev-4"><i data-lucide="arrow-left"></i>
+                            Voltar</button>
+                        <button type="button" class="btn-submit" id="btn-next-4">Próxima Etapa <i
+                                data-lucide="arrow-right"></i></button>
+                    </div>
                 </div>
 
-                <div class="form-actions" style="margin-top: 2.5rem;">
-                    <!-- CAMINHO CORRIGIDO -->
-                    <a href="../index.html" class="btn-action" style="padding: 1rem 2rem; text-decoration: none;">Cancelar</a>
-                    <button type="submit" class="btn-submit">Enviar Requerimento de Cadastro</button>
+                <!-- ETAPA 5: Ponto de OCUPAÇÃO -->
+                <div class="form-step" id="step-5">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>5. Solicitação de Ponto de Ocupação</h2>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="cep-ponto">CEP do Ponto <span
+                                    style="font-size: 0.8rem; color: #9CA3AF; font-weight: normal;">(Opcional)</span></label>
+                            <input type="text" id="cep-ponto" placeholder="00000-000" maxlength="9" inputmode="numeric">
+                        </div>
+                        <div class="input-group" style="flex: 3;">
+                            <label for="endereco-ponto">Endereço do Ponto (Rua, Avenida, Praça) <span
+                                    class="required-marker">*</span></label>
+                            <input type="text" id="endereco-ponto" placeholder="Nome da rua, avenida ou praça" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group" style="flex: 1;">
+                            <label for="numero-ponto">Número <span class="required-marker">*</span></label>
+                            <input type="text" id="numero-ponto" placeholder="Nº" required>
+                        </div>
+                        <div class="input-group" style="flex: 2;">
+                            <label for="complemento-ponto">Complemento</label>
+                            <input type="text" id="complemento-ponto" placeholder="Box, referência, esquina...">
+                        </div>
+                        <div class="input-group" style="flex: 2;">
+                            <label for="bairro-ponto">Bairro <span class="required-marker">*</span></label>
+                            <input type="text" id="bairro-ponto" placeholder="Nome do bairro" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="estado-ponto">Estado do Ponto (UF) <span
+                                    class="required-marker">*</span></label>
+                            <select id="estado-ponto" name="estado_ponto" class="styled-select" required>
+                                <option value="" disabled selected>Carregando Estados...</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="cidade-ponto">Cidade do Ponto <span class="required-marker">*</span></label>
+                            <select id="cidade-ponto" name="cidade_ponto" class="styled-select" required disabled>
+                                <option value="" disabled selected>Aguardando UF...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group full-width">
+                            <label for="opcao-local-2">Ponto de Referência / Local Alternativo</label>
+                            <input type="text" id="opcao-local-2"
+                                placeholder="Referência próxima ou segunda opção de local">
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="justify-content: space-between; margin-top: 1rem;">
+                        <button type="button" class="btn-action" id="btn-prev-5"><i data-lucide="arrow-left"></i>
+                            Voltar</button>
+                        <button type="button" class="btn-submit" id="btn-next-5">Próxima Etapa <i
+                                data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ETAPA 6: DOCUMENTOS -->
+                <div class="form-step" id="step-6">
+                    <div class="section-title">
+                        <div class="title-accent"></div>
+                        <h2>6. Documentos Anexos e Fotos</h2>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="doc-foto">Foto 3x4 Recente (Credencial) <span
+                                    class="required-marker">*</span></label>
+                            <input type="file" id="doc-foto" accept="image/*" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="doc-estrutura">Foto Nítida do Equipamento <span
+                                    class="required-marker">*</span></label>
+                            <input type="file" id="doc-estrutura" accept="image/*" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="doc-rg">Cópia do Documento (RG/CNH) <span
+                                    class="required-marker">*</span></label>
+                            <input type="file" id="doc-rg" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="doc-cpf">Cópia do CPF <span class="required-marker">*</span></label>
+                            <input type="file" id="doc-cpf" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="doc-comprovante">Comprovante de Residência Atualizado <span
+                                    class="required-marker">*</span></label>
+                            <input type="file" id="doc-comprovante" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="doc-saude">Laudo Sanitário / Saúde (Se houver)</label>
+                            <input type="file" id="doc-saude">
+                        </div>
+                    </div>
+
+                    <div class="info-callout-box"
+                        style="background-color: #FEF3C7; border-left: 4px solid #D97706; padding: 1.2rem; border-radius: 6px; margin-top: 2rem;">
+                        <p style="color: #92400E; margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                            <strong>Aviso Importante:</strong> O envio do formulário <strong>NÃO AUTORIZA O EXERCÍCIO DA
+                                ATIVIDADE</strong>. O pedido passará por análise. Somente após a aprovação você receberá
+                            a Licença.
+                        </p>
+                    </div>
+
+                    <div class="form-actions"
+                        style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <button type="button" class="btn-action" id="btn-prev-6"><i data-lucide="arrow-left"></i>
+                            Voltar</button>
+                        <button type="submit" class="btn-submit" id="btn-enviar-final"
+                            style="display: inline-flex; align-items: center; gap: 8px;">
+                            <i data-lucide="send"></i> Enviar Requerimento
+                        </button>
+                    </div>
                 </div>
 
             </form>
 
-        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- TELA DE SUCESSO / CONFIRMAÇÃO DO ENVIO -->
+            <div id="success-screen" class="success-card">
+                <div class="success-icon-wrapper">
+                    <i data-lucide="check-circle-2" style="width: 44px; height: 44px;"></i>
+                </div>
+
+                <h2 class="success-title">Requerimento Enviado com Sucesso!</h2>
+                <p class="success-subtitle">
+                    Seus dados e documentos foram registrados com sucesso no sistema APAL e já estão na fila para
+                    análise da Secretaria de Serviços Públicos.
+                </p>
+
+                <!-- CAIXA DE PROTOCOLO E DADOS DO REQUERENTE -->
+                <div class="protocol-box"
+                    style="background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%); border: 1px solid #BFDBFE; border-radius: 12px; padding: 1.5rem; max-width: 550px; margin: 0 auto 2rem auto; text-align: left; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.05);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+                        <div>
+                            <span class="protocol-label" id="protocolo-label"
+                                style="display: block; font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Número
+                                do Protocolo</span>
+                            <span class="protocol-number" id="protocolo-gerado"
+                                style="font-size: 1.4rem; font-weight: 800; color: #1D4ED8; font-family: monospace;">APAL-2026-XXXXXX</span>
+                        </div>
+                        <span class="badge success"
+                            style="background: #ECFDF3; color: #027A48; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">REGISTRADO</span>
+                    </div>
+                    <div style="font-size: 0.88rem; color: #334155; display: grid; gap: 4px;">
+                        <div><strong>Requerente:</strong> <span id="resumo-nome">-</span></div>
+                        <div><strong>CPF:</strong> <span id="resumo-cpf">-</span></div>
+                        <div><strong>Atividade / Comércio:</strong> <span id="resumo-comercio">-</span></div>
+                    </div>
+                </div>
+
+                <!-- RESUMO DO PRÓXIMO PASSO -->
+                <div class="next-steps-container">
+                    <div class="next-steps-title">
+                        <i data-lucide="clock" style="color: #2563EB; width: 20px; height: 20px;"></i>
+                        Próximas Etapas do Processo
+                    </div>
+
+                    <ul class="timeline-list">
+                        <li class="timeline-item">
+                            <div class="timeline-badge">1</div>
+                            <div class="timeline-content">
+                                <h4>Análise Documental</h4>
+                                <p>A equipe revisará os anexos e os dados cadastrais informados.</p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <div class="timeline-badge" style="background-color: #94A3B8;">2</div>
+                            <div class="timeline-content">
+                                <h4>Vistoria Técnica do Ponto</h4>
+                                <p>Validação da viabilidade do local e metragem do equipamento.</p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <div class="timeline-badge" style="background-color: #94A3B8;">3</div>
+                            <div class="timeline-content">
+                                <h4>Liberação da Credencial</h4>
+                                <p>Emissão do Alvará e QR Code oficial direto no seu painel.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ALERTA LEGAL -->
+                <div
+                    style="background-color: #FEF8EC; border-left: 4px solid #F59E0B; padding: 1rem; border-radius: 8px; max-width: 650px; margin: 0 auto 2rem auto; text-align: left;">
+                    <p
+                        style="color: #92400E; margin: 0; font-size: 0.85rem; line-height: 1.5; display: flex; gap: 8px; align-items: flex-start;">
+                        <i data-lucide="alert-triangle"
+                            style="flex-shrink: 0; width: 18px; height: 18px; margin-top: 2px;"></i>
+                        <span><strong>Aviso Importante:</strong> Guarde o número do seu protocolo. O envio do formulário
+                            não autoriza o exercício imediato da atividade comercial nas ruas.</span>
+                    </p>
+                </div>
+
+                <!-- BOTÕES DE AÇÃO REVISADOS -->
+                <div class="success-actions">
+                    <button type="button" id="btn-imprimir-pdf" class="btn-action">
+                        <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Imprimir Comprovante
+                    </button>
+
+                    <button type="button" id="btn-compartilhar" class="btn-action">
+                        <i data-lucide="share-2" style="width: 18px; height: 18px;"></i> Compartilhar Protocolo
+                    </button>
+
+                    <a href="../index.html" class="btn-action">
+                        <i data-lucide="home" style="width: 18px; height: 18px;"></i> Início
+                    </a>
+
+                    <button type="button" onclick="iniciarNovoCadastro()" class="btn-action btn-novo-req">
+                        <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i> Novo Requerimento
+                    </button>
+
+                    <a href="credencial.html" class="btn-submit">
+                        <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i> Meu Painel
+                    </a>
+                </div>
+            </div>
+
     </main>
 
+    <!-- RODAPÉ INSTITUCIONAL -->
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista</p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é
+                Legal</span></p>
     </footer>
 
     <!-- VLIBRAS -->
@@ -364,9 +696,213 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+
+    <!-- ============================================================
+                 DOCUMENTO OFICIAL APAL PARA IMPRESSÃO / PDF (3 PÁGINAS)
+                 ============================================================ -->
+            <div id="print-official-form" class="print-official-container">
+                
+                <!-- PÁGINA 1 -->
+                <div class="print-page">
+                    <div class="print-header">
+                        <div class="print-header-top">
+                            <strong>ESTADO DA BAHIA</strong><br>
+                            <strong>PREFEITURA MUNICIPAL DE VITÓRIA DA CONQUISTA</strong><br>
+                            <span>Secretaria Municipal de Serviços Públicos / Coordenação de Licenciamento e Posturas</span><br>
+                            <small>www.pmvc.ba.gov.br</small>
+                        </div>
+                        <h2 class="print-doc-title">
+                            FORMULÁRIO PARA CADASTRO E REGULARIZAÇÃO DE<br>
+                            COMÉRCIO AMBULANTE E EVENTUAL - APAL
+                        </h2>
+                    </div>
+
+                    <!-- DADOS DO REQUERENTE -->
+                    <div class="print-section">
+                        <div class="print-section-title">Dados do Requerente</div>
+                        <div class="print-grid print-grid-2">
+                            <div><strong>NOME:</strong> <span id="pdf-nome">-</span></div>
+                            <div><strong>CPF:</strong> <span id="pdf-cpf">-</span></div>
+                        </div>
+                        <div class="print-grid print-grid-3">
+                            <div><strong>RG:</strong> <span id="pdf-rg">-</span></div>
+                            <div><strong>Nacionalidade:</strong> <span id="pdf-nacionalidade">Brasileira</span></div>
+                            <div><strong>Estado Civil:</strong> <span id="pdf-estado-civil">-</span></div>
+                        </div>
+                    </div>
+
+                    <!-- ENDEREÇO RESIDENCIAL -->
+                    <div class="print-section">
+                        <div class="print-section-title">Endereço Residencial</div>
+                        <div class="print-grid print-grid-3-wide">
+                            <div><strong>Endereço:</strong> <span id="pdf-endereco">-</span></div>
+                            <div><strong>Número:</strong> <span id="pdf-numero">-</span></div>
+                            <div><strong>Bairro:</strong> <span id="pdf-bairro">-</span></div>
+                        </div>
+                        <div class="print-grid print-grid-3">
+                            <div><strong>Complemento:</strong> <span id="pdf-complemento">-</span></div>
+                            <div><strong>CEP:</strong> <span id="pdf-cep">-</span></div>
+                            <div><strong>Cidade:</strong> <span id="pdf-cidade">Vitória da Conquista - BA</span></div>
+                        </div>
+                        <div class="print-grid print-grid-2">
+                            <div><strong>Tel.:</strong> <span id="pdf-tel">-</span></div>
+                            <div><strong>E-mail:</strong> <span id="pdf-email">-</span></div>
+                        </div>
+                    </div>
+
+                    <!-- INFORMAÇÕES PESSOA JURÍDICA -->
+                    <div class="print-section">
+                        <div class="print-section-title">Informações Pessoa Jurídica (Se houver)</div>
+                        <div class="print-grid print-grid-2">
+                            <div><strong>CNPJ:</strong> <span id="pdf-pj-cnpj">Não se aplica</span></div>
+                            <div><strong>Insc. Municipal:</strong> <span id="pdf-pj-insc">Não se aplica</span></div>
+                        </div>
+                        <div class="print-grid print-grid-2">
+                            <div><strong>Razão Social:</strong> <span id="pdf-pj-razao">-</span></div>
+                            <div><strong>Nome Fantasia:</strong> <span id="pdf-pj-fantasia">-</span></div>
+                        </div>
+                    </div>
+
+                    <!-- FORMA DE ATUAÇÃO ATUAL -->
+                    <div class="print-section">
+                        <div class="print-section-title">Forma de Atuação Atual</div>
+                        <div class="print-row-line">
+                            <strong>1. Comércio:</strong> 
+                            <span class="pdf-check" id="pdf-atual-ambulante">( ) Ambulante</span> 
+                            <span class="pdf-check" id="pdf-atual-eventual">( ) Eventual</span>
+                        </div>
+                        <div class="print-row-line">
+                            <strong>1.1 Categoria:</strong> 
+                            <span class="pdf-check" id="pdf-cat-atual-a">( ) A</span> 
+                            <span class="pdf-check" id="pdf-cat-atual-b">( ) B</span> 
+                            <span class="pdf-check" id="pdf-cat-atual-c">( ) C</span>
+                        </div>
+                        <div class="print-row-line">
+                            <strong>1.2. Espécie de mercadoria comercializada:</strong> <span id="pdf-mercadoria-atual">-</span>
+                        </div>
+                    </div>
+
+                    <div class="print-footer-page">Página 1 de 3</div>
+                </div>
+
+                <!-- PÁGINA 2 -->
+                <div class="print-page">
+                    <div class="print-header">
+                        <div class="print-header-top">
+                            <strong>ESTADO DA BAHIA</strong><br>
+                            <strong>PREFEITURA MUNICIPAL DE VITÓRIA DA CONQUISTA</strong><br>
+                            <span>Secretaria Municipal de Serviços Públicos / Coordenação de Licenciamento e Posturas</span>
+                        </div>
+                        <h2 class="print-doc-title">FORMULÁRIO PARA CADASTRO E REGULARIZAÇÃO - APAL</h2>
+                    </div>
+
+                    <div class="print-section">
+                        <div class="print-row-line"><strong>1.3. Logradouro ou área pública de atuação:</strong> <span id="pdf-logradouro-atual">-</span></div>
+                        <div class="print-row-line"><strong>1.4. Área utilizada:</strong> <span id="pdf-area-atual">-</span></div>
+                        <div class="print-row-line">
+                            <strong>1.5. Dias de atuação:</strong> 
+                            <span id="pdf-dias-atual">( ) Dom ( ) Seg ( ) Ter ( ) Qua ( ) Qui ( ) Sex ( ) Sáb</span>
+                        </div>
+                        <div class="print-row-line"><strong>1.6. Horário de atuação:</strong> <span id="pdf-horario-atual">-</span></div>
+                    </div>
+
+                    <!-- FORMA DE ATUAÇÃO PRETENDIDA -->
+                    <div class="print-section">
+                        <div class="print-section-title">Forma de Atuação Pretendida</div>
+                        <div class="print-row-line">
+                            <strong>2. Comércio:</strong> 
+                            <span class="pdf-check" id="pdf-pret-ambulante">( ) Ambulante</span> 
+                            <span class="pdf-check" id="pdf-pret-eventual">( ) Eventual</span>
+                        </div>
+                        <div class="print-row-line">
+                            <strong>2.1 Categoria:</strong> 
+                            <span class="pdf-check" id="pdf-cat-pret-a">( ) A</span> 
+                            <span class="pdf-check" id="pdf-cat-pret-b">( ) B</span> 
+                            <span class="pdf-check" id="pdf-cat-pret-c">( ) C</span>
+                        </div>
+                        <div class="print-row-line">
+                            <strong>2.2. Espécie de mercadoria a ser comercializada:</strong> <span id="pdf-mercadoria-pretendida">-</span>
+                        </div>
+                        <div class="print-row-line"><strong>2.3. Opção 1 de Logradouro ou área pública:</strong> <span id="pdf-ponto-op1">-</span></div>
+                        <div class="print-row-line"><strong>2.4. Opção 2 de Logradouro ou área pública:</strong> <span id="pdf-ponto-op2">-</span></div>
+                        <div class="print-row-line"><strong>2.5. Opção 3 de Logradouro ou área pública:</strong> <span id="pdf-ponto-op3">N/A</span></div>
+                        <div class="print-row-line"><strong>2.6. Área utilizada:</strong> <span id="pdf-area-pretendida">-</span></div>
+                        <div class="print-row-line">
+                            <strong>2.7. Dias de atuação:</strong> 
+                            <span id="pdf-dias-pretendida">( ) Dom ( ) Seg ( ) Ter ( ) Qua ( ) Qui ( ) Sex ( ) Sáb</span>
+                        </div>
+                        <div class="print-row-line"><strong>2.8. Horário de atuação:</strong> <span id="pdf-horario-pretendida">-</span></div>
+                    </div>
+
+                    <!-- ASSINATURA PÁGINA 2 -->
+                    <div class="print-signature-block">
+                        <p>Vitória da Conquista - BA, <span class="pdf-data-extenso">_____ de ____________________ de ________</span></p>
+                        <div class="print-signature-line"></div>
+                        <p>Assinatura do Requerente</p>
+                    </div>
+
+                    <div class="print-footer-page">Página 2 de 3</div>
+                </div>
+
+                <!-- PÁGINA 3 -->
+                <div class="print-page">
+                    <div class="print-header">
+                        <div class="print-header-top">
+                            <strong>ESTADO DA BAHIA</strong><br>
+                            <strong>PREFEITURA MUNICIPAL DE VITÓRIA DA CONQUISTA</strong><br>
+                            <span>Secretaria Municipal de Serviços Públicos / Coordenação de Licenciamento e Posturas</span>
+                        </div>
+                        <h2 class="print-doc-title">INSTRUÇÕES E DIRETRIZES DO APAL (VITÓRIA DA CONQUISTA)</h2>
+                    </div>
+
+                    <div class="print-legal-box">
+                        <p>O comércio ambulante e eventual realizado em vias e áreas públicas de Vitória da Conquista compreende a venda direta, em caráter permanente ou eventual, estruturado nas seguintes categorias:</p>
+                        <p><strong>Categoria A:</strong> Atividade comercial desenvolvida em veículo automotor, reboques e similares, que se locomovem ou se deslocam, onde a manipulação e o desenvolvimento das atividades podem ou não ocorrer em seu interior.</p>
+                        <p><strong>Categoria B:</strong> Equipamentos montados ou estruturados para tração humana (carrinhos e tabuleiros).</p>
+                        <p><strong>Categoria C:</strong> Atividade comercial exercida em barracas desmontáveis ou estruturas fixas temporárias.</p>
+                    </div>
+
+                    <div class="print-alert-box">
+                        <h3>AVISO IMPORTANTE</h3>
+                        <p>Declaro estar ciente de que o presente requerimento <strong>NÃO AUTORIZA O IMEDIATO EXERCÍCIO DA ATIVIDADE DE VENDEDOR AMBULANTE</strong>, devendo aguardar que o pedido seja analisado pela fiscalização municipal de posturas. Somente após a aprovação e emissão do Alvará/Credencial, o requerente poderá ocupar o local solicitado.</p>
+                        <p>A não observância deste aviso poderá acarretar sanções, multas e apreensão de equipamentos e mercadorias, nos termos da legislação municipal vigente de Vitória da Conquista, bem como o indeferimento definitivo do pedido.</p>
+                        <p><strong>É terminantemente proibida a comercialização e o consumo de bebidas em embalagens de vidro em vias e logradouros públicos por ambulantes e barraqueiros.</strong></p>
+                    </div>
+
+                    <div class="print-section">
+                        <div class="print-section-title">DOCUMENTOS OBRIGATÓRIOS PARA INSTRUÇÃO DO PEDIDO:</div>
+                        <ul class="print-doc-list">
+                            <li>a) Cópia da Identidade (RG);</li>
+                            <li>b) Cópia do CPF;</li>
+                            <li>c) Cópia do Comprovante de Residência atualizado no município;</li>
+                            <li>d) Cópia do documento do veículo e licenciamento atualizado, no caso de interessados na Categoria A;</li>
+                            <li>e) Atestado de Saúde Ocupacional (ASO) ou Carteira de Saúde válida (obrigatório para o ramo de manipulação de alimentos).</li>
+                        </ul>
+                    </div>
+
+                    <!-- ASSINATURA PÁGINA 3 -->
+                    <div class="print-signature-block">
+                        <p>Vitória da Conquista - BA, <span class="pdf-data-extenso">_____ de ____________________ de ________</span></p>
+                        <div class="print-signature-line"></div>
+                        <p>Assinatura do Requerente</p>
+                    </div>
+
+                    <div class="print-footer-page">Página 3 de 3</div>
+                </div>
+
+            </div>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <!-- CAMINHO CORRIGIDO PARA O SCRIPT.JS -->
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- JS DO CADASTRO -->
     <script src="../js/script.js"></script>
 
+    <script>
+        lucide.createIcons();
+    </script>
+
 </body>
+
 </html>

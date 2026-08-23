@@ -1,0 +1,92 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Gestores da Secretaria - Ponto Certo Conquista{% endblock %}
+
+{% block header_extra_class %} header-master{% endblock %}
+
+{% block header_nav %}
+{% include "master/_nav.html" with active="gestores" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section" style="background-color: var(--texto-escuro);">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Gestão de Gestores da Secretaria</h1>
+        <p>Controle de servidores cadastrados, permissões de aprovação e credenciais administrativas.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+            <h2>Gestores Cadastrados ({{ total_gestores }})</h2>
+        </div>
+        <a href="{% url 'master_cadastrar_gestor' %}" class="btn-submit" style="background-color: var(--azul-vibrante); text-decoration: none; padding: 0.7rem 1.2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="user-plus" aria-hidden="true"></i> Cadastrar Novo Gestor
+        </a>
+    </div>
+
+    <form method="get" class="form-row" style="margin-bottom: 1.5rem;" role="search">
+        <div class="input-group full-width">
+            <label for="search-gestor">Pesquisar Gestor Cadastrado</label>
+            <input type="search" id="search-gestor" name="q" value="{{ busca }}" placeholder="Digite o nome, CPF, secretaria ou cargo do gestor...">
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <caption class="sr-only">Lista de gestores cadastrados</caption>
+            <thead>
+                <tr>
+                    <th>NOME COMPLETO</th>
+                    <th>SECRETARIA / ÓRGÃO</th>
+                    <th>CARGO / FUNÇÃO</th>
+                    <th>E-MAIL INSTITUCIONAL</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES DA TI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gestor in gestores %}
+                <tr>
+                    <td><strong>{{ gestor.nome }} {{ gestor.sobrenome }}</strong></td>
+                    <td>{{ gestor.departamento }}</td>
+                    <td>{{ gestor.cargo }}</td>
+                    <td>{{ gestor.email }}</td>
+                    <td>
+                        {% if gestor.ativo %}
+                        <span class="badge success"><i data-lucide="check-circle" aria-hidden="true"></i> Ativo</span>
+                        {% else %}
+                        <span class="badge danger"><i data-lucide="lock" aria-hidden="true"></i> Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="btn-action" title="Editar cadastro (em breve)">
+                                <i data-lucide="edit" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn-action" title="Resetar senha (em breve)">
+                                <i data-lucide="key" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum gestor cadastrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'master_admin' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar ao Painel da TI
+        </a>
+    </div>
+</div>
+{% endblock %}

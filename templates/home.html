@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ponto Certo Conquista - Vitória da Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="inicio" %}
+{% endblock %}
+
+{% block hero %}
+<section class="modern-hero home-hero-split" aria-label="Apresentação Ponto Certo Conquista">
+    <div class="home-hero-visual">
+        <div class="home-hero-photo">
+            <img
+                src="{% static 'img/home-ambulante.png' %}"
+                alt="Ambulante vendendo frutas em feira livre"
+                class="home-hero-img"
+                width="1920"
+                height="1080"
+                decoding="async"
+                fetchpriority="high"
+            >
+        </div>
+        <div class="home-hero-fade" aria-hidden="true"></div>
+    </div>
+
+    <div class="hero-content-wrapper">
+        <h1 class="hero-title">
+            O comércio ambulante organizado e <span class="text-highlight-pink">legalizado</span>.
+        </h1>
+        <p class="hero-description">
+            Solicite a licença, acompanhe o alvará digital e trabalhe com segurança nas ruas de Vitória da Conquista.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'registro' %}" class="btn-modern-primary">
+                <i data-lucide="user-plus" aria-hidden="true"></i> Quero me Cadastrar
+            </a>
+            <a href="{% url 'entrar' %}" class="btn-modern-outline">
+                <i data-lucide="log-in" aria-hidden="true"></i> Já sou ambulante
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block main_class %}home-main-container{% endblock %}
+
+{% block content %}
+<section aria-labelledby="home-recursos-titulo">
+<h2 id="home-recursos-titulo" class="sr-only">Recursos da plataforma</h2>
+<div class="features-grid">
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-blue">
+            <i data-lucide="qr-code" class="icon-blue" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Credencial Digital</h3>
+        <p class="feature-description">
+            Tenha seu crachá com QR Code oficial direto no celular. Fácil de apresentar para a fiscalização e passa credibilidade aos clientes.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-pink">
+            <i data-lucide="shield-check" class="icon-pink" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Segurança no Ponto</h3>
+        <p class="feature-description">
+            Trabalhe com dignidade. Estando regularizado, você garante o seu espaço de atuação sem o risco de ter suas mercadorias apreendidas.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon-wrapper icon-bg-green">
+            <i data-lucide="smartphone" class="icon-green" aria-hidden="true"></i>
+        </div>
+        <h3 class="feature-title">Processo 100% Online</h3>
+        <p class="feature-description">
+            Esqueça as filas. Envie seus documentos pelo sistema, acompanhe a análise e receba seu alvará digitalmente.
+        </p>
+    </div>
+
+</div>
+</section>
+
+<div class="steps-header">
+    <h2 class="steps-title">Como funciona a regularização?</h2>
+    <p class="steps-subtitle">Um processo transparente em quatro etapas simples.</p>
+</div>
+
+<div class="steps-grid">
+
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="user" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="step-card-title">Seu Cadastro</h3>
+        <p class="step-card-description">Crie sua conta informando seus dados pessoais, endereço e tipo de comércio.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="file-text" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="step-card-title">Envio de Documentos</h3>
+        <p class="step-card-description">Anexe as cópias do seu RG, CPF, Comprovante de Residência e fotos da estrutura.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="search" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="step-card-title">Análise do Município</h3>
+        <p class="step-card-description">A fiscalização avalia os documentos enviados e a viabilidade do ponto solicitado.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-icon-wrapper">
+            <i data-lucide="badge-check" class="step-icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="step-card-title">Credencial Liberada</h3>
+        <p class="step-card-description">Após a aprovação do requerimento, seu alvará digital é emitido direto no seu painel.</p>
+    </div>
+
+</div>
+
+<div class="cta-banner" id="cadastro">
+    <div class="cta-content">
+        <div class="cta-alert-badge">
+            <i data-lucide="sparkles" class="cta-alert-icon" aria-hidden="true"></i> Regularize sua atividade
+        </div>
+        <h3 class="cta-title">Pronto para trabalhar com tranquilidade?</h3>
+        <p class="cta-description">
+            Faça seu requerimento online agora mesmo e garanta a sua credencial oficial de comerciante ambulante em Vitória da Conquista.
+        </p>
+
+        <div class="cta-buttons">
+            <a href="{% url 'registro' %}" class="btn-download-primary">
+                <i data-lucide="user-plus" aria-hidden="true"></i> Iniciar Meu Cadastro
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="public-ai-chat" class="public-ai-chat hidden" aria-hidden="true">
+    <div class="public-ai-chat-header">
+        <h3>Consultor APAL</h3>
+        <button id="public-ai-chat-close" class="assistente-icon-btn-sm assistente-icon-btn" aria-label="Fechar janela de chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+    </div>
+    <div id="public-ai-chat-body" class="public-ai-chat-body" aria-live="polite">
+        <div class="assistente-turno">
+            <div class="assistente-balao resposta">
+                <span class="assistente-rotulo">Assistente Consultor APAL</span>
+                <p>Olá! Sou o Assistente Consultor da APAL. Posso te orientar sobre quais bairros possuem maior demanda para o seu produto ou tirar dúvidas sobre a legislação municipal. Como posso te ajudar hoje?</p>
+            </div>
+        </div>
+    </div>
+    <div class="public-ai-chat-footer">
+        <form id="public-ai-chat-form" class="assistente-form-composer">
+            <div class="assistente-composer">
+                <textarea id="public-ai-chat-input" placeholder="Digite sua dúvida..." required rows="1"></textarea>
+                <button type="submit" class="assistente-composer-enviar" id="public-ai-chat-submit" aria-label="Enviar mensagem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="public-ai-widget-container">
+    <div id="public-ai-tooltip" class="public-ai-tooltip">Precisa de ajuda?</div>
+    <button id="public-ai-fab" class="public-ai-fab" aria-label="Dúvidas sobre onde vender? Fale com a IA" title="Dúvidas sobre onde vender? Fale com a IA">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+    </button>
+</div>
+{% endblock %}

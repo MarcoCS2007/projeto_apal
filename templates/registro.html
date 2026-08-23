@@ -1,0 +1,128 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Criar Conta - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="entrar" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Cadastre-se na Plataforma</h1>
+        <p>Crie sua conta para acessar os serviços, solicitar licenças e gerenciar suas atividades.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper" style="max-width: 600px;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Criar Nova Conta</h2>
+    </div>
+
+    <form id="registro-form" method="post" action="{% url 'registro' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="reg-nome">Nome Completo</label>
+                {{ form.nome_completo }}
+                {% if form.nome_completo.errors %}
+                <div class="login-error" role="alert">{{ form.nome_completo.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="reg-email">E-mail de Acesso</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="login-error" role="alert">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="input-group">
+                <label for="cpf-cadastro">CPF</label>
+                {{ form.cpf }}
+                {% if form.cpf.errors %}
+                <div class="login-error" role="alert">{{ form.cpf.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="reg-telefone">Telefone / WhatsApp</label>
+                {{ form.telefone_whatsapp }}
+                {% if form.telefone_whatsapp.errors %}
+                <div class="login-error" role="alert">{{ form.telefone_whatsapp.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="reg-password">Senha de Acesso</label>
+                <div class="input-password-wrapper">
+                    {{ form.password }}
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                <div class="login-error" role="alert">{{ form.password.errors.0 }}</div>
+                {% endif %}
+                <ul class="password-requirements" id="password-requirements" aria-live="polite">
+                    <li data-rule="length">Mínimo de 8 caracteres</li>
+                    <li data-rule="letter">Pelo menos uma letra</li>
+                    <li data-rule="number">Pelo menos um número</li>
+                    <li data-rule="not-numeric">Não use senha só com números</li>
+                    <li data-rule="match">As duas senhas coincidem</li>
+                </ul>
+            </div>
+            <div class="input-group">
+                <label for="reg-confirm-password">Confirmar Senha</label>
+                <div class="input-password-wrapper">
+                    {{ form.password_confirm }}
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password_confirm.errors %}
+                <div class="login-error" role="alert">{{ form.password_confirm.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="aceite-lgpd" style="display: flex; align-items: flex-start; gap: 0.6rem; text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 500; color: var(--texto-escuro);">
+                    {{ form.aceite_lgpd }}
+                    <span>
+                        Li e aceito o tratamento dos meus dados pessoais para o licenciamento e a fiscalização do comércio ambulante, nos termos da
+                        <a href="{% url 'privacidade' %}" target="_blank" rel="noopener">política de privacidade (LGPD)</a>.
+                    </span>
+                </label>
+                {% if form.aceite_lgpd.errors %}
+                <div class="login-error" role="alert">{{ form.aceite_lgpd.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                <i data-lucide="user-plus"></i> Finalizar Cadastro
+            </button>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Já possui uma conta? Entre aqui
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

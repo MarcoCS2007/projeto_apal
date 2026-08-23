@@ -1,0 +1,146 @@
+<!-- Quem for mexer ao conectar com django descomente a linha abaixo: -->
+<!-- {% extends 'base.html' %} -->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dossiê do Trabalhador - APAL Gestor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- CABEÇALHO DO GESTOR -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
+                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                    <span style="font-size: 0.85rem; background: #EFF6FF; color: #2563EB; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Painel Gestor</span>
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="triagem.html"><i data-lucide="file-check"></i> Triagem</a>
+                <a href="dashboard.html"><i data-lucide="bar-chart-3"></i> Relatórios</a>
+                <a href="dossie.html" class="active"><i data-lucide="user-check"></i> Dossiê</a>
+                <a href="../index.html"><i data-lucide="log-out" style="color: #EF4444;"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <h1 style="font-size: 1.8rem; font-weight: 800; color: #0F172A; margin: 0;">Dossiê do Ambulante</h1>
+                <p style="color: #475569; margin: 4px 0 0 0;">Histórico regulatório, índice de conformidade e exportação de relatório.</p>
+            </div>
+            
+            <!-- BOTÃO EXPORTAÇÃO PDF (HU-5.4) -->
+            <a 
+                href="/api/trabalhador/104/dossie/pdf/" 
+                target="_blank" 
+                style="background: #FF007F; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 0, 127, 0.25);">
+                <i data-lucide="file-down"></i> Exportar Dossiê (PDF)
+            </a>
+        </div>
+
+        <!-- CARD PRINCIPAL: PERFIL DO TRABALHADOR -->
+        <div class="form-card" style="padding: 28px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid #2563EB;">
+                    JS
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <h2 style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin: 0;">João da Silva</h2>
+                        <span style="background: #D1FAE5; color: #059669; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">
+                            Cadastrado e Regular
+                        </span>
+                    </div>
+                    <p style="color: #475569; margin: 6px 0 0 0; font-size: 0.95rem;">
+                        <strong>CPF:</strong> 123.456.789-00 &bull; <strong>Inscrição Municipal:</strong> APAL-2026-0104
+                    </p>
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;">
+
+            <!-- ÍNDICE DE CONFORMIDADE / SCORE DO TRABALHADOR -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Score de Conformidade</span>
+                    <strong style="display: block; font-size: 1.6rem; color: #10B981; margin-top: 4px;">98 / 100</strong>
+                    <small style="color: #059669; font-weight: 600;">Excelente Histórico</small>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Ponto Autorizado</span>
+                    <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">Praça Barão do Rio Branco</strong>
+                    <small style="color: #475569;">Centro - Vitória da Conquista</small>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px;">
+                    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Categoria</span>
+                    <strong style="display: block; font-size: 1.1rem; color: #0F172A; margin-top: 4px;">Categoria B</strong>
+                    <small style="color: #475569;">Carrinho Tracionado Humano</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE HISTÓRICO DE MULTAS E INFRAÇÕES -->
+        <div class="form-card" style="padding: 24px; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin-top: 0; margin-bottom: 16px;">Histórico de Fiscalização & Notificações</h3>
+
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 10px;">Data</th>
+                        <th style="padding: 10px;">Ocorrência</th>
+                        <th style="padding: 10px;">Agente Fiscal</th>
+                        <th style="padding: 10px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #E2E8F0;">
+                        <td style="padding: 12px 10px; color: #475569;">15/01/2026</td>
+                        <td style="padding: 12px 10px; font-weight: 600; color: #0F172A;">Vistoria de Rotina (Equipamento)</td>
+                        <td style="padding: 12px 10px; color: #475569;">Fiscal Posturas #402</td>
+                        <td style="padding: 12px 10px;"><span style="color: #059669; font-weight: 600;">Aprovado</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #E2E8F0;">
+                        <td style="padding: 12px 10px; color: #475569;">10/11/2025</td>
+                        <td style="padding: 12px 10px; font-weight: 600; color: #0F172A;">Advertência por descarte fora do horário</td>
+                        <td style="padding: 12px 10px; color: #475569;">Fiscal Posturas #108</td>
+                        <td style="padding: 12px 10px;"><span style="color: #D97706; font-weight: 600;">Advertido / Regularizado</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer-pmvc" style="margin-top: 60px;">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Módulo de Gestão</span></p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

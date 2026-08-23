@@ -159,6 +159,8 @@ Estes são os atalhos que você vai usar com frequência. Existem duas versões,
 | Roda o pre-commit | `make precommit` | `./dev.sh precommit` |
 | Roda os testes | `make test` | `./dev.sh test` |
 | Terminal no container | `make bash` | `./dev.sh bash` |
+| Seed de demonstração | `make seed` | `./dev.sh exec python manage.py seed_inicial` |
+| Seed para gráficos | `make seed_massivo` | `./dev.sh exec python manage.py seed_massivo` |
 | Comando livre | `make cmd="..."` | `./dev.sh exec ...` |
 
 Exemplo de comando livre, para criar uma migração nova:
@@ -346,13 +348,13 @@ projeto_apal/
     workflows/
       ci.yml         pipeline de CI que valida lint, formatação e testes
   config/          configurações do Django (urls, wsgi, asgi e settings/ por ambiente: base, dev, prod)
-  apps/            módulos do sistema (usuarios, acessos, licenciamento, espacos, fiscalizacao, financeiro, notificacoes, importacoes, analytics, relatorios, comum)
+  apps/            módulos do sistema (core, usuarios, licenciamento, espacos, fiscalizacao, assistente)
   tests/           configuração e factories de testes
   templates/       páginas HTML
   static/          arquivos de estilo, scripts e imagens
   docs/            documentação do projeto
   infra/           arquivos de Docker
-  scripts/         utilitários
+  scripts/         utilitários (ex.: seed_massivo)
   requirements/    listas de dependências (base.txt, dev.txt)
   manage.py        ponto de entrada do Django
   pytest.ini       configuração do pytest

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permissões Globais - APAL</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Técnico da TI -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">APAL</a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
+                <a href="gerenciar-fiscais.html"><i data-lucide="id-card"></i> Fiscais</a>
+                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
+                <a href="gerenciar-permissoes.html" class="active"><i data-lucide="key"></i> Permissões</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Gestão de Permissões Globais e Segurança</h1>
+            <p>Configure privilégios de acesso por perfil, políticas de autenticação e regras de segurança do sistema.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+        
+        <form onsubmit="event.preventDefault(); alert('Permissões e políticas globais de segurança atualizadas com sucesso!'); window.location.href='dashboard-ti.html';">
+            
+            <!-- CARD 1: MATRIZ DE PERMISSÕES POR PERFIL -->
+            <div class="form-card" style="margin-bottom: 2rem;">
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+                    <h2>Matriz de Acessos por Perfil de Usuário</h2>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--texto-cinza); margin-bottom: 1.5rem;">
+                    Marque os módulos e recursos que cada perfil tem autorização para acessar na plataforma.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>MÓDULO / RECURSO DO SISTEMA</th>
+                                <th style="text-align: center;">AMBULANTE</th>
+                                <th style="text-align: center;">FISCAL DE RUA</th>
+                                <th style="text-align: center;">GESTOR MUNICIPAL</th>
+                                <th style="text-align: center;">CIDADÃO / PÚBLICO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Consulta do Mapa de Vagas em Tempo Real</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Ambulante ver mapa"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal ver mapa"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor ver mapa"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Cidadão ver mapa"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Solicitação e Renovação de Licença</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Ambulante solicitar licença"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Fiscal"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor solicitar licença"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Emissão Direta e Validação de Alvará</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Ambulante apenas visualiza"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Fiscal apenas valida via QR"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor emitir alvará"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Leitura de QR Code / Validação de Campo</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Ambulante exibe o QR"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal validar via QR"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor validar via QR"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Cidadão consultar QR"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lavratura de Autos de Ocorrência / Apreensão</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Ambulante"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Fiscal registrar ocorrência"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor gerenciar ocorrências"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Cidadão faz denúncias"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Exportação de Relatórios Gerenciais (.CSV / .PDF)</strong></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Ambulante"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Fiscal"></td>
+                                <td style="text-align: center;"><input type="checkbox" checked title="Permite Gestor exportar dados"></td>
+                                <td style="text-align: center;"><input type="checkbox" disabled title="Não aplicável a Cidadão"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CARD 2: POLÍTICAS DE SEGURANÇA E AUTENTICAÇÃO -->
+            <div class="form-card" style="margin-bottom: 2rem;">
+                <div class="section-title">
+                    <div class="title-accent" style="background-color: #F59E0B;"></div>
+                    <h2>Políticas de Autenticação e Sessão</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="tempo-sessao">Tempo Limite de Sessão por Inatividade</label>
+                        <select id="tempo-sessao" required>
+                            <option value="15">15 minutos</option>
+                            <option value="30" selected>30 minutos (Recomendado)</option>
+                            <option value="60">60 minutos (1 hora)</option>
+                            <option value="120">120 minutos (2 horas)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="tentativas-login">Tentativas Incorretas para Bloqueio</label>
+                        <select id="tentativas-login" required>
+                            <option value="3">3 tentativas incorretas</option>
+                            <option value="5" selected>5 tentativas incorretas (Padrão)</option>
+                            <option value="10">10 tentativas incorretas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="autenticacao-2fa">Exigência de 2FA (Dois Fatores)</label>
+                        <select id="autenticacao-2fa" required>
+                            <option value="todos">Obrigatório para Todos os Perfis</option>
+                            <option value="internos" selected>Obrigatório apenas para TI, Gestores e Fiscais</option>
+                            <option value="opcional">Opcional para todos os perfis</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="retencao-logs">Período de Retenção de Logs de Auditoria</label>
+                        <select id="retencao-logs" required>
+                            <option value="6">6 meses</option>
+                            <option value="12" selected>12 meses (Exigência LGPD)</option>
+                            <option value="24">24 meses (2 anos)</option>
+                            <option value="36">36 meses (3 anos)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AÇÕES DO FORMULÁRIO -->
+            <div class="form-card">
+                <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="dashboard-ti.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="arrow-left"></i> Voltar ao Painel da TI
+                    </a>
+                    
+                    <button type="submit" class="btn-submit" style="background-color: var(--azul-vibrante); display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="save"></i> Salvar Configurações Globais
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

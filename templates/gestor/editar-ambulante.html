@@ -1,0 +1,90 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Editar ambulante - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ambulantes" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Editar dados cadastrais</h1>
+        <p>{{ ambulante.nome_completo }} · CPF {{ ambulante.cpf_formatado }}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.nome_completo.id_for_label }}">{{ form.nome_completo.label }}</label>
+                {{ form.nome_completo }}
+                {{ form.nome_completo.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.telefone_whatsapp.id_for_label }}">{{ form.telefone_whatsapp.label }}</label>
+                {{ form.telefone_whatsapp }}
+                {{ form.telefone_whatsapp.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.telefone_2.id_for_label }}">{{ form.telefone_2.label }}</label>
+                {{ form.telefone_2 }}
+                {{ form.telefone_2.errors }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.apelido_nome_fantasia.id_for_label }}">{{ form.apelido_nome_fantasia.label }}</label>
+                {{ form.apelido_nome_fantasia }}
+                {{ form.apelido_nome_fantasia.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.tipo_atuacao.id_for_label }}">{{ form.tipo_atuacao.label }}</label>
+                {{ form.tipo_atuacao }}
+                {{ form.tipo_atuacao.errors }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.nis.id_for_label }}">{{ form.nis.label }}</label>
+                {{ form.nis }}
+                {{ form.nis.errors }}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.escolaridade.id_for_label }}">{{ form.escolaridade.label }}</label>
+                {{ form.escolaridade }}
+                {{ form.escolaridade.errors }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.genero.id_for_label }}">{{ form.genero.label }}</label>
+                {{ form.genero }}
+                {{ form.genero.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.renda_mensal_estimada.id_for_label }}">{{ form.renda_mensal_estimada.label }}</label>
+                {{ form.renda_mensal_estimada }}
+                {{ form.renda_mensal_estimada.errors }}
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <a href="{% url 'gestor_dossie' ambulante.pk %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar ao dossiê
+            </a>
+            <button type="submit" class="btn-submit">Salvar alterações</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

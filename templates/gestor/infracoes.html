@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de Infrações - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="ocorrencias" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Catálogo de Infrações</h1>
+        <p>Gerencie os tipos de ocorrência e seus pontos de desconto na gamificação.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+            <div class="title-accent" style="background-color: #EF4444;"></div>
+            <h2>Tipos de Ocorrência Cadastrados</h2>
+        </div>
+        <a href="{% url 'gestor_infracao_nova' %}" class="btn-action" style="text-decoration: none;">+ Nova Infração</a>
+    </div>
+
+    <div class="table-responsive table-stack" style="margin-top: 1.5rem;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DESCRIÇÃO</th>
+                    <th>GRAVIDADE</th>
+                    <th>PONTOS DESCONTO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for infracao in infracoes %}
+                <tr>
+                    <td data-label="Descrição">{{ infracao.descricao }}</td>
+                    <td data-label="Gravidade">{{ infracao.get_gravidade_display }}</td>
+                    <td data-label="Pontos">
+                        <span style="color: #EF4444; font-weight: bold;">-{{ infracao.pontos_desconto }}</span> pts
+                    </td>
+                    <td data-label="Ações">
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <a href="{% url 'gestor_infracao_editar' infracao.pk %}" class="btn-action" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: #64748B;">
+                                <i data-lucide="edit"></i> Editar
+                            </a>
+                            <form action="{% url 'gestor_infracao_apagar' infracao.pk %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-action" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: #EF4444; border: none; cursor: pointer;" onclick="return confirm('Tem certeza que deseja apagar esta infração?');">
+                                    <i data-lucide="trash-2"></i> Apagar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhuma infração cadastrada no catálogo ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

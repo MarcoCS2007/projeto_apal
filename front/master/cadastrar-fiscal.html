@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Fiscal - APAL</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Técnico da TI -->
+    <header class="top-header" style="border-bottom: 3px solid var(--texto-escuro);">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">APAL</a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard-ti.html"><i data-lucide="shield-alert"></i> Painel TI</a>
+                <a href="gerenciar-fiscais.html" class="active"><i data-lucide="id-card"></i> Fiscais</a>
+                <a href="gerenciar-gestores.html"><i data-lucide="users"></i> Gestores</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="background-color: var(--texto-escuro);">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Cadastro de Fiscal de Rua</h1>
+            <p>Preencha os dados oficiais para emitir as credenciais de acesso do novo agente de fiscalização.</p>
+        </div>
+    </section>
+
+    <!-- Área Principal -->
+    <main class="main-container">
+        <div class="form-card" style="max-width: 800px; margin: 0 auto;">
+            
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #10B981;"></div>
+                <h2>Dados do Novo Agente</h2>
+            </div>
+
+            <form onsubmit="event.preventDefault(); alert('Fiscal cadastrado com sucesso! As credenciais de acesso foram enviadas para o e-mail informado.'); window.location.href='gerenciar-fiscais.html';">
+                
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="fiscal-nome">Nome Completo do Agente</label>
+                        <input type="text" id="fiscal-nome" placeholder="Ex: Carlos Eduardo Moreira" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="fiscal-matricula">Número da Matrícula</label>
+                        <input type="text" id="fiscal-matricula" placeholder="Ex: #4599" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="fiscal-cpf">CPF do Agente</label>
+                        <input type="text" id="fiscal-cpf" placeholder="000.000.000-00" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="fiscal-email">E-mail Institucional</label>
+                        <input type="email" id="fiscal-email" placeholder="fiscal.nome@pmvc.ba.gov.br" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="fiscal-zona">Zona / Setor de Atuação Principal</label>
+                        <select id="fiscal-zona" required>
+                            <option value="" disabled selected>Selecione a zona...</option>
+                            <option value="centro">Centro Comercial / Praça 9 de Novembro</option>
+                            <option value="bairro_brasil">Feira do Bairro Brasil / Zona Oeste</option>
+                            <option value="terminal">Terminal Lauro de Freitas</option>
+                            <option value="ceasa">Região do Ceasa / Centro Histórico</option>
+                            <option value="itinerante">Fiscalização Itinerante / Eventos</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="fiscal-senha">Senha Provisória</label>
+                        <input type="password" id="fiscal-senha" placeholder="Crie uma senha provisória" required>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação do Formulário -->
+                <div class="form-actions" style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="gerenciar-fiscais.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="arrow-left"></i> Cancelar e Voltar
+                    </a>
+                    <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="user-check"></i> Cadastrar Agente
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </main>
+
+    <!-- FUNDO ESCURECIDO PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

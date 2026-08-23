@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Privacidade e LGPD - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Política de privacidade</h1>
+        <p>Tratamento de dados pessoais no licenciamento do comércio ambulante.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 720px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Base legal</h2>
+    </div>
+    <p>{{ base_legal }}</p>
+    <p>O cadastro no Ponto Certo Conquista registra o aceite do titular, a data/hora e essa base legal. O CPF completo aparece só no dossiê interno; listagens usam CPF mascarado.</p>
+
+    <div class="section-title" style="margin-top: 2rem;">
+        <div class="title-accent"></div>
+        <h2>Retenção</h2>
+    </div>
+    <p>Logs do assistente e de acesso a dossiê são mantidos por <strong>{{ retencao_meses }} meses</strong>, conforme a política definida no painel Master. Depois disso a rotina <code>purgar_retencao</code> remove os registros vencidos.</p>
+
+    <div class="section-title" style="margin-top: 2rem;">
+        <div class="title-accent"></div>
+        <h2>Documentos enviados</h2>
+    </div>
+    <p>Anexos (RG, comprovante, laudos) ficam em storage local controlado e só são baixados por quem tem direito: o próprio ambulante, gestor/fiscal autorizado ou o Administrador.</p>
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'index' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar ao início
+        </a>
+    </p>
+</div>
+{% endblock %}

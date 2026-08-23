@@ -1,0 +1,79 @@
+{% if oob_badge %}
+{% include "ambulante/_status_badge.html" with licenca=licenca oob_badge=True %}
+{% endif %}
+<div id="painel-emissao-alvara" style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px; border-radius: 8px;">
+    {% if licenca.aguardando_taxa %}
+    <p style="color: #475569; font-size: 0.95rem; margin-top: 0; text-align: center;">
+        Após a confirmação do pagamento do Documento de Arrecadação Municipal (DAM),
+        o processo segue para a emissão do alvará pela prefeitura.
+    </p>
+    <p style="text-align: center; margin-bottom: 1rem;">
+        <strong style="font-size: 1.25rem; color: #2563EB;">R$ {{ licenca.valor_taxa|floatformat:2 }}</strong>
+    </p>
+    <div style="text-align: center;">
+        <button
+            type="button"
+            hx-post="{% url 'alvara_simular_pagamento' licenca.pk %}"
+            hx-target="#painel-emissao-alvara"
+            hx-swap="outerHTML"
+            hx-disabled-elt="this"
+            class="btn-submit"
+            style="display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="credit-card"></i> Simular pagamento da taxa (DAM)
+        </button>
+    </div>
+    {% elif licenca.taxa_paga and licenca.status == "Aprovado" %}
+    <p style="color: #027A48; font-size: 0.95rem; margin: 0; text-align: center;">
+        <i data-lucide="check-circle-2" style="width: 18px; vertical-align: middle;"></i>
+        Pagamento da taxa confirmado. Aguarde a prefeitura emitir o alvará digital
+        (número oficial e QR Code).
+    </p>
+    {% elif licenca.status == "Pendência Documental" %}
+    <p style="color: #475569; font-size: 0.95rem; margin: 0 0 1rem;">
+        Há pendência documental. Reenvie os anexos rejeitados para a solicitação voltar à análise.
+    </p>
+    {% if licenca.motivo_parecer %}
+    <p style="color: #B42318; font-size: 0.9rem; margin: 0 0 1rem;"><strong>Parecer:</strong> {{ licenca.motivo_parecer }}</p>
+    {% endif %}
+    <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+        <i data-lucide="upload"></i> Reenviar documentos
+    </a>
+    {% elif licenca.status == "Indeferido" %}
+    <p style="color: #475569; font-size: 0.95rem; margin: 0 0 0.75rem;">
+        A solicitação foi indeferida. Consulte o motivo e, se for o caso, revise o cadastro.
+    </p>
+    {% if licenca.motivo_parecer %}
+    <p style="color: #B42318; font-size: 0.95rem; margin: 0;"><strong>Motivo:</strong> {{ licenca.motivo_parecer }}</p>
+    {% endif %}
+    {% elif licenca.status == "Em Análise" %}
+    <p style="color: #475569; font-size: 0.95rem; margin: 0; text-align: center;">
+        Sua solicitação está na fila da prefeitura. O protocolo acima é o comprovante do pedido.
+    </p>
+    {% elif licenca.pode_renovar %}
+    <p style="color: #475569; font-size: 0.95rem; margin: 0 0 1rem; text-align: center;">
+        Esta licença venceu. Abra uma renovação para reentrar na análise com os mesmos dados de ponto e categoria.
+    </p>
+    <form method="post" action="{% url 'ambulante_renovar' licenca.pk %}" style="text-align: center;">
+        {% csrf_token %}
+        <button type="submit" class="btn-submit" style="display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="refresh-cw"></i> Renovar licença
+        </button>
+    </form>
+    {% elif licenca.status == "Ativo" %}
+    <p style="color: #027A48; font-size: 0.95rem; margin: 0 0 1rem; text-align: center;">
+        Licença ativa. Mostre a credencial digital com QR Code ao fiscal.
+    </p>
+    <p style="text-align: center; margin: 0; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'ambulante_credencial' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="id-card"></i> Ver credencial
+        </a>
+        <a href="{% url 'ambulante_credencial_qr' %}?download=1" class="btn-action" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="download"></i> Baixar QR Code
+        </a>
+    </p>
+    {% else %}
+    <p style="color: #475569; font-size: 0.95rem; margin: 0; text-align: center;">
+        Acompanhe o andamento pelo status do protocolo.
+    </p>
+    {% endif %}
+</div>

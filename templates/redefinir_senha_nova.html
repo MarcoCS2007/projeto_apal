@@ -1,0 +1,90 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Nova Senha - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="entrar" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Definir Nova Senha</h1>
+        <p>Escolha uma senha segura para voltar a acessar a plataforma.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card login-wrapper">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Nova Senha de Acesso</h2>
+    </div>
+
+    {% if validlink %}
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="nova-senha">Nova senha</label>
+                <div class="input-password-wrapper">
+                    {{ form.new_password1 }}
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.new_password1.errors %}
+                <div class="login-error" role="alert">{{ form.new_password1.errors.0 }}</div>
+                {% endif %}
+                <ul class="password-requirements" id="password-requirements" aria-live="polite">
+                    <li data-rule="length">Mínimo de 8 caracteres</li>
+                    <li data-rule="letter">Pelo menos uma letra</li>
+                    <li data-rule="number">Pelo menos um número</li>
+                    <li data-rule="not-numeric">Não use senha só com números</li>
+                    <li data-rule="match">As duas senhas coincidem</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="nova-senha-confirmacao">Confirmar nova senha</label>
+                <div class="input-password-wrapper">
+                    {{ form.new_password2 }}
+                    <button type="button" class="btn-toggle-password" title="Mostrar senha" aria-label="Mostrar senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.new_password2.errors %}
+                <div class="login-error" role="alert">{{ form.new_password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                <i data-lucide="key"></i> Salvar Nova Senha
+            </button>
+            <a href="{% url 'entrar' %}" class="forgot-password" style="text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar para o login
+            </a>
+        </div>
+    </form>
+    {% else %}
+    <div class="login-error" role="alert">
+        Este link de redefinição é inválido ou já expirou. Solicite um novo envio.
+    </div>
+    <div class="form-actions" style="flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+        <a href="{% url 'redefinir_senha' %}" class="btn-submit" style="width: 100%; text-align: center; text-decoration: none;">
+            Solicitar novo link
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

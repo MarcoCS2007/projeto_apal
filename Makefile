@@ -3,6 +3,9 @@
 up:
 	docker compose up --build
 
+up-prod:
+	docker compose -f docker-compose.prod.yml --env-file .envs/.env.prod up -d --build
+
 migrate:
 	docker compose exec web python manage.py migrate
 
@@ -17,7 +20,10 @@ precommit:
 		docker compose exec -T web black .; \
 		
 seed:
-	docker compose exec web python manage.py seed
+	docker compose exec web python manage.py seed_inicial
+
+seed_massivo:
+	docker compose exec web python manage.py seed_massivo
 
 test:
 	docker compose exec web pytest

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score do Ambulante - APAL</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho do Ambulante -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <i data-lucide="map-pin" style="color: #2563EB; width: 28px; height: 28px; stroke-width: 2.5px;"></i>
+                    <span class="logo-text" style="font-weight: 800; font-size: 1.65rem; color: #EC4899; letter-spacing: -0.5px;">APAL</span>
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="../index.html"><i data-lucide="home"></i> Início</a>
+                <a href="credencial.html"><i data-lucide="layout-dashboard"></i> Meu Painel</a>
+                <a href="cadastro.html"><i data-lucide="file-text"></i> Novo Cadastro</a>
+                <a href="score.html" class="active"><i data-lucide="award"></i> Meu Score</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Score do Ambulante</h1>
+            <p>Acompanhe sua pontuação em tempo real e descubra quais vantagens você possui na cidade.</p>
+        </div>
+    </section>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-container">
+        
+        <!-- WIDGET PRINCIPAL: PONTUAÇÃO ATUAL DO AMBULANTE -->
+        <div class="form-card" style="margin-bottom: 2rem; border-top: 4px solid #F59E0B; background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">Sua Pontuação Atual</span>
+                    <h2 style="font-size: 2.2rem; font-weight: 800; color: #0F172A; margin-top: 2px; display: flex; align-items: baseline; gap: 6px;">
+                        850 <span style="font-size: 1rem; color: #64748B; font-weight: 600;">/ 1.000 pts</span>
+                    </h2>
+                </div>
+                <div style="background: #FEF3C7; border: 1.5px solid #F59E0B; color: #B45309; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 800; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-lucide="star" style="fill: #F59E0B; color: #F59E0B; width: 20px; height: 20px;"></i> Nível Ouro
+                </div>
+            </div>
+
+            <!-- BARRA DE PROGRESSO -->
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">
+                    <span>Progresso para o Nível Diamante</span>
+                    <span>Faltam 50 pts</span>
+                </div>
+                <div style="width: 100%; height: 14px; background-color: #E2E8F0; border-radius: 999px; overflow: hidden; padding: 2px;">
+                    <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #F59E0B 0%, #1D4ED8 100%); border-radius: 999px; transition: width 0.5s ease;"></div>
+                </div>
+            </div>
+
+            <!-- EXTRATO RÁPIDO DE COMO GANHOU OS PONTOS -->
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.2rem;">
+                <h4 style="font-size: 0.92rem; font-weight: 700; color: #0F172A; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="list-checks" style="color: #2563EB;"></i> De onde vem a sua pontuação:
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; font-size: 0.88rem;">
+                    <div style="display: flex; align-items: center; gap: 8px; color: #166534;">
+                        <i data-lucide="check-circle-2" style="color: #16A34A; width: 18px; height: 18px;"></i>
+                        <span>Alvará e Licença em dia: <strong>+300 pts</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; color: #166534;">
+                        <i data-lucide="check-circle-2" style="color: #16A34A; width: 18px; height: 18px;"></i>
+                        <span>Vistoria Técnica Aprovada: <strong>+250 pts</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; color: #166534;">
+                        <i data-lucide="check-circle-2" style="color: #16A34A; width: 18px; height: 18px;"></i>
+                        <span>Sem advertências de postura: <strong>+200 pts</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; color: #166534;">
+                        <i data-lucide="check-circle-2" style="color: #16A34A; width: 18px; height: 18px;"></i>
+                        <span>Cadastro e Dados Atualizados: <strong>+100 pts</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. O QUE É O SCORE DO AMBULANTE -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #3B82F6;"></div>
+                <h2>O que é o Score do Ambulante?</h2>
+            </div>
+            
+            <p style="font-size: 1rem; line-height: 1.6; color: var(--texto-escuro); margin-bottom: 1rem;">
+                O <strong>Score do Ambulante</strong> é um sistema de avaliação e reconhecimento criado pela Prefeitura Municipal de Vitória da Conquista através do projeto <strong>APAL</strong>. Ele mede o compromisso do comerciante com as normas da cidade, pagamento de taxas, higiene do local e bom relacionamento com fiscais e cidadãos.
+            </p>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--texto-cinza);">
+                Quanto mais alta sua pontuação (de 0 a 1.000 pontos), maior a sua classificação e mais privilégios você conquista, como prioridade na escolha de vagas em grandes festas e feiras da cidade!
+            </p>
+        </div>
+
+        <!-- 2. OS NÍVEIS DO SCORE -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #F59E0B;"></div>
+                <h2>Níveis de Classificação</h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.5rem;">
+                
+                <!-- Nível Bronze -->
+                <div style="background: #FFF8F0; border: 1px solid #FCD34D; padding: 1.2rem; border-radius: 8px; text-align: center;">
+                    <div style="width: 48px; height: 48px; background: #D97706; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem auto; font-size: 1.2rem; font-weight: bold;">
+                        <i data-lucide="shield"></i>
+                    </div>
+                    <h3 style="color: #92400E; margin-bottom: 0.3rem;">Bronze</h3>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #D97706;">0 a 499 PONTOS</span>
+                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.6rem;">Comerciante iniciante ou com pendências cadastrais/taxas a regularizar.</p>
+                </div>
+
+                <!-- Nível Prata -->
+                <div style="background: #F3F4F6; border: 1px solid #D1D5DB; padding: 1.2rem; border-radius: 8px; text-align: center;">
+                    <div style="width: 48px; height: 48px; background: #6B7280; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem auto; font-size: 1.2rem; font-weight: bold;">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h3 style="color: #374151; margin-bottom: 0.3rem;">Prata</h3>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #4B5563;">500 a 749 PONTOS</span>
+                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.6rem;">Cadastro em dia, poucas ou nenhuma advertência no histórico.</p>
+                </div>
+
+                <!-- Nível Ouro -->
+                <div style="background: #FEF3C7; border: 2px solid #F59E0B; padding: 1.2rem; border-radius: 8px; text-align: center; position: relative;">
+                    <span style="position: absolute; top: -10px; right: 10px; background: #F59E0B; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">SEU NÍVEL</span>
+                    <div style="width: 48px; height: 48px; background: #F59E0B; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem auto; font-size: 1.2rem; font-weight: bold;">
+                        <i data-lucide="star"></i>
+                    </div>
+                    <h3 style="color: #B45309; margin-bottom: 0.3rem;">Ouro</h3>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #D97706;">750 a 899 PONTOS</span>
+                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.6rem;">Excelente histórico de pagamentos, ponto limpo e sem infrações.</p>
+                </div>
+
+                <!-- Nível Diamante -->
+                <div style="background: #EFF6FF; border: 1px solid #60A5FA; padding: 1.2rem; border-radius: 8px; text-align: center;">
+                    <div style="width: 48px; height: 48px; background: #2563EB; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem auto; font-size: 1.2rem; font-weight: bold;">
+                        <i data-lucide="gem"></i>
+                    </div>
+                    <h3 style="color: #1E40AF; margin-bottom: 0.3rem;">Diamante</h3>
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #2563EB;">900 a 1.000 PONTOS</span>
+                    <p style="font-size: 0.85rem; color: var(--texto-cinza); margin-top: 0.6rem;">Ambulante modelo! Destaque máximo em organização e atendimento.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. BENEFÍCIOS DO SCORE ALTO -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #10B981;"></div>
+                <h2>Vantagens e Benefícios</h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.2rem;">
+                
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: #D1FAE5; color: #059669; padding: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="calendar-check" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1rem; color: var(--texto-escuro); margin-bottom: 0.3rem;">Prioridade em Eventos da Cidade</h3>
+                        <p style="font-size: 0.88rem; color: var(--texto-cinza); line-height: 1.5;">Escolha antecipada dos melhores pontos no São João, Natal Conquista e Micareta.</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: #D1FAE5; color: #059669; padding: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="badge-check" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1rem; color: var(--texto-escuro); margin-bottom: 0.3rem;">Selo "Ambulante Nota 10"</h3>
+                        <p style="font-size: 0.88rem; color: var(--texto-cinza); line-height: 1.5;">Selo de recomendação exibido no QR Code da sua credencial para o consumidor ver.</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: #D1FAE5; color: #059669; padding: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1rem; color: var(--texto-escuro); margin-bottom: 0.3rem;">Cursos Gratuitos do SEBRAE</h3>
+                        <p style="font-size: 0.88rem; color: var(--texto-cinza); line-height: 1.5;">Vagas exclusivas em treinamentos de gestão, vendas, higiene e manipulação de alimentos.</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: #D1FAE5; color: #059669; padding: 0.8rem; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="coins" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1rem; color: var(--texto-escuro); margin-bottom: 0.3rem;">Facilidade em Microcrédito</h3>
+                        <p style="font-size: 0.88rem; color: var(--texto-cinza); line-height: 1.5;">Encaminhamento prioritário para linhas de crédito de investimento no equipamento.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 4. COMO AUMENTAR O SCORE -->
+        <div class="form-card">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: #8B5CF6;"></div>
+                <h2>Como Aumentar seu Score?</h2>
+            </div>
+
+            <ul style="list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                <li style="display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; color: var(--texto-escuro);">
+                    <i data-lucide="check-circle-2" style="color: #10B981; width: 20px; height: 20px;"></i>
+                    <strong>Pague a taxa do Alvará (DAM) no prazo:</strong> Pagamentos em dia somam pontos mensais.
+                </li>
+                <li style="display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; color: var(--texto-escuro);">
+                    <i data-lucide="check-circle-2" style="color: #10B981; width: 20px; height: 20px;"></i>
+                    <strong>Mantenha a área limpa:</strong> Tenha sempre uma lixeira própria com saco plástico.
+                </li>
+                <li style="display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; color: var(--texto-escuro);">
+                    <i data-lucide="check-circle-2" style="color: #10B981; width: 20px; height: 20px;"></i>
+                    <strong>Evite infrações de postura:</strong> Não obstrua calçadas nem o trânsito de pedestres.
+                </li>
+                <li style="display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; color: var(--texto-escuro);">
+                    <i data-lucide="check-circle-2" style="color: #10B981; width: 20px; height: 20px;"></i>
+                    <strong>Mantenha a credencial visível:</strong> Apresente o QR Code sempre que solicitado pelo fiscal.
+                </li>
+            </ul>
+
+            <div style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.2rem;">
+                <a href="credencial.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                    <i data-lucide="arrow-left"></i> Voltar ao Meu Painel
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- JS GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

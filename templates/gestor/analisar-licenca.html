@@ -1,0 +1,389 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Análise de Requerimento - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "gestor/_nav.html" with active="fila" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Análise de Solicitação de Alvará</h1>
+        <p>Parecer técnico: documentos, metragem, ponto, categoria e encaminhamento.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent"></div>
+            <h2>Protocolo {{ licenca.protocolo }}</h2>
+        </div>
+        {% if licenca.status == "Pendência Documental" %}
+        <span class="badge purple"><i data-lucide="alert-circle"></i> {{ licenca.status }}</span>
+        {% elif licenca.status == "Indeferido" %}
+        <span class="badge danger"><i data-lucide="x-circle"></i> {{ licenca.status }}</span>
+        {% elif licenca.status == "Aprovado" %}
+        <span class="badge success"><i data-lucide="check-circle"></i> Encaminhado para emissão</span>
+        {% else %}
+        <span class="badge warning"><i data-lucide="clock"></i> {{ licenca.status }}</span>
+        {% endif %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; background: var(--fundo-cinza); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">REQUERENTE</label>
+            <p style="font-weight: 600;"><a href="{% url 'gestor_dossie' ambulante.pk %}">{{ ambulante.nome_completo }}</a></p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">CPF</label>
+            <p style="font-weight: 600;">{{ ambulante.cpf_formatado }}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">TIPO DE ESTRUTURA</label>
+            <p style="font-weight: 600;">{% if estrutura %}{{ estrutura.tipo_estrutura }} ({{ estrutura.dimensoes_metragem }} m²){% else %}Não informada{% endif %}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">PONTO PRETENDIDO</label>
+            <p style="font-weight: 600; color: var(--azul-vibrante);">{% if ponto %}{{ ponto.nome_identificacao }} — {{ ponto.status_ocupacao }}{% else %}Não informado{% endif %}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">CATEGORIA</label>
+            <p style="font-weight: 600;">{% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}A definir no parecer{% endif %}</p>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--texto-cinza); font-weight: 700;">ESCALA / HORÁRIO</label>
+            <p style="font-weight: 600;">
+                {% if escalas %}
+                    {% for escala in escalas %}{{ escala.dia_semana }} {{ escala.horario_inicio|time:"H:i" }}–{{ escala.horario_termino|time:"H:i" }}{% if not forloop.last %}; {% endif %}{% endfor %}
+                {% else %}
+                Será definida na emissão do alvará.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #F59E0B;"></div>
+        <h2>Conferência técnica</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+        {% if licenca.categoria_produto %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-weight: 600; color: #92400E; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="alert-triangle"></i> Exige laudo sanitário?
+            </span>
+            {% if licenca.categoria_produto.exige_laudo_sanitario %}
+            <span class="badge warning">SIM (OBRIGATÓRIO)</span>
+            {% else %}
+            <span class="badge success">NÃO</span>
+            {% endif %}
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-weight: 600; color: #92400E; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="flame"></i> Exige laudo dos bombeiros?
+            </span>
+            {% if licenca.categoria_produto.exige_laudo_bombeiros %}
+            <span class="badge warning">SIM (OBRIGATÓRIO)</span>
+            {% else %}
+            <span class="badge success">NÃO</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-weight: 600;">Ponto disponível?</span>
+            {% if ponto_disponivel %}
+            <span class="badge success">Sim / livre para atribuição</span>
+            {% else %}
+            <span class="badge danger">Indisponível</span>
+            {% endif %}
+        </div>
+        {% if alerta_metragem %}
+        <div style="padding: 0.8rem 1rem; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 6px; color: #B42318; font-weight: 600;">
+            {{ alerta_metragem }}
+        </div>
+        {% elif estrutura and ponto %}
+        <div style="padding: 0.8rem 1rem; background: #ECFDF3; border: 1px solid #A7F3D0; border-radius: 6px; color: #027A48; font-weight: 600;">
+            Metragem da estrutura dentro do limite do ponto.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="form-card" style="margin-bottom: 2rem;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+        <h2>Documentos e fotos anexados</h2>
+    </div>
+    <div class="table-responsive table-stack">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DOCUMENTO</th>
+                    <th>ARQUIVO</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if ambulante.foto %}
+                <tr>
+                    <td data-label="Documento"><strong>Foto 3x4 do titular</strong></td>
+                    <td data-label="Arquivo">{{ ambulante.foto.name }}</td>
+                    <td data-label="Status"><span class="badge success">Anexado</span></td>
+                    <td data-label="Ações">
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                <a href="{{ ambulante.foto.url }}" class="doc-abrir-item" download role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{{ ambulante.foto.url }}"
+                                    data-doc-titulo="Foto 3x4 do titular"
+                                    data-doc-tipo="image">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if estrutura and estrutura.foto_estrutura %}
+                <tr>
+                    <td data-label="Documento"><strong>Foto da estrutura</strong></td>
+                    <td data-label="Arquivo">{{ estrutura.foto_estrutura.name }}</td>
+                    <td data-label="Status"><span class="badge success">Anexado</span></td>
+                    <td data-label="Ações">
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                <a href="{{ estrutura.foto_estrutura.url }}" class="doc-abrir-item" download role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{{ estrutura.foto_estrutura.url }}"
+                                    data-doc-titulo="Foto da estrutura"
+                                    data-doc-tipo="image">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
+                    </td>
+                </tr>
+                {% endif %}
+                {% for doc in documentos %}
+                <tr id="analise-doc-{{ doc.pk }}">
+                    <td data-label="Documento"><strong>{{ doc.get_tipo_documento_display }}</strong></td>
+                    <td data-label="Arquivo">{% if doc.arquivo %}{{ doc.arquivo.name }}{% else %}—{% endif %}</td>
+                    <td data-label="Status">
+                        {% if doc.status_aprovacao == "Aprovado" %}
+                        <span class="badge success">{{ doc.status_aprovacao }}</span>
+                        {% elif doc.status_aprovacao == "Rejeitado" %}
+                        <span class="badge danger">{{ doc.status_aprovacao }}</span>
+                        {% else %}
+                        <span class="badge warning">{{ doc.status_aprovacao }}</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Ações">
+                        {% if doc.arquivo %}
+                        <details class="doc-abrir-menu">
+                            <summary class="btn-action doc-abrir-toggle">
+                                <i data-lucide="folder-open"></i> Abrir
+                            </summary>
+                            <div class="doc-abrir-lista" role="menu">
+                                {% if doc.pendente %}
+                                <form action="{% url 'documento_aprovar' doc.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="doc-abrir-item doc-abrir-item-success" role="menuitem">
+                                        <i data-lucide="check-circle-2"></i> Aprovar documento
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <a href="{% url 'documento_arquivo' doc.pk %}?download=1" class="doc-abrir-item" role="menuitem">
+                                    <i data-lucide="download"></i> Baixar
+                                </a>
+                                <button type="button" class="doc-abrir-item" role="menuitem"
+                                    data-doc-fullscreen
+                                    data-doc-url="{% url 'documento_arquivo' doc.pk %}"
+                                    data-doc-titulo="{{ doc.get_tipo_documento_display }}">
+                                    <i data-lucide="maximize-2"></i> Abrir em tela cheia
+                                </button>
+                            </div>
+                        </details>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                    {% if not ambulante.foto %}
+                    <tr>
+                        <td colspan="4">Nenhum documento anexado. A triagem detalhada entra na etapa de documentos.</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-card">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+        <h2>Parecer final da Secretaria</h2>
+    </div>
+
+    {% if not na_fila %}
+    <p style="color: var(--texto-cinza);">Este processo já recebeu parecer ({{ licenca.status }}). {% if licenca.motivo_parecer %}<strong>Registro:</strong> {{ licenca.motivo_parecer }}{% endif %}</p>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        {% if licenca.pode_emitir %}
+        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-submit" style="display: inline-flex; text-decoration: none; background-color: #10B981;">
+            <i data-lucide="badge-check"></i> Emitir alvará e QR Code
+        </a>
+        {% elif licenca.numero_licenca %}
+        <a href="{% url 'gestor_emitir' licenca.pk %}" class="btn-action" style="text-decoration: none;">Ver alvará {{ licenca.numero_licenca }}</a>
+        {% endif %}
+        <a href="{% url 'gestor_fila' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left"></i> Voltar à fila
+        </a>
+    </div>
+    {% else %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="input-group">
+                <label for="{{ form.categoria_produto.id_for_label }}">{{ form.categoria_produto.label }}</label>
+                {{ form.categoria_produto }}
+                {% if form.categoria_produto.errors %}<p class="field-error">{{ form.categoria_produto.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="input-group">
+                <label for="{{ form.ponto_ocupacao.id_for_label }}">{{ form.ponto_ocupacao.label }}</label>
+                {{ form.ponto_ocupacao }}
+                {% if form.ponto_ocupacao.errors %}<p class="field-error">{{ form.ponto_ocupacao.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group full-width">
+                <label for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
+                {{ form.motivo }}
+                {% if form.motivo.errors %}<p class="field-error">{{ form.motivo.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <a href="{% url 'gestor_fila' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i> Voltar à fila
+            </a>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" name="acao" value="pendencia" class="btn-action" style="padding: 0.8rem 1.4rem;">
+                    <i data-lucide="rotate-ccw"></i> Devolver com pendência
+                </button>
+                <button type="submit" name="acao" value="indeferir" class="btn-action" style="color: #DC2626; border-color: #FCA5A5; padding: 0.8rem 1.4rem;" data-confirm="Indeferir este requerimento? O ambulante será notificado e o pedido será encerrado." data-confirm-title="Indeferir requerimento" data-confirm-ok="Indeferir">
+                    <i data-lucide="x-circle"></i> Indeferir
+                </button>
+                <button type="submit" name="acao" value="deferir" class="btn-submit" style="background-color: #10B981; padding: 0.8rem 1.8rem;">
+                    <i data-lucide="check-circle-2"></i> Deferir e encaminhar para emissão
+                </button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<div id="doc-fullscreen-modal" class="doc-fullscreen-modal" hidden aria-hidden="true">
+    <div class="doc-fullscreen-barra">
+        <strong id="doc-fullscreen-titulo">Documento</strong>
+        <button type="button" id="doc-fullscreen-fechar" class="btn-action" aria-label="Fechar tela cheia">
+            <i data-lucide="x"></i> Fechar
+        </button>
+    </div>
+    <div class="doc-fullscreen-corpo" id="doc-fullscreen-corpo"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    document.querySelectorAll(".doc-abrir-menu").forEach(function (menu) {
+        menu.addEventListener("toggle", function () {
+            if (!menu.open) return;
+            document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (outro) {
+                if (outro !== menu) outro.removeAttribute("open");
+            });
+        });
+    });
+
+    document.addEventListener("click", function (event) {
+        document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (menu) {
+            if (!menu.contains(event.target)) menu.removeAttribute("open");
+        });
+    });
+
+    var modal = document.getElementById("doc-fullscreen-modal");
+    var tituloEl = document.getElementById("doc-fullscreen-titulo");
+    var corpo = document.getElementById("doc-fullscreen-corpo");
+    var fechar = document.getElementById("doc-fullscreen-fechar");
+
+    function fecharFullscreen() {
+        if (!modal) return;
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("doc-fullscreen-open");
+        if (corpo) corpo.innerHTML = "";
+    }
+
+    function abrirFullscreen(url, titulo, tipo) {
+        if (!modal || !corpo) return;
+        tituloEl.textContent = titulo || "Documento";
+        corpo.innerHTML = "";
+        var ehImagem = tipo === "image" || /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url);
+        if (ehImagem) {
+            var img = document.createElement("img");
+            img.src = url;
+            img.alt = titulo || "Documento";
+            corpo.appendChild(img);
+        } else {
+            var iframe = document.createElement("iframe");
+            iframe.src = url;
+            iframe.title = titulo || "Documento";
+            corpo.appendChild(iframe);
+        }
+        modal.hidden = false;
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("doc-fullscreen-open");
+        document.querySelectorAll(".doc-abrir-menu[open]").forEach(function (menu) {
+            menu.removeAttribute("open");
+        });
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+            window.lucide.createIcons();
+        }
+    }
+
+    document.querySelectorAll("[data-doc-fullscreen]").forEach(function (botao) {
+        botao.addEventListener("click", function () {
+            abrirFullscreen(
+                botao.getAttribute("data-doc-url"),
+                botao.getAttribute("data-doc-titulo"),
+                botao.getAttribute("data-doc-tipo")
+            );
+        });
+    });
+
+    fechar && fechar.addEventListener("click", fecharFullscreen);
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && modal && !modal.hidden) fecharFullscreen();
+    });
+})();
+</script>
+{% endblock %}

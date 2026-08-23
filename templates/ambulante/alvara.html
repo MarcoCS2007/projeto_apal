@@ -1,0 +1,123 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meu Alvará - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="alvara" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Meu alvará</h1>
+        <p>Acompanhe o protocolo e o status da sua solicitação de alvará.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{% if not licenca %}
+<div class="form-card" style="max-width: 720px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent"></div>
+        <h2>Nenhuma solicitação ainda</h2>
+    </div>
+    <p style="color: var(--texto-cinza);">
+        {% if ambulante.cadastro_completo %}
+            Conclua o envio dos anexos para abrir o requerimento. O protocolo aparece aqui e na fila da prefeitura.
+        {% else %}
+            Complete o cadastro socioeconômico e envie os documentos para gerar um protocolo de licença.
+        {% endif %}
+    </p>
+    <p style="margin-top: 1.5rem;">
+        {% if ambulante.cadastro_completo %}
+        <a href="{% url 'ambulante_cadastro' %}?etapa=6" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="upload"></i> Enviar documentos
+        </a>
+        {% else %}
+        <a href="{% url 'ambulante_cadastro' %}" class="btn-submit" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="clipboard-list"></i> Completar cadastro
+        </a>
+        {% endif %}
+    </p>
+</div>
+{% elif not licenca_aprovada %}
+<div class="form-card" style="padding: 28px; max-width: 720px; margin: 0 auto; text-align: center;">
+    <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Protocolo nº</span>
+    <h2 style="font-size: 1.4rem; font-weight: 700; color: #0F172A; margin: 4px 0 1.25rem 0;">{{ licenca.protocolo }}</h2>
+    <div class="info-callout-box" style="margin: 0 auto; text-align: left;">
+        <p style="margin: 0; color: #475569;">
+            Sua solicitação está em andamento. Acompanhe o protocolo acima; a prefeitura ainda não concluiu a aprovação do alvará.
+        </p>
+    </div>
+</div>
+{% else %}
+<div class="form-card" style="padding: 28px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 20px;">
+        <div>
+            <span style="font-size: 0.85rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Protocolo nº</span>
+            <h2 style="font-size: 1.4rem; font-weight: 700; color: #0F172A; margin: 4px 0 0 0;">{{ licenca.protocolo }}</h2>
+            {% if licenca.numero_licenca %}
+            <p style="margin: 6px 0 0; color: #475569; font-size: 0.9rem;">Alvará {{ licenca.numero_licenca }}</p>
+            {% endif %}
+        </div>
+        {% include "ambulante/_status_badge.html" with licenca=licenca %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;">
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Requerente</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">{{ ambulante.nome_completo }}</span>
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Ponto solicitado</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">
+                {% if licenca.ponto_ocupacao %}
+                    {{ licenca.ponto_ocupacao.nome_identificacao }}
+                    {% if licenca.ponto_ocupacao.bairro %} — {{ licenca.ponto_ocupacao.bairro }}{% endif %}
+                {% else %}
+                    Não informado
+                {% endif %}
+            </span>
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Categoria</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">
+                {% if licenca.categoria_produto %}{{ licenca.categoria_produto.nome_categoria }}{% else %}Não informada{% endif %}
+            </span>
+        </div>
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Tipo de pedido</strong>
+            <span style="font-size: 1rem; color: #0F172A; font-weight: 600;">{{ licenca.tipo_pedido }}</span>
+        </div>
+        {% if licenca.aguardando_taxa or licenca.taxa_paga %}
+        <div>
+            <strong style="display: block; font-size: 0.85rem; color: #64748B;">Valor da taxa (DAM)</strong>
+            <span style="font-size: 1.25rem; color: #2563EB; font-weight: 800;">R$ {{ licenca.valor_taxa|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% include "ambulante/_painel_taxa.html" with licenca=licenca %}
+</div>
+{% endif %}
+{% include "ambulante/_voltar_painel.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous" defer></script>
+<script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+        const csrfToken = document.querySelector("meta[name='csrf-token']");
+        if (csrfToken) {
+            event.detail.headers["X-CSRFToken"] = csrfToken.getAttribute("content");
+        }
+    });
+    document.body.addEventListener("htmx:afterSwap", function () {
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

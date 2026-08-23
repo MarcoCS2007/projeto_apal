@@ -1,0 +1,337 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Meu perfil - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="perfil" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Meu perfil</h1>
+        <p>Visualize seus dados cadastrais e gerencie suas informações de acesso.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card perfil-card">
+    {% if form.errors %}
+    <div id="error-card" class="error-card" style="display: flex;" role="alert">
+        <i data-lucide="alert-octagon"></i>
+        <div>
+            <strong>Não foi possível salvar o perfil.</strong><br>
+            <span id="error-message">{{ form.non_field_errors.0|default:"Corrija os campos destacados. A mensagem de cada campo indica o que ajustar." }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <form id="perfil-form" method="post" enctype="multipart/form-data" novalidate{% if not modo_edicao %} data-perfil-readonly="true"{% endif %}>
+        {% csrf_token %}
+
+        <section class="perfil-secao" aria-labelledby="perfil-foto-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-foto-titulo">Foto 3x4</h2>
+            </div>
+            <div class="perfil-foto">
+                <div class="perfil-foto-preview" id="perfil-foto-preview">
+                    {% if ambulante.foto %}
+                    <img src="{{ ambulante.foto.url }}" alt="Foto 3x4 de {{ ambulante.nome_completo }}" id="perfil-foto-img" width="96" height="128" decoding="async">
+                    {% else %}
+                    <span id="perfil-foto-iniciais" aria-hidden="true">{{ ambulante.iniciais }}</span>
+                    <span class="sr-only">Nenhuma foto 3x4 enviada ainda</span>
+                    {% endif %}
+                </div>
+                {% if modo_edicao %}
+                <div class="input-group perfil-foto-acoes" style="flex: 1; min-width: min(100%, 220px);">
+                    <label for="perfil-foto">Inserir ou atualizar foto</label>
+                    {{ form.foto }}
+                    {% if form.foto.errors %}<div class="login-error">{{ form.foto.errors.0 }}</div>{% endif %}
+                    <p class="field-hint">Use uma foto recente no formato 3x4, em JPEG ou PNG.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="perfil-secao" aria-labelledby="perfil-pessoais-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-pessoais-titulo">Dados pessoais</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group full-width">
+                    <label for="perfil-nome">Nome completo</label>
+                    <input id="perfil-nome" type="text" value="{{ ambulante.nome_completo }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-data-nasc">Data de nascimento</label>
+                    <input id="perfil-data-nasc" type="text" value="{% if ambulante.data_nasc %}{{ ambulante.data_nasc|date:'d/m/Y' }}{% else %}Não informado{% endif %}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-genero">Gênero</label>
+                    <input id="perfil-genero" type="text" value="{{ ambulante.get_genero_display|default:'Não informado' }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-renda">Renda mensal estimada</label>
+                    {% if modo_edicao %}
+                    {{ form.renda_mensal_estimada }}
+                    {% if form.renda_mensal_estimada.errors %}<div class="login-error">{{ form.renda_mensal_estimada.errors.0 }}</div>{% endif %}
+                    {% else %}
+                    <input id="perfil-renda" type="text" value="{% if ambulante.renda_mensal_estimada %}R$ {{ ambulante.renda_mensal_estimada }}{% else %}Não informado{% endif %}" readonly>
+                    {% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="perfil-escolaridade">Escolaridade</label>
+                    <input id="perfil-escolaridade" type="text" value="{{ escolaridade_label|default:'Não informado' }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-telefone">Telefone / WhatsApp{% if modo_edicao %} <span class="required-marker">*</span>{% endif %}</label>
+                    {% if modo_edicao %}
+                    {{ form.telefone_whatsapp }}
+                    {% if form.telefone_whatsapp.errors %}<div class="login-error">{{ form.telefone_whatsapp.errors.0 }}</div>{% endif %}
+                    {% else %}
+                    <input id="perfil-telefone" type="text" value="{{ ambulante.telefone_whatsapp|default:'Não informado' }}" readonly>
+                    {% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="perfil-telefone-2">Telefone secundário</label>
+                    {% if modo_edicao %}
+                    {{ form.telefone_2 }}
+                    {% if form.telefone_2.errors %}<div class="login-error">{{ form.telefone_2.errors.0 }}</div>{% endif %}
+                    {% else %}
+                    <input id="perfil-telefone-2" type="text" value="{{ ambulante.telefone_2|default:'Não informado' }}" readonly>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-rg">RG</label>
+                    <input id="perfil-rg" type="text" value="{{ extras.rg|default:'Não informado' }}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-nis">NIS (CadÚnico)</label>
+                    <input id="perfil-nis" type="text" value="{% if extras.sem_nis %}Não possui NIS{% else %}{{ ambulante.nis|default:'Não informado' }}{% endif %}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-auxiliares">Auxiliares</label>
+                    <input id="perfil-auxiliares" type="text" value="{{ ambulante.num_funcionarios }}" readonly>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1.25rem;">
+                <div class="input-group">
+                    <label for="perfil-email">E-mail <span class="required-marker">*</span></label>
+                    {% if modo_edicao %}
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="login-error">{{ form.email.errors.0 }}</div>{% endif %}
+                    {% else %}
+                    <input id="perfil-email" type="email" value="{{ ambulante.email }}" readonly>
+                    {% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="cpf-cadastro">CPF</label>
+                    <input id="cpf-cadastro" type="text" value="{{ ambulante.cpf_formatado }}" readonly>
+                </div>
+            </div>
+        </section>
+
+        <section class="perfil-secao" aria-labelledby="perfil-endereco-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-endereco-titulo">Endereço residencial</h2>
+            </div>
+
+            {% if modo_edicao %}
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="cep-input">CEP <span class="required-marker">*</span></label>
+                    {{ form.cep }}
+                    {% if form.cep.errors %}<div class="login-error">{{ form.cep.errors.0 }}</div>{% endif %}
+                    <p id="cep-residencial-status" class="field-hint" hidden></p>
+                </div>
+                <div class="input-group" style="flex: 3;">
+                    <label for="endereco-input">Endereço <span class="required-marker">*</span></label>
+                    {{ form.logradouro }}
+                    {% if form.logradouro.errors %}<div class="login-error">{{ form.logradouro.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="numero-input">Número <span class="required-marker">*</span></label>
+                    {{ form.numero }}
+                    {% if form.numero.errors %}<div class="login-error">{{ form.numero.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="complemento-input">Complemento</label>
+                    {{ form.complemento }}
+                </div>
+                <div class="input-group">
+                    <label for="bairro-input">Bairro <span class="required-marker">*</span></label>
+                    {{ form.bairro }}
+                    {% if form.bairro.errors %}<div class="login-error">{{ form.bairro.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="estado-input">Estado (UF) <span class="required-marker">*</span></label>
+                    <select id="estado-input" name="estado_uf" class="styled-select" required data-valor-inicial="{{ form.estado_uf.value|default:'' }}">
+                        <option value="" disabled {% if not form.estado_uf.value %}selected{% endif %}>Selecione o estado...</option>
+                        {% if form.estado_uf.value %}
+                        <option value="{{ form.estado_uf.value }}" selected>{{ form.estado_uf.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.estado_uf.errors %}<div class="login-error">{{ form.estado_uf.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="cidade-input">Cidade <span class="required-marker">*</span></label>
+                    <select id="cidade-input" name="cidade" class="styled-select" required data-valor-inicial="{{ form.cidade.value|default:'' }}">
+                        <option value="" disabled {% if not form.cidade.value %}selected{% endif %}>Selecione a cidade...</option>
+                        {% if form.cidade.value %}
+                        <option value="{{ form.cidade.value }}" selected>{{ form.cidade.value }}</option>
+                        {% endif %}
+                    </select>
+                    {% if form.cidade.errors %}<div class="login-error">{{ form.cidade.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-cep">CEP</label>
+                    <input id="perfil-cep" type="text" value="{{ endereco.cep|default:'Não informado' }}" readonly>
+                </div>
+                <div class="input-group" style="flex: 3;">
+                    <label for="perfil-logradouro">Endereço</label>
+                    <input id="perfil-logradouro" type="text" value="{{ endereco.logradouro|default:'Não informado' }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-numero">Número</label>
+                    <input id="perfil-numero" type="text" value="{{ endereco.numero|default:'Não informado' }}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-complemento">Complemento</label>
+                    <input id="perfil-complemento" type="text" value="{{ endereco.complemento|default:'Não informado' }}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-bairro">Bairro</label>
+                    <input id="perfil-bairro" type="text" value="{{ endereco.bairro|default:'Não informado' }}" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-uf">Estado (UF)</label>
+                    <input id="perfil-uf" type="text" value="{{ endereco.estado_uf|default:'Não informado' }}" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-cidade">Cidade</label>
+                    <input id="perfil-cidade" type="text" value="{{ endereco.cidade|default:'Não informado' }}" readonly>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        {% if modo_edicao %}
+        <section class="perfil-secao" aria-labelledby="perfil-senha-titulo">
+            <div class="section-title">
+                <div class="title-accent"></div>
+                <h2 id="perfil-senha-titulo">Trocar senha</h2>
+            </div>
+            <p class="field-hint" style="margin-top: 0; margin-bottom: 1rem;">
+                Preencha os três campos abaixo apenas se desejar alterar a senha. É obrigatório informar a senha atual.
+            </p>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-senha-atual">Senha atual</label>
+                    {{ form.senha_atual }}
+                    {% if form.senha_atual.errors %}<div class="login-error">{{ form.senha_atual.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="perfil-senha-nova">Nova senha</label>
+                    {{ form.senha_nova }}
+                    {% if form.senha_nova.errors %}<div class="login-error">{{ form.senha_nova.errors.0 }}</div>{% endif %}
+                    <p class="field-hint">Use no mínimo 8 caracteres, misturando letras. Evite senhas só numéricas.</p>
+                </div>
+                <div class="input-group">
+                    <label for="perfil-senha-confirmacao">Confirmar nova senha</label>
+                    {{ form.senha_nova_confirmacao }}
+                    {% if form.senha_nova_confirmacao.errors %}<div class="login-error">{{ form.senha_nova_confirmacao.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if modo_edicao %}
+        <div class="form-actions" style="justify-content: space-between; margin-top: 0.5rem;">
+            <a href="{% url 'ambulante_perfil' %}" class="btn-action">Cancelar</a>
+            <button type="submit" class="btn-submit">Salvar perfil</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<div class="form-actions perfil-acoes-rodape" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem;">
+    <a href="{% url 'ambulante_painel' %}" class="btn-action" style="display: inline-flex; text-decoration: none; align-items: center; gap: 6px;">
+        <i data-lucide="arrow-left"></i> Voltar ao painel
+    </a>
+    {% if not modo_edicao %}
+    <a href="{% url 'ambulante_perfil' %}?editar=1" class="btn-submit btn-primary-pink" style="display: inline-flex; text-decoration: none; align-items: center; gap: 6px;">
+        <i data-lucide="pencil"></i> Editar perfil
+    </a>
+    {% else %}
+    <span aria-hidden="true" style="flex: 0 0 auto; width: 1px; height: 1px;"></span>
+    {% endif %}
+    <form action="{% url 'logout' %}" method="post" style="display: inline; margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; color: #B42318; border-color: #FDA29B;">
+            <i data-lucide="log-out"></i> Sair da conta
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var campoFoto = document.getElementById("perfil-foto");
+        var preview = document.getElementById("perfil-foto-preview");
+        if (campoFoto && preview) {
+            campoFoto.addEventListener("change", function () {
+                var arquivo = campoFoto.files && campoFoto.files[0];
+                if (!arquivo || !arquivo.type.startsWith("image/")) return;
+                var leitor = new FileReader();
+                leitor.onload = function () {
+                    var imagem = document.getElementById("perfil-foto-img");
+                    if (!imagem) {
+                        preview.innerHTML = "";
+                        imagem = document.createElement("img");
+                        imagem.id = "perfil-foto-img";
+                        imagem.width = 96;
+                        imagem.height = 128;
+                        preview.appendChild(imagem);
+                    }
+                    imagem.src = leitor.result;
+                    imagem.alt = "Pré-visualização da foto 3x4";
+                };
+                leitor.readAsDataURL(arquivo);
+            });
+        }
+        {% if form.errors %}
+        if (typeof mostrarToast === "function") {
+            mostrarToast("Não foi possível salvar o perfil. Corrija os campos destacados e tente de novo.", "error");
+        }
+        {% endif %}
+    })();
+</script>
+{% endblock %}

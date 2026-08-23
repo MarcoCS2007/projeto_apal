@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorias de Produtos - APAL</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- LUCIDE ICONS (Biblioteca Oficial) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho Administrativo (Gestor) -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i data-lucide="map-pin" class="logo-icon"></i>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">APAL</a></span>
+            </div>
+            <nav class="header-nav">
+                <a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Painel Central</a>
+                <a href="ambulantes-cadastrados.html"><i data-lucide="users"></i> Ambulantes</a>
+                <a href="gerenciar-categorias.html" class="active"><i data-lucide="tags"></i> Categorias</a>
+                <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- WIDGET FLUTUANTE DE ACESSIBILIDADE -->
+    <div id="access-widget-container" class="access-widget-container">
+        <button id="open-access-float" class="floating-access-btn" title="Ferramentas de Acessibilidade">
+            <span class="access-text">Acessibilidade</span>
+            <i data-lucide="eye-off"></i>
+        </button>
+    </div>
+
+    <!-- PAINEL DE ACESSIBILIDADE -->
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
+        <div class="access-header">
+            <h3>Acessibilidade</h3>
+            <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="access-grid">
+            <button id="btn-aumentar" class="access-option"><i data-lucide="zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-diminuir" class="access-option"><i data-lucide="zoom-out"></i> Diminuir Texto</button>
+            <button id="btn-escuro" class="access-option"><i data-lucide="moon"></i> Contraste Escuro</button>
+            <button id="btn-claro" class="access-option"><i data-lucide="sun"></i> Contraste Claro</button>
+            <button id="btn-ler-texto" class="access-option"><i data-lucide="volume-2"></i> Ouvir Todo o Conteúdo</button>
+            <button id="btn-ler-clique" class="access-option"><i data-lucide="mouse-pointer"></i> Ouvir Trecho ao Clicar</button>
+            <button id="btn-parar-leitura" class="access-option"><i data-lucide="circle-stop"></i> Parar Leitura</button>
+            <button id="btn-simplificar-ia" class="access-option"><i data-lucide="sparkles"></i> Simplificar com IA</button>
+            <button id="btn-significado-ia" class="access-option"><i data-lucide="book-open"></i> Significado de Termos</button>
+            <button id="btn-zoom" class="access-option"><i data-lucide="search"></i> Zoom na Tela</button>
+            <button id="btn-sat-alta" class="access-option"><i data-lucide="palette"></i> Saturação Alta</button>
+            <button id="btn-sat-baixa" class="access-option"><i data-lucide="droplet"></i> Saturação Baixa</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container" style="text-align: center;">
+            <h1>Categorias de Produtos e Exigências Legais</h1>
+            <p>Cadastre ramos de atividade comercial e defina travas automáticas para laudos sanitários e bombeiros.</p>
+        </div>
+    </section>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-container">
+
+        <!-- CARD 1: CADASTRO DE NOVA CATEGORIA -->
+        <div class="form-card" style="margin-bottom: 2rem;">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: var(--azul-vibrante);"></div>
+                <h2>Cadastrar Nova Categoria de Produto</h2>
+            </div>
+
+            <form onsubmit="event.preventDefault(); alert('Categoria cadastrada com sucesso!'); this.reset();">
+                
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="nome-categoria">Nome da Categoria</label>
+                        <input type="text" id="nome-categoria" placeholder="Ex: Alimentação Preparada (Lanches/Refeições)" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="descricao-categoria">Descrição Breve dos Produtos Permitidos</label>
+                        <input type="text" id="descricao-categoria" placeholder="Ex: Venda de acarajé, churrasquinho, pastéis, lanches rápidos e sucos." required>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 1rem; background: var(--fundo-cinza); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--borda-cinza);">
+                    <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                        <strong style="font-size: 0.95rem; color: var(--texto-escuro);">Configuração de Exigências Obrigatórias (Travas de Anexo)</strong>
+                        
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="exige-sanitario" style="width: 18px; height: 18px;">
+                            <span>Exigir <strong>Laudo da Vigilância Sanitária / Carteira de Manipulador</strong> para aprovar alvará</span>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="exige-bombeiros" style="width: 18px; height: 18px;">
+                            <span>Exigir <strong>Laudo de Vistoria do Corpo de Bombeiros</strong> (Gás de Cozinha / Chama Aberta)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn-submit" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="plus-circle"></i> Salvar Categoria
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- CARD 2: LISTA DE CATEGORIAS CADASTRADAS -->
+        <div class="form-card">
+            <div class="section-title">
+                <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+                <h2>Categorias Registradas no Sistema</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>NOME DA CATEGORIA</th>
+                            <th>DESCRIÇÃO</th>
+                            <th style="text-align: center;">LAUDO SANITÁRIO</th>
+                            <th style="text-align: center;">BOMBEIROS</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Alimentos & Bebidas Preparadas</strong></td>
+                            <td>Lanches, pastéis, churrasco, acarajé e refeições rápidas.</td>
+                            <td style="text-align: center;"><span class="badge warning"><i data-lucide="check"></i> Obrigatório</span></td>
+                            <td style="text-align: center;"><span class="badge warning"><i data-lucide="check"></i> Obrigatório</span></td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-action" onclick="alert('Editando categoria...')"><i data-lucide="edit"></i></button>
+                                    <button class="btn-action" onclick="confirm('Excluir esta categoria?') && alert('Excluída.')" style="color: #DC2626;"><i data-lucide="trash-2"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vestuário & Acessórios</strong></td>
+                            <td>Roupas, bijuterias, calçados, bolsas e miudezas.</td>
+                            <td style="text-align: center;"><span class="badge success">Isento</span></td>
+                            <td style="text-align: center;"><span class="badge success">Isento</span></td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-action" onclick="alert('Editando categoria...')"><i data-lucide="edit"></i></button>
+                                    <button class="btn-action" onclick="confirm('Excluir esta categoria?') && alert('Excluída.')" style="color: #DC2626;"><i data-lucide="trash-2"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Artesanato & Utilidades</strong></td>
+                            <td>Peças em madeira, barro, brinquedos e artigos para o lar.</td>
+                            <td style="text-align: center;"><span class="badge success">Isento</span></td>
+                            <td style="text-align: center;"><span class="badge success">Isento</span></td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-action" onclick="alert('Editando categoria...')"><i data-lucide="edit"></i></button>
+                                    <button class="btn-action" onclick="confirm('Excluir esta categoria?') && alert('Excluída.')" style="color: #DC2626;"><i data-lucide="trash-2"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: left;">
+                <a href="dashboard.html" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-lucide="arrow-left"></i> Voltar ao Painel Central
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FUNDO ESCURECIDO PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- JANELA MODAL DA IA -->
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+        <div class="access-header">
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="sparkles"></i> Assistente de Acessibilidade
+            </h3>
+            <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ai-response-content" class="custom-scrollbar">
+            Aguardando seleção...
+        </div>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="footer-pmvc">
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
+    </footer>
+
+    <!-- VLIBRAS -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- SCRIPT GLOBAL DA APLICAÇÃO -->
+    <script src="../js/script.js"></script>
+    
+    <!-- Inicialização dos ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

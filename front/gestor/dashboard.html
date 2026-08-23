@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gestor - Ponto Legal VCA</title>
+    <title>Dashboard Gestor - APAL</title>
     
-    <!-- Fonte Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,40 +12,22 @@
     <!-- LUCIDE ICONS (Biblioteca Oficial) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- CAMINHO CORRIGIDO PARA O CSS -->
+    <!-- CSS GLOBAL -->
     <link rel="stylesheet" href="../css/style.css">
-
-    <!-- Estilos exclusivos para os Cards Clicáveis -->
-    <style>
-        a.stat-card {
-            text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        a.stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-top-color: var(--cor-destaque);
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Cabeçalho Administrativo -->
+    <!-- Cabeçalho Administrativo (Limpo e Organizado) -->
     <header class="top-header">
         <div class="header-container">
             <div class="logo-area">
                 <i data-lucide="map-pin" class="logo-icon"></i>
-                <!-- CAMINHO CORRIGIDO PARA A RAIZ -->
-                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">Ponto Legal <strong>VCA</strong></a></span>
+                <span class="logo-text"><a href="../index.html" style="text-decoration: none; color: inherit;">APAL</a></span>
             </div>
-            <!-- Menu de navegação do Gestor -->
             <nav class="header-nav">
                 <a href="dashboard.html" class="active"><i data-lucide="layout-dashboard"></i> Painel Central</a>
                 <a href="#"><i data-lucide="map"></i> Mapa de Vagas</a>
                 <a href="#"><i data-lucide="wallet"></i> Financeiro</a>
-                <!-- CAMINHO CORRIGIDO PARA A RAIZ (Sair) -->
                 <a href="../index.html" style="color: #DC2626;"><i data-lucide="log-out"></i> Sair</a>
             </nav>
         </div>
@@ -61,7 +42,7 @@
     </div>
 
     <!-- PAINEL DE ACESSIBILIDADE -->
-    <div id="accessibility-panel" class="access-panel hidden">
+    <div id="accessibility-panel" class="access-panel custom-scrollbar hidden">
         <div class="access-header">
             <h3>Acessibilidade</h3>
             <button id="close-access" class="close-btn"><i data-lucide="x"></i></button>
@@ -82,7 +63,7 @@
         </div>
     </div>
 
-    <!-- Faixa Azul (Hero Section) -->
+    <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-container" style="text-align: center;">
             <h1>Visão Geral do Município</h1>
@@ -92,8 +73,16 @@
 
     <!-- Área Principal do Dashboard -->
     <main class="main-container">
+
+        <!-- 1. ALERTAS INTELIGENTES (Aparecem no topo da área útil para prioridade de leitura) -->
+        <div class="info-callout-box" style="background-color: #FEF3C7; border-left-color: #D97706; margin-bottom: 2rem;">
+            <p style="color: #92400E; display: flex; align-items: center; gap: 0.6rem;">
+                <i data-lucide="alert-triangle" style="width: 20px !important; height: 20px !important; color: #D97706;"></i>
+                <strong>Smart Alert:</strong> A Praça 9 de Novembro atingiu 90% da capacidade de vagas na Categoria A. Existem 15 licenças vencendo nos próximos 30 dias.
+            </p>
+        </div>
         
-        <!-- Grid de Estatísticas Rápidas (Mesma pasta 'gestor', links mantidos) -->
+        <!-- 2. GRID DE ESTATÍSTICAS RÁPIDAS -->
         <div class="stats-grid">
             <a href="ambulantes-cadastrados.html" class="stat-card">
                 <div class="stat-icon"><i data-lucide="users"></i></div>
@@ -125,13 +114,23 @@
             </a>
         </div>
 
-        <!-- Tabela de Solicitações -->
+        <!-- 3. PAINEL PRINCIPAL DE GESTÃO -->
         <div class="form-card" style="margin-top: 2rem;">
-            <div class="section-title">
-                <div class="title-accent"></div>
-                <h2>Licenças Aguardando Validação</h2>
+            
+            <!-- Título da Seção Integrado com a Ação Principal (Layout Flexível) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div class="section-title" style="margin-bottom: 0;">
+                    <div class="title-accent"></div>
+                    <h2>Licenças Aguardando Validação</h2>
+                </div>
+
+                <!-- Botão de Ação Direta alinhado ao Título da Tabela -->
+                <a href="emitir-alvara.html" class="btn-submit" style="background-color: #10B981; text-decoration: none; padding: 0.7rem 1.2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-lucide="plus-circle"></i> Emitir Licença Direta
+                </a>
             </div>
 
+            <!-- Tabela de Dados -->
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
@@ -150,48 +149,63 @@
                             <td>João da Silva</td>
                             <td>Alimentação</td>
                             <td>Fixo</td>
-                            <td><span class="badge warning">Em Análise</span></td>
-                            <td><button class="btn-action">Avaliar</button></td>
+                            <td><span class="badge warning"><i data-lucide="clock"></i> Em Análise</span></td>
+                            <td>
+                                <button class="btn-action" onclick="window.location.href='em-analise.html'">
+                                    <i data-lucide="eye"></i> Avaliar
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>555.666.777-88</td>
                             <td>Maria Oliveira</td>
                             <td>Vestuário</td>
                             <td>Temporário</td>
-                            <td><span class="badge success">Aprovada</span></td>
-                            <!-- Botão "Emitir Alvará" (mesma pasta 'gestor') -->
-                            <td><button class="btn-action" onclick="window.location.href='emitir-alvara.html'">Emitir Alvará</button></td>
+                            <td><span class="badge success"><i data-lucide="check-circle"></i> Aprovada</span></td>
+                            <td>
+                                <button class="btn-action" onclick="window.location.href='emitir-alvara.html'">
+                                    <i data-lucide="file-check"></i> Emitir Alvará
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>999.888.777-66</td>
                             <td>Carlos Santos</td>
                             <td>Eletrônicos</td>
                             <td>Móvel</td>
-                            <td><span class="badge danger">Pendente</span></td>
-                            <td><button class="btn-action">Avaliar</button></td>
+                            <td><span class="badge danger"><i data-lucide="alert-circle"></i> Pendente</span></td>
+                            <td>
+                                <button class="btn-action" onclick="window.location.href='em-analise.html'">
+                                    <i data-lucide="eye"></i> Avaliar
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
         </div>
     </main>
 
+    <!-- FUNDO ESCURECIDO (OVERLAY) PARA O MODAL DA IA -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
     <!-- JANELA MODAL DA IA -->
-    <div id="ai-modal" class="access-panel hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
+    <div id="ai-modal" class="access-panel custom-scrollbar hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; position: fixed;">
         <div class="access-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">
                 <i data-lucide="sparkles"></i> Assistente de Acessibilidade
             </h3>
             <button id="close-ai-modal" class="close-btn"><i data-lucide="x"></i></button>
         </div>
-        <div id="ai-response-content" style="padding: 1rem 0; font-size: 0.95rem; line-height: 1.6; color: var(--texto-escuro); max-height: 350px; overflow-y: auto;">
+        <div id="ai-response-content" class="custom-scrollbar">
             Aguardando seleção...
         </div>
     </div>
 
-    <!-- Rodapé -->
+    <!-- RODAPÉ INSTITUCIONAL -->
     <footer class="footer-pmvc">
-        <p>Prefeitura Municipal de Vitória da Conquista</p>
+        <p>Prefeitura Municipal de Vitória da Conquista &bull; <span class="footer-highlight">APAL - Aqui Pode, Aqui é Legal</span></p>
     </footer>
 
     <!-- VLIBRAS -->
@@ -206,7 +220,7 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
     
-    <!-- CAMINHO CORRIGIDO PARA O JS -->
+    <!-- JS GLOBAL DA APLICAÇÃO -->
     <script src="../js/script.js"></script>
     
     <!-- Inicialização dos ícones do Lucide -->

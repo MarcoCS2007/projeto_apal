@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Credencial digital - Ponto Certo Conquista{% endblock %}
+
+{% block header_nav %}
+{% include "publico/_nav.html" with active="credencial" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Credencial digital</h1>
+        <p>Gerencie suas licenças, acompanhe solicitações e acesse sua credencial digital oficial.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{% if qr_liberado %}
+<div class="form-card">
+{% else %}
+<div class="form-card" style="max-width: 720px; margin: 0 auto;">
+{% endif %}
+    {% include "ambulante/_credencial_conteudo.html" %}
+</div>
+{% include "ambulante/_voltar_painel.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById("btn-imprimir-cred")?.addEventListener("click", function () {
+        window.print();
+    });
+</script>
+{% endblock %}

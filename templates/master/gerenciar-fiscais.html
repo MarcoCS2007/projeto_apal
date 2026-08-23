@@ -1,0 +1,92 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Fiscais de Campo - Ponto Certo Conquista{% endblock %}
+
+{% block header_extra_class %} header-master{% endblock %}
+
+{% block header_nav %}
+{% include "master/_nav.html" with active="fiscais" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section" style="background-color: var(--texto-escuro);">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Gestão de Fiscais de Campo</h1>
+        <p>Consulte, edite dados, resete senhas e controle o acesso dos agentes cadastrados.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div class="section-title" style="margin: 0;">
+            <div class="title-accent" style="background-color: var(--texto-escuro);"></div>
+            <h2>Fiscais Cadastrados ({{ total_fiscais }})</h2>
+        </div>
+        <a href="{% url 'master_cadastrar_fiscal' %}" class="btn-submit" style="background-color: #10B981; text-decoration: none; padding: 0.7rem 1.2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="user-plus" aria-hidden="true"></i> Cadastrar Novo Fiscal
+        </a>
+    </div>
+
+    <form method="get" class="form-row" style="margin-bottom: 1.5rem;" role="search">
+        <div class="input-group full-width">
+            <label for="search-fiscal">Pesquisar Fiscal Cadastrado</label>
+            <input type="search" id="search-fiscal" name="q" value="{{ busca }}" placeholder="Digite o nome, matrícula ou CPF do agente...">
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <caption class="sr-only">Lista de fiscais cadastrados</caption>
+            <thead>
+                <tr>
+                    <th>MATRÍCULA</th>
+                    <th>NOME COMPLETO</th>
+                    <th>CPF</th>
+                    <th>ZONA DE ATUAÇÃO</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES DA TI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fiscal in fiscais %}
+                <tr>
+                    <td><strong>{{ fiscal.matricula_funcional }}</strong></td>
+                    <td>{{ fiscal.nome }} {{ fiscal.sobrenome }}</td>
+                    <td>{{ fiscal.cpf_mascarado }}</td>
+                    <td>{{ fiscal.zona_atuacao_primaria }}</td>
+                    <td>
+                        {% if fiscal.ativo %}
+                        <span class="badge success"><i data-lucide="check-circle" aria-hidden="true"></i> Ativo</span>
+                        {% else %}
+                        <span class="badge danger"><i data-lucide="lock" aria-hidden="true"></i> Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="btn-action" title="Editar cadastro (em breve)">
+                                <i data-lucide="edit" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn-action" title="Resetar senha (em breve)">
+                                <i data-lucide="key" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum fiscal cadastrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: left;">
+        <a href="{% url 'master_admin' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar ao Painel da TI
+        </a>
+    </div>
+</div>
+{% endblock %}

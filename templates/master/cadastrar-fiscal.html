@@ -1,0 +1,95 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Cadastrar Fiscal - Ponto Certo Conquista{% endblock %}
+
+{% block header_extra_class %} header-master{% endblock %}
+
+{% block header_nav %}
+{% include "master/_nav.html" with active="fiscais" %}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-section" style="background-color: var(--texto-escuro);">
+    <div class="hero-container" style="text-align: center;">
+        <h1>Cadastro de Fiscal de Rua</h1>
+        <p>Preencha os dados oficiais para emitir as credenciais de acesso do novo agente de fiscalização.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="section-title">
+        <div class="title-accent" style="background-color: #10B981;"></div>
+        <h2>Dados do Novo Agente</h2>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-error" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="fiscal-nome">Nome Completo do Agente</label>
+                {{ form.nome_completo }}
+                {% if form.nome_completo.errors %}
+                <div class="login-error" role="alert">{{ form.nome_completo.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="input-group">
+                <label for="fiscal-matricula">Número da Matrícula</label>
+                {{ form.matricula_funcional }}
+                {% if form.matricula_funcional.errors %}
+                <div class="login-error" role="alert">{{ form.matricula_funcional.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="fiscal-cpf">CPF do Agente</label>
+                {{ form.cpf }}
+                {% if form.cpf.errors %}
+                <div class="login-error" role="alert">{{ form.cpf.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="input-group">
+                <label for="fiscal-email">E-mail Institucional</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="login-error" role="alert">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label for="fiscal-zona">Zona / Setor de Atuação Principal</label>
+                {{ form.zona_atuacao_primaria }}
+                {% if form.zona_atuacao_primaria.errors %}
+                <div class="login-error" role="alert">{{ form.zona_atuacao_primaria.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="input-group">
+                <label for="fiscal-senha">Senha Provisória</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="login-error" role="alert">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 2rem; border-top: 1px solid var(--borda-cinza); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <a href="{% url 'master_fiscais' %}" class="forgot-password" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left" aria-hidden="true"></i> Cancelar e Voltar
+            </a>
+            <button type="submit" class="btn-submit" style="background-color: #10B981; display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="user-check" aria-hidden="true"></i> Cadastrar Agente
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
