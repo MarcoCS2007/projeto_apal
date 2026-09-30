@@ -1,4 +1,5 @@
-# Sistema APAL - Aqui pode, aqui é legal
+# PONTO CERTO CONQUISTA (HACKATON - DEMO)
+Versão de demonstração (funcional) utilizada no evento
 
 Sistema para modernizar o processo de licenciamento e gestão de trabalhadores ambulantes, garantindo organização urbana, controle legal e acesso a oportunidades de forma digna e transparente;
 
